@@ -6,6 +6,6 @@
   "scripts": {
     "start": "node serve.mjs",
     "sync": "node tools/sync.mjs",
-    "test": "node --test test/logic.test.mjs"
+    "test": "node --test test/*.test.mjs"
   }
 }

@@ -23,21 +23,60 @@ button.primary { background: var(--amber); color: #0f172a; border-color: var(--a
 .tile small { color: var(--sub); } .tile.on small { color: #e0f2fe; }
 aside { display: flex; flex-direction: column; gap: 12px; }
 aside label { display: flex; flex-direction: column; gap: 6px; color: var(--sub); }
-input[type=number] { font: inherit; width: 110px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--edge); background: #0f172a; color: var(--text); }
+.body-inputs { display: flex; gap: 12px; flex-wrap: wrap; }
+.body-inputs label span { display: flex; align-items: center; gap: 6px; color: var(--text); }
+.body-note { font-size: 12px; }
+input[type=number] { font: inherit; width: 90px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--edge); background: #0f172a; color: var(--text); }
 .file input { font-size: 13px; }
 .sel { margin: 0; color: var(--sub); } .sel b { color: var(--text); }
 #start { font-size: 20px; padding: 14px; }
-#vrslot { position: relative; min-height: 48px; }
-#vrslot #vr { position: static !important; width: 100% !important; left: auto !important; bottom: auto !important; }
 .help { font-size: 13px; color: var(--sub); margin: 0; line-height: 1.6; }
 .hud { position: fixed; left: 16px; top: 16px; z-index: 4; display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border-radius: 12px; background: rgba(11, 18, 32, 0.6); }
 .hud span { font-size: 13px; color: var(--sub); }
 .bar { left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 12px; padding: 12px 16px; border-radius: 16px; background: rgba(11, 18, 32, 0.9); border: 1px solid var(--edge); width: max-content; max-width: calc(100vw - 24px); }
 .chip { background: var(--coral); color: #0f172a; font-weight: 800; letter-spacing: 3px; border-radius: 999px; padding: 4px 10px; font-size: 12px; }
 .time { color: var(--accent); min-width: 130px; }
+.views { display: inline-flex; border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; }
+.views button { border: 0; border-radius: 0; background: transparent; padding: 8px 12px; }
+.views button.on { background: var(--accent); color: #0f172a; font-weight: 700; }
+.replay-hint { flex-basis: 100%; font-size: 13px; color: var(--sub); text-align: center; }
 #rlines p { margin: 6px 0; line-height: 1.5; }
 .verdict { background: rgba(255, 107, 94, 0.15); border-left: 4px solid var(--coral); padding: 10px 12px; border-radius: 8px; }
 .buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 #flash { position: fixed; inset: 0; z-index: 3; pointer-events: none; background: #ff1a1a; opacity: 0; transition: opacity 0.6s; }
 #flash.on { opacity: 0.55; transition: opacity 0.05s; }
 #fps { position: fixed; right: 10px; bottom: 8px; z-index: 4; font-size: 12px; color: var(--sub); }
+
+/* phones and tablets (body.touch is set from the main pointer, not the screen size) */
+body:not(.touch) .touch-only, body.touch .desktop-only { display: none !important; }
+#view canvas { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+button { touch-action: manipulation; }
+.hud button { margin-top: 6px; align-self: flex-start; padding: 8px 12px; font-size: 14px; pointer-events: auto; }
+.touch-controls { position: fixed; left: 0; bottom: 0; z-index: 4; padding: 0 0 max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); pointer-events: none; }
+.stick { width: 136px; height: 136px; border-radius: 50%; background: rgba(11, 18, 32, 0.35); border: 2px solid rgba(241, 245, 249, 0.55);
+  display: grid; place-items: center; pointer-events: auto; touch-action: none; }
+.knob { width: 58px; height: 58px; border-radius: 50%; background: rgba(241, 245, 249, 0.85); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35); pointer-events: none; }
+.hud { padding-top: max(10px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); }
+.card { max-height: calc(100dvh - 24px); }
+@media (max-width: 700px), (max-height: 520px) {
+  .card { padding: 14px 16px; border-radius: 14px; width: calc(100vw - 16px); max-height: calc(100dvh - 16px); }
+  h1 { font-size: 20px; } h1 span { display: block; font-size: 16px; }
+  header p { margin-bottom: 10px; font-size: 13px; }
+  h2 { font-size: 20px; }
+  .columns { gap: 12px; }
+  .scenarios { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+  .tile { padding: 8px 10px; font-size: 14px; }
+  #start { font-size: 18px; padding: 12px; }
+  .hud { top: 8px; padding: 8px 10px; } .hud b { font-size: 14px; } .hud span { display: none; }
+  .bar { bottom: max(10px, env(safe-area-inset-bottom)); padding: 8px 10px; gap: 6px 8px; font-size: 14px; }
+  .time { min-width: 0; } .views { display: inline-flex; border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; }
+.views button { border: 0; border-radius: 0; background: transparent; padding: 8px 12px; }
+.views button.on { background: var(--accent); color: #0f172a; font-weight: 700; }
+.replay-hint { display: none; }
+  .buttons { flex-wrap: wrap; } .buttons button { flex: 1 1 140px; }
+  #rlines p { font-size: 14px; margin: 4px 0; }
+  .stick { width: 120px; height: 120px; } .knob { width: 50px; height: 50px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .columns { grid-template-columns: 1fr 220px; }
+}

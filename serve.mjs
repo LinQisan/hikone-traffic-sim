@@ -1,6 +1,6 @@
 // Static server for the web port (no dependencies): node serve.mjs [--port 8770] [--host 127.0.0.1]
-// WebXR needs a secure context: http://localhost is one. For a Quest on USB:
-//   adb reverse tcp:8770 tcp:8770   then open http://localhost:8770 in the Quest browser.
+// For a phone or tablet on the same network: node serve.mjs --host 0.0.0.0, then open
+// http://<this computer's IP>:8770 on the device.
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';

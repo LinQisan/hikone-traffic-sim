@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
 <title>Hikone Traffic Simulator</title>
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
@@ -17,29 +18,42 @@
 <section id="title" class="overlay card" hidden>
   <header>
     <h1>Hikone Traffic Simulator <span>彦根交通安全シミュレーター</span></h1>
-    <p>彦根・京橋 ・ 歩行者の交通安全体験（ブラウザ版）</p>
+    <p>彦根・京橋 ・ 歩行と自転車の交通安全体験（ブラウザ版）</p>
   </header>
   <div class="columns">
     <div id="scenarios" class="scenarios"></div>
     <aside>
-      <label>身長 / Height <input id="height" type="number" min="90" max="210" step="5" value="170"> cm</label>
+      <div class="body-inputs">
+        <label>身長 / Height <span><input id="height" type="number" min="90" max="210" step="1" value="170" inputmode="numeric"> cm</span></label>
+        <label>体重 / Weight <span><input id="weight" type="number" min="15" max="150" step="1" value="60" inputmode="numeric"> kg</span></label>
+      </div>
+      <p class="sel body-note">身長は目の高さとリプレイの小熊の背丈、体重は小熊の体つきに反映されます。</p>
       <label class="file">カスタム場面（JSON）を開く <input id="file" type="file" accept=".json,application/json"></label>
       <p class="sel">選択中：<b id="selected"></b></p>
       <button id="start" class="primary">開始 / Start</button>
-      <div id="vrslot"></div>
-      <p class="help">クリックで視点操作（マウス）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し<br>
-        VR：Quest のブラウザで「ENTER VR」・左スティックで移動</p>
+      <p class="help desktop-only">クリックで視点操作（マウス）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し</p>
+      <p class="help touch-only">左下のスティックで移動 ・ 画面をドラッグして見回す ・ 横向きがおすすめ</p>
     </aside>
   </div>
 </section>
 
-<div id="hud" class="hud" hidden><b id="hudname"></b><span>クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span></div>
+<div id="hud" class="hud" hidden><b id="hudname"></b><span id="hudhelp">クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span>
+  <button id="hudretry" class="touch-only">やり直し / Restart</button></div>
+
+<div id="touch" class="touch-controls" hidden>
+  <div class="stick" aria-label="移動スティック"><div class="knob"></div></div>
+</div>
 
 <section id="replayui" class="overlay bar" hidden>
-  <span class="chip">REPLAY</span><b>事故のリプレイ / Accident replay</b>
+  <span class="chip">REPLAY</span><b id="replayname">事故のリプレイ / Accident replay</b>
   <span id="rtime" class="time"></span>
+  <span class="views" role="group" aria-label="視点 / View">
+    <button id="viewover" class="on" aria-pressed="true">俯瞰 / Overview</button>
+    <button id="viewdriver" aria-pressed="false">運転者 / Driver (V)</button>
+  </span>
   <button id="again">もう一度再生 / Replay (B)</button>
   <button id="next" class="primary">スキップ / Skip</button>
+  <span id="rhint" class="replay-hint" aria-live="polite"></span>
 </section>
 
 <section id="results" class="overlay card narrow" hidden>

@@ -10,7 +10,8 @@ world coordinates to three.js as (-x, y, z) and negates yaw, which keeps models 
 consistent (src/coords.js).
 
 Besides the project's models this adds web-only ones: a Japanese sedan (the Unity car prefabs use
-a third-party model that is not redistributed here) and the two traffic signal types.
+a third-party model that is not redistributed here). The traffic signals are not models: the
+Unity exporter writes their scene meshes into scene.json (signalMeshes).
 """
 import math
 import os
@@ -82,30 +83,7 @@ def sedan():
     return b.finish()
 
 
-def signal(kind):
-    """Japanese traffic signal head on its pole: 'car' (horizontal, 3 lamps, 4.7 m) or 'pedestrian'
-    (vertical, 2 panels, 3.0 m). Origin at the head; the pole goes down to the ground; faces +z."""
-    name = "WEB_Signal_" + kind.capitalize()
-    clear_asset(name)
-    b = MB(name)
-    if kind == "car":
-        b.box((0, 0, 0), (1.2, 0.36, 0.26), "HK_Metal", bottom=True)
-        # seen from the front: blue (go) on the left, red on the right (the glTF export mirrors x)
-        for i, m in enumerate(("HK_SignRed", "HK_SignYellow", "HK_SignBlue")):
-            b.box((-0.38 + i * 0.38, 0, 0.135), (0.26, 0.26, 0.02), m)
-            b.box((-0.38 + i * 0.38, 0.14, 0.2), (0.3, 0.03, 0.14), "HK_Metal")
-        b.box((0.75, -0.02, -0.1), (0.35, 0.06, 0.06), "HK_Metal")
-        b.box((0.9, -2.35, -0.1), (0.14, 4.7, 0.14), "HK_Metal")
-    else:
-        b.box((0, 0, 0), (0.34, 0.66, 0.2), "HK_Metal", bottom=True)
-        b.box((0, 0.16, 0.105), (0.26, 0.26, 0.02), "HK_SignRed")
-        b.box((0, -0.16, 0.105), (0.26, 0.26, 0.02), "HK_SignBlue")
-        b.box((0, -1.6, -0.18), (0.12, 3.2, 0.12), "HK_Metal")
-    return b.finish()
-
-
 hk_assets.export = export_glb
 hk_assets.build_all()
-for ob in (sedan(), signal("car"), signal("pedestrian")):
-    export_glb(ob)
+export_glb(sedan())
 print("WEB_EXPORTED", len(written), " ".join(sorted(written)))

@@ -1,7 +1,6 @@
 // VRLearn web port: title → walk/ride the scenario → contact (flash, freeze) → replay → feedback,
-// or goal → success feedback. Desktop (pointer lock + WASD) or WebXR (Quest browser).
+// or goal → success feedback. Desktop browsers (pointer lock + WASD) and phones/tablets (touch stick + drag).
 import * as THREE from 'three';
-import { VRButton } from 'three/addons/webxr/VRButton.js';
 import * as S from './shared/scenario.js';
 import { toThree, yawToThree } from './coords.js';
 import { buildMaterials, buildEnvironment, buildLight, model } from './world.js';
@@ -12,61 +11,83 @@ import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, successV
   SECONDS_BEFORE_IMPACT, SECONDS_AFTER_IMPACT, BUFFER_SECONDS } from './analysis.js';
 import { instance, BODY_MODEL, paintFor } from './vehicles.js';
 import { Replay } from './replay.js';
-import { Panel } from './panel.js';
+import { painted, paint, PaintRenderer } from './style.js';
+import { buildSignals } from './signals.js';
+import { propReview } from './prop-review.js';
+import { replayReviewFrames } from './replay-review.js';
+import { PerformanceProbe } from './performance.js';
+import { TouchControls, isTouchDevice } from './touch-controls.js';
+import { AdaptiveResolution } from './resolution.js';
 
 const $ = id => document.getElementById(id);
 const json = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
 const status = text => { $('loading').textContent = text; };
 
 // ---------------------------------------------------------------- set-up
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
+// Dual-GPU laptops otherwise render on the integrated GPU (about half the frame rate here).
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+const params = new URLSearchParams(location.search);
+const nativeQuality = params.get('quality') === 'high';
+// Desktop resolution follows the GPU (resolution.js); fixed for measurements and quality=high.
+const resolution = new AdaptiveResolution({ enabled: !nativeQuality && !params.has('benchmark') });
+const sizeRenderer = () => {
+  // A Retina/4K desktop otherwise spends most of its time on invisible subpixel detail.
+  const ratio = nativeQuality ? Math.min(devicePixelRatio, 2)
+    : Math.min(devicePixelRatio, 1.25, Math.sqrt(1_600_000 / (innerWidth * innerHeight))) * resolution.scale;
+  renderer.setPixelRatio(ratio);
+  renderer.setSize(innerWidth, innerHeight);
+};
+sizeRenderer();
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 renderer.toneMapping = THREE.NeutralToneMapping;
-renderer.xr.enabled = true;
-renderer.xr.setReferenceSpaceType('local-floor');
+renderer.toneMappingExposure = 1.08;
 $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.08, 2500);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.08, 500);
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight);
+  sizeRenderer();
 });
 
 status('データを読み込んでいます…');
-const [sceneData, layout, map, roadTiles, scenarioIndex] = await Promise.all([
-  json('data/scene.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json')]);
+const [sceneData, signalData, layout, map, roadTiles, scenarioIndex] = await Promise.all([
+  json('data/scene.json'), json('data/signals.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json')]);
 const ground = new Ground(roadTiles);
 const materials = buildMaterials(sceneData.materials);
 const light = buildLight(scene, renderer, sceneData.light);
 status('街を組み立てています…');
 const env = await buildEnvironment(scene, layout, materials);
-const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium', 'WEB_Signal_Car', 'WEB_Signal_Pedestrian'];
-await Promise.all(vehicleModels.map(model));
+const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium'];
+await Promise.all(vehicleModels.map(name => model(name)));
 
-// fixed scene objects: traffic signals and the black walls that hide where cars appear
-for (const s of sceneData.signals) {
-  const signal = instance(s.kind === 'car' ? 'WEB_Signal_Car' : 'WEB_Signal_Pedestrian', materials);
-  signal.position.copy(toThree(s.x, s.y, s.z));
-  signal.rotation.y = yawToThree(s.yaw);
-  scene.add(signal);
-}
+// New closed signal models retain the source's installation matrices.
+const signals = await buildSignals(scene, signalData, materials);
+const occluders = new THREE.Group();
+scene.add(occluders);
 for (const w of sceneData.blackWalls) {
-  const wall = new THREE.Mesh(new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05)), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05)), painted(new THREE.MeshStandardMaterial({ color: 0x7a8599, roughness: 1 })));
   wall.position.copy(toThree(w.x, w.y, w.z));
   wall.rotation.y = yawToThree(w.yaw);
-  scene.add(wall);
+  occluders.add(wall);
 }
 
 const player = new Player(camera, renderer, map, ground);
 scene.add(player.rig);
+scene.add(player.bicycle.root);
 const replay = new Replay(scene, materials, ground);
-const panel = new Panel();
-scene.add(panel.mesh);
 const flash = $('flash');
+const touchDevice = isTouchDevice();
+document.body.classList.toggle('touch', touchDevice);
+const touch = new TouchControls(player, renderer.domElement, $('touch'));
+// P compares the mesh's baked paint with/without the fine bristle and coloured-light finish.
+// The sculpted shapes, pigments and relief strokes remain visible in both modes.
+const artRenderer = new PaintRenderer(renderer);
+const setPainted = on => { paint.strength.value = on ? 1 : 0; };
+addEventListener('keydown', e => {
+  if (e.code === 'KeyP' && !e.target.closest?.('input, textarea')) setPainted(!paint.strength.value);
+});
 
 // ---------------------------------------------------------------- title
 let selected = scenarioIndex.find(e => e.template) ?? scenarioIndex[0];
@@ -100,10 +121,6 @@ $('file').onchange = async ev => {
   } catch (e) { alert('読み込めません：\n' + e.message); }
 };
 $('start').onclick = () => start();
-const vr = VRButton.createButton(renderer);
-vr.id = 'vr';
-$('vrslot').append(vr);
-renderer.xr.addEventListener('sessionstart', () => { if (state === 'title') start(); else { panel.placeInFront(camera); } });
 renderTitle();
 $('loading').hidden = true;
 $('title').hidden = false;
@@ -118,10 +135,16 @@ async function start(again = false) {
   else if (customScenario) { scenario = customScenario; entry = { template: false, id: customScenario.id }; }
   else { entry = selected; scenario = S.normalize(await json('data/scenarios/' + selected.file)); }
   cleanup();
-  const heightCm = Number($('height').value) || 170;
+  const clampInput = (id, min, max, fallback) => {
+    const v = Math.round(Number($(id).value));
+    const value = Number.isFinite(v) && v > 0 ? Math.max(min, Math.min(max, v)) : fallback;
+    $(id).value = value;
+    return value;
+  };
+  const heightCm = clampInput('height', 90, 210, 170), weightKg = clampInput('weight', 15, 150, 60);
   const builtIn = entry.template ? Number(entry.id.replace('builtin-', '')) - 1 : -1;
   run = {
-    scenario, entry, heightCm, time: 0,
+    scenario, entry, heightCm, weightKg, time: 0,
     traffic: new Traffic(scenario, { seed: (Date.now() & 0xffffff) + 1, builtInMix: !!entry.template }),
     recorder: new Recorder(), cars: new Map(), parked: new THREE.Group(), impact: null,
   };
@@ -134,32 +157,37 @@ async function start(again = false) {
   }
   scene.add(run.parked);
   const sp = scenario.spawn, gl = scenario.goal;
-  player.place(sp.x, sp.z, yawTo(sp.x, sp.z, gl.x, gl.z), heightCm);
+  player.place(sp.x, sp.z, yawTo(sp.x, sp.z, gl.x, gl.z), heightCm, scenario.playerMode, weightKg);
   player.enabled = true;
   state = 'playing';
   $('title').hidden = true; $('results').hidden = true; $('replayui').hidden = true;
   $('hud').hidden = false;
   $('hudname').textContent = (entry.template ? entry.id.replace('builtin-', '') + ' ' : '') + scenario.name;
-  panel.mesh.visible = false;
+  const bike = scenario.playerMode === 'bicycle';
+  $('hudhelp').textContent = touchDevice
+    ? (bike ? 'スティック：上でこぐ・下でブレーキ・左右でハンドル ・ ドラッグで見回す' : 'スティックで移動 ・ ドラッグで見回す')
+    : (bike ? 'W こぐ ・ S ブレーキ ・ A / D ハンドル ・ マウスで見回す ・ R でやり直し' : 'クリックで視点操作 ・ WASD で移動 ・ R でやり直し');
+  touch.setActive(touchDevice);
 }
 
 function cleanup() {
   replay.stop();
+  player.bicycle.root.visible = false;
+  light.invalidate();
   if (!run) return;
   for (const mesh of run.cars.values()) scene.remove(mesh);
   scene.remove(run.parked);
 }
 
 function toTitle() {
+  touch.setActive(false);
   cleanup();
   run = null;
   state = 'title';
   player.enabled = false;
   document.exitPointerLock?.();
   $('hud').hidden = true; $('results').hidden = true; $('replayui').hidden = true;
-  panel.mesh.visible = false;
   $('title').hidden = false;
-  if (renderer.xr.isPresenting) renderer.xr.getSession().end();
 }
 
 function syncCars() {
@@ -184,10 +212,13 @@ function onImpact(car) {
   player.enabled = false;
   document.exitPointerLock?.();
   state = 'impact';
-  run.impactUntil = run.time + 1.2;
+  // the view falls with the body; the replay starts once the recording covers 1.6 s after contact
+  player.knockDown(car.yaw);
+  touch.setActive(false);
+  $('hud').hidden = true;
+  run.impactUntil = run.time + SECONDS_AFTER_IMPACT;
   flash.classList.add('on');
-  for (const source of renderer.xr.getSession()?.inputSources ?? [])
-    source.gamepad?.hapticActuators?.[0]?.pulse?.(1, 400);
+  navigator.vibrate?.(300);
 }
 
 function beginReplay() {
@@ -196,15 +227,21 @@ function beginReplay() {
   run.recorder.stop();
   run.frames = run.recorder.window(t - SECONDS_BEFORE_IMPACT, t + SECONDS_AFTER_IMPACT, t);
   for (const mesh of run.cars.values()) mesh.visible = false;
-  replay.start(run.frames, t, run.impact.car.id, run.heightCm);
+  player.bicycle.root.visible = false;
+  replay.start(run.frames, t, run.impact.car.id, run.heightCm, run.scenario.playerMode, run.weightKg);
+  light.invalidate();
   state = 'replay';
   $('hud').hidden = true;
   $('replayui').hidden = false;
-  if (renderer.xr.isPresenting) { panel.placeInFront(camera); panel.mesh.visible = true; }
+  $('replayname').textContent = run.scenario.playerMode === 'bicycle'
+    ? '自転車のリプレイ / Bicycle replay' : '事故のリプレイ / Accident replay';
 }
 
 function showResults(success) {
+  touch.setActive(false);
   replay.stop();
+  player.bicycle.root.visible = false;
+  light.invalidate();
   state = 'results';
   $('replayui').hidden = true; $('hud').hidden = true;
   const s = run.scenario, bicycle = S.MODE_LABELS[s.playerMode] === '自転車' || s.playerMode === 'bicycle';
@@ -237,46 +274,42 @@ function showResults(success) {
   $('rlines').replaceChildren(...lines.map(l => Object.assign(document.createElement('p'), { textContent: l })));
   $('rverdict').textContent = verdict;
   $('results').hidden = false;
-  if (renderer.xr.isPresenting) {
-    panel.placeInFront(camera);
-    panel.draw({ title, lines: [...lines, verdict], hint: 'B / Y：もう一度体験　　A / X・トリガー：タイトルへ', accent: success ? '#4ade80' : '#ff6b5e' });
-    panel.mesh.visible = true;
-  }
 }
 
 $('next').onclick = () => { if (state === 'replay') showResults(false); };
 $('again').onclick = () => { if (state === 'replay') replay.restart(); };
+// replay viewpoint: from above, or through the windscreen of the car (the driver's view)
+function setReplayView(view) {
+  replay.setView(view);
+  for (const [id, v] of [['viewover', 'overview'], ['viewdriver', 'driver']]) {
+    $(id).classList.toggle('on', replay.view === v);
+    $(id).setAttribute('aria-pressed', String(replay.view === v));
+  }
+}
+$('viewover').onclick = () => setReplayView('overview');
+$('viewdriver').onclick = () => setReplayView('driver');
 $('retry').onclick = () => start(true);
+$('hudretry').onclick = () => { if (state === 'playing') start(true); };
 $('totitle').onclick = () => toTitle();
 addEventListener('keydown', e => {
-  if (state === 'replay' && (e.code === 'Enter' || e.code === 'Space')) showResults(false);
-  else if (state === 'replay' && e.code === 'KeyB') replay.restart();
+  if (e.repeat) return;
+  // Advancing the replay requires explicitly activating its Next/Skip button.
+  if (state === 'replay' && e.code === 'KeyB') replay.restart();
+  else if (state === 'replay' && e.code === 'KeyV') setReplayView(replay.view === 'driver' ? 'overview' : 'driver');
   else if (state === 'results' && e.code === 'KeyR') start(true);
   else if (state === 'results' && e.code === 'Enter') toTitle();
   else if (state === 'playing' && e.code === 'KeyR') start(true);      // operator abort: restart
 });
 
-// XR buttons: A/X (4) and the trigger = primary, B/Y (5) = secondary
-const pressed = new Set();
-function xrButtons() {
-  for (const source of renderer.xr.getSession()?.inputSources ?? []) {
-    const b = source.gamepad?.buttons ?? [];
-    for (const [i, action] of [[0, 'primary'], [4, 'primary'], [5, 'secondary']]) {
-      const key = source.handedness + i, down = !!b[i]?.pressed;
-      if (down && !pressed.has(key)) {
-        pressed.add(key);
-        if (state === 'replay') action === 'primary' ? showResults(false) : replay.restart();
-        else if (state === 'results') action === 'primary' ? toTitle() : start(true);
-      } else if (!down) pressed.delete(key);
-    }
-  }
-}
-
 // ---------------------------------------------------------------- loop
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
+timer.connect(document);
+const probe = new PerformanceProbe($('fps'), renderer, new URLSearchParams(location.search).has('benchmark'),
+  { geometryBytes: env.geometryBytes, placements: env.objects, meshes: env.root.children.length });
+const lightPosition = new THREE.Vector3();
+let debugCamera = null;
 let fpsTime = 0, fpsFrames = 0;
 function tick(dt) {
-  if (renderer.xr.isPresenting) xrButtons();
   if (state === 'playing') {
     run.time += dt;
     player.update(dt);
@@ -290,38 +323,101 @@ function tick(dt) {
     else if (S.pointInArea([player.x, player.z], s.goal)) { player.enabled = false; document.exitPointerLock?.(); showResults(true); }
   } else if (state === 'impact') {
     run.time += dt;
+    // a short red flash at contact, then it fades (CSS) so the fall itself stays visible
+    if (run.time - run.impact.time > 0.2) flash.classList.remove('on');
     player.update(dt);
     run.recorder.capture(run.time, player.head(), run.traffic.cars);
     if (run.time >= run.impactUntil) beginReplay();
   } else if (state === 'replay') {
     const label = replay.update(dt);
-    $('rtime').textContent = label;
-    $('next').textContent = replay.atEnd ? '結果へ進む / Next' : 'スキップ / Skip';
-    if (renderer.xr.isPresenting) {
-      replay.render(renderer);
-      panel.draw({ title: '事故のリプレイ / Accident replay', image: replay.target.texture, lines: [label],
-        hint: replay.atEnd ? 'A / X・トリガー：結果へ進む　　B / Y：もう一度再生' : 'A / X・トリガー：スキップ　　B / Y：もう一度再生' });
-    }
+    if ($('rtime').textContent !== label) $('rtime').textContent = label;
+    const next = replay.atEnd ? '結果へ進む / Next' : 'スキップ / Skip';
+    if ($('next').textContent !== next) $('next').textContent = next;
+    const hint = replay.atEnd ? '再生終了。Next をクリックして結果へ進んでください。'
+      : '最後まで再生して停止します。スキップをクリックすると結果へ進みます。';
+    if ($('rhint').textContent !== hint) $('rhint').textContent = hint;
   } else if (state !== 'results') {
     player.update(dt);
   }
 }
 
 renderer.setAnimationLoop(() => {
-  const dt = Math.min(clock.getDelta(), 0.1);
+  timer.update();
+  const elapsed = timer.getDelta();
+  const dt = Math.min(elapsed, 0.1);
+  // Resize before drawing: a canvas resized after its frame is drawn shows one blank frame.
+  if (resolution.frame(elapsed, performance.now(), document.hidden)) sizeRenderer();
+  const updateStart = performance.now();
   tick(dt);
-  light.follow(toThree(player.x, 0, player.z));
-  const view = state === 'replay' && !renderer.xr.isPresenting ? replay.camera : camera;
-  if (view === replay.camera) { replay.camera.aspect = innerWidth / innerHeight; replay.camera.updateProjectionMatrix(); }
-  renderer.render(scene, view);
-  fpsFrames++; fpsTime += dt;
-  if (fpsTime > 1) { $('fps').textContent = `${Math.round(fpsFrames / fpsTime)} fps ・ ${renderer.info.render.calls} draw calls`; fpsTime = 0; fpsFrames = 0; }
+  if (debugCamera) lightPosition.copy(debugCamera.position).setY(0);
+  else if (state === 'replay') lightPosition.copy(replay.focus).setY(0);
+  else lightPosition.set(-player.x, 0, player.z);
+  const moving = state === 'playing' && (run.cars.size > 0 || player.mode === 'bicycle' && player.speed > 0)
+    || state === 'replay' && !replay.atEnd;
+  light.follow(lightPosition, moving, updateStart);
+  const view = debugCamera ?? (state === 'replay' ? replay.activeCamera : camera);
+  if (env.updateLOD(view, null, light.shadowCamera)) light.invalidate();
+  if (debugCamera) { debugCamera.aspect = innerWidth / innerHeight; debugCamera.updateProjectionMatrix(); }
+  if (view === replay.activeCamera && view.aspect !== innerWidth / innerHeight) { view.aspect = innerWidth / innerHeight; view.updateProjectionMatrix(); }
+  const updateMs = performance.now() - updateStart;
+  artRenderer.render(scene, view);
+  probe.frame(elapsed, updateMs);
+  fpsFrames++; fpsTime += elapsed;
+  if (fpsTime > 1) { $('fps').textContent = `${Math.round(fpsFrames / fpsTime)} fps ・ ${artRenderer.calls} draw calls ・ ${Math.round(resolution.scale * 100)}%`; fpsTime = 0; fpsFrames = 0; }
 });
 // debugging and tests
 window.vrlearn = {
-  scene, camera, renderer, player, env, ground, start, toTitle,
+  scene, camera, renderer, player, env, signals, ground, start, toTitle, resolution, replay,
   select(id) { selected = scenarioIndex.find(e => e.id === id) ?? selected; customScenario = null; renderTitle(); },
   get run() { return run; }, get state() { return state; },
+  setPainted,
+  /** Contact with the nearest car now (checking the fall and the replay without driving into one). */
+  knock() {
+    if (state !== 'playing') return;
+    const near = [...run.traffic.cars].sort((a, b) => Math.hypot(a.x - player.x, a.z - player.z) - Math.hypot(b.x - player.x, b.z - player.z))[0];
+    if (near) onImpact(near);
+  },
+  /** Look from (x, y, z) at (tx, ty, tz) in Unity coordinates (comparisons with Unity screenshots); null to stop. */
+  debugView(x, y, z, tx, ty, tz, fov = 60) {
+    if (x == null) { debugCamera = null; return; }
+    debugCamera ??= new THREE.PerspectiveCamera(fov, innerWidth / innerHeight, 0.1, 500);
+    debugCamera.fov = fov;
+    debugCamera.position.copy(toThree(x, y, z));
+    debugCamera.lookAt(toThree(tx, ty, tz));
+    light.follow(toThree(x, 0, z));
+    for (const id of ['title', 'hud', 'results', 'replayui']) $(id).hidden = true;
+  },
   /** Advance the game by `seconds` at a fixed step (tests; works while the tab is in the background). */
   simulate(seconds, step = 1 / 60) { for (let t = 0; t < seconds; t += step) tick(step); },
 };
+
+// Repeatable art-review viewpoints, separate from scenario spawns and recordings.
+const review = new URLSearchParams(location.search);
+const reviewViews = {
+  street: [55, 2.15, 23, 0, 2.8, 27, 62],
+  architecture: [51.7, 2.4, 29, 51.7, 4.0, 14, 55],
+  foliage: [38, 2.0, 36, 26, 5.0, 46, 65],
+  bridge: [32, 2.0, 37, 32, 3.0, 65, 62],
+};
+const propCamera = propReview(review.get('view'), scene, materials);
+if (propCamera) {
+  env.root.visible = signals.root.visible = occluders.visible = false;
+  window.vrlearn.debugView(...propCamera);
+} else if (reviewViews[review.get('view')]) window.vrlearn.debugView(...reviewViews[review.get('view')]);
+if (review.get('finish') === 'off') setPainted(false);
+if (review.get('view') === 'ride') {
+  selected = scenarioIndex.find(e => e.id === 'builtin-07');
+  await start();
+  player.pitch = -12; player.apply();
+}
+if (['replay', 'replay-bicycle'].includes(review.get('view'))) {
+  // Exercise the real recording/replay flow and its controls, using an inspection recording.
+  const bicycle = review.get('view') === 'replay-bicycle';
+  if (bicycle) selected = scenarioIndex.find(e => e.id === 'builtin-07');
+  await start();
+  const demo = replayReviewFrames(bicycle);
+  for (const frame of demo.frames) run.recorder.capture(frame.t, frame.head, frame.cars);
+  run.time = demo.impact;
+  onImpact({ ...demo.car, currentSpeed: 4.5 });
+  beginReplay();
+}

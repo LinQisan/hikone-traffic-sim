@@ -1,8 +1,10 @@
-// The Hikone Kyobashi environment: the same layout and models as the Unity scene, instanced, with
-// the Unity materials, light and fog (data/scene.json from Tools/VRLearn/Web/Export Scene For Web).
+// The impressionist Hikone mesh set, instanced at the experiment's original placements.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placement } from './coords.js';
+import { LIGHT, painted, paintedSky, PigmentPalette } from './style.js';
+import { environmentInstances } from './environment-instances.js';
+import { packPigments } from './geometry-budget.js';
 
 const NO_SHADOW = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)/;
 const loader = new GLTFLoader();
@@ -10,18 +12,23 @@ const models = new Map();
 const loaded = new Map();
 
 /** The parts (geometry, material, local matrix) of a model, loaded once. */
-export async function model(name) {
-  if (!models.has(name)) {
-    models.set(name, loader.loadAsync(`data/models/${name}.glb`).then(gltf => {
+export async function model(name, detail = 'high', { packed = true } = {}) {
+  const key = name + '/' + detail + '/' + packed;
+  if (!models.has(key)) {
+    models.set(key, loader.loadAsync(`data/models/impressionist/${name}${detail === 'low' ? '.lod' : ''}.glb`).then(gltf => {
       gltf.scene.updateMatrixWorld(true);
       const parts = [];
-      gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: o.geometry, material: o.material, matrix: o.matrixWorld.clone() }); });
-      loaded.set(name, parts);
+      gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: packed ? packPigments(o.geometry) : o.geometry,
+        material: o.material, matrix: o.matrixWorld.clone() }); });
+      if (detail === 'high') loaded.set(name, parts);
       return parts;
     }));
   }
-  return models.get(name);
+  return models.get(key);
 }
+
+/** Registers parts for a model name without loading a file (tests run without a browser). */
+export function registerModel(name, parts) { loaded.set(name, parts); }
 
 /** Parts of a model already loaded with model() (for objects created during the run). */
 export function loadedModel(name) {
@@ -31,110 +38,114 @@ export function loadedModel(name) {
 }
 
 export function buildMaterials(specs) {
-  const textureLoader = new THREE.TextureLoader();
-  const textures = new Map();
-  const texture = (name, tile, color) => {
-    const key = name + '@' + tile;
-    if (!textures.has(key)) {
-      const t = textureLoader.load(`data/textures/${name}.png`);
-      t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      t.repeat.set(1 / tile, 1 / tile);       // model UVs are in metres
-      t.colorSpace = color ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-      t.anisotropy = 4;
-      textures.set(key, t);
-    }
-    return textures.get(key);
-  };
   const map = new Map();
   for (const s of specs) {
-    const color = new THREE.Color().setRGB(s.color[0], s.color[1], s.color[2], THREE.SRGBColorSpace);
-    const m = new THREE.MeshStandardMaterial({
-      name: s.name, color, roughness: 1 - s.smoothness, metalness: s.metallic,
-      map: s.texture ? texture(s.texture, s.tileMeters, true) : null,
-      normalMap: s.normalMap ? texture(s.normalMap, s.normalTileMeters, false) : null,
-    });
-    if (s.emissive) { m.emissive = color.clone(); m.emissiveIntensity = 0.7; }
-    if (s.name === 'HK_Glass') { m.roughness = 0.08; m.metalness = 0.3; }
+    // The pigment is baked into COLOR_0, including the separate relief strokes.
+    // Original photographic/regular-tile textures would hide this mesh painting.
+    const m = painted(new THREE.MeshLambertMaterial({
+      name: s.name, color: 0xffffff, vertexColors: true,
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1,
+    }));
+    if (s.emissive) { m.emissive.setRGB(...s.color, THREE.SRGBColorSpace); m.emissiveIntensity = 0.4; }
     map.set(s.name, m);
   }
   return map;
 }
 
-export const material = (materials, m) => (m && materials.get(m.name)) || m;
+export function material(materials, m) {
+  const shared = m && materials.get(m.name);
+  if (shared) return shared;
+  if (m?.userData.hkPainted === true) return m;
+  if (m && !m.userData.hkPainted) {
+    const simple = painted(new THREE.MeshLambertMaterial({ name: m.name, color: m.color,
+      vertexColors: m.vertexColors, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity,
+      side: m.side, transparent: m.transparent, opacity: m.opacity }));
+    simple.userData.hkPainted = true;
+    m.userData.hkPainted = simple;
+  }
+  return m?.userData.hkPainted || m;
+}
 
-/** Instanced environment from layout.json items { a: asset, p: [x, y, z], r: yaw, s: scale }. */
+/**
+ * The city from layout.json items { a: asset, p: [x, y, z], r: yaw, s: scale }: one shared pigment
+ * material, one InstancedMesh per asset and detail level (environment-instances.js).
+ */
 export async function buildEnvironment(scene, layout, materials) {
   const byAsset = new Map();
   for (const item of layout.items) {
     if (!byAsset.has(item.a)) byAsset.set(item.a, []);
     byAsset.get(item.a).push(item);
   }
-  const root = new THREE.Group();
-  root.name = 'HikoneEnvironment';
-  const m = new THREE.Matrix4();
-  let drawCalls = 0;
-  await Promise.all([...byAsset.entries()].map(async ([asset, items]) => {
-    let parts;
-    try { parts = await model(asset); } catch (e) { console.warn('missing model', asset, e); return; }
-    for (const part of parts) {
-      const mesh = new THREE.InstancedMesh(part.geometry, material(materials, part.material), items.length);
-      items.forEach((it, i) => {
-        placement(it.p[0], it.p[1], it.p[2], it.r, it.s, m).multiply(part.matrix);
-        mesh.setMatrixAt(i, m);
-      });
-      mesh.instanceMatrix.needsUpdate = true;
-      mesh.computeBoundingSphere();
-      mesh.castShadow = !NO_SHADOW.test(asset);
-      mesh.receiveShadow = true;
-      mesh.name = asset;
-      root.add(mesh);
-      drawCalls++;
-    }
+  // scene.json's pigments (and their emissive light) win over the GLB's own material
+  const resolve = parts => parts.map(part => ({ ...part, material: material(materials, part.material) }));
+  const definitions = await Promise.all([...byAsset].map(async ([asset, items]) => {
+    // unpacked: environment-instances re-packs while merging
+    const [high, low] = await Promise.all([model(asset, 'high', { packed: false }), model(asset, 'low', { packed: false })]);
+    return { asset, items, high: resolve(high), low: resolve(low) };
   }));
-  scene.add(root);
-  return { root, drawCalls, assets: byAsset.size };
+  const palette = new PigmentPalette();
+  const env = environmentInstances(definitions, palette, asset => !NO_SHADOW.test(asset), m => m.side);
+  scene.add(env.root);
+  return Object.assign(env, { palette, assetCount: byAsset.size, style: 'mesh-pigment-impasto' });
 }
 
-/** Sky dome, image-based light from it, sun with a shadow box that follows the participant, fog. */
+/** Bake the painted sky once; diffuse light and cached shadows follow the participant. */
 export function buildLight(scene, renderer, light) {
-  const horizon = new THREE.Color().setRGB(...light.fogColor, THREE.SRGBColorSpace);
-  const zenith = new THREE.Color().setRGB(0.3, 0.52, 0.86, THREE.SRGBColorSpace);
-  const sky = new THREE.Mesh(new THREE.SphereGeometry(1500, 32, 16), new THREE.ShaderMaterial({
-    side: THREE.BackSide, depthWrite: false, fog: false,
-    uniforms: { horizon: { value: horizon }, zenith: { value: zenith } },
-    vertexShader: 'varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-    fragmentShader: 'uniform vec3 horizon; uniform vec3 zenith; varying vec3 vDir;\nvoid main(){ float t = pow(clamp(vDir.y,0.0,1.0),0.55); gl_FragColor = vec4(mix(horizon, zenith, t),1.0);\n#include <colorspace_fragment>\n}',
-  }));
+  const rgb = c => new THREE.Color().setRGB(...c, THREE.SRGBColorSpace);
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(1500, 32, 16), paintedSky());
   sky.name = 'Sky';
   sky.renderOrder = -1;
-  scene.add(sky);
-
   const envScene = new THREE.Scene();
-  envScene.add(sky.clone());
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(envScene, 0.04).texture;
-  scene.environmentIntensity = 0.55;
+  envScene.add(sky);
+  const skyTarget = new THREE.WebGLCubeRenderTarget(512, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
+  new THREE.CubeCamera(1, 1700, skyTarget).update(renderer, envScene);
+  scene.background = skyTarget.texture;
+  sky.geometry.dispose(); sky.material.dispose();
 
-  scene.add(new THREE.HemisphereLight(
-    new THREE.Color().setRGB(...light.ambientSky, THREE.SRGBColorSpace),
-    new THREE.Color().setRGB(...light.ambientGround, THREE.SRGBColorSpace), 1.0));
-  const sun = new THREE.DirectionalLight(new THREE.Color().setRGB(...light.color, THREE.SRGBColorSpace), 2.4 * light.intensity);
+  scene.add(new THREE.HemisphereLight(rgb(LIGHT.sky), rgb(LIGHT.ground), LIGHT.hemisphere));
+  const sun = new THREE.DirectionalLight(rgb(LIGHT.sunColor), LIGHT.sunIntensity * light.intensity);
   // Unity's light travels along its forward; three's points from position to target (x mirrored)
   const d = new THREE.Vector3(light.direction[0], -light.direction[1], -light.direction[2]).normalize();
   sun.userData.offset = d.multiplyScalar(80);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.autoUpdate = false;
+  sun.shadow.needsUpdate = true;
   Object.assign(sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 220 });
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.03;
   scene.add(sun, sun.target);
-  scene.fog = new THREE.Fog(horizon, light.fogStart, light.fogEnd);
+  scene.fog = new THREE.Fog(rgb(LIGHT.fog), LIGHT.fogStart, LIGHT.fogEnd);
+  const followed = new THREE.Vector3(Infinity, Infinity, Infinity);
+  const RECENTER = 4, texel = (sun.shadow.camera.right - sun.shadow.camera.left) / sun.shadow.mapSize.x;
+  const lightZ = sun.userData.offset.clone().normalize();
+  const lightX = new THREE.Vector3(0, 1, 0).cross(lightZ).normalize(), lightY = lightZ.clone().cross(lightX);
+  let lastShadow = -Infinity;
   return {
     sky, sun,
-    follow(position) {
-      sky.position.copy(position);
-      sun.target.position.copy(position);
-      sun.position.copy(position).add(sun.userData.offset);
+    /** The shadow camera as it stands (env culling keeps every caster inside it). */
+    get shadowCamera() { return sun.shadow.camera; },
+    invalidate() { sun.shadow.needsUpdate = true; },
+    /**
+     * Centres the shadow box on the participant. The centre moves in whole shadow-map texels of the
+     * light's own axes (the basis three's lookAt gives the shadow camera), so re-centring never
+     * shifts shadow edges by a fraction of a texel (that showed as shimmering while walking).
+     */
+    follow(position, moving = false, now = 0) {
+      const moved = followed.distanceToSquared(position) > RECENTER * RECENTER;
+      if (moved) {
+        followed.copy(position);
+        const a = Math.round(position.dot(lightX) / texel) * texel, b = Math.round(position.dot(lightY) / texel) * texel;
+        const c = position.dot(lightZ);
+        sun.target.position.copy(lightX).multiplyScalar(a).addScaledVector(lightY, b).addScaledVector(lightZ, c);
+        sun.position.copy(sun.target.position).add(sun.userData.offset);
+        sun.updateMatrixWorld(); sun.target.updateMatrixWorld();
+        sun.shadow.updateMatrices(sun);
+      }
+      if (moved || (moving && now - lastShadow > 50)) {
+        sun.shadow.needsUpdate = true;
+        lastShadow = now;
+      }
     }
   };
 }

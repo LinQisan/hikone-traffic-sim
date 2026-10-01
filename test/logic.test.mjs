@@ -20,8 +20,10 @@ test('the exported data is complete', () => {
   const layout = data('layout.json');
   const missing = [...new Set(layout.items.map(i => i.a))].filter(a => !fs.existsSync(path.join(root, 'data', 'models', a + '.glb')));
   assert.deepEqual(missing, [], 'every layout asset has a .glb');
-  for (const m of ['WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium', 'WEB_Signal_Car', 'WEB_Signal_Pedestrian'])
+  for (const m of ['WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium'])
     assert.ok(fs.existsSync(path.join(root, 'data', 'models', m + '.glb')), m);
+  const signals = data('signals.json');
+  assert.ok(signals.parts.length > 0 && signals.parts.every(p => signals.meshes[p.mesh] && p.matrix.length === 16), 'signal meshes');
   assert.equal(data('scenarios/index.json').filter(e => e.template).length, 10);
 });
 
