@@ -25,7 +25,8 @@ const status = text => { $('loading').textContent = text; };
 
 // ---------------------------------------------------------------- set-up
 // Dual-GPU laptops otherwise render on the integrated GPU (about half the frame rate here).
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+// Phones: no multisampling (dense screens, painted edges; it costs much of a mobile GPU's bandwidth).
+const renderer = new THREE.WebGLRenderer({ antialias: !isTouchDevice(), powerPreference: 'high-performance' });
 const params = new URLSearchParams(location.search);
 const nativeQuality = params.get('quality') === 'high';
 // Desktop resolution follows the GPU (resolution.js); fixed for measurements and quality=high.
@@ -158,6 +159,7 @@ async function start(again = false) {
   scene.add(run.parked);
   const sp = scenario.spawn, gl = scenario.goal;
   player.place(sp.x, sp.z, yawTo(sp.x, sp.z, gl.x, gl.z), heightCm, scenario.playerMode, weightKg);
+  run.lastX = sp.x; run.lastZ = sp.z;
   player.enabled = true;
   state = 'playing';
   $('title').hidden = true; $('results').hidden = true; $('replayui').hidden = true;
@@ -315,7 +317,10 @@ function tick(dt) {
     player.update(dt);
     const s = run.scenario;
     if (S.hasTrigger(s) && run.traffic.triggerTime == null && S.pointInArea([player.x, player.z], s.trigger)) run.traffic.trigger();
-    run.traffic.step(dt);
+    // the participant's position and velocity time the event's accident car (traffic.js "meet")
+    const vx = (player.x - run.lastX) / dt, vz = (player.z - run.lastZ) / dt;
+    run.lastX = player.x; run.lastZ = player.z;
+    run.traffic.step(dt, { x: player.x, z: player.z, vx, vz });
     syncCars();
     run.recorder.capture(run.time, player.head(), run.traffic.cars);
     const hit = run.traffic.hit(player.x, player.z);
@@ -323,6 +328,8 @@ function tick(dt) {
     else if (S.pointInArea([player.x, player.z], s.goal)) { player.enabled = false; document.exitPointerLock?.(); showResults(true); }
   } else if (state === 'impact') {
     run.time += dt;
+    run.traffic.step(dt);                      // only a car that does not stop (noStop) still moves
+    syncCars();
     // a short red flash at contact, then it fades (CSS) so the fall itself stays visible
     if (run.time - run.impact.time > 0.2) flash.classList.remove('on');
     player.update(dt);

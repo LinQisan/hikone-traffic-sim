@@ -34,8 +34,11 @@ for (const f of fs.readdirSync(path.join(root, textures)).filter(f => f.endsWith
 const scenarioDir = path.join(data, 'scenarios');
 fs.rmSync(scenarioDir, { recursive: true, force: true });
 const list = [];
+// built-in events: the web's own tuned versions (./events) replace the Unity templates — vehicle
+// spawns, routes and timing are re-designed for the browser (tools/check_events.mjs checks them)
 const add = (rel, template) => {
-  const text = fs.readFileSync(path.join(root, 'Scenarios', rel), 'utf8');
+  const own = template && path.join(web, 'events', path.basename(rel));
+  const text = own && fs.existsSync(own) ? fs.readFileSync(own, 'utf8') : fs.readFileSync(path.join(root, 'Scenarios', rel), 'utf8');
   const s = JSON.parse(text);
   if (s.format !== 'vrlearn-scenario') return;
   const file = path.basename(rel);

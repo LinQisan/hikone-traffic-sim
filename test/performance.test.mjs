@@ -145,7 +145,7 @@ test('cached shadows still update for moving cars, camera motion and scene chang
   shadow.needsUpdate = false;
   light.follow(position, true, 1010);
   assert.equal(shadow.needsUpdate, false, 'shadow refresh is capped independently of head tracking');
-  light.follow(position, true, 1060);
+  light.follow(position, true, 1090);
   assert.equal(shadow.needsUpdate, true);
   shadow.needsUpdate = false;
   light.follow(new THREE.Vector3(1, 0, 0), false, 1100);

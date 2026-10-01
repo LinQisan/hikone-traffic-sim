@@ -13,6 +13,9 @@ import { placement } from './coords.js';
 export const LOD_FAR = 60, LOD_NEAR = 52.8;       // hysteresis: switch out at 60 m, back in at 52.8 m
 const BIG = 100;                                  // assets wider than this are cut into cells
 const MARGIN = 1.5;                               // safety for fast turns and the camera's near plane
+// the lists are rebuilt only once the view has moved this far or turned this much (1–2 ms of CPU
+// each); the culling margin grows with distance to cover the turn in between
+const MOVE_AGAIN = 0.25, TURN_AGAIN = Math.cos(1 * Math.PI / 180), TURN_MARGIN = Math.tan(2 * Math.PI / 180);
 
 /** The attribute as plain floats (normalized integers scaled back), without per-element getters. */
 function floats(attribute) {
@@ -184,6 +187,7 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
   const projection = new THREE.Matrix4();
   const eye = new THREE.Vector3(), secondEye = new THREE.Vector3(), sphere = new THREE.Sphere();
   const lastView = new Float32Array(64).fill(NaN), view = new Float32Array(64);
+  const look = new THREE.Vector3(), lastLook = new THREE.Vector3(), lastEye = new THREE.Vector3(Infinity, 0, 0);
   const frustumOf = (camera, f, position) => {
     camera.updateWorldMatrix(true, false);
     f.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
@@ -214,13 +218,15 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       frustumOf(camera, frustum, eye);
       if (secondCamera) frustumOf(secondCamera, second, secondEye);
       if (shadowCamera) shadowFrustum.setFromProjectionMatrix(projection.multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
-      view.set(camera.matrixWorld.elements, 0); view.set(camera.projectionMatrix.elements, 16);
+      view.fill(0);
+      view.set(camera.projectionMatrix.elements, 16);
       if (secondCamera) view.set(secondCamera.matrixWorld.elements, 32);
       if (shadowCamera) view.set(shadowCamera.matrixWorld.elements, 48);
-      let same = true;
-      for (let i = 0; i < 64; i++) if (view[i] !== lastView[i] && !(Number.isNaN(view[i]) && Number.isNaN(lastView[i]))) { same = false; break; }
+      camera.getWorldDirection(look);
+      let same = eye.distanceTo(lastEye) < MOVE_AGAIN && look.dot(lastLook) > TURN_AGAIN;
+      for (let i = 16; same && i < 64; i++) if (view[i] !== lastView[i]) same = false;
       if (same) return false;
-      lastView.set(view);
+      lastView.set(view); lastEye.copy(eye); lastLook.copy(look);
       builds++;
       let changed = false;
       const near = p => Math.min(p.distanceTo(eye), secondCamera ? p.distanceTo(secondEye) : Infinity);
@@ -230,7 +236,7 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
         for (const p of a.placements) {
           p.distance = Math.max(0, near(p.center) - p.radius);
           if (lodOf(p, p.distance)) changed = true;
-          sphere.set(p.center, p.radius + MARGIN);
+          sphere.set(p.center, p.radius + MARGIN + p.distance * TURN_MARGIN);
           const box = a.shadow && shadowCamera && shadowFrustum.intersectsSphere(sphere);
           if (box) lists[p.low ? 1 : 0][0].push(p);
           else if (frustum.intersectsSphere(sphere) || (secondCamera && second.intersectsSphere(sphere))) lists[p.low ? 1 : 0][1].push(p);

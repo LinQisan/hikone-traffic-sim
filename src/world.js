@@ -142,7 +142,7 @@ export function buildLight(scene, renderer, light) {
         sun.updateMatrixWorld(); sun.target.updateMatrixWorld();
         sun.shadow.updateMatrices(sun);
       }
-      if (moved || (moving && now - lastShadow > 50)) {
+      if (moved || (moving && now - lastShadow > 80)) {        // moving cars: about 12 Hz
         sun.shadow.needsUpdate = true;
         lastShadow = now;
       }

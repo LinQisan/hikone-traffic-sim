@@ -45,12 +45,11 @@ test('cars appear on time, accelerate at 8 m/s² and leave at the end of their r
   const car = t.cars[0];
   t.step(1);
   assert.ok(Math.abs(car.distance - S.distanceAt(car.speed > 0 ? 1.1 : 0, car.speed)) < 0.2);
-  // the accident car only after the trigger (+ its delay)
-  t.step(20);
-  assert.ok(!t.cars.some(c => c.accident));
-  t.trigger();
-  t.step(s.vehicles.find(v => v.accident).delaySeconds + 0.05);
-  assert.ok(t.cars.some(c => c.accident));
+  // the accident car of 01 leaves when the participant sets off towards the road (traffic.js "meet")
+  t.step(20, { x: s.spawn.x, z: s.spawn.z, vx: 0, vz: 0 });
+  assert.ok(!t.cars.some(c => c.accident), 'not while the participant stands and looks');
+  t.step(0.1, { x: s.spawn.x, z: s.spawn.z + 0.3, vx: 0, vz: 2.4 });
+  assert.ok(t.cars.some(c => c.accident), 'as soon as they walk on towards the road');
   assert.ok(t.cars.every(c => c.body === 'sedan'), 'files use their own body (the templates say sedan)');
 });
 
