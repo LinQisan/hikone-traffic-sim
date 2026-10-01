@@ -135,8 +135,10 @@ export class Replay {
   applyCrash(group, centre, m, h, kind) {
     const base = this.animal.root, height = this.animal.height;
     if (m.tilt === 0 && m.spin === 0 && m.x === 0 && m.y === 0 && m.z === 0) {
+      // before contact (and on a restart): the body back on its ring, upright (pose() sets the bob)
       group.quaternion.identity();
       if (kind !== 'body') group.position.set(0, 0, 0);
+      else { group.position.x = 0; group.position.z = 0; }
       return;
     }
     const yaw = this.figure.quaternion, inverse = _q1.copy(yaw).invert();
