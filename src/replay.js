@@ -10,47 +10,13 @@ import { createReplayAnimal, BEAR_EYE_HEIGHT } from './replay-animal.js';
 import { createReplayCyclist, ridingTrack, sampleRide } from './replay-cyclist.js';
 import { classifyCrash, crashMotion, bicycleMotion } from './crash.js';
 import { BODY_SIZE } from './traffic.js';
+import { buildCockpit } from './cockpit.js';
 
 const SLOW_FROM = 0.8, SLOW_UNTIL = 0.4, SLOW_RATE = 0.45;
 const LIME = 0x7dff33, CONTACT = 0xff4033;
 const UP = new THREE.Vector3(0, 1, 0), _box = new THREE.Box3();
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _v4 = new THREE.Vector3();
 const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion();
-
-/**
- * A simple cockpit for the driver's view, in the camera's space (x right, y up, looking down -z).
- * The driver sits right of the car's centre line (right-hand drive): dashboard, steering wheel in
- * front of the driver, A-pillars, the roof edge and the bonnet in the car's paint.
- */
-function buildCockpit() {
-  const root = new THREE.Group();
-  root.name = 'DriverCockpit';
-  root.visible = false;
-  const dark = new THREE.MeshLambertMaterial({ color: 0x2b3442 }), trim = new THREE.MeshLambertMaterial({ color: 0x46505e });
-  const paint = new THREE.MeshLambertMaterial({ color: 0xdddddd });
-  const centre = -0.37;
-  const box = (material, size, position, rotation = [0, 0, 0]) => {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
-    mesh.position.set(...position); mesh.rotation.set(...rotation);
-    root.add(mesh);
-    return mesh;
-  };
-  box(dark, [1.7, 0.22, 0.5], [centre, -0.47, -0.78]);                       // dashboard
-  box(trim, [1.7, 0.03, 0.06], [centre, -0.355, -0.56]);                     // dashboard edge
-  box(paint, [1.62, 0.03, 1.5], [centre, -0.5, -1.75], [0.09, 0, 0]);       // bonnet
-  for (const x of [centre - 0.74, centre + 0.74]) box(dark, [0.07, 0.95, 0.07], [x, 0.02, -0.62], [-0.62, 0, 0]);   // A-pillars
-  box(dark, [1.6, 0.06, 0.25], [centre, 0.42, -0.3]);                        // roof edge
-  const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.024, 8, 28), dark);
-  wheel.position.set(0, -0.36, -0.48); wheel.rotation.x = -0.45;
-  root.add(wheel);
-  box(dark, [0.04, 0.17, 0.03], [0, -0.42, -0.47], [-0.45, 0, 0]);          // wheel spoke
-  root.traverse(o => { if (o.isMesh) o.renderOrder = 10; });
-  return {
-    root,
-    paint(rgb) { paint.color.setRGB(...rgb, THREE.SRGBColorSpace); },
-    dispose() { root.traverse(o => o.geometry?.dispose()); dark.dispose(); trim.dispose(); paint.dispose(); },
-  };
-}
 
 export class Replay {
   constructor(scene, materials, ground) {
@@ -59,7 +25,7 @@ export class Replay {
     this.ground = ground;
     this.camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 500);
     // the driver's view: from the accident car's driver seat (right-hand drive), along its travel
-    this.driverCamera = new THREE.PerspectiveCamera(68, 16 / 9, 0.05, 500);
+    this.driverCamera = new THREE.PerspectiveCamera(50, 16 / 9, 0.05, 500);
     this.view = 'overview';
 
     this.root = null;
@@ -78,9 +44,7 @@ export class Replay {
     this.playing = true;
     this.root = new THREE.Group();
     this.scene.add(this.root);
-    this.root.add(this.driverCamera);              // its cockpit is drawn only inside the replay
-    this.cockpit = buildCockpit();
-    this.driverCamera.add(this.cockpit.root);
+    this.root.add(this.driverCamera);
     this.overlays = [];
     const owned = object => { this.overlays.push(object); return object; };
     // copies of every car seen in the window
@@ -124,8 +88,9 @@ export class Replay {
     const recorded = carTrack.find(c => c.id === carId) ?? carTrack[0];
     this.driverTrack = carTrack;
     this.driverCarId = carId;
-    this.cockpit.paint(paintFor(carId));
     this.driverSize = BODY_SIZE[recorded?.body] ?? BODY_SIZE.sedan;
+    this.cockpit = buildCockpit(recorded?.body ?? 'sedan', this.driverSize, paintFor(carId));
+    this.root.add(this.cockpit.root);              // drawn only in the driver view
     this.crash = carNow ? classifyCrash({
       person: at,
       personVelocity: { x: (at.x - meBefore.x) / 0.15, z: (at.z - meBefore.z) / 0.15 },
@@ -204,20 +169,27 @@ export class Replay {
   }
 
   /**
-   * The driver's eyes: right-hand drive, so 0.37 m right of the centre line and a little ahead
-   * of the middle, at about 78 % of the body height; looking along the car with a slight dip.
-   * Before the car appears in the recording (or after it leaves) the view holds its nearest pose.
+   * The driver's eyes in the accident car (cockpit.js lays out seat, bonnet, pillars and wheel for
+   * its body type), looking ahead with a slight dip. At contact the view nods forward as the car
+   * brakes hard. Before the car appears in the recording the view holds its first pose.
    */
   placeDriver(t) {
     const track = this.driverTrack;
-    if (!track?.length) return;
+    if (!track?.length || !this.cockpit) return;
     const c = sample(track, Math.max(track[0].t, Math.min(track.at(-1).t, t)));
-    const a = c.yaw * Math.PI / 180, f = { x: Math.sin(a), z: Math.cos(a) }, r = { x: Math.cos(a), z: -Math.sin(a) };
-    const [, height, length] = this.driverSize;
-    const ex = c.x + r.x * 0.37 + f.x * length * 0.04, ez = c.z + r.z * 0.37 + f.z * length * 0.04;
-    const ey = this.ground.heightAt(c.x, c.z) + height * 0.78;
-    this.driverCamera.position.copy(toThree(ex, ey, ez));
-    this.driverCamera.lookAt(toThree(ex + f.x * 20, ey - 1.0, ez + f.z * 20));
+    const car = this.cockpit.root;
+    car.position.copy(toThree(c.x, this.ground.heightAt(c.x, c.z), c.z));
+    car.rotation.set(0, yawToThree(c.yaw), 0);
+    car.updateMatrixWorld();
+    const e = this.cockpit.layout.eye;
+    this.driverCamera.position.set(-e.right, e.up, e.forward).applyMatrix4(car.matrixWorld);
+    const ahead = _v1.set(-e.right, e.up - 20 * Math.tan(4 * Math.PI / 180), e.forward + 20).applyMatrix4(car.matrixWorld);
+    this.driverCamera.lookAt(ahead);
+    const s = t - this.impact;
+    if (s > 0) {
+      const nod = 6 * Math.sin(Math.min(1, s / 0.18) * Math.PI / 2) * Math.exp(-3 * Math.max(0, s - 0.18));
+      this.driverCamera.rotateX(-nod * Math.PI / 180);
+    }
   }
 
   fanGeometry(length) {

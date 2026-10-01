@@ -12,6 +12,7 @@ const { classifyCrash, crashMotion } = await import('../src/crash.js');
 const { createReplayAnimal, bearGirth } = await import('../src/replay-animal.js');
 const { Replay } = await import('../src/replay.js');
 const { registerModel } = await import('../src/world.js');
+const { cockpitLayout } = await import('../src/cockpit.js');
 // a box stands in for the sedan model (the GLB loads only in a browser)
 registerModel('WEB_Sedan', [{ geometry: new THREE.BoxGeometry(1.76, 1.45, 4.6), material: new THREE.MeshLambertMaterial({ name: 'Box' }), matrix: new THREE.Matrix4() }]);
 
@@ -97,9 +98,15 @@ test("the driver's view sits in the accident car's right-hand seat, looks along 
   replay.frame(0.5);
   const eye = replay.driverCamera.position, look = replay.driverCamera.getWorldDirection(new THREE.Vector3());
   // car at Unity x = 5.8 heading +x: its right side is Unity -z (z = 2 - 0.37)
-  assert.ok(Math.abs(-eye.x - (12.3 - 2.5 - 4 + 4.6 * 0.04)) < 1e-6 && Math.abs(eye.z - 1.63) < 1e-6, 'right-hand drive seat');
-  assert.ok(Math.abs(eye.y - (0.01 + 1.45 * 0.78)) < 1e-6, 'at the driver\'s eye height');
-  assert.ok(-look.x > 0.99 && look.y < 0, 'looking ahead along the road, slightly down');
+  const layout = cockpitLayout('sedan', [1.76, 1.45, 4.6]);
+  assert.ok(Math.abs(-eye.x - (5.8 + layout.eye.forward)) < 1e-6 && Math.abs(eye.z - 1.63) < 1e-6, 'right-hand drive seat');
+  assert.ok(Math.abs(eye.y - (0.01 + layout.eye.up)) < 1e-6 && eye.y > 1 && eye.y < 1.3, 'at a sedan driver\'s eye height');
+  assert.ok(-look.x > 0.99 && look.y < 0 && look.y > -0.12, 'looking ahead along the road, slightly down');
+  // the windscreen frame is natural: pillars rise from the bonnet towards the driver, the bonnet
+  // is below the eyes and ahead of them, the wheel right in front of the driver
+  assert.ok(layout.cowlF > layout.roofF && layout.roofF > layout.eye.forward, 'raked windscreen ahead of the eyes');
+  assert.ok(layout.cowl < layout.eye.up - 0.2 && layout.roofH > layout.eye.up + 0.15, 'bonnet below, roof above the eyes');
+  for (const body of ['kei-tall', 'kei-hatch']) assert.ok(cockpitLayout(body, [1.475, 1.6, 3.395]).hood < layout.hood, `${body}: shorter nose`);
   const before = eye.clone();
   replay.frame(0.9);
   assert.ok(-replay.driverCamera.position.x > -before.x + 3, 'moves with the car');
