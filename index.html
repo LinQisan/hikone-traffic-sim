@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hikone Traffic Simulator</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.js", "three/addons/": "./vendor/three/addons/" } }
+</script>
+</head>
+<body>
+<div id="view"></div>
+<div id="flash"></div>
+<div id="loading" class="overlay center">読み込み中…</div>
+
+<section id="title" class="overlay card" hidden>
+  <header>
+    <h1>Hikone Traffic Simulator <span>彦根交通安全シミュレーター</span></h1>
+    <p>彦根・京橋 ・ 歩行者の交通安全体験（ブラウザ版）</p>
+  </header>
+  <div class="columns">
+    <div id="scenarios" class="scenarios"></div>
+    <aside>
+      <label>身長 / Height <input id="height" type="number" min="90" max="210" step="5" value="170"> cm</label>
+      <label class="file">カスタム場面（JSON）を開く <input id="file" type="file" accept=".json,application/json"></label>
+      <p class="sel">選択中：<b id="selected"></b></p>
+      <button id="start" class="primary">開始 / Start</button>
+      <div id="vrslot"></div>
+      <p class="help">クリックで視点操作（マウス）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し<br>
+        VR：Quest のブラウザで「ENTER VR」・左スティックで移動</p>
+    </aside>
+  </div>
+</section>
+
+<div id="hud" class="hud" hidden><b id="hudname"></b><span>クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span></div>
+
+<section id="replayui" class="overlay bar" hidden>
+  <span class="chip">REPLAY</span><b>事故のリプレイ / Accident replay</b>
+  <span id="rtime" class="time"></span>
+  <button id="again">もう一度再生 / Replay (B)</button>
+  <button id="next" class="primary">スキップ / Skip</button>
+</section>
+
+<section id="results" class="overlay card narrow" hidden>
+  <h2 id="rtitle"></h2>
+  <div id="rlines"></div>
+  <p id="rverdict" class="verdict"></p>
+  <div class="buttons">
+    <button id="retry">もう一度体験 / Try again (R)</button>
+    <button id="totitle" class="primary">タイトルへ / Title (Enter)</button>
+  </div>
+</section>
+<div id="fps"></div>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>

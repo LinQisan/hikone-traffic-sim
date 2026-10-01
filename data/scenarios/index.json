@@ -1,0 +1,92 @@
+[
+  {
+    "file": "builtin-01.json",
+    "id": "builtin-01",
+    "name": "横断歩道：手前の車線を右から来る車",
+    "nameEn": "Car from the right",
+    "setting": "crossing",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-02.json",
+    "id": "builtin-02",
+    "name": "交差点：横から曲がってくる車",
+    "nameEn": "Turning car",
+    "setting": "crossing",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-03.json",
+    "id": "builtin-03",
+    "name": "道路の途中：左から続けて来る車",
+    "nameEn": "Another car from the left",
+    "setting": "midblock",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-04.json",
+    "id": "builtin-04",
+    "name": "道路の途中：止まっている車の陰から来る車",
+    "nameEn": "Car hidden by a truck",
+    "setting": "midblock",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-05.json",
+    "id": "builtin-05",
+    "name": "交差点：うしろから曲がってくる車",
+    "nameEn": "Car turning from behind",
+    "setting": "crossing",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-06.json",
+    "id": "builtin-06",
+    "name": "道路の途中：スピードを出して止まらない車",
+    "nameEn": "Speeding car",
+    "setting": "midblock",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-07.json",
+    "id": "builtin-07",
+    "name": "自転車：駐車場から急に出てくる車",
+    "nameEn": "Car pulling out",
+    "setting": "bicycle",
+    "playerMode": "bicycle",
+    "template": true
+  },
+  {
+    "file": "builtin-08.json",
+    "id": "builtin-08",
+    "name": "自転車：出入口の前を通るときの車",
+    "nameEn": "Passing a driveway",
+    "setting": "bicycle",
+    "playerMode": "bicycle",
+    "template": true
+  },
+  {
+    "file": "builtin-09.json",
+    "id": "builtin-09",
+    "name": "道路の途中：左右から時間差で来る車",
+    "nameEn": "Cars from both sides",
+    "setting": "midblock",
+    "playerMode": "walking",
+    "template": true
+  },
+  {
+    "file": "builtin-10.json",
+    "id": "builtin-10",
+    "name": "自転車：道路の右側を走る（逆走）",
+    "nameEn": "Riding on the wrong side",
+    "setting": "bicycle",
+    "playerMode": "bicycle",
+    "template": true
+  }
+]

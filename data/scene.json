@@ -1,0 +1,882 @@
+{
+    "format": "vrlearn-web-scene",
+    "version": 1,
+    "exportedFrom": "Assets/_Project/Scenes/Gameplay_Hikone.unity",
+    "materials": [
+        {
+            "name": "HK_Asphalt",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "HK_T_Asphalt",
+            "tileMeters": 4.0,
+            "smoothness": 0.18000000715255738,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Bark",
+            "color": [
+                0.6200000047683716,
+                0.5499999523162842,
+                0.5
+            ],
+            "texture": "HK_T_Wood",
+            "tileMeters": 1.0,
+            "smoothness": 0.05000000074505806,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Curb",
+            "color": [
+                1.0800000429153443,
+                1.059999942779541,
+                1.0199999809265137
+            ],
+            "texture": "HK_T_StoneWall",
+            "tileMeters": 1.5,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Glass",
+            "color": [
+                0.09999997168779373,
+                0.1199999526143074,
+                0.12999996542930604
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.8799999952316284,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Gold",
+            "color": [
+                0.800000011920929,
+                0.6299999952316284,
+                0.2699999511241913
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.6000000238418579,
+            "metallic": 0.8500000238418579,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Grass",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "HK_T_Grass",
+            "tileMeters": 6.0,
+            "smoothness": 0.05000000074505806,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Guard",
+            "color": [
+                0.29999998211860659,
+                0.21999996900558473,
+                0.15999996662139893
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.30000001192092898,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_KeiPaint",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.6000000238418579,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Lamp",
+            "color": [
+                1.0,
+                0.8600000143051148,
+                0.6200000047683716
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.20000000298023225,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Leaf",
+            "color": [
+                0.2699999511241913,
+                0.41999995708465578,
+                0.18999996781349183
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_LeafDark",
+            "color": [
+                0.13999995589256288,
+                0.2699999511241913,
+                0.1499999761581421
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Metal",
+            "color": [
+                0.18999996781349183,
+                0.18999996781349183,
+                0.19999995827674867
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.44999998807907107,
+            "metallic": 0.6000000238418579,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_MetalLight",
+            "color": [
+                0.6200000047683716,
+                0.6299999952316284,
+                0.6399999260902405
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.5,
+            "metallic": 0.699999988079071,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Namako",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "HK_T_Namako",
+            "tileMeters": 1.2000000476837159,
+            "smoothness": 0.15000000596046449,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Noren",
+            "color": [
+                0.13999995589256288,
+                0.18999996781349183,
+                0.3399999737739563
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.05000000074505806,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_NorenRed",
+            "color": [
+                0.5799999833106995,
+                0.13999995589256288,
+                0.1199999526143074
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.05000000074505806,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Plaster",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "HK_T_Plaster",
+            "tileMeters": 2.0,
+            "smoothness": 0.07999999821186066,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_PlasterWarm",
+            "color": [
+                0.949999988079071,
+                0.9100000262260437,
+                0.8199999928474426
+            ],
+            "texture": "HK_T_Plaster",
+            "tileMeters": 2.0,
+            "smoothness": 0.07999999821186066,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_PlateGreen",
+            "color": [
+                0.09999997168779373,
+                0.3399999737739563,
+                0.18999996781349183
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.30000001192092898,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_RoofRidge",
+            "color": [
+                0.17999997735023499,
+                0.18999996781349183,
+                0.2099999487400055
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.3499999940395355,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_RoofTile",
+            "color": [
+                0.8999999761581421,
+                0.9200000166893005,
+                0.9599999785423279
+            ],
+            "texture": "HK_T_RoofTile",
+            "tileMeters": 2.0,
+            "smoothness": 0.3499999940395355,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Rubber",
+            "color": [
+                0.04999998211860657,
+                0.04999998211860657,
+                0.04999998211860657
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.15000000596046449,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Sakura",
+            "color": [
+                0.949999988079071,
+                0.7599999904632568,
+                0.8199999928474426
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Shoji",
+            "color": [
+                0.949999988079071,
+                0.9200000166893005,
+                0.8199999928474426
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.05000000074505806,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Sidewalk",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "HK_T_Pavers",
+            "tileMeters": 2.4000000953674318,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_SignBlue",
+            "color": [
+                0.07999997586011887,
+                0.29999998211860659,
+                0.6599999666213989
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.30000001192092898,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_SignRed",
+            "color": [
+                0.7799999713897705,
+                0.09999997168779373,
+                0.09999997168779373
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.30000001192092898,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_SignYellow",
+            "color": [
+                0.949999988079071,
+                0.7799999713897705,
+                0.09999997168779373
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.30000001192092898,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Soil",
+            "color": [
+                0.29999998211860659,
+                0.25999996066093447,
+                0.19999995827674867
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.05000000074505806,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Stone",
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ],
+            "texture": "HK_T_StoneWall",
+            "tileMeters": 3.200000047683716,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_StoneDark",
+            "color": [
+                0.699999988079071,
+                0.6899999976158142,
+                0.6700000166893005
+            ],
+            "texture": "HK_T_StoneWall",
+            "tileMeters": 2.0,
+            "smoothness": 0.10000000149011612,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_TruckCab",
+            "color": [
+                0.8999999761581421,
+                0.8999999761581421,
+                0.8799999952316284
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.44999998807907107,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_VanBody",
+            "color": [
+                0.800000011920929,
+                0.8100000023841858,
+                0.8199999928474426
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.3499999940395355,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_VanRib",
+            "color": [
+                0.6000000238418579,
+                0.6100000143051148,
+                0.6200000047683716
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.30000001192092898,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_Water",
+            "color": [
+                0.12999996542930604,
+                0.2399999499320984,
+                0.2399999499320984
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.9300000071525574,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "HK_T_WaterNormal",
+            "normalTileMeters": 12.0
+        },
+        {
+            "name": "HK_WhitePaint",
+            "color": [
+                0.9200000166893005,
+                0.9200000166893005,
+                0.8999999761581421
+            ],
+            "texture": "",
+            "tileMeters": 1.0,
+            "smoothness": 0.20000000298023225,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_WoodDark",
+            "color": [
+                0.41999995708465578,
+                0.35999998450279238,
+                0.32999998331069949
+            ],
+            "texture": "HK_T_Wood",
+            "tileMeters": 2.0,
+            "smoothness": 0.18000000715255738,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_WoodLight",
+            "color": [
+                1.2999999523162842,
+                1.2000000476837159,
+                1.0499999523162842
+            ],
+            "texture": "HK_T_Wood",
+            "tileMeters": 2.0,
+            "smoothness": 0.20000000298023225,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        },
+        {
+            "name": "HK_WoodMid",
+            "color": [
+                0.8199999928474426,
+                0.7400000095367432,
+                0.6599999666213989
+            ],
+            "texture": "HK_T_Wood",
+            "tileMeters": 2.0,
+            "smoothness": 0.20000000298023225,
+            "metallic": 0.0,
+            "emissive": false,
+            "normalMap": "",
+            "normalTileMeters": 1.0
+        }
+    ],
+    "light": {
+        "direction": [
+            0.556670606136322,
+            -0.7660444378852844,
+            0.321393758058548
+        ],
+        "color": [
+            1.0,
+            0.95686274766922,
+            0.8392156958580017
+        ],
+        "intensity": 1.0,
+        "ambientSky": [
+            0.7200000286102295,
+            0.800000011920929,
+            0.8899999856948853
+        ],
+        "ambientEquator": [
+            0.5400000214576721,
+            0.6000000238418579,
+            0.6800000071525574
+        ],
+        "ambientGround": [
+            0.3499999940395355,
+            0.3700000047683716,
+            0.4099999964237213
+        ],
+        "fogColor": [
+            0.7400000095367432,
+            0.800000011920929,
+            0.8600000143051148
+        ],
+        "fogStart": 110.0,
+        "fogEnd": 620.0,
+        "background": [
+            0.1921568661928177,
+            0.3019607961177826,
+            0.4745098054409027
+        ]
+    },
+    "signals": [
+        {
+            "kind": "car",
+            "model": "TrafficLight_Car_Left",
+            "x": 29.139999389648439,
+            "y": 4.699999809265137,
+            "z": 32.31999969482422,
+            "yaw": 0.0,
+            "size": []
+        },
+        {
+            "kind": "car",
+            "model": "TrafficLight_Car_Left",
+            "x": 45.40999984741211,
+            "y": 4.699999809265137,
+            "z": 28.010000228881837,
+            "yaw": 90.0,
+            "size": []
+        },
+        {
+            "kind": "car",
+            "model": "TrafficLight_Car_Right",
+            "x": 24.520000457763673,
+            "y": 4.699999809265137,
+            "z": 22.75,
+            "yaw": 270.0,
+            "size": []
+        },
+        {
+            "kind": "car",
+            "model": "TrafficLight_Car_Right",
+            "x": 34.68000030517578,
+            "y": 4.699999809265137,
+            "z": 20.520000457763673,
+            "yaw": 180.0,
+            "size": []
+        },
+        {
+            "kind": "pedestrian",
+            "model": "TrafficLight_Walk",
+            "x": 43.150001525878909,
+            "y": 3.0,
+            "z": 31.030000686645509,
+            "yaw": 0.0,
+            "size": []
+        },
+        {
+            "kind": "pedestrian",
+            "model": "TrafficLight_Walk",
+            "x": 43.40999984741211,
+            "y": 3.0,
+            "z": 20.969999313354493,
+            "yaw": 180.0,
+            "size": []
+        }
+    ],
+    "blackWalls": [
+        {
+            "kind": "blackwall",
+            "model": "BlackWall",
+            "x": -103.19999694824219,
+            "y": 4.59999942779541,
+            "z": 26.389999389648439,
+            "yaw": 90.0,
+            "size": [
+                10.000001907348633,
+                11.3818998336792,
+                0.010000001639127732
+            ]
+        },
+        {
+            "kind": "blackwall",
+            "model": "BlackWall (1)",
+            "x": 10.0,
+            "y": 2.4000000953674318,
+            "z": 6.630000114440918,
+            "yaw": 0.0,
+            "size": [
+                9.399999618530274,
+                5.0,
+                0.009999999776482582
+            ]
+        }
+    ],
+    "scenarios": [
+        {
+            "id": 0,
+            "spawnYaw": 0.0,
+            "parked": []
+        },
+        {
+            "id": 1,
+            "spawnYaw": 0.0,
+            "parked": [
+                {
+                    "kind": "car",
+                    "model": "sedan",
+                    "x": 45.58000183105469,
+                    "y": 0.5100011825561523,
+                    "z": 24.15999984741211,
+                    "yaw": 270.0,
+                    "size": []
+                },
+                {
+                    "kind": "car",
+                    "model": "sedan",
+                    "x": 12.609999656677246,
+                    "y": 0.5100011825561523,
+                    "z": 28.18000030517578,
+                    "yaw": 90.0,
+                    "size": []
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "spawnYaw": 0.0,
+            "parked": [
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Large",
+                    "x": 62.258506774902347,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                },
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Medium",
+                    "x": 75.2167739868164,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "spawnYaw": 0.0,
+            "parked": [
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Large",
+                    "x": 55.348506927490237,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                },
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Medium",
+                    "x": 68.30677795410156,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "spawnYaw": 0.0,
+            "parked": [
+                {
+                    "kind": "car",
+                    "model": "sedan",
+                    "x": 12.609999656677246,
+                    "y": 0.5100011825561523,
+                    "z": 28.18000030517578,
+                    "yaw": 90.0,
+                    "size": []
+                },
+                {
+                    "kind": "car",
+                    "model": "sedan",
+                    "x": 45.58000183105469,
+                    "y": 0.5100011825561523,
+                    "z": 24.15999984741211,
+                    "yaw": 270.0,
+                    "size": []
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "spawnYaw": 0.0,
+            "parked": [
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Large",
+                    "x": 55.348506927490237,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                },
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Medium",
+                    "x": 68.30677795410156,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "spawnYaw": 0.0,
+            "parked": []
+        },
+        {
+            "id": 7,
+            "spawnYaw": 0.0,
+            "parked": []
+        },
+        {
+            "id": 8,
+            "spawnYaw": 0.0,
+            "parked": [
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Large",
+                    "x": 55.348506927490237,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                },
+                {
+                    "kind": "truck",
+                    "model": "HK_Truck_Medium",
+                    "x": 68.30677795410156,
+                    "y": -0.010080456733703614,
+                    "z": 24.0,
+                    "yaw": 0.0,
+                    "size": []
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "spawnYaw": 0.0,
+            "parked": []
+        }
+    ]
+}

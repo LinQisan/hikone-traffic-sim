@@ -1,0 +1,11 @@
+{
+  "name": "hikone-traffic-sim",
+  "private": true,
+  "description": "Browser port of the VRLearn traffic-safety experience (three.js, no build step)",
+  "type": "module",
+  "scripts": {
+    "start": "node serve.mjs",
+    "sync": "node tools/sync.mjs",
+    "test": "node --test test/logic.test.mjs"
+  }
+}

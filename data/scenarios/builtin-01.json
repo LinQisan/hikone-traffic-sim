@@ -1,0 +1,153 @@
+{
+    "format": "vrlearn-scenario",
+    "version": 1,
+    "id": "builtin-01",
+    "name": "横断歩道：手前の車線を右から来る車",
+    "nameEn": "Car from the right",
+    "setting": "crossing",
+    "learningGoal": "車の流れが切れても、手前の車線を右から来る車を確かめてから渡る。",
+    "situation": "横断歩道を渡り始めたところで、右から来た車とぶつかりました。",
+    "point": "渡る前に右・左・右を見て、車が来ないことを確かめてから渡りましょう。",
+    "map": "hikone-kyobashi",
+    "playerMode": "walking",
+    "spawn": {
+        "x": 40.0,
+        "z": 14.0
+    },
+    "goal": {
+        "x": 40.0,
+        "z": 32.0,
+        "width": 5.06,
+        "depth": 1.0,
+        "yaw": 0.0
+    },
+    "trigger": {
+        "x": 40.1,
+        "z": 19.46,
+        "width": 4.26,
+        "depth": 4.28,
+        "yaw": 0.0
+    },
+    "vehicles": [
+        {
+            "name": "車の流れ Left",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": 8.01,
+                    "z": 8.74
+                },
+                {
+                    "x": 8.0,
+                    "z": 20.2
+                },
+                {
+                    "x": 16.0,
+                    "z": 27.8
+                },
+                {
+                    "x": 80.51,
+                    "z": 27.97
+                },
+                {
+                    "x": 93.67,
+                    "z": 17.92
+                },
+                {
+                    "x": 94.31,
+                    "z": 0.93
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 5.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": false,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": 0.0
+        },
+        {
+            "name": "車の流れ Right",
+            "model": "Car_Right",
+            "body": "",
+            "route": [
+                {
+                    "x": 90.0,
+                    "z": 6.16
+                },
+                {
+                    "x": 89.64,
+                    "z": 16.42
+                },
+                {
+                    "x": 83.11,
+                    "z": 23.39
+                },
+                {
+                    "x": 24.22,
+                    "z": 23.31
+                },
+                {
+                    "x": 12.39,
+                    "z": 15.69
+                },
+                {
+                    "x": 12.11,
+                    "z": 7.43
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 5.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": true,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": 0.0
+        },
+        {
+            "name": "事故車 1",
+            "model": "Car_Right",
+            "body": "",
+            "route": [
+                {
+                    "x": 90.0,
+                    "z": 6.16
+                },
+                {
+                    "x": 89.64,
+                    "z": 16.42
+                },
+                {
+                    "x": 83.11,
+                    "z": 23.39
+                },
+                {
+                    "x": 24.22,
+                    "z": 23.31
+                },
+                {
+                    "x": 12.39,
+                    "z": 15.69
+                },
+                {
+                    "x": 12.11,
+                    "z": 7.43
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 6.0,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": 0.0
+        }
+    ]
+}
