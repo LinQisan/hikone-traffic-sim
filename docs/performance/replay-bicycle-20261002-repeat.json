@@ -1,0 +1,15 @@
+{
+  "geometryBytes": 33084219,
+  "placements": 1260,
+  "meshes": 465,
+  "frames": 146,
+  "fps": 18.274442066270446,
+  "medianMs": 54,
+  "p95Ms": 61.5,
+  "updateMs": 0.7472602738807462,
+  "calls": 155.16438356164383,
+  "triangles": 971840.6369863014,
+  "width": 1280,
+  "height": 720,
+  "multiDraw": true
+}

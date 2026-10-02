@@ -12,7 +12,7 @@ registerHooks({ resolve(specifier, context, next) {
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const { environmentInstances, LOD_FAR, LOD_NEAR } = await import('../src/environment-instances.js');
-const { PigmentPalette } = await import('../src/style.js');
+const { PigmentPalette, pigmentOf } = await import('../src/style.js');
 const { placement } = await import('../src/coords.js');
 const { buildLight } = await import('../src/world.js');
 const { packPigments } = await import('../src/geometry-budget.js');
@@ -47,24 +47,31 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
     p.matrix.elements.forEach((v, i) => assert.ok(Math.abs(v - expected.elements[i]) < 1e-4, 'placement remains aligned with the simulator'));
   }
 
-  // the cells of a large asset hold exactly its triangles and pigments
+  // Cells retain triangle winding and pigment rows, at the Float32 precision uploaded to the GPU.
   const signature = triangles => createHash('sha256').update(triangles.sort().join('\n')).digest('hex');
-  const road = definitions.find(d => d.asset === 'HK_RoadRaised'), point = new THREE.Vector3();
-  placement(...road.items[0].p, road.items[0].r, road.items[0].s, expected);
-  for (const [detail, key] of [['high', 'highMesh'], ['low', 'lowMesh']]) {
-    const source = [];
-    for (const part of road[detail]) {
-      const m = part.matrix.clone().premultiply(expected), g = part.geometry, row = palette.row(part.material);
-      for (let i = 0; i < g.index.count; i += 3) source.push(row + '/' + [0, 1, 2].map(j =>
-        point.fromBufferAttribute(g.attributes.position, g.index.getX(i + j)).applyMatrix4(m).toArray().map(v => v.toFixed(3)).join(',')).join(';'));
+  const point = new THREE.Vector3();
+  for (const name of ['HK_RoadRaised', 'HK_GroundFar']) {
+    const definition = definitions.find(d => d.asset === name);
+    placement(...definition.items[0].p, definition.items[0].r, definition.items[0].s, expected);
+    for (const [detail, key] of [['high', 'highMesh'], ['low', 'lowMesh']]) {
+      const source = [];
+      for (const part of definition[detail]) {
+        const m = part.matrix.clone().premultiply(expected), g = part.geometry, row = palette.row(part.material);
+        for (let i = 0; i < g.index.count; i += 3) source.push(row + '/' + [0, 1, 2].map(j =>
+          point.fromBufferAttribute(g.attributes.position, g.index.getX(i + j)).applyMatrix4(m).toArray().map(v => Math.fround(v).toFixed(3)).join(',')).join(';'));
+      }
+      const cut = [];
+      for (const cell of environment.cells.filter(c => c.asset === definition.asset && c[key])) {
+        const g = cell[key].geometry;
+        for (let i = 0; i < g.index.count; i += 3) cut.push(g.attributes.hkPigment.getX(g.index.getX(i)) + '/' + [0, 1, 2].map(j =>
+          point.fromBufferAttribute(g.attributes.position, g.index.getX(i + j)).toArray().map(v => v.toFixed(3)).join(',')).join(';'));
+      }
+      assert.equal(signature(cut), signature(source), `${name} ${detail}: every triangle and pigment survives the cut`);
     }
-    const cut = [];
-    for (const cell of environment.cells.filter(c => c.asset === road.asset && c[key])) {
-      const g = cell[key].geometry;
-      for (let i = 0; i < g.index.count; i += 3) cut.push(g.attributes.hkPigment.getX(g.index.getX(i)) + '/' + [0, 1, 2].map(j =>
-        point.fromBufferAttribute(g.attributes.position, g.index.getX(i + j)).toArray().map(v => v.toFixed(3)).join(',')).join(';'));
-    }
-    assert.equal(signature(cut), signature(source), `road ${detail}: every triangle and pigment survives the cut`);
+  }
+  for (const cell of environment.cells) for (const mesh of [cell.highMesh, cell.lowMesh]) {
+    if (mesh && mesh.geometry.attributes.position.count <= 65535)
+      assert.ok(mesh.geometry.index.array instanceof Uint16Array, 'a small cell uses compact indices even when its source needs 32 bits');
   }
 
   // a street view: few draws, objects behind the viewer culled, shadow casters behind kept
@@ -78,7 +85,10 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   const shadowCamera = sun.shadow.camera, shadowFrustum = new THREE.Frustum().setFromProjectionMatrix(
     new THREE.Matrix4().multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
   assert.equal(environment.updateLOD(camera, null, shadowCamera), true);
-  const visible = environment.root.children.filter(m => m.visible).length;
+  environment.root.updateMatrixWorld(true);
+  const viewFrustum = new THREE.Frustum().setFromProjectionMatrix(
+    new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+  const visible = environment.root.children.filter(m => m.visible && (!m.frustumCulled || viewFrustum.intersectsObject(m))).length;
   assert.ok(visible < 180, `draw budget: ${visible}`);
   const drawn = a => [a.high, a.low].flatMap(m => Array.from({ length: m.count }, (_, i) => m.instanceMatrix.array[i * 16 + 12]));
   const tree = environment.assets.find(a => a.asset === 'HK_Tree_Cedar');
@@ -108,6 +118,23 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   assert.equal(at((LOD_FAR + LOD_NEAR) / 2), true, 'LOD hysteresis avoids flickering around the threshold');
   assert.equal(at(LOD_NEAR - 3), false);
   for (const mesh of environment.root.children) mesh.geometry.dispose();
+});
+
+test('compact pigment rows retain linear colours, dab strength and HDR emissive light', () => {
+  const palette = new PigmentPalette();
+  for (const name of ['HK_Asphalt', 'HK_Sakura', 'ART_LampGlow']) {
+    const material = new THREE.MeshLambertMaterial({ name, emissive: 0xffa840, emissiveIntensity: 2 });
+    const row = palette.row(material), pigment = pigmentOf(name), base = row * 12;
+    const linear = value => new THREE.Color().setRGB(...value, THREE.SRGBColorSpace).toArray();
+    const actual = Array.from(palette.data.slice(base, base + 12));
+    const expected = [...linear(pigment.warm), pigment.dab, ...linear(pigment.cool), 1,
+      ...material.emissive.clone().multiplyScalar(2).toArray(), 1];
+    expected.forEach((v, i) => assert.ok(Math.abs(v - actual[i]) < 1e-7, `${name}: palette component ${i}`));
+    assert.equal(palette.row(material), row, 'reused source material keeps its row');
+  }
+  assert.equal(palette.texture.image.width, 3);
+  assert.equal(palette.texture.image.data.byteLength, 3072);
+  palette.texture.dispose();
 });
 
 test('packed normals/colours reduce bandwidth while preserving positions and pigment precision', () => {

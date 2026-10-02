@@ -91,12 +91,14 @@ export function cutIntoCells(geometry, cellSize) {
   }
   const result = [], remap = new Int32Array(geometry.attributes.position.count).fill(-1);
   for (const [key, ids] of cells) {
-    const order = [], local = new (geometry.attributes.position.count > 65535 ? Uint32Array : Uint16Array)(ids.length);
+    const order = [];
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
       if (remap[id] < 0) { remap[id] = order.length; order.push(id); }
-      local[i] = remap[id];
     }
+    // The whole ground can need 32-bit indices while each cell fits in 16 bits.
+    const local = new (order.length > 65535 ? Uint32Array : Uint16Array)(ids.length);
+    for (let i = 0; i < ids.length; i++) local[i] = remap[ids[i]];
     for (const id of order) remap[id] = -1;
     const cell = new THREE.BufferGeometry();
     for (const [name, attribute] of Object.entries(geometry.attributes)) {
@@ -130,8 +132,9 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     }
     box.getSize(size);
     if (items.length === 1 && Math.max(size.x, size.z) > BIG) {
-      // Large unique asset: world-space cells (about five per side, at least 64 m).
-      const cellSize = Math.max(64, Math.max(size.x, size.z) / 5);
+      // Cap cells at 128 m: the 1.4 km ground otherwise submits 280 m of brush
+      // geometry at once, including much that is outside the view or behind fog.
+      const cellSize = Math.max(64, Math.min(128, Math.max(size.x, size.z) / 5));
       placement(...items[0].p, items[0].r, items[0].s, matrix);
       const levels = [high, low].map(parts => {
         const merged = mergeParts(parts, palette, matrix), split = cutIntoCells(merged, cellSize);

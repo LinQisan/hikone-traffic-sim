@@ -153,8 +153,8 @@ export class PigmentPalette {
   static ROWS = 64;
   constructor() {
     this.rows = new Map();
-    this.data = new Float32Array(4 * PigmentPalette.ROWS * 4);
-    this.texture = new THREE.DataTexture(this.data, 4, PigmentPalette.ROWS, THREE.RGBAFormat, THREE.FloatType);
+    this.data = new Float32Array(3 * PigmentPalette.ROWS * 4);
+    this.texture = new THREE.DataTexture(this.data, 3, PigmentPalette.ROWS, THREE.RGBAFormat, THREE.FloatType);
     this.texture.magFilter = this.texture.minFilter = THREE.NearestFilter;
     this.materials = new Map();
   }
@@ -165,9 +165,10 @@ export class PigmentPalette {
     if (index >= PigmentPalette.ROWS) throw new Error('pigment palette is full');
     const pigment = pigmentOf(material.name), linear = c => new THREE.Color().setRGB(...c, THREE.SRGBColorSpace);
     const emissive = material.emissive ? material.emissive.clone().multiplyScalar(material.emissiveIntensity ?? 1) : new THREE.Color(0, 0, 0);
-    const texels = [[...linear(pigment.warm).toArray(), 1], [...linear(pigment.cool).toArray(), 1],
-      [pigment.dab, 0, 0, 1], [...emissive.toArray(), 1]];
-    texels.forEach((t, i) => this.data.set(t, (index * 4 + i) * 4));
+    // Strength shares warm.a, saving one vertex texture lookup without quantizing any pigment.
+    const texels = [[...linear(pigment.warm).toArray(), pigment.dab], [...linear(pigment.cool).toArray(), 1],
+      [...emissive.toArray(), 1]];
+    texels.forEach((t, i) => this.data.set(t, (index * 3 + i) * 4));
     this.texture.needsUpdate = true;
     this.rows.set(material.name, index);
     return index;
@@ -194,10 +195,11 @@ export class PigmentPalette {
           varying float vHkDab;
           varying vec3 vHkEmissive;`,
         vertexBody: `int hkRow = int(hkPigment + 0.5);
-          vHkWarm = texelFetch(hkPalette, ivec2(0, hkRow), 0).rgb;
+          vec4 hkWarmDab = texelFetch(hkPalette, ivec2(0, hkRow), 0);
+          vHkWarm = hkWarmDab.rgb;
           vHkCool = texelFetch(hkPalette, ivec2(1, hkRow), 0).rgb;
-          vHkDab = texelFetch(hkPalette, ivec2(2, hkRow), 0).r;
-          vHkEmissive = texelFetch(hkPalette, ivec2(3, hkRow), 0).rgb;`,
+          vHkDab = hkWarmDab.a;
+          vHkEmissive = texelFetch(hkPalette, ivec2(2, hkRow), 0).rgb;`,
         fragmentDeclarations: `varying vec3 vHkWarm;
           varying vec3 vHkCool;
           varying float vHkDab;
@@ -208,7 +210,7 @@ export class PigmentPalette {
         emissive: 'totalEmissiveRadiance += vHkEmissive;',
       });
     };
-    material.customProgramCacheKey = () => 'hk-palette-v1';
+    material.customProgramCacheKey = () => 'hk-palette-v2';
     this.materials.set(key, material);
     return material;
   }
