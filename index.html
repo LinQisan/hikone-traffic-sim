@@ -11,17 +11,104 @@
 </script>
 </head>
 <body>
-<div id="view"></div>
+<div id="view" role="img" aria-label="彦根・京橋の街の 3D 表示 / 3D view of Hikone Kyobashi"></div>
 <div id="flash"></div>
-<div id="loading" class="overlay center">読み込み中…</div>
+<p id="announce" class="visually-hidden" aria-live="assertive"></p>
+<noscript><p class="noscript">このページを使うには JavaScript を有効にしてください。 / Please enable JavaScript.</p></noscript>
 
-<section id="title" class="overlay card" hidden>
+<section id="loading" class="overlay loading" aria-labelledby="loadtitle">
+  <div class="loader">
+    <!-- a little bear crossing the road; a small car waits for it -->
+    <svg class="scene" viewBox="0 0 240 120" role="img" aria-label="横断歩道をわたる小熊のイラスト / A little bear crossing the road">
+      <g class="road">
+        <rect x="0" y="86" width="240" height="34" fill="#7f86a8"/>
+        <g class="stripes" fill="#f6f0dc"><rect x="70" y="90" width="12" height="26" rx="2"/><rect x="90" y="90" width="12" height="26" rx="2"/><rect x="110" y="90" width="12" height="26" rx="2"/><rect x="130" y="90" width="12" height="26" rx="2"/><rect x="150" y="90" width="12" height="26" rx="2"/></g>
+      </g>
+      <g class="car" transform="translate(196 74)">
+        <rect x="0" y="6" width="38" height="16" rx="6" fill="#8fb6d8"/><rect x="7" y="0" width="22" height="11" rx="4" fill="#bcd7ee"/>
+        <circle cx="9" cy="23" r="4.5" fill="#33405a"/><circle cx="30" cy="23" r="4.5" fill="#33405a"/>
+        <circle class="lamp" cx="1.5" cy="13" r="2.2" fill="#ffe08a"/>
+      </g>
+      <g class="bear">
+        <g class="legs"><rect class="leg l" x="-9" y="20" width="8" height="12" rx="4" fill="#d9a86c"/><rect class="leg r" x="1" y="20" width="8" height="12" rx="4" fill="#d9a86c"/></g>
+        <ellipse cx="0" cy="12" rx="13" ry="14" fill="#e0b47c"/><ellipse cx="0" cy="15" rx="8" ry="8" fill="#ffe7c4"/>
+        <g class="head">
+          <circle cx="-11" cy="-17" r="6" fill="#e0b47c"/><circle cx="11" cy="-17" r="6" fill="#e0b47c"/>
+          <circle cx="-11" cy="-17" r="3" fill="#eba091"/><circle cx="11" cy="-17" r="3" fill="#eba091"/>
+          <circle cx="0" cy="-6" r="15" fill="#e0b47c"/>
+          <ellipse cx="0" cy="-1" rx="7" ry="5" fill="#ffe7c4"/><ellipse cx="0" cy="-3" rx="2.6" ry="1.9" fill="#2a3441"/>
+          <circle class="eye" cx="-5.5" cy="-8" r="1.8" fill="#2a3441"/><circle class="eye" cx="5.5" cy="-8" r="1.8" fill="#2a3441"/>
+          <circle cx="-9" cy="-3" r="2.2" fill="#eba091" opacity=".7"/><circle cx="9" cy="-3" r="2.2" fill="#eba091" opacity=".7"/>
+        </g>
+        <path d="M-10 5 Q0 10 10 5 L10 8 Q0 13 -10 8Z" fill="#4ea596"/><rect x="4" y="7" width="4" height="9" rx="2" fill="#4ea596"/>
+        <g class="arm"><rect x="10" y="2" width="6" height="13" rx="3" fill="#d9a86c" transform="rotate(-150 13 4)"/></g>
+      </g>
+    </svg>
+    <h1 id="loadtitle">彦根交通安全シミュレーター</h1>
+    <div class="bar-track" role="progressbar" aria-labelledby="loadstep" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div class="bar-fill" id="progressfill"></div></div>
+    <p id="loadstep" class="step" role="status">ページを準備しています… / Getting ready…</p>
+    <p class="tip" aria-live="off"><span class="tip-label">ひとこと</span> <span id="tip">渡る前に 右・左・右 / Look right, left, right</span></p>
+    <div id="loaderror" class="loaderror" role="alert" hidden>
+      <p id="loaderrortext"></p>
+      <button id="reload" class="primary" type="button">もう一度読み込む / Reload</button>
+    </div>
+  </div>
+</section>
+<script>
+// Loading screen: runs before three.js arrives. app.js reports steps and progress through it;
+// any error during start-up turns into a readable message with a reload button.
+(() => {
+  const $ = id => document.getElementById(id);
+  const tips = ['渡る前に 右・左・右 / Look right, left, right', '止まっている車の陰に注意 / Mind the blind spot behind parked cars',
+    '曲がる車は うしろからも来る / Turning cars can come from behind', '自転車は 左側を走る / Bicycles keep to the left',
+    '出入口の前では スピードを落とす / Slow down at driveways', '速い車は すぐに来る / Fast cars arrive sooner than they seem'];
+  let tip = 0;
+  const rotate = setInterval(() => { tip = (tip + 1) % tips.length; $('tip').textContent = tips[tip]; }, 3200);
+  let shown = 0;
+  window.hikoneLoading = {
+    step(text, fraction) {
+      if (text) $('loadstep').textContent = text;
+      if (fraction != null) {
+        shown = Math.max(shown, Math.min(1, fraction));
+        $('progressfill').style.transform = `scaleX(${shown})`;
+        $('progress').setAttribute('aria-valuenow', String(Math.round(shown * 100)));
+      }
+    },
+    done() {
+      clearInterval(rotate);
+      this.step('準備ができました / Ready', 1);
+      const el = $('loading');
+      el.classList.add('leaving');
+      setTimeout(() => { el.hidden = true; }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 450);
+    },
+    fail(message) {
+      clearInterval(rotate);
+      $('loading').classList.add('failed');
+      $('loaderrortext').textContent = message;
+      $('loaderror').hidden = false;
+      $('reload').focus();
+    },
+  };
+  $('reload').onclick = () => location.reload();
+  const failed = reason => {
+    if ($('loading').hidden) return;                       // a problem after start-up is not a loading error
+    const text = String(reason?.message ?? reason ?? '');
+    window.hikoneLoading.fail(/WebGL|context/i.test(text)
+      ? 'このブラウザでは 3D 表示（WebGL）が使えません。ハードウェアアクセラレーションを有効にするか、別のブラウザでお試しください。 / This browser cannot show 3D (WebGL).'
+      : `読み込みに失敗しました。通信を確かめて、もう一度お試しください。 / Loading failed. (${text.slice(0, 160)})`);
+  };
+  addEventListener('error', e => failed(e.error ?? e.message));
+  addEventListener('unhandledrejection', e => failed(e.reason));
+})();
+</script>
+
+<section id="title" class="overlay card" aria-labelledby="titleheading" hidden>
   <header>
-    <h1>Hikone Traffic Simulator <span>彦根交通安全シミュレーター</span></h1>
+    <h1 id="titleheading">Hikone Traffic Simulator <span>彦根交通安全シミュレーター</span></h1>
     <p>彦根・京橋 ・ 歩行と自転車の交通安全体験（ブラウザ版）</p>
   </header>
   <div class="columns">
-    <div id="scenarios" class="scenarios"></div>
+    <div id="scenarios" class="scenarios" role="group" aria-label="場面を選ぶ / Choose a scenario"></div>
     <aside>
       <div class="body-inputs">
         <label>身長 / Height <span><input id="height" type="number" min="90" max="210" step="1" value="170" inputmode="numeric"> cm</span></label>
@@ -29,35 +116,35 @@
       </div>
       <p class="sel body-note">身長は目の高さとリプレイの小熊の背丈、体重は小熊の体つきに反映されます。</p>
       <label class="file">カスタム場面（JSON）を開く <input id="file" type="file" accept=".json,application/json"></label>
-      <p class="sel">選択中：<b id="selected"></b></p>
+      <p class="sel" aria-live="polite">選択中：<b id="selected"></b></p>
       <button id="start" class="primary">開始 / Start</button>
-      <p class="help desktop-only">クリックで視点操作（マウス）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し</p>
+      <p class="help desktop-only">クリックで視点操作（マウス）・ Q / E で見回す（キーボード）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し</p>
       <p class="help touch-only">左下のスティックで移動 ・ 画面をドラッグして見回す ・ 横向きがおすすめ</p>
     </aside>
   </div>
 </section>
 
-<div id="hud" class="hud" hidden><b id="hudname"></b><span id="hudhelp">クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span>
+<div id="hud" class="hud" role="region" aria-label="体験中 / Playing" hidden><b id="hudname"></b><span id="hudhelp">クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span>
   <button id="hudretry" class="touch-only">やり直し / Restart</button></div>
 
-<div id="touch" class="touch-controls" hidden>
-  <div class="stick" aria-label="移動スティック"><div class="knob"></div></div>
+<div id="touch" class="touch-controls" aria-hidden="true" hidden>
+  <div class="stick"><div class="knob"></div></div>
 </div>
 
-<section id="replayui" class="overlay bar" hidden>
+<section id="replayui" class="overlay bar" role="region" aria-labelledby="replayname" hidden>
   <span class="chip">REPLAY</span><b id="replayname">事故のリプレイ / Accident replay</b>
   <span id="rtime" class="time"></span>
   <span class="views" role="group" aria-label="視点 / View">
     <button id="viewover" class="on" aria-pressed="true">俯瞰 / Overview</button>
     <button id="viewdriver" aria-pressed="false">運転者 / Driver (V)</button>
   </span>
-  <button id="again">もう一度再生 / Replay (B)</button>
-  <button id="next" class="primary">スキップ / Skip</button>
+  <button id="again" type="button">もう一度再生 / Replay (B)</button>
+  <button id="next" class="primary" type="button">スキップ / Skip</button>
   <span id="rhint" class="replay-hint" aria-live="polite"></span>
 </section>
 
-<section id="results" class="overlay card narrow" hidden>
-  <h2 id="rtitle"></h2>
+<section id="results" class="overlay card narrow" role="dialog" aria-labelledby="rtitle" hidden>
+  <h2 id="rtitle" tabindex="-1"></h2>
   <div id="rlines"></div>
   <p id="rverdict" class="verdict"></p>
   <div class="buttons">
@@ -65,7 +152,7 @@
     <button id="totitle" class="primary">タイトルへ / Title (Enter)</button>
   </div>
 </section>
-<div id="fps"></div>
+<div id="fps" aria-hidden="true"></div>
 <script type="module" src="src/app.js"></script>
 </body>
 </html>

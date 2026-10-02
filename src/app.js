@@ -20,8 +20,22 @@ import { TouchControls, isTouchDevice } from './touch-controls.js';
 import { AdaptiveResolution } from './resolution.js';
 
 const $ = id => document.getElementById(id);
-const json = url => fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); });
-const status = text => { $('loading').textContent = text; };
+// loading screen (index.html): data files are the first 15 %, the models the next 75 %, building the rest
+const loading = window.hikoneLoading ?? { step() {}, done() {}, fail() {} };
+const progress = { files: [0, 0], models: [0, 0], base: 0 };
+const showProgress = text => loading.step(text, progress.base
+  + 0.15 * (progress.files[1] ? progress.files[0] / progress.files[1] : 0)
+  + 0.75 * (progress.models[1] ? progress.models[0] / progress.models[1] : 0));
+THREE.DefaultLoadingManager.onProgress = (url, loaded, total) => { progress.models = [loaded, total]; showProgress(); };
+const json = url => {
+  progress.files[1]++;
+  return fetch(url).then(r => { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); })
+    .then(data => { progress.files[0]++; showProgress(); return data; });
+};
+const status = text => showProgress(text);
+// screen-reader announcements of what happens (start, contact, goal, replay, results)
+const announce = text => { const el = $('announce'); el.textContent = ''; requestAnimationFrame(() => { el.textContent = text; }); };
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
 // ---------------------------------------------------------------- set-up
 // Dual-GPU laptops otherwise render on the integrated GPU (about half the frame rate here).
@@ -52,17 +66,18 @@ addEventListener('resize', () => {
   sizeRenderer();
 });
 
-status('データを読み込んでいます…');
+status('データを読み込んでいます… / Loading data…');
 const [sceneData, signalData, layout, map, roadTiles, scenarioIndex] = await Promise.all([
   json('data/scene.json'), json('data/signals.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json')]);
 const ground = new Ground(roadTiles);
 const materials = buildMaterials(sceneData.materials);
 const light = buildLight(scene, renderer, sceneData.light);
-status('街を組み立てています…');
+status('街の模型を読み込んでいます… / Loading the town…');
 const env = await buildEnvironment(scene, layout, materials);
 const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium'];
 await Promise.all(vehicleModels.map(name => model(name)));
 
+status('街を組み立てています… / Building the town…');
 // New closed signal models retain the source's installation matrices.
 const signals = await buildSignals(scene, signalData, materials);
 const occluders = new THREE.Group();
@@ -75,6 +90,8 @@ for (const w of sceneData.blackWalls) {
 }
 
 const player = new Player(camera, renderer, map, ground);
+player.reducedMotion = reducedMotion.matches;          // no roll of the view when the body falls
+reducedMotion.addEventListener?.('change', e => { player.reducedMotion = e.matches; });
 scene.add(player.rig);
 scene.add(player.bicycle.root);
 const replay = new Replay(scene, materials, ground);
@@ -93,7 +110,7 @@ addEventListener('keydown', e => {
 // ---------------------------------------------------------------- title
 let selected = scenarioIndex.find(e => e.template) ?? scenarioIndex[0];
 let customScenario = null;
-function renderTitle() {
+function renderTitle(focusSelected = false) {
   const list = $('scenarios');
   list.replaceChildren();
   for (const group of [['組み込み / Built-in', scenarioIndex.filter(e => e.template)], ['カスタム / Custom', scenarioIndex.filter(e => !e.template)]]) {
@@ -101,11 +118,17 @@ function renderTitle() {
     list.append(Object.assign(document.createElement('h3'), { textContent: group[0] }));
     for (const e of group[1]) {
       const b = document.createElement('button');
-      b.className = 'tile' + (e === selected && !customScenario ? ' on' : '');
+      const on = e === selected && !customScenario;
+      b.type = 'button';
+      b.className = 'tile' + (on ? ' on' : '');
+      b.setAttribute('aria-pressed', String(on));
       const n = e.template ? e.id.replace('builtin-', '') + ' ' : '';
-      b.innerHTML = `<b>${n}${e.name}</b><small>${e.nameEn ?? ''} ・ ${S.MODE_LABELS[e.playerMode] ?? ''}</small>`;
-      b.onclick = () => { selected = e; customScenario = null; renderTitle(); };
+      const name = Object.assign(document.createElement('b'), { textContent: n + e.name });
+      const sub = Object.assign(document.createElement('small'), { textContent: `${e.nameEn ?? ''} ・ ${S.MODE_LABELS[e.playerMode] ?? ''}` });
+      b.append(name, sub);
+      b.onclick = () => { selected = e; customScenario = null; renderTitle(true); };
       list.append(b);
+      if (on && focusSelected) b.focus();
     }
   }
   $('selected').textContent = customScenario ? `ファイル：${customScenario.name}` : `${selected.name}`;
@@ -123,8 +146,9 @@ $('file').onchange = async ev => {
 };
 $('start').onclick = () => start();
 renderTitle();
-$('loading').hidden = true;
+loading.done();
 $('title').hidden = false;
+$('start').focus({ preventScroll: true });
 
 // ---------------------------------------------------------------- run
 let state = 'title';
@@ -168,8 +192,10 @@ async function start(again = false) {
   const bike = scenario.playerMode === 'bicycle';
   $('hudhelp').textContent = touchDevice
     ? (bike ? 'スティック：上でこぐ・下でブレーキ・左右でハンドル ・ ドラッグで見回す' : 'スティックで移動 ・ ドラッグで見回す')
-    : (bike ? 'W こぐ ・ S ブレーキ ・ A / D ハンドル ・ マウスで見回す ・ R でやり直し' : 'クリックで視点操作 ・ WASD で移動 ・ R でやり直し');
+    : (bike ? 'W こぐ ・ S ブレーキ ・ A / D ハンドル ・ マウスか Q / E で見回す ・ R でやり直し' : 'クリックで視点操作 ・ Q / E で見回す ・ WASD で移動 ・ R でやり直し');
   touch.setActive(touchDevice);
+  document.activeElement?.blur?.();                       // keys go to the game, not to a hidden button
+  announce(`${$('hudname').textContent}。開始しました。${bike ? 'W でこぎ、A と D でハンドル。' : 'W で前へ、Q と E で見回します。'}`);
 }
 
 function cleanup() {
@@ -190,6 +216,7 @@ function toTitle() {
   document.exitPointerLock?.();
   $('hud').hidden = true; $('results').hidden = true; $('replayui').hidden = true;
   $('title').hidden = false;
+  renderTitle(true);
 }
 
 function syncCars() {
@@ -220,6 +247,7 @@ function onImpact(car) {
   $('hud').hidden = true;
   run.impactUntil = run.time + SECONDS_AFTER_IMPACT;
   flash.classList.add('on');
+  announce('車と接触しました。 / Contact with a car.');
   navigator.vibrate?.(300);
 }
 
@@ -233,6 +261,8 @@ function beginReplay() {
   replay.start(run.frames, t, run.impact.car.id, run.heightCm, run.scenario.playerMode, run.weightKg);
   light.invalidate();
   state = 'replay';
+  announce('リプレイです。俯瞰か運転者の視点で見られます。 / Replay.');
+  $('next').focus({ preventScroll: true });
   $('hud').hidden = true;
   $('replayui').hidden = false;
   $('replayname').textContent = run.scenario.playerMode === 'bicycle'
@@ -276,6 +306,8 @@ function showResults(success) {
   $('rlines').replaceChildren(...lines.map(l => Object.assign(document.createElement('p'), { textContent: l })));
   $('rverdict').textContent = verdict;
   $('results').hidden = false;
+  $('rtitle').focus({ preventScroll: true });
+  announce(`${title}。${verdict}`);
 }
 
 $('next').onclick = () => { if (state === 'replay') showResults(false); };
@@ -295,6 +327,8 @@ $('hudretry').onclick = () => { if (state === 'playing') start(true); };
 $('totitle').onclick = () => toTitle();
 addEventListener('keydown', e => {
   if (e.repeat) return;
+  // a focused button or field handles its own Enter/Space; shortcuts must not fire a second action
+  if (e.target.closest?.('button, input, textarea, select') && ['Enter', 'Space', 'NumpadEnter'].includes(e.code)) return;
   // Advancing the replay requires explicitly activating its Next/Skip button.
   if (state === 'replay' && e.code === 'KeyB') replay.restart();
   else if (state === 'replay' && e.code === 'KeyV') setReplayView(replay.view === 'driver' ? 'overview' : 'driver');
@@ -363,9 +397,9 @@ renderer.setAnimationLoop(() => {
     || state === 'replay' && !replay.atEnd;
   light.follow(lightPosition, moving, updateStart);
   const view = debugCamera ?? (state === 'replay' ? replay.activeCamera : camera);
+  const aspect = innerWidth / innerHeight;
+  if (view.aspect !== aspect) { view.aspect = aspect; view.updateProjectionMatrix(); }
   if (env.updateLOD(view, null, light.shadowCamera)) light.invalidate();
-  if (debugCamera) { debugCamera.aspect = innerWidth / innerHeight; debugCamera.updateProjectionMatrix(); }
-  if (view === replay.activeCamera && view.aspect !== innerWidth / innerHeight) { view.aspect = innerWidth / innerHeight; view.updateProjectionMatrix(); }
   const updateMs = performance.now() - updateStart;
   artRenderer.render(scene, view);
   probe.frame(elapsed, updateMs);

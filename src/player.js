@@ -114,6 +114,9 @@ export class Player {
 
   update(dt) {
     if (this.fall) { this.fall.t += dt; this.apply(); return; }
+    // keyboard looking (no mouse needed): Q / E turn the head at 90°/s
+    const turn = (this.keys.has('KeyE') ? 1 : 0) - (this.keys.has('KeyQ') ? 1 : 0);
+    if (turn) this.look(turn * 90 * dt, 0);
     if (this.mode === 'bicycle') { this.ride(dt); return; }
     let [sx, sf] = this.input();
     const len = Math.hypot(sx, sf);
@@ -204,7 +207,7 @@ export class Player {
     const p = toThree(this.x + f.push[0] * throwDistance, groundY, this.z + f.push[1] * throwDistance);
     this.rig.position.copy(p);
     this.camera.position.set(0, height, 0);
-    const roll = f.roll * ROLL * settle;
+    const roll = this.reducedMotion ? 0 : f.roll * ROLL * settle;   // prefers-reduced-motion: no roll
     const pitch = f.pitch + (LYING_PITCH - f.pitch) * settle;
     this.camera.rotation.set(pitch * Math.PI / 180, Math.PI - this.yaw * Math.PI / 180, roll, 'YXZ');
     if (this.mode === 'bicycle') this.bicycle.root.rotation.z = -f.roll * 1.35 * settle;   // the bicycle goes down too

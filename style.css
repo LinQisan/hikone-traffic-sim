@@ -80,3 +80,46 @@ button { touch-action: manipulation; }
 @media (orientation: landscape) and (max-height: 520px) {
   .columns { grid-template-columns: 1fr 220px; }
 }
+
+/* ---------------------------------------------------------------- loading screen */
+.loading { inset: 0; display: grid; place-items: center; padding: 24px;
+  background: radial-gradient(ellipse at 50% 35%, #fff4dc 0%, #f4dcc0 45%, #c9b8d8 100%); color: #3a3350; transition: opacity 0.45s ease; }
+.loading.leaving { opacity: 0; }
+.loader { width: min(420px, 100%); text-align: center; }
+.loader .scene { width: 100%; height: auto; overflow: visible; }
+.loader h1 { font-size: 20px; margin: 10px 0 14px; color: #3a3350; }
+.bar-track { height: 12px; border-radius: 999px; background: rgba(58, 51, 80, 0.15); overflow: hidden; }
+.bar-fill { height: 100%; width: 100%; transform: scaleX(0); transform-origin: left; border-radius: inherit;
+  background: linear-gradient(90deg, #4ea596, #e0b47c, #eba091); transition: transform 0.35s ease; }
+.loader .step { margin: 10px 0 4px; font-size: 14px; }
+.loader .tip { margin: 6px 0 0; font-size: 13px; color: #5d5470; min-height: 2.6em; }
+.tip-label { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #4ea596; color: #fff; font-size: 11px; font-weight: 700; margin-right: 4px; }
+.loaderror { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff; color: #7a2a20; text-align: left; font-size: 14px; }
+.loaderror p { margin: 0 0 10px; }
+.loading.failed .bear { animation-play-state: paused; }
+.bear { transform: translate(52px, 66px); animation: bear-cross 6.4s ease-in-out infinite; }
+.bear .leg { transform-box: fill-box; transform-origin: 50% 0; animation: bear-step 0.5s ease-in-out infinite alternate; }
+.bear .leg.r { animation-delay: -0.5s; }
+.bear .head { transform-box: fill-box; transform-origin: 50% 90%; animation: bear-bob 0.5s ease-in-out infinite alternate; }
+.bear .eye { transform-box: fill-box; transform-origin: center; animation: bear-blink 3.6s infinite; }
+.car .lamp { animation: lamp 1s steps(2) infinite; }
+@keyframes bear-cross { 0%, 8% { transform: translate(52px, 66px); } 78%, 100% { transform: translate(178px, 66px); } }
+@keyframes bear-step { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+@keyframes bear-bob { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-1.5px) rotate(3deg); } }
+@keyframes bear-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes lamp { 50% { opacity: 0.25; } }
+.noscript { position: fixed; inset: 0; z-index: 20; margin: 0; display: grid; place-items: center; padding: 24px; background: var(--bg); text-align: center; }
+
+/* ---------------------------------------------------------------- accessibility */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+:focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; border-radius: 10px; }
+button:focus-visible, input:focus-visible { box-shadow: 0 0 0 5px rgba(253, 230, 138, 0.35); }
+.tile[aria-pressed="true"] { background: #0ea5e9; border-color: #7dd3fc; }
+.tile[aria-pressed="true"] small { color: #e0f2fe; }
+body.touch button { min-height: 44px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
+  .bear { animation: none; transform: translate(118px, 66px); }
+  #flash.on { opacity: 0.25; }
+}
+@media (forced-colors: active) { .bar-fill { background: Highlight; } .tile[aria-pressed="true"] { outline: 2px solid Highlight; } }
