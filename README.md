@@ -4,6 +4,10 @@
 
 ## 動かす
 
+すぐ試す: **https://linqisan.github.io/hikone-traffic-sim/**（GitHub Pages、`main` を公開）
+
+手元で動かす:
+
 ```bash
 node serve.mjs                 # http://127.0.0.1:8770/
 node serve.mjs --host 0.0.0.0  # 同じ LAN のスマートフォンから http://<PC の IP>:8770/
