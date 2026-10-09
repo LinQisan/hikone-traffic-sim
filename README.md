@@ -4,7 +4,7 @@
 
 ## 動かす
 
-すぐ試す: **https://linqisan.github.io/hikone-traffic-sim/**（GitHub Pages、`main` を公開）
+すぐ試す: **https://linqisan.github.io/hikone-traffic-sim/**
 
 手元で動かす:
 
