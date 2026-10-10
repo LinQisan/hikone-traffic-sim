@@ -1,4 +1,5 @@
-// Scenario model shared by the browser, the local server and the tests.
+// Scenario model shared by the web scenario editor (../hikone-traffic-sim/editor, which gets a copy
+// through its tools/sync.mjs), the browser port, its local server and the tests.
 // Mirrors Assets/_Project/Scripts/Scenario/CustomScenario.cs: same fields, defaults, order and
 // validation messages. Keep both sides in step (see CustomScenario.Validate).
 

@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <title>シナリオエディタ — Hikone Traffic Simulator</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" href="../" title="シミュレーターへ戻る / Back to the simulator">
+      <!-- the loading screen's little bear, head only -->
+      <svg class="logo" viewBox="-22 -26 44 40" aria-hidden="true">
+        <circle cx="-11" cy="-17" r="6" fill="#e0b47c"/><circle cx="11" cy="-17" r="6" fill="#e0b47c"/>
+        <circle cx="-11" cy="-17" r="3" fill="#eba091"/><circle cx="11" cy="-17" r="3" fill="#eba091"/>
+        <circle cx="0" cy="-6" r="15" fill="#e0b47c"/>
+        <ellipse cx="0" cy="-1" rx="7" ry="5" fill="#ffe7c4"/><ellipse cx="0" cy="-3" rx="2.6" ry="1.9" fill="#2a3441"/>
+        <circle cx="-5.5" cy="-8" r="1.8" fill="#2a3441"/><circle cx="5.5" cy="-8" r="1.8" fill="#2a3441"/>
+        <circle cx="-9" cy="-3" r="2.2" fill="#eba091" opacity=".7"/><circle cx="9" cy="-3" r="2.2" fill="#eba091" opacity=".7"/>
+      </svg>
+      <span>シナリオエディタ <small>Scenario editor</small></span>
+    </a>
+    <div class="file">
+      <span id="fileName">—</span>
+      <span id="dirty" class="dirty" hidden title="未保存の変更があります">●</span>
+    </div>
+    <div class="actions">
+      <button id="btnNew" title="新しい場面">＋ 新規</button>
+      <button id="btnDuplicate" title="この場面を複製">複製</button>
+      <label class="button" title="JSON ファイルを読み込む">開く<input id="importFile" type="file" accept=".json,application/json"></label>
+      <button id="btnSave" class="primary" title="保存 (Ctrl+S)">保存</button>
+      <span class="sep"></span>
+      <button id="btnUndo" title="元に戻す (Ctrl+Z)">↶</button>
+      <button id="btnRedo" title="やり直す (Ctrl+Shift+Z)">↷</button>
+      <span class="sep"></span>
+      <button id="btnTry" class="accent" title="このままの内容をシミュレーターで体験（新しいタブ）">▶ ブラウザで試す</button>
+      <button id="btnPlay" class="server-only" title="保存して Unity エディタで再生">▶ Unityで試す</button>
+      <button id="btnQuest" class="server-only" title="保存済みの場面を USB / ワイヤレス adb でつないだ Quest にコピー">⇪ Questに送る</button>
+      <button id="btnDownload" title="この場面を JSON ファイルとして書き出す">⇩ JSON</button>
+      <button id="btnDelete" class="danger" title="この場面を削除">削除</button>
+    </div>
+    <div id="status" class="status"></div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel left">
+      <section>
+        <h2>場面 <span id="mode" class="mode"></span></h2>
+        <div id="scenarioList" class="list"></div>
+      </section>
+      <section>
+        <h2>表示</h2>
+        <label class="check"><input type="checkbox" id="layerSurfaces"> 路面（車道・歩道）</label>
+        <label class="check"><input type="checkbox" id="layerLanes" checked> 組み込みの車線</label>
+        <label class="check"><input type="checkbox" id="layerWalls" checked> 見えない壁</label>
+        <label class="check"><input type="checkbox" id="layerSignals"> 信号</label>
+        <label class="check"><input type="checkbox" id="snapLanes" checked> 車線に吸着（3 m 以内）</label>
+      </section>
+      <section class="help">
+        <h2>操作</h2>
+        <ul>
+          <li>ドラッグ：移動 / 空白をドラッグ：地図を動かす</li>
+          <li>ホイール：拡大・縮小</li>
+          <li>車を描く：クリックで点を追加、Enter / ダブルクリックで完了</li>
+          <li>ルート上をダブルクリック：点を追加 / 点を右クリック：削除</li>
+          <li>□ ハンドル：大きさ ○ ハンドル：向き</li>
+          <li>Space：再生 / Delete：削除 / Esc：選択解除</li>
+        </ul>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <svg id="map" tabindex="0"></svg>
+      <div class="tools">
+        <button id="toolSelect" class="tool active" title="選択・移動 (V)">↖ 選択</button>
+        <button id="toolDraw" class="tool" title="車のルートを描く (C)">✎ 車を描く</button>
+        <button id="btnFit" class="tool" title="全体を表示 (F)">⤢</button>
+      </div>
+      <div id="drawHint" class="hint" hidden>クリックで点を追加 ・ Enter / ダブルクリックで完了 ・ Esc で中止</div>
+      <div id="coords" class="coords"></div>
+      <div id="loading" class="loading">地図を読み込み中…</div>
+    </section>
+
+    <aside class="panel right">
+      <div id="inspector"></div>
+      <section>
+        <h2>チェック <span id="problemCount" class="count"></span></h2>
+        <div id="problems" class="problems"></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="timeline">
+    <button id="btnTimePlay" class="play" title="再生 / 一時停止 (Space)">▶</button>
+    <input type="range" id="timeSlider" min="0" max="40" step="0.05" value="0">
+    <span id="timeLabel" class="time">0.0 秒</span>
+    <label class="check"><input type="checkbox" id="triggerOn" checked> トリガーに入る</label>
+    <label class="num">時刻 <input type="number" id="triggerTime" step="0.5" min="0"> 秒</label>
+    <label class="check"><input type="checkbox" id="triggerAuto" checked> 歩く速さから推定</label>
+    <span id="timelineInfo" class="info"></span>
+  </footer>
+
+  <dialog id="questDialog" class="dialog">
+    <h2>Quest に送る</h2>
+    <p class="note">「マイ場面」のうちエラーのない場面を、つないだ Quest のアプリにコピーします。PC で消した場面は Quest からも消えます（組み込みの 10 場面はアプリに入っているので送りません）。</p>
+    <div id="questStatus" class="quest-status">確認中…</div>
+    <div id="questResult" class="quest-result"></div>
+    <div class="dialog-buttons">
+      <button id="questRefresh">再確認</button>
+      <button id="questSend" class="primary">送る</button>
+      <button id="questClose">閉じる</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

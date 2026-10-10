@@ -1,0 +1,201 @@
+{
+    "format": "vrlearn-scenario",
+    "version": 1,
+    "id": "builtin-06",
+    "name": "道路の途中：スピードを出して止まらない車",
+    "nameEn": "Speeding car",
+    "setting": "midblock",
+    "learningGoal": "遠くに見えても、速い車はすぐに来る。十分に離れているときだけ渡る。",
+    "situation": "車はまだ遠いと思って渡り始めたところで、スピードを出した車にぶつかられました。車は止まらずに走り去りました。",
+    "point": "速い車はあっという間に近くまで来ます。車が遠くにいて、ゆっくりのときだけ渡りましょう。",
+    "map": "hikone-kyobashi",
+    "playerMode": "walking",
+    "spawn": {
+        "x": 62.62,
+        "z": 19.0
+    },
+    "goal": {
+        "x": 63.63,
+        "z": 31.77,
+        "width": 5.06,
+        "depth": 1.0,
+        "yaw": 0.0
+    },
+    "trigger": {
+        "x": 62.64,
+        "z": 25.75,
+        "width": 2.53,
+        "depth": 3.07,
+        "yaw": 0.0
+    },
+    "vehicles": [
+        {
+            "name": "事故車 1",
+            "model": "Car_EndlessGo",
+            "body": "",
+            "route": [
+                {
+                    "x": 71.93,
+                    "z": 26.41
+                },
+                {
+                    "x": 69.88,
+                    "z": 26.41
+                },
+                {
+                    "x": 64.8,
+                    "z": 26.41
+                },
+                {
+                    "x": 51.95,
+                    "z": 26.41
+                },
+                {
+                    "x": 42.58,
+                    "z": 24.19
+                },
+                {
+                    "x": 19.42,
+                    "z": 24.19
+                },
+                {
+                    "x": 12.7,
+                    "z": 24.19
+                },
+                {
+                    "x": -6.08,
+                    "z": 24.19
+                },
+                {
+                    "x": -6.08,
+                    "z": 23.92
+                },
+                {
+                    "x": -109.0,
+                    "z": 23.92
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 0.5,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": -90.0
+        },
+        {
+            "name": "事故車 2",
+            "model": "Car_EndlessGo",
+            "body": "",
+            "route": [
+                {
+                    "x": 71.93,
+                    "z": 26.41
+                },
+                {
+                    "x": 69.88,
+                    "z": 26.41
+                },
+                {
+                    "x": 64.8,
+                    "z": 26.41
+                },
+                {
+                    "x": 51.95,
+                    "z": 26.41
+                },
+                {
+                    "x": 42.58,
+                    "z": 24.19
+                },
+                {
+                    "x": 19.42,
+                    "z": 24.19
+                },
+                {
+                    "x": 12.7,
+                    "z": 24.19
+                },
+                {
+                    "x": -6.08,
+                    "z": 24.19
+                },
+                {
+                    "x": -6.08,
+                    "z": 23.92
+                },
+                {
+                    "x": -109.0,
+                    "z": 23.92
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 4.0,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": -90.0
+        },
+        {
+            "name": "事故車 3",
+            "model": "Car_EndlessGo",
+            "body": "",
+            "route": [
+                {
+                    "x": 71.93,
+                    "z": 26.41
+                },
+                {
+                    "x": 69.88,
+                    "z": 26.41
+                },
+                {
+                    "x": 64.8,
+                    "z": 26.41
+                },
+                {
+                    "x": 51.95,
+                    "z": 26.41
+                },
+                {
+                    "x": 42.58,
+                    "z": 24.19
+                },
+                {
+                    "x": 19.42,
+                    "z": 24.19
+                },
+                {
+                    "x": 12.7,
+                    "z": 24.19
+                },
+                {
+                    "x": -6.08,
+                    "z": 24.19
+                },
+                {
+                    "x": -6.08,
+                    "z": 23.92
+                },
+                {
+                    "x": -109.0,
+                    "z": 23.92
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 11.0,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": -90.0
+        }
+    ]
+}

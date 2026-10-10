@@ -1,0 +1,133 @@
+{
+    "format": "vrlearn-scenario",
+    "version": 1,
+    "id": "builtin-08",
+    "name": "自転車：出入口の前を通るときの車",
+    "nameEn": "Passing a driveway",
+    "setting": "bicycle",
+    "learningGoal": "出入口の前を通りすぎるまで、横から出てくる車に気をつける。",
+    "situation": "自転車で駐車場の出入口の前を通っているとき、出てきた車に横からぶつかられました。",
+    "point": "出入口の前は止まれる速さで通り、車が見えたらすぐ止まりましょう。",
+    "map": "hikone-kyobashi",
+    "playerMode": "bicycle",
+    "spawn": {
+        "x": -37.54,
+        "z": 22.77
+    },
+    "goal": {
+        "x": -83.62,
+        "z": 23.57,
+        "width": 5.06,
+        "depth": 1.0,
+        "yaw": 270.0
+    },
+    "trigger": {
+        "x": -58.14,
+        "z": 24.1,
+        "width": 2.53,
+        "depth": 3.07,
+        "yaw": 0.0
+    },
+    "vehicles": [
+        {
+            "name": "車の流れ Acident_Left",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": -107.87,
+                    "z": 27.8
+                },
+                {
+                    "x": -100.29,
+                    "z": 27.8
+                },
+                {
+                    "x": 80.51,
+                    "z": 27.97
+                },
+                {
+                    "x": 93.67,
+                    "z": 17.92
+                },
+                {
+                    "x": 94.31,
+                    "z": 0.93
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 1.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": false,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": 90.0
+        },
+        {
+            "name": "車の流れ Acident_Right",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": -19.0,
+                    "z": 24.2
+                },
+                {
+                    "x": -21.19,
+                    "z": 24.2
+                },
+                {
+                    "x": -110.9,
+                    "z": 24.2
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 1.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": true,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": -90.0
+        },
+        {
+            "name": "事故車 1",
+            "model": "Car_SideHit",
+            "body": "",
+            "route": [
+                {
+                    "x": -65.82,
+                    "z": 16.1
+                },
+                {
+                    "x": -65.88,
+                    "z": 17.48
+                },
+                {
+                    "x": -66.2,
+                    "z": 21.42
+                },
+                {
+                    "x": -71.12,
+                    "z": 23.51
+                },
+                {
+                    "x": -108.93,
+                    "z": 24.19
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 0.5,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": 0.0
+        }
+    ]
+}

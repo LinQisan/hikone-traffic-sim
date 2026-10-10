@@ -1,0 +1,217 @@
+{
+    "format": "vrlearn-scenario",
+    "version": 1,
+    "id": "builtin-02",
+    "name": "交差点：横から曲がってくる車",
+    "nameEn": "Turning car",
+    "setting": "crossing",
+    "learningGoal": "交差点では、横やうしろから曲がってくる車にも気をつける。",
+    "situation": "交差点の横断歩道を渡っているとき、左うしろ（キャッスルロード側）から右に曲がってきた車とぶつかりました。",
+    "point": "前だけでなく、曲がってくる車が来ないか、横やうしろも確かめましょう。",
+    "map": "hikone-kyobashi",
+    "playerMode": "walking",
+    "spawn": {
+        "x": 40.0,
+        "z": 14.0
+    },
+    "goal": {
+        "x": 40.0,
+        "z": 32.0,
+        "width": 5.06,
+        "depth": 1.0,
+        "yaw": 0.0
+    },
+    "trigger": {
+        "x": 40.0,
+        "z": 25.8,
+        "width": 4.95,
+        "depth": 7.72,
+        "yaw": 0.0
+    },
+    "vehicles": [
+        {
+            "name": "車の流れ Left2",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": 7.16,
+                    "z": -3.72
+                },
+                {
+                    "x": 21.63,
+                    "z": -3.74
+                },
+                {
+                    "x": 29.92,
+                    "z": 4.36
+                },
+                {
+                    "x": 29.9,
+                    "z": 49.47
+                },
+                {
+                    "x": 35.88,
+                    "z": 62.26
+                },
+                {
+                    "x": 46.1,
+                    "z": 64.7
+                },
+                {
+                    "x": 54.9,
+                    "z": 64.7
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 5.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": true,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": 90.0
+        },
+        {
+            "name": "車の流れ Right2",
+            "model": "Car_Right",
+            "body": "",
+            "route": [
+                {
+                    "x": 52.87,
+                    "z": 60.39
+                },
+                {
+                    "x": 44.52,
+                    "z": 60.47
+                },
+                {
+                    "x": 40.33,
+                    "z": 59.3
+                },
+                {
+                    "x": 34.5,
+                    "z": 52.7
+                },
+                {
+                    "x": 33.89,
+                    "z": 6.33
+                },
+                {
+                    "x": 26.15,
+                    "z": -6.85
+                },
+                {
+                    "x": 6.2,
+                    "z": -8.15
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 5.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": false,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": -90.0
+        },
+        {
+            "name": "事故車 1",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": 29.96,
+                    "z": 12.4
+                },
+                {
+                    "x": 30.1,
+                    "z": 20.92
+                },
+                {
+                    "x": 36.78,
+                    "z": 27.62
+                },
+                {
+                    "x": 40.41,
+                    "z": 27.91
+                },
+                {
+                    "x": 51.05,
+                    "z": 27.91
+                },
+                {
+                    "x": 80.51,
+                    "z": 27.97
+                },
+                {
+                    "x": 93.67,
+                    "z": 17.92
+                },
+                {
+                    "x": 94.36,
+                    "z": 0.72
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 0.5,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": 0.0
+        },
+        {
+            "name": "事故車 2",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": 29.96,
+                    "z": 12.4
+                },
+                {
+                    "x": 30.1,
+                    "z": 20.92
+                },
+                {
+                    "x": 36.78,
+                    "z": 27.62
+                },
+                {
+                    "x": 40.41,
+                    "z": 27.91
+                },
+                {
+                    "x": 51.05,
+                    "z": 27.91
+                },
+                {
+                    "x": 80.51,
+                    "z": 27.97
+                },
+                {
+                    "x": 93.67,
+                    "z": 17.92
+                },
+                {
+                    "x": 94.36,
+                    "z": 0.72
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "trigger",
+            "delaySeconds": 4.0,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": true,
+            "overrideYaw": true,
+            "yaw": 0.0
+        }
+    ]
+}

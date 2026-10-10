@@ -1,0 +1,97 @@
+{
+    "format": "vrlearn-scenario",
+    "version": 1,
+    "id": "builtin-10",
+    "name": "自転車：道路の右側を走る（逆走）",
+    "nameEn": "Riding on the wrong side",
+    "setting": "bicycle",
+    "learningGoal": "自転車は左側通行。右側を走ると前から来る車とぶつかりやすい。",
+    "situation": "自転車で道路の右側を走っていて、前から来た車とぶつかりました。",
+    "point": "自転車は車道の左側を走りましょう。前から来る車とすれ違うのはとても危険です。",
+    "map": "hikone-kyobashi",
+    "playerMode": "bicycle",
+    "spawn": {
+        "x": -37.54,
+        "z": 28.59
+    },
+    "goal": {
+        "x": -83.62,
+        "z": 28.13,
+        "width": 5.06,
+        "depth": 1.0,
+        "yaw": 270.0
+    },
+    "trigger": {
+        "x": 0.0,
+        "z": 0.0,
+        "width": 0.0,
+        "depth": 0.0,
+        "yaw": 0.0
+    },
+    "vehicles": [
+        {
+            "name": "車の流れ Acident_Left",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": -107.87,
+                    "z": 27.99
+                },
+                {
+                    "x": -100.29,
+                    "z": 27.99
+                },
+                {
+                    "x": 80.51,
+                    "z": 27.97
+                },
+                {
+                    "x": 93.67,
+                    "z": 17.92
+                },
+                {
+                    "x": 94.31,
+                    "z": 0.93
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 1.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": false,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": 90.0
+        },
+        {
+            "name": "車の流れ Acident_Right",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": -19.0,
+                    "z": 24.2
+                },
+                {
+                    "x": -21.19,
+                    "z": 24.2
+                },
+                {
+                    "x": -110.9,
+                    "z": 24.2
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 1.0,
+            "repeatMinSeconds": 4.0,
+            "repeatMaxSeconds": 6.0,
+            "stopOnTrigger": false,
+            "accident": false,
+            "overrideYaw": true,
+            "yaw": -90.0
+        }
+    ]
+}

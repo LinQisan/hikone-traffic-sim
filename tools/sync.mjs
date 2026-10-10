@@ -1,5 +1,6 @@
 // Copies the data the web port needs from the VRLearn Unity project into ./data (and the shared
-// scenario model into ./src/shared). Run after changing the environment, scenarios or the map:
+// scenario model, VRLearn's ScenarioModel/scenario.js, into ./src/shared). The scenario editor
+// (./editor) uses the map image and the Unity templates in data/editor/templates. Run after changing the environment, scenarios or the map:
 //   node tools/sync.mjs            (VRLEARN_ROOT overrides ../VRLearn)
 // Models come from tools/export_models.py (Blender); scene.json from the Unity menu
 // Tools/VRLearn/Web/Export Scene For Web.
@@ -24,7 +25,15 @@ const copy = (from, to) => {
 copy('Assets/_Project/Hikone/Layout/hikone_layout.json', path.join(data, 'layout.json'));
 copy('Art/Hikone/road_tiles_geometry.json', path.join(data, 'road_tiles.json'));
 copy('Scenarios/maps/hikone-kyobashi/map.json', path.join(data, 'map.json'));
-copy('ScenarioEditor/web/scenario.js', path.join(web, 'src', 'shared', 'scenario.js'));
+copy('Scenarios/maps/hikone-kyobashi/map.png', path.join(data, 'map.png'));
+copy('ScenarioModel/scenario.js', path.join(web, 'src', 'shared', 'scenario.js'));
+
+// the editor's templates are Unity's own (what the headset runs), not the re-timed events below
+const editorTemplates = path.join(data, 'editor', 'templates');
+fs.rmSync(editorTemplates, { recursive: true, force: true });
+const templateNames = fs.readdirSync(path.join(root, 'Scenarios', 'templates')).filter(f => f.endsWith('.json')).sort();
+for (const f of templateNames) copy(`Scenarios/templates/${f}`, path.join(editorTemplates, f));
+fs.writeFileSync(path.join(editorTemplates, 'index.json'), JSON.stringify(templateNames, null, 2) + '\n');
 
 const textures = 'Assets/_Project/Hikone/Textures';
 for (const f of fs.readdirSync(path.join(root, textures)).filter(f => f.endsWith('.png')))
@@ -53,5 +62,5 @@ for (const f of fs.readdirSync(path.join(root, 'Scenarios')).filter(f => f.endsW
 fs.writeFileSync(path.join(scenarioDir, 'index.json'), JSON.stringify(list, null, 2) + '\n');
 
 const missing = ['scene.json', 'models/HK_RoadSurf_Cross.glb', 'models/WEB_Sedan.glb'].filter(f => !fs.existsSync(path.join(data, f)));
-console.log(`synced from ${root}: layout, road tiles, map, ${list.length} scenarios, textures, shared/scenario.js`);
+console.log(`synced from ${root}: layout, road tiles, map, ${list.length} scenarios, ${templateNames.length} editor templates, textures, shared/scenario.js`);
 if (missing.length) console.warn('still missing (run the Unity exporter / tools/export_models.py):', missing.join(', '));
