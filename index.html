@@ -116,16 +116,18 @@
       </div>
       <p class="sel body-note">身長は目の高さとリプレイの小熊の背丈、体重は小熊の体つきに反映されます。</p>
       <label class="file">カスタム場面（JSON）を開く <input id="file" type="file" accept=".json,application/json"></label>
+      <a class="editor-link" href="editor/">✎ シナリオエディタで場面を作る / Scenario editor</a>
       <p class="sel" aria-live="polite">選択中：<b id="selected"></b></p>
       <button id="start" class="primary">開始 / Start</button>
-      <p class="help desktop-only">クリックで視点操作（マウス）・ Q / E で見回す（キーボード）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し</p>
+      <p class="help desktop-only">クリックで視点操作（マウス）・ Q / E で見回す（キーボード）・ WASD / 矢印キーで移動 ・ Esc で解除 ・ R でやり直し ・ M でメニューへ</p>
       <p class="help touch-only">左下のスティックで移動 ・ 画面をドラッグして見回す ・ 横向きがおすすめ</p>
     </aside>
   </div>
 </section>
 
 <div id="hud" class="hud" role="region" aria-label="体験中 / Playing" hidden><b id="hudname"></b><span id="hudhelp">クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span>
-  <button id="hudretry" class="touch-only">やり直し / Restart</button></div>
+  <span class="hudbuttons"><button id="hudretry" type="button" class="touch-only">やり直し / Restart</button>
+  <button id="hudmenu" type="button">メニュー / Menu (M)</button></span></div>
 
 <div id="touch" class="touch-controls" aria-hidden="true" hidden>
   <div class="stick"><div class="knob"></div></div>
@@ -140,6 +142,7 @@
   </span>
   <button id="again" type="button">もう一度再生 / Replay (B)</button>
   <button id="next" class="primary" type="button">スキップ / Skip</button>
+  <button id="replaymenu" type="button">メニュー / Menu (M)</button>
   <span id="rhint" class="replay-hint" aria-live="polite"></span>
 </section>
 

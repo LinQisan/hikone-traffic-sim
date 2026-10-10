@@ -18,6 +18,7 @@ import { replayReviewFrames } from './replay-review.js';
 import { PerformanceProbe } from './performance.js';
 import { TouchControls, isTouchDevice } from './touch-controls.js';
 import { AdaptiveResolution } from './resolution.js';
+import { Obstacles } from './obstacles.js';
 
 const $ = id => document.getElementById(id);
 // loading screen (index.html): data files are the first 15 %, the models the next 75 %, building the rest
@@ -67,8 +68,9 @@ addEventListener('resize', () => {
 });
 
 status('データを読み込んでいます… / Loading data…');
-const [sceneData, signalData, layout, map, roadTiles, scenarioIndex] = await Promise.all([
-  json('data/scene.json'), json('data/signals.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json')]);
+const [sceneData, signalData, layout, map, roadTiles, scenarioIndex, collision] = await Promise.all([
+  json('data/scene.json'), json('data/signals.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json'),
+  json('data/collision.json')]);
 const ground = new Ground(roadTiles);
 const materials = buildMaterials(sceneData.materials);
 const light = buildLight(scene, renderer, sceneData.light);
@@ -89,7 +91,9 @@ for (const w of sceneData.blackWalls) {
   occluders.add(wall);
 }
 
-const player = new Player(camera, renderer, map, ground);
+// buildings, walls, trees and posts at body height, plus the parked vehicles of each run
+const obstacles = new Obstacles(collision);
+const player = new Player(camera, renderer, map, ground, obstacles);
 player.reducedMotion = reducedMotion.matches;          // no roll of the view when the body falls
 reducedMotion.addEventListener?.('change', e => { player.reducedMotion = e.matches; });
 scene.add(player.rig);
@@ -131,7 +135,7 @@ function renderTitle(focusSelected = false) {
       if (on && focusSelected) b.focus();
     }
   }
-  $('selected').textContent = customScenario ? `ファイル：${customScenario.name}` : `${selected.name}`;
+  $('selected').textContent = customScenario ? `${params.get('play') === 'editor' ? 'エディタから' : 'ファイル'}：${customScenario.name}` : `${selected.name}`;
 }
 $('file').onchange = async ev => {
   const file = ev.target.files[0];
@@ -145,6 +149,15 @@ $('file').onchange = async ev => {
   } catch (e) { alert('読み込めません：\n' + e.message); }
 };
 $('start').onclick = () => start();
+// "▶ ブラウザで試す" in the scenario editor (editor/): the scenario arrives through localStorage
+if (params.get('play') === 'editor') {
+  try {
+    const s = S.normalize(JSON.parse(localStorage.getItem('vrlearn.editor.play')));
+    const errors = S.validate(s, map).filter(p => p.level === 'error').map(p => p.message);
+    if (errors.length) throw new Error(errors.join('\n'));
+    customScenario = s;
+  } catch (e) { console.warn('editor scenario not loaded:', e); }
+}
 renderTitle();
 loading.done();
 $('title').hidden = false;
@@ -173,13 +186,16 @@ async function start(again = false) {
     traffic: new Traffic(scenario, { seed: (Date.now() & 0xffffff) + 1, builtInMix: !!entry.template }),
     recorder: new Recorder(), cars: new Map(), parked: new THREE.Group(), impact: null,
   };
-  // parked cars and trucks of a built-in scenario (Unity's ScenarioHost objects)
+  // parked cars and trucks of a built-in scenario (Unity's ScenarioHost objects); they are solid
+  const footprints = [];
   for (const p of (builtIn >= 0 ? sceneData.scenarios.find(x => x.id === builtIn)?.parked : null) ?? []) {
     const mesh = instance(p.kind === 'truck' ? p.model : BODY_MODEL.sedan, materials, { paint: paintFor(Math.round(p.x)) });
+    footprints.push(footprint(mesh, p));
     mesh.position.copy(toThree(p.x, ground.heightAt(p.x, p.z), p.z));
-    mesh.rotation.y = yawToThree(p.yaw + (p.kind === 'car' ? 0 : 0));
+    mesh.rotation.y = yawToThree(p.yaw);
     run.parked.add(mesh);
   }
+  obstacles.setParked(footprints);
   scene.add(run.parked);
   const sp = scenario.spawn, gl = scenario.goal;
   player.place(sp.x, sp.z, yawTo(sp.x, sp.z, gl.x, gl.z), heightCm, scenario.playerMode, weightKg);
@@ -192,15 +208,26 @@ async function start(again = false) {
   const bike = scenario.playerMode === 'bicycle';
   $('hudhelp').textContent = touchDevice
     ? (bike ? 'スティック：上でこぐ・下でブレーキ・左右でハンドル ・ ドラッグで見回す' : 'スティックで移動 ・ ドラッグで見回す')
-    : (bike ? 'W こぐ ・ S ブレーキ ・ A / D ハンドル ・ マウスか Q / E で見回す ・ R でやり直し' : 'クリックで視点操作 ・ Q / E で見回す ・ WASD で移動 ・ R でやり直し');
+    : (bike ? 'W こぐ ・ S ブレーキ ・ A / D ハンドル ・ マウスか Q / E で見回す ・ R でやり直し ・ M でメニュー' : 'クリックで視点操作 ・ Q / E で見回す ・ WASD で移動 ・ R でやり直し ・ M でメニュー');
   touch.setActive(touchDevice);
   document.activeElement?.blur?.();                       // keys go to the game, not to a hidden button
   announce(`${$('hudname').textContent}。開始しました。${bike ? 'W でこぎ、A と D でハンドル。' : 'W で前へ、Q と E で見回します。'}`);
 }
 
+/** Ground footprint of a parked vehicle (Unity x, z, yaw; size [width, length]) from its model. */
+const _box = new THREE.Box3(), _size = new THREE.Vector3(), _centre = new THREE.Vector3();
+function footprint(mesh, p) {
+  mesh.updateMatrixWorld(true);                            // still at the origin, unrotated
+  _box.setFromObject(mesh);
+  _box.getSize(_size); _box.getCenter(_centre);
+  const a = p.yaw * Math.PI / 180, cx = -_centre.x, cz = _centre.z;   // model centre, Unity axes
+  return { x: p.x + cx * Math.cos(a) + cz * Math.sin(a), z: p.z - cx * Math.sin(a) + cz * Math.cos(a), yaw: p.yaw, size: [_size.x, _size.z] };
+}
+
 function cleanup() {
   replay.stop();
   player.bicycle.root.visible = false;
+  obstacles.setParked([]);
   light.invalidate();
   if (!run) return;
   for (const mesh of run.cars.values()) scene.remove(mesh);
@@ -209,6 +236,7 @@ function cleanup() {
 
 function toTitle() {
   touch.setActive(false);
+  flash.classList.remove('on');
   cleanup();
   run = null;
   state = 'title';
@@ -325,12 +353,22 @@ $('viewdriver').onclick = () => setReplayView('driver');
 $('retry').onclick = () => start(true);
 $('hudretry').onclick = () => { if (state === 'playing') start(true); };
 $('totitle').onclick = () => toTitle();
+// back to the menu at any time: during the run, the fall and the replay
+let lockReleased = 0;
+document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) lockReleased = performance.now(); });
+const mouseLockedRecently = () => performance.now() - lockReleased < 400;
+const leaveToMenu = () => { if (['playing', 'impact', 'replay'].includes(state)) { toTitle(); announce('メニューに戻りました。 / Back to the menu.'); } };
+$('hudmenu').onclick = leaveToMenu;
+$('replaymenu').onclick = leaveToMenu;
 addEventListener('keydown', e => {
   if (e.repeat) return;
   // a focused button or field handles its own Enter/Space; shortcuts must not fire a second action
   if (e.target.closest?.('button, input, textarea, select') && ['Enter', 'Space', 'NumpadEnter'].includes(e.code)) return;
   // Advancing the replay requires explicitly activating its Next/Skip button.
-  if (state === 'replay' && e.code === 'KeyB') replay.restart();
+  if (e.code === 'KeyM' && !e.target.closest?.('input, textarea')) leaveToMenu();
+  // Esc while the mouse is free (the first Esc only releases pointer lock)
+  else if (e.code === 'Escape' && !document.pointerLockElement && !mouseLockedRecently()) leaveToMenu();
+  else if (state === 'replay' && e.code === 'KeyB') replay.restart();
   else if (state === 'replay' && e.code === 'KeyV') setReplayView(replay.view === 'driver' ? 'overview' : 'driver');
   else if (state === 'results' && e.code === 'KeyR') start(true);
   else if (state === 'results' && e.code === 'Enter') toTitle();
@@ -408,7 +446,7 @@ renderer.setAnimationLoop(() => {
 });
 // debugging and tests
 window.vrlearn = {
-  scene, camera, renderer, player, env, signals, ground, start, toTitle, resolution, replay,
+  scene, camera, renderer, player, obstacles, env, signals, ground, start, toTitle, resolution, replay,
   select(id) { selected = scenarioIndex.find(e => e.id === id) ?? selected; customScenario = null; renderTitle(); },
   get run() { return run; }, get state() { return state; },
   setPainted,

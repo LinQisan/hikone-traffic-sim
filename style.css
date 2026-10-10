@@ -28,6 +28,8 @@ aside label { display: flex; flex-direction: column; gap: 6px; color: var(--sub)
 .body-note { font-size: 12px; }
 input[type=number] { font: inherit; width: 90px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--edge); background: #0f172a; color: var(--text); }
 .file input { font-size: 13px; }
+.editor-link { color: var(--accent); font-size: 14px; text-decoration: none; }
+.editor-link:hover { text-decoration: underline; }
 .sel { margin: 0; color: var(--sub); } .sel b { color: var(--text); }
 #start { font-size: 20px; padding: 14px; }
 .help { font-size: 13px; color: var(--sub); margin: 0; line-height: 1.6; }
@@ -51,6 +53,7 @@ input[type=number] { font: inherit; width: 90px; padding: 6px 8px; border-radius
 body:not(.touch) .touch-only, body.touch .desktop-only { display: none !important; }
 #view canvas { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 button { touch-action: manipulation; }
+.hudbuttons { display: flex; gap: 8px; }
 .hud button { margin-top: 6px; align-self: flex-start; padding: 8px 12px; font-size: 14px; pointer-events: auto; }
 .touch-controls { position: fixed; left: 0; bottom: 0; z-index: 4; padding: 0 0 max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); pointer-events: none; }
 .stick { width: 136px; height: 136px; border-radius: 50%; background: rgba(11, 18, 32, 0.35); border: 2px solid rgba(241, 245, 249, 0.55);

@@ -2,7 +2,7 @@
 // WASD / arrow keys. Phones/tablets: the on-screen stick moves, dragging looks (touch-controls.js).
 // Movement speed matches the Quest app: OVRPlayerController with Acceleration 0.1 adds 0.01 per
 // frame and damps by 1 + 0.3 x 60 x dt, which settles at about 2.4 m/s at 72 Hz. The invisible walls
-// of the map stop the participant.
+// of the map, the buildings and the parked vehicles (obstacles.js) stop the participant.
 import * as THREE from 'three';
 import { crossesWall } from './shared/scenario.js';
 import { deltaYaw } from './analysis.js';
@@ -16,15 +16,19 @@ export const FALL_SECONDS = 0.55;      // eye level to the ground
 // rider can look round over the shoulder (body twist + head turn), in degrees
 const PEDAL = 2.5, BRAKE = 6, COAST = 0.4, PUSH_BACK = 0.6, TURN_RATE = 75, STAND_TURN = 30;
 export const LOOK_LIMIT = 150;
+// body radius when walking; riding: the wheels' contact points, metres ahead of and behind the centre
+export const BODY_RADIUS = 0.25;
+const WHEEL_REACH = 0.8, WHEEL_RADIUS = 0.2;
 const UP = new THREE.Vector3(0, 1, 0);
 const LYING_EYE = 0.25, THROW = 0.9, ROLL = 75 * Math.PI / 180, LYING_PITCH = 8;
 
 export class Player {
-  constructor(camera, renderer, map, ground) {
+  constructor(camera, renderer, map, ground, obstacles = null) {
     this.camera = camera;
     this.renderer = renderer;
     this.map = map;
     this.ground = ground;
+    this.obstacles = obstacles;
     this.rig = new THREE.Group();
     this.rig.add(camera);
     this.x = 0; this.z = 0; this.yaw = 0; this.pitch = 0;
@@ -129,7 +133,8 @@ export class Player {
     // a little look-ahead so the participant stops just short of a wall; slide along it
     const reach = (ddx, ddz) => {
       const l = Math.hypot(ddx, ddz) || 1;
-      return !crossesWall(this.map, from, { x: this.x + ddx + ddx / l * 0.25, z: this.z + ddz + ddz / l * 0.25 });
+      return !crossesWall(this.map, from, { x: this.x + ddx + ddx / l * 0.25, z: this.z + ddz + ddz / l * 0.25 })
+        && !this.obstacles?.blocked(this.x + ddx, this.z + ddz, BODY_RADIUS);
     };
     let mx = 0, mz = 0;
     if (reach(dx, dz)) { mx = dx; mz = dz; }
@@ -159,19 +164,31 @@ export class Player {
     else v = Math.sign(v) * Math.max(0, Math.abs(v) - COAST * dt);
     // turning rate: full lock at riding speed, a slow turn when (nearly) standing
     const rate = steer * Math.max(STAND_TURN, TURN_RATE * Math.min(1, Math.abs(v) / 1.2)) * (v < 0 ? -1 : 1);
-    const turn = rate * dt;
+    let turn = rate * dt;
+    // a wheel may not swing into a building or a parked vehicle (it may turn away from one)
+    if (turn && this.wheelsBlocked(this.x, this.z, this.rideYaw + turn) && !this.wheelsBlocked(this.x, this.z, this.rideYaw)) turn = 0;
     this.rideYaw = (this.rideYaw + turn + 360) % 360;
     this.yaw = (this.yaw + turn + 360) % 360;              // the head turns with the bicycle
     const a = this.rideYaw * Math.PI / 180, step = v * dt;
     const dx = Math.sin(a) * step, dz = Math.cos(a) * step;
     const l = Math.hypot(dx, dz);
-    const blocked = l > 0 && crossesWall(this.map, { x: this.x, z: this.z },
-      { x: this.x + dx + dx / l * 0.6, z: this.z + dz + dz / l * 0.6 });
+    const blocked = l > 0 && (crossesWall(this.map, { x: this.x, z: this.z },
+      { x: this.x + dx + dx / l * 0.6, z: this.z + dz + dz / l * 0.6 })
+      || this.wheelsBlocked(this.x + dx, this.z + dz, this.rideYaw, Math.sign(v)));
     if (blocked) v = 0;
     else { this.x += dx; this.z += dz; this.distance += step; }
     this.rideSpeed = v;
     this.speed = Math.abs(v);
     this.apply();
+  }
+
+  /** Would the bicycle at (x, z) heading `yaw` touch an obstacle? `ahead` 1/-1: only that wheel. */
+  wheelsBlocked(x, z, yaw, ahead = 0) {
+    if (!this.obstacles) return false;
+    const a = yaw * Math.PI / 180, fx = Math.sin(a) * WHEEL_REACH, fz = Math.cos(a) * WHEEL_REACH;
+    return (ahead >= 0 && this.obstacles.blocked(x + fx, z + fz, WHEEL_RADIUS))
+      || (ahead <= 0 && this.obstacles.blocked(x - fx, z - fz, WHEEL_RADIUS))
+      || this.obstacles.blocked(x, z, BODY_RADIUS);
   }
 
   apply() {
