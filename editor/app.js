@@ -102,6 +102,7 @@ function pushUndo(key = null) {
 }
 function undo() {
   if (!state.undo.length) return;
+  stopDrawing();
   state.redo.push(snapshot());
   state.scenario = JSON.parse(state.undo.pop());
   state.lastEdit = { key: null, at: 0 };
@@ -110,6 +111,7 @@ function undo() {
 }
 function redo() {
   if (!state.redo.length) return;
+  stopDrawing();
   state.undo.push(snapshot());
   state.scenario = JSON.parse(state.redo.pop());
   fixSelection();
@@ -504,15 +506,19 @@ function finishDrawing(fromDoubleClick = false) {
   if (state.drawing == null) return;
   const i = state.drawing;
   const v = state.scenario.vehicles[i];
-  state.drawing = null;
-  $('drawHint').hidden = true;
-  setTool('select');
+  stopDrawing();
   if (v && v.route.length < 2) {
     state.scenario.vehicles.splice(i, 1);
     state.selection = null;
     toast('ルートには 2 点以上が必要なので、この車は取り消しました。');
   }
   onScenarioChanged({ inspector: 'full' });
+}
+
+function stopDrawing() {
+  state.drawing = null;
+  $('drawHint').hidden = true;
+  setTool('select');
 }
 
 function deletePoint(i, n) {
@@ -525,10 +531,19 @@ function deletePoint(i, n) {
 }
 
 function deleteVehicle(i) {
+  if (!state.scenario.vehicles[i]) return;
   pushUndo();
+  if (state.drawing === i) stopDrawing();
+  else if (state.drawing != null && state.drawing > i) state.drawing--;
   state.scenario.vehicles.splice(i, 1);
-  state.selection = null;
+  const sel = state.selection;
+  if (sel?.kind === 'vehicle') {
+    if (sel.index === i) state.selection = null;
+    else if (sel.index > i) sel.index--;
+  }
   onScenarioChanged({ inspector: 'full' });
+  const buttons = $('inspector').querySelectorAll('.vehicle-select');
+  (buttons[Math.min(i, buttons.length - 1)] ?? $('btnAddVehicle'))?.focus();
 }
 
 function setTool(tool) {
@@ -672,15 +687,21 @@ function vehicleList() {
   const s = state.scenario;
   return html('div', {},
     html('div', { class: 'vehicles' }, s.vehicles.map((v, i) =>
-      html('div', { class: 'vehicle-row' + (state.selection?.kind === 'vehicle' && state.selection.index === i ? ' active' : ''),
-        onclick: () => select({ kind: 'vehicle', index: i }) },
-        html('span', { class: 'swatch', style: `background:${vehicleColor(v, i)}` }),
-        html('span', { class: 'name' }, v.name || `車 ${i + 1}`),
-        v.accident ? html('span', { class: 'tag accident' }, '事故車') : null,
-        html('span', { class: 'tag' }, v.start === S.START_TRIGGER ? 'トリガー' : '開始'),
-        S.isRepeating(v) ? html('span', { class: 'tag' }, '繰り返し') : null))),
+      html('div', { class: 'vehicle-row' + (state.selection?.kind === 'vehicle' && state.selection.index === i ? ' active' : '') },
+        html('button', { class: 'vehicle-select', type: 'button',
+          'aria-pressed': state.selection?.kind === 'vehicle' && state.selection.index === i ? 'true' : 'false',
+          onclick: () => select({ kind: 'vehicle', index: i }) },
+          html('span', { class: 'swatch', style: `background:${vehicleColor(v, i)}` }),
+          html('span', { class: 'name' }, v.name || `車 ${i + 1}`),
+          v.accident ? html('span', { class: 'tag accident' }, '事故車') : null,
+          html('span', { class: 'tag' }, v.start === S.START_TRIGGER ? 'トリガー' : '開始'),
+          S.isRepeating(v) ? html('span', { class: 'tag' }, '繰り返し') : null),
+        html('button', { class: 'vehicle-delete', type: 'button',
+          title: `${v.name || `車 ${i + 1}`} の車とルートを削除`,
+          'aria-label': `${v.name || `車 ${i + 1}`} の車とルートを削除`,
+          onclick: () => deleteVehicle(i) }, '削除')))),
     html('div', { class: 'row-buttons' },
-      html('button', { onclick: addVehicle }, '＋ 車を追加して描く'),
+      html('button', { id: 'btnAddVehicle', onclick: addVehicle }, '＋ 車を追加して描く'),
       laneMenu()));
 }
 
@@ -862,10 +883,10 @@ function loadScenario(scenario, file) {
   state.file = file;
   state.saved = file ? S.serialize(state.scenario) : '';
   state.undo = []; state.redo = [];
-  state.selection = null; state.drawing = null;
+  state.selection = null;
   state.time = 0; state.playing = false;
   state.tab = 'meta';
-  setTool('select');
+  stopDrawing();
   fitScenario();
   refreshAll();
   $('triggerAuto').checked = true;
@@ -1167,6 +1188,7 @@ function onKey(event) {
   if (event.key === 'f' || event.key === 'F') fitScenario();
   if (event.key === 'Delete' || event.key === 'Backspace') {
     const sel = state.selection;
+    if (sel?.kind === 'vehicle') event.preventDefault();
     if (sel?.kind === 'vehicle' && sel.point != null) deletePoint(sel.index, sel.point);
     else if (sel?.kind === 'vehicle') deleteVehicle(sel.index);
   }

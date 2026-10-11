@@ -148,10 +148,19 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 .tabs button.active { background: var(--accent); color: #0f172a; font-weight: 700; }
 .vehicles { display: flex; flex-direction: column; gap: 4px; }
 .vehicle-row {
-  display: flex; align-items: center; gap: 8px; padding: 7px 9px; border: 1px solid var(--edge); border-radius: 10px; cursor: pointer; background: var(--card);
+  display: flex; align-items: center; border: 1px solid var(--edge); border-radius: 10px; background: var(--card);
 }
 .vehicle-row:hover { border-color: var(--accent); }
 .vehicle-row.active { border-color: var(--accent); background: var(--accent-soft); }
+.vehicle-select {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; min-height: 44px; padding: 7px 9px;
+  border: 0; border-radius: 9px; background: transparent; text-align: left;
+}
+.vehicle-delete {
+  flex: none; min-width: 44px; min-height: 44px; margin-right: 2px; padding: 6px;
+  border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--coral); font-size: 12px;
+}
+.vehicle-delete:hover { border-color: var(--coral); background: var(--bg); }
 .vehicle-row .swatch { width: 12px; height: 12px; border-radius: 4px; flex: none; }
 .vehicle-row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tag { font-size: 10px; padding: 1px 6px; border-radius: 999px; background: var(--bg); color: var(--sub); }
@@ -212,4 +221,4 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 .dialog-buttons button:disabled { opacity: .45; cursor: default; }
 
 @media (prefers-reduced-motion: reduce) { .logo { transition: none; } }
-@media (forced-colors: active) { .actions button, .tool, .tabs button, .play { border: 1px solid ButtonText; } }
+@media (forced-colors: active) { .actions button, .tool, .tabs button, .play, .vehicle-select, .vehicle-delete { border: 1px solid ButtonText; } }
