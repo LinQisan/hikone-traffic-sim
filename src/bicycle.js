@@ -4,9 +4,19 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 export const WHEEL_RADIUS = 0.205;
+/**
+ * The bicycle is drawn in units of the rider's height (its parent is scaled by it), proportioned
+ * for a child: a 1.2 m rider gets 20-inch wheels, a 0.9 m one 14-inch. Real bicycles stop growing
+ * at adult size: from about 1.6 m everyone rides 26-inch wheels (0.66 m across), saddle ~0.75 m,
+ * grips ~1.05 m. The factor turns the drawing into that size.
+ */
+export const ADULT_WHEEL = 0.66;
+export function bicycleScale(heightM) {
+  return Math.min(1, ADULT_WHEEL / (2 * WHEEL_RADIUS * heightM));
+}
 export const CRANK_RADIUS = 0.09;
 export const SADDLE = new THREE.Vector3(0, 0.465, -0.18);
-export const GRIPS = [-1, 1].map(side => new THREE.Vector3(side * 0.22, 0.76, 0.255));
+export const GRIPS = [-1, 1].map(side => new THREE.Vector3(side * 0.22, 0.66, 0.255));
 const REAR = -0.34, FRONT = 0.39, CRANK = new THREE.Vector3(0, 0.225, -0.035);
 
 export function createBicycle() {
@@ -56,13 +66,13 @@ export function createBicycle() {
     tube(root, seat, axle, 0.015, 'mint');
     tube(root, [side * 0.034, 0.54, 0.265], [side * 0.034, WHEEL_RADIUS, FRONT], 0.018, 'ochre');
   }
-  tube(root, head, [0, 0.735, 0.255], 0.017, 'ink');
-  tube(root, [-0.22, 0.76, 0.255], [0.22, 0.76, 0.255], 0.018, 'ochre');
+  tube(root, head, [0, 0.635, 0.255], 0.017, 'ink');
+  tube(root, [-0.22, 0.66, 0.255], [0.22, 0.66, 0.255], 0.018, 'ochre');
   for (const side of [-1, 1]) {
-    tube(root, [side * 0.15, 0.76, 0.255], [side * 0.25, 0.76, 0.255], 0.024, 'ink');
-    tube(root, [side * 0.12, 0.745, 0.275], [side * 0.20, 0.745, 0.29], 0.009, 'cream');
+    tube(root, [side * 0.15, 0.66, 0.255], [side * 0.25, 0.66, 0.255], 0.024, 'ink');
+    tube(root, [side * 0.12, 0.645, 0.275], [side * 0.20, 0.645, 0.29], 0.009, 'cream');
   }
-  ball(root, [0, 0.748, 0.255], [0.037, 0.013, 0.029], 'cream'); // bell
+  ball(root, [0, 0.648, 0.255], [0.037, 0.013, 0.029], 'cream'); // bell
   ball(root, SADDLE.toArray(), [0.095, 0.035, 0.115], 'saddle');
   ball(root, [0, 0.57, 0.307], [0.045, 0.034, 0.042], 'ochre');
   ball(root, [0, 0.57, 0.338], [0.033, 0.026, 0.008], 'cream'); // front lamp

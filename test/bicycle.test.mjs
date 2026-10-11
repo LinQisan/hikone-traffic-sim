@@ -135,3 +135,21 @@ test('live bicycle mode displays and rolls the bike, records travel yaw and rese
     player.bicycle.dispose();
   } finally { globalThis.addEventListener = original; }
 });
+
+test('real-world sizes: an adult rides a 26-inch city bicycle, children a proportionally smaller one', async () => {
+  const { createReplayCyclist } = await import('../src/replay-cyclist.js');
+  const { SADDLE, GRIPS } = await import('../src/bicycle.js');
+  const { EYE_RATIO } = await import('../src/player.js');
+  const size = h => { const c = createReplayCyclist(h, {}), H = h / 100, k = c.bikeScale;
+    const out = { wheel: 2 * WHEEL_RADIUS * H * k, saddle: SADDLE.y * H * k, grips: GRIPS[0].y * H * k, eye: c.eyeHeight * H };
+    c.dispose(); return out; };
+  for (const h of [170, 185, 210]) {
+    const s = size(h);
+    assert.ok(Math.abs(s.wheel - 0.66) < 0.01, `${h} cm: 26-inch wheels, not ${s.wheel.toFixed(2)} m`);
+    assert.ok(s.saddle > 0.7 && s.saddle < 0.85 && s.grips > 0.95 && s.grips < 1.12, `${h} cm: saddle ${s.saddle.toFixed(2)}, grips ${s.grips.toFixed(2)} m`);
+  }
+  const adult = size(170);
+  assert.ok(adult.eye > 1.4 && adult.eye < 1.62, `seated eye height ${adult.eye.toFixed(2)} m, below the standing ${(1.7 * EYE_RATIO).toFixed(2)} m`);
+  const child = size(120);
+  assert.ok(child.wheel > 0.45 && child.wheel < 0.55, `a 120 cm child rides about 20-inch wheels: ${child.wheel.toFixed(2)} m`);
+});
