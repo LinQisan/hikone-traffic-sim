@@ -21,6 +21,9 @@ const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const S = await import('../src/shared/scenario.js');
 const { Traffic, PLAYER_RADIUS, meetPoint, smoothRoute, BODY_SIZE } = await import('../src/traffic.js');
 const { placement } = await import('../src/coords.js');
+const { webLayout } = await import('../src/web-layout.js');
+const { Ground } = await import('../src/ground.js');
+const { kerbY, DROP } = await import('../src/kerb.js');
 
 const args = process.argv.slice(2);
 const dirArg = args.indexOf('--dir');
@@ -42,13 +45,16 @@ const glb = async name => {
   return parts;
 };
 const NOT_SOLID = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|ChainFence|Guardrail|StreetLamp|GuidePost|Hedge)/;
-const layout = JSON.parse(fs.readFileSync(new URL('layout.json', data)));
+// the city as the browser shows it: its layout overrides and lower kerbs (web-layout.js, kerb.js)
+const layout = webLayout(JSON.parse(fs.readFileSync(new URL('layout.json', data))));
+const ground = new Ground(JSON.parse(fs.readFileSync(new URL('road_tiles.json', data))));
 const cache = new Map();
 const cells = new Map();
-const addTriangles = (geometry, matrix) => {
+const addTriangles = (geometry, matrix, mapVertices = false) => {
   const g = geometry.index ? geometry.toNonIndexed() : geometry.clone();
   g.applyMatrix4(matrix);
   const p = g.attributes.position.array;
+  if (mapVertices) for (let i = 1; i < p.length; i += 3) p[i] = kerbY(p[i]);
   for (let i = 0; i < p.length; i += 9) {
     const key = Math.floor((p[i] + p[i + 3] + p[i + 6]) / 48) + ',' + Math.floor((p[i + 2] + p[i + 5] + p[i + 8]) / 48);
     if (!cells.has(key)) cells.set(key, []);
@@ -60,12 +66,12 @@ const m = new THREE.Matrix4();
 for (const item of layout.items) {
   if (NOT_SOLID.test(item.a)) continue;
   if (!cache.has(item.a)) cache.set(item.a, await glb(item.a));
-  for (const g of cache.get(item.a)) addTriangles(g, placement(...item.p, item.r, item.s, m));
+  for (const g of cache.get(item.a)) addTriangles(g, placement(...item.p, item.r, item.s, m), item.mapVertices);
 }
 // the black walls inside the gatehouses hide where cars appear and leave (scene.json blackWalls)
 for (const w of scene.blackWalls) {
   const g = new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05));
-  addTriangles(g, placement(w.x, w.y, w.z, w.yaw, [1, 1, 1], new THREE.Matrix4()));
+  addTriangles(g, placement(w.x, w.y - DROP, w.z, w.yaw, [1, 1, 1], new THREE.Matrix4()));
 }
 const cityMeshes = [...cells.values()].map(list => {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3));
@@ -167,7 +173,7 @@ function run(scenario, occluders, behaviour) {
     if (S.hasTrigger(scenario) && traffic.triggerTime == null && S.pointInArea([x, z], scenario.trigger)) traffic.trigger();
     const before = new Set(traffic.cars.map(c => c.id));
     traffic.step(1 / 30, { x, z, vx: mx * 30, vz: mz * 30 });
-    const eye = { x, y: eyeH, z };
+    const eye = { x, y: ground.heightAt(x, z) + eyeH, z };       // above the ground underfoot, as in the app
     for (const car of traffic.cars) {
       if (!before.has(car.id) && !out.spawns.some(e => e.id === car.id)) {
         const dist = Math.hypot(car.x - x, car.z - z);

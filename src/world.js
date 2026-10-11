@@ -5,6 +5,7 @@ import { placement } from './coords.js';
 import { LIGHT, painted, paintedSky, PigmentPalette } from './style.js';
 import { environmentInstances } from './environment-instances.js';
 import { packPigments } from './geometry-budget.js';
+import { kerbY } from './kerb.js';
 
 const NO_SHADOW = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)/;
 const loader = new GLTFLoader();
@@ -78,9 +79,28 @@ export async function buildEnvironment(scene, layout, materials) {
   }
   // scene.json's pigments (and their emissive light) win over the GLB's own material
   const resolve = parts => parts.map(part => ({ ...part, material: material(materials, part.material) }));
+  // road-level objects (kerbed road tiles, raised roads, the bridge, the castle-hill terrain): every
+  // vertex takes the browser's lower kerb height (kerb.js); they stand at one base height each
+  const lowerKerbs = (parts, base) => parts.map(part => {
+    const geometry = part.geometry.clone(), position = geometry.getAttribute('position');
+    const local = new THREE.Vector3(), world = new THREE.Vector3(), inverse = part.matrix.clone().invert();
+    for (let i = 0; i < position.count; i++) {
+      world.fromBufferAttribute(position, i).applyMatrix4(part.matrix);
+      world.y = kerbY(base + world.y) - base;
+      local.copy(world).applyMatrix4(inverse);
+      position.setXYZ(i, local.x, local.y, local.z);
+    }
+    geometry.computeBoundingBox(); geometry.computeBoundingSphere();
+    return { ...part, geometry };
+  });
   const definitions = await Promise.all([...byAsset].map(async ([asset, items]) => {
     // unpacked: environment-instances re-packs while merging
-    const [high, low] = await Promise.all([model(asset, 'high', { packed: false }), model(asset, 'low', { packed: false })]);
+    let [high, low] = await Promise.all([model(asset, 'high', { packed: false }), model(asset, 'low', { packed: false })]);
+    if (items.some(i => i.mapVertices)) {
+      const base = items[0].p[1];
+      if (!items.every(i => i.mapVertices && i.p[1] === base && i.s[1] === 1)) throw new Error(`${asset}: road-level placements must share one base height`);
+      [high, low] = [lowerKerbs(high, base), lowerKerbs(low, base)];
+    }
     return { asset, items, high: resolve(high), low: resolve(low) };
   }));
   const palette = new PigmentPalette();

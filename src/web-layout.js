@@ -1,7 +1,8 @@
 // The web port's own choices on top of VRLearn's layout (data/layout.json stays generated): props
 // that the real Kyobashi crossing does not have are left out of the browser scene, and a few are
-// shown as the real ones. Positions of
-// everything else are unchanged. Pure logic (renderer, collision builder and tests share it).
+// shown as the real ones; kerbs are lower (kerb.js). Horizontal positions are unchanged. Pure logic
+// (renderer, collision builder, event checker and tests share it).
+import { DROP, movesWhole } from './kerb.js';
 
 /** Left out, matched by asset and position (Unity x, z, within 0.5 m). */
 export const WEB_HIDDEN = [
@@ -24,8 +25,15 @@ export const WEB_REPLACED = [
 const near = (item, h) => h.a === item.a && Math.hypot(item.p[0] - h.x, item.p[2] - h.z) < 0.5;
 export const isHidden = item => WEB_HIDDEN.some(h => near(item, h));
 
-/** The layout as the browser shows it. */
+/**
+ * The layout as the browser shows it: hidden and swapped props, and lower kerbs (kerb.js) — objects
+ * at pavement level and above stand 0.25 m lower; road-level objects keep their base (their
+ * vertices are mapped by whoever builds them: world.js, build_collision.mjs, check_events.mjs).
+ */
 export const webLayout = layout => ({ ...layout, items: layout.items.filter(item => !isHidden(item)).map(item => {
   const swap = WEB_REPLACED.find(h => near(item, h));
-  return swap ? { ...item, a: swap.as } : item;
+  const out = swap ? { ...item, a: swap.as } : { ...item };
+  if (movesWhole(item.p[1])) out.p = [item.p[0], item.p[1] - DROP, item.p[2]];
+  else out.mapVertices = true;
+  return out;
 }) });

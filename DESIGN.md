@@ -17,7 +17,7 @@ Why the browser port is built the way it is, and what it deliberately does not d
 
 ## 3. Relation to the Unity app
 
-- **Geometry comes from Unity:** roads, building placements, routes, triggers, spawns, goals, signals and black walls are VRLearn exports (`data/` is generated). The browser port changes looks and event timing, never positions.
+- **Geometry comes from Unity:** roads, building placements, routes, triggers, spawns, goals, signals and black walls are VRLearn exports (`data/` is generated). The browser port changes looks and event timing, never horizontal positions; the one vertical exception is the lower kerb (§6).
 - **Shared scenario format:** `src/shared/scenario.js` is a copy of VRLearn's `ScenarioModel/scenario.js`, with the same fields, defaults and validation messages as Unity's `CustomScenario.cs`; files written by the editor run on the Quest.
 - **Shared evaluation:** the results page uses the Unity app's measures (time looking towards the car, last look, sideways checks).
 - **Deliberate differences:** signals are display only (they never switch); no sound, rain or night; no code-only behaviours of built-ins 06–08 (the editor templates lack them too).
@@ -44,6 +44,8 @@ Why the browser port is built the way it is, and what it deliberately does not d
 
 - **Eye height** = height × 0.936, as Unity's `ReplayMannequin`.
 - **The view falls with the body** on contact (0.55 s down and rolling) instead of just turning red: it should feel like being hit. With reduced motion there is no roll and the red flash is weaker.
+- **Real sizes:** the participant's eye height follows anthropometry (height × 0.936: 1.59 m at 170 cm). Vehicles are their real Japanese sizes: a sedan like a Corolla (4.60 × 1.76 × 1.45 m); kei cars at the legal 3.40 × 1.48 m, tall 1.79 m, hatch 1.52 m; a large truck 11.8 × 2.49 × 3.62 m and a 4-tonne van 8.6 × 2.30 × 3.62 m (legal limits 12 × 2.5 × 3.8 m). The bicycle is a real city bicycle (ママチャリ) for adults (26-inch wheels, saddle 0.75 m, grips 1.06 m, 1.88 m long), proportionally smaller for children (20-inch at 1.2 m); it does not grow with a tall rider. Seated eye height at 170 cm: about 1.5 m.
+- **Lower kerbs than Unity:** Unity's pavements stand 40 cm above the carriageway (its experiment geometry); Japanese kerbs are about 15 cm, and from a 40 cm pavement the eyes were ~2 m above the road, so cars looked low. The browser maps heights (`src/kerb.js`): the carriageway and everything below stays, everything at pavement level and above moves down 0.25 m (pavement 0.16 m), kerb faces and ramps in between are compressed. Horizontal positions, signal heads above the road and the cars are unchanged; ground, city, collision grid and the event checker all use the same mapping (the checker's eyes now stand on the ground underfoot, as in the app).
 - **Bicycle:** pedal, brake and steering are separate; looking back never turns the bike (the rider twists); standing still, the bike can be pushed backwards. Looking and moving stay independent, as on a real bicycle.
 - **Solid surroundings:** the body cannot pass buildings, walls, stone walls, trees, hedges, fences, posts, signal poles or parked vehicles.
   - The city is cut at body height (0.3–1.8 m above the ground) into a 0.2 m grid, built offline by `tools/build_collision.mjs`, so a run time check is a table lookup. Kerbs and steps below 0.3 m are stepped over; eaves and tree crowns above 1.8 m pass overhead. Parked vehicles are oriented boxes from their models.

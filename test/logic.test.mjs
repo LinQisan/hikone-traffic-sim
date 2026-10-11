@@ -30,7 +30,7 @@ test('the exported data is complete', () => {
 test('ground heights match the Unity road colliders', () => {
   const g = new Ground(data('road_tiles.json'));
   assert.ok(Math.abs(g.heightAt(32, 10) - 0.01) < 1e-3, 'carriageway 0.01');
-  assert.ok(Math.abs(g.heightAt(40, 14) - 0.41) < 1e-3, 'sidewalk 0.41');
+  assert.ok(Math.abs(g.heightAt(40, 14) - 0.16) < 1e-3, 'sidewalk 0.16 in the browser (Unity 0.41; kerb.js)');
   assert.ok(Math.abs(g.heightAt(60, 26) - 0.01) < 1e-3, 'Route 25');
   assert.equal(Ground.fallback(32, 45), 0.01, 'bridge deck carriageway');
 });
@@ -92,4 +92,24 @@ test('analysis: looking toward the car, side checks, verdicts and the placement 
   assert.ok(Math.abs(a.vehicleKmh - 21.6) < 0.5, 'car at 6 m/s');
   const c = crossingAnalysis(frames);
   assert.ok(c.checkedRight && !c.checkedLeft);
+});
+
+test('lower kerbs: road level unchanged, pavement 15 cm above it, everything above moved down alike', async () => {
+  const { kerbY, CARRIAGEWAY, PAVEMENT, DROP } = await import('../src/kerb.js');
+  const { webLayout } = await import('../src/web-layout.js');
+  assert.equal(kerbY(0.01), 0.01);
+  assert.equal(kerbY(-1.35), -1.35, 'the moat water stays');
+  assert.ok(Math.abs(kerbY(0.41) - PAVEMENT) < 1e-12 && Math.abs(PAVEMENT - CARRIAGEWAY - 0.15) < 1e-12, 'a 15 cm kerb');
+  assert.ok(Math.abs(kerbY(4.4) - (4.4 - DROP)) < 1e-12, 'the castle hill moves down with the pavement');
+  for (let y = 0; y < 0.5; y += 0.01) assert.ok(kerbY(y + 0.01) >= kerbY(y), 'monotonic: nothing folds over');
+  const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
+  const shown = webLayout(layout);
+  const house = shown.items.find(i => i.a === 'HK_Machiya_A');
+  const source = layout.items.find(i => i.a === 'HK_Machiya_A' && i.p[0] === house.p[0] && i.p[2] === house.p[2]);
+  assert.ok(Math.abs(house.p[1] - (source.p[1] - DROP)) < 1e-12 && !house.mapVertices, 'a house stands 0.25 m lower');
+  assert.ok(shown.items.filter(i => /^HK_Road_|^HK_RoadRaised|^HK_Kyobashi$|^HK_Terrain/.test(i.a)).every(i => i.mapVertices), 'kerbed road pieces map their vertices');
+  // every house still stands on the browser's ground (not floating, not sunk)
+  const g = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  for (const h of shown.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a)).slice(0, 40))
+    assert.ok(Math.abs(g.heightAt(h.p[0], h.p[2]) - h.p[1]) < 0.03, `${h.a} at ${h.p[0]}, ${h.p[2]}: ground ${g.heightAt(h.p[0], h.p[2]).toFixed(3)}, base ${h.p[1].toFixed(3)}`);
 });

@@ -23,6 +23,7 @@ const { placement } = await import('../src/coords.js');
 const { Ground } = await import('../src/ground.js');
 const { CELL, BAND_LOW, BAND_HIGH, encodeBits } = await import('../src/obstacles.js');
 const { webLayout } = await import('../src/web-layout.js');
+const { kerbY } = await import('../src/kerb.js');
 
 const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
@@ -91,7 +92,8 @@ for (const item of layout.items) {
     world.multiplyMatrices(m, matrix);
     const pos = geometry.attributes.position, index = geometry.index;
     const count = index ? index.count : pos.count;
-    const corner = k => { v.fromBufferAttribute(pos, index ? index.getX(k) : k).applyMatrix4(world); return [-v.x, v.y, v.z]; };   // three → Unity
+    const corner = k => { v.fromBufferAttribute(pos, index ? index.getX(k) : k).applyMatrix4(world);
+      return [-v.x, item.mapVertices ? kerbY(v.y) : v.y, v.z]; };   // three → Unity (road-level objects: lower kerbs)
     for (let k = 0; k < count; k += 3) markTriangle(corner(k), corner(k + 1), corner(k + 2));
   }
 }
