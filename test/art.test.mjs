@@ -3,7 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { signalPlacements } from '../src/signal-layout.js';
+import { signalPlacements, signalRigs, POLE, ARM_ABOVE_HEAD } from '../src/signal-layout.js';
+import { webLayout, WEB_HIDDEN, WEB_REPLACED } from '../src/web-layout.js';
 
 const modelRoot = new URL('../data/models/', import.meta.url);
 const glb = (name, painted = true) => {
@@ -138,8 +139,9 @@ test('the lamp has an outward-facing bottom; lamp, signal shells and supports ar
   assert.ok(caps.length >= 6, 'the eight-sided lantern has a triangulated bottom cap');
   for (const [a, b, c] of caps) assert.ok(cross(subtract(b, a), subtract(c, a))[1] < 0,
     'bottom cap faces the viewer below the lamp with normal front-face culling');
-  for (const name of ['ART_Signal_Car', 'ART_Signal_Pedestrian']) {
-    for (const material of ['ART_SignalHousing', 'ART_Frame', 'ART_SignalRed', 'ART_SignalGreen']) closed(name, material);
+  for (const [name, housing, hood] of [['ART_Signal_Car', 'ART_SignalHousing', 'ART_SignalHood'],
+    ['ART_Signal_Pedestrian', 'ART_SignalHousingDark', 'ART_SignalHoodDark']]) {
+    for (const material of [housing, hood, 'ART_Frame', 'ART_SignalRed', 'ART_SignalGreen']) closed(name, material);
   }
   closed('ART_Signal_Car', 'ART_SignalYellow');
   closed('ART_Signal_Support', 'ART_Frame');
@@ -184,12 +186,10 @@ test('front windscreens are outside the vehicle hull and visible from the front'
   }
 });
 
-test('new signal heads retain the six original anchors, facing directions and twelve supports', () => {
+test('new signal heads retain the six original anchors and facing directions', () => {
   const data = JSON.parse(fs.readFileSync(new URL('../data/signals.json', import.meta.url)));
-  const placements = signalPlacements(data);
-  const heads = placements.filter(p => p.asset !== 'ART_Signal_Support');
+  const heads = signalPlacements(data);
   assert.equal(heads.length, 6);
-  assert.equal(placements.length - heads.length, 12);
   for (const head of heads) {
     const original = data.parts.find(p => p.group === head.group && p.name === head.name);
     assert.deepEqual(head.matrix.slice(12, 15), [-original.matrix[12], original.matrix[13], original.matrix[14]]);
@@ -200,10 +200,49 @@ test('new signal heads retain the six original anchors, facing directions and tw
     for (const offset of [0, 4, 8]) assert.ok(Math.abs(Math.hypot(...head.matrix.slice(offset, offset + 3)) - 1) < 1e-5,
       'a real-size housing is not scaled twice');
   }
-  for (const name of ['ART_Signal_Car', 'ART_Signal_Pedestrian']) {
-    const housing = triangles(name, 'ART_SignalHousing').flat();
+  for (const [name, material] of [['ART_Signal_Car', 'ART_SignalHousing'], ['ART_Signal_Pedestrian', 'ART_SignalHousingDark']]) {
+    const housing = triangles(name, material).flat();
     const red = triangles(name, 'ART_SignalRed').flat();
     assert.ok(Math.min(...red.map(p => p[2])) < Math.min(...housing.map(p => p[2])),
       'actual exported lenses protrude on the original negative-Z observer side');
+  }
+});
+
+test('signal posts stand on the source poles and face like the heads; the car lamps read green, yellow, red from the left', () => {
+  const data = JSON.parse(fs.readFileSync(new URL('../data/signals.json', import.meta.url)));
+  const rigs = signalRigs(data);
+  assert.equal(rigs.length, 6);
+  assert.equal(rigs.filter(r => r.kind === 'car').length, 4);
+  for (const r of rigs) {
+    const parts = data.parts.filter(p => p.group === r.group);
+    const pole = parts.find(p => p.name === 'Pole2'), head = parts.find(p => p.name.startsWith('TrafficLight_'));
+    assert.deepEqual([r.pole.x, r.pole.z], [pole.matrix[12], pole.matrix[14]]);
+    assert.deepEqual([r.head.x, r.head.y, r.head.z], head.matrix.slice(12, 15));
+    assert.ok(Math.abs(Math.hypot(...r.facing) - 1) < 1e-9);
+    assert.ok(r.head.y + ARM_ABOVE_HEAD < POLE[r.kind].height || r.kind === 'pedestrian', 'the arm meets the pole below its top');
+    // the lenses look the way the source head's lens side does
+    const lens = signalPlacements(data).find(h => h.group === r.group).matrix;
+    const front = [lens[8], -lens[10]], l = Math.hypot(...front);       // three -Z axis → Unity
+    assert.ok(Math.abs(front[0] / l - r.facing[0]) < 1e-6 && Math.abs(front[1] / l - r.facing[1]) < 1e-6, `${r.group}: posts face like the head`);
+  }
+  // Japanese order seen from the front (from local -Z looking +Z, right is local -X): green, yellow, red
+  const mean = material => { const p = triangles('ART_Signal_Car', material).flat(); return p.reduce((s, q) => s + q[0], 0) / p.length; };
+  assert.ok(mean('ART_SignalGreen') > mean('ART_SignalYellow') && mean('ART_SignalYellow') > mean('ART_SignalRed'), 'green left, red right');
+});
+
+test('the browser leaves out the crosswalk signs and the guide post of the signalised corners, and shows 40 on Route 25', () => {
+  const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
+  const shown = webLayout(layout);
+  assert.equal(layout.items.length - shown.items.length, WEB_HIDDEN.length, 'every hidden entry matches exactly one item');
+  assert.ok(!shown.items.some(i => i.a === 'HK_Sign_Crosswalk' || i.a === 'HK_GuidePost'));
+  assert.ok(shown.items.some(i => i.a === 'HK_Sign_Speed30') && shown.items.some(i => i.a === 'HK_Sign_Stop'));
+  // Route 25 along the moat shows 40 km/h (both of its speed signs), Castle Road keeps 30
+  const forty = shown.items.filter(i => i.a === 'HK_Sign_Speed40');
+  assert.equal(forty.length, WEB_REPLACED.length);
+  assert.ok(forty.every(i => i.p[2] > 20 && i.p[2] < 32), 'on Route 25');
+  for (const name of new Set(shown.items.map(i => i.a))) assert.ok(manifest.models[name], `${name}: built`);
+  for (const name of ['HK_Sign_Speed30', 'HK_Sign_Speed40']) {
+    for (const material of ['HK_SignRed', 'HK_WhitePaint', 'HK_SignBlue', 'HK_MetalLight']) closed(name, material);
+    assert.equal(manifest.models[name].design, 'abstract-closed-solids-v2', `${name}: authored, digits read from the front`);
   }
 });

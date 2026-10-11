@@ -8,7 +8,10 @@ from mathutils import Vector
 
 SIGNAL_MODELS = ('ART_Signal_Car', 'ART_Signal_Pedestrian', 'ART_Signal_Support')
 VEHICLE_MODELS = ('WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium')
-MODEL_NAMES = (*SIGNAL_MODELS, *VEHICLE_MODELS, 'HK_StreetLamp')
+# speed signs authored here: 40 is web-only (VRLearn has none); 30 replaces the rebuilt source,
+# whose digits came out mirrored in the browser ("OE")
+SIGN_MODELS = ('HK_Sign_Speed30', 'HK_Sign_Speed40')
+MODEL_NAMES = (*SIGNAL_MODELS, *VEHICLE_MODELS, *SIGN_MODELS, 'HK_StreetLamp')
 
 
 def identity(p):
@@ -126,20 +129,32 @@ def lantern(b):
                      0.023, 'ART_Frame', segments=6, end_radius=0.020)
 
 
-def signal_lens(b, x, y, radius, material, front=0.16):
+def signal_lens(b, x, y, radius, material, front=0.16, hood=0.15, arc=(18, 162), hood_material='ART_Frame'):
     cylinder(b, (x, y, front - 0.03), (x, y, front + 0.024), radius + 0.026,
              'ART_Frame', segments=24, bevel=0.012)
     cylinder(b, (x, y, front + 0.020), (x, y, front + 0.049), radius,
              material, segments=24, bevel=0.006)
-    # Closed semicircular sun visor with front/back and end walls.
-    arc = [math.radians(18 + 144 * i / 12) for i in range(13)]
-    outer = [(x + (radius + 0.052) * math.cos(t), y + (radius + 0.052) * math.sin(t)) for t in arc]
-    inner = [(x + (radius + 0.023) * math.cos(t), y + (radius + 0.023) * math.sin(t)) for t in reversed(arc)]
+    # Closed sun visor (hood) over the lens with front/back and end walls; `arc` in degrees from +X.
+    steps = max(6, round((arc[1] - arc[0]) / 12))
+    angles = [math.radians(arc[0] + (arc[1] - arc[0]) * i / steps) for i in range(steps + 1)]
+    outer = [(x + (radius + 0.052) * math.cos(t), y + (radius + 0.052) * math.sin(t)) for t in angles]
+    inner = [(x + (radius + 0.023) * math.cos(t), y + (radius + 0.023) * math.sin(t)) for t in reversed(angles)]
     polygon = outer + inner
     if sum(polygon[i][0] * polygon[(i + 1) % len(polygon)][1] - polygon[(i + 1) % len(polygon)][0] * polygon[i][1]
            for i in range(len(polygon))) > 0:
         polygon.reverse()
-    loft(b, [[(xx, yy, front + zz) for xx, yy in polygon] for zz in (-0.012, 0.15)], 'ART_Frame')
+    loft(b, [[(xx, yy, front + zz) for xx, yy in polygon] for zz in (-0.012, hood)], hood_material)
+
+
+def square_lamp(b, y, material, walking, front):
+    """A Japanese pedestrian lamp: square lens in a dark frame under a three-sided hood."""
+    beveled_box(b, (0, y, front - 0.012), (0.31, 0.31, 0.03), 'ART_Frame', 0.01)
+    beveled_box(b, (0, y, front + 0.012), (0.27, 0.27, 0.024), material, 0.012)
+    person(b, 0, y, walking, front + 0.026)
+    for center, size in (((0, y + 0.165, front + 0.08), (0.34, 0.022, 0.18)),
+                         ((-0.163, y + 0.02, front + 0.08), (0.022, 0.31, 0.18)),
+                         ((0.163, y + 0.02, front + 0.08), (0.022, 0.31, 0.18))):
+        beveled_box(b, center, size, 'ART_SignalHoodDark', 0.006)
 
 
 def person(b, x, y, walking, front):
@@ -159,17 +174,47 @@ def person(b, x, y, walking, front):
 
 
 def signals(b, name):
+    """Kyobashi's signals as photographed: a grey three-lamp head (green, yellow, red from the
+    driver's left) with deep hoods, hung by two short brackets from the mast arm above it; a dark
+    pedestrian head with two square hooded lamps (red standing figure over green walking one)."""
     if name == 'ART_Signal_Support':
         cylinder(b, (0, -1, 0), (0, 1, 0), 0.5, 'ART_Frame', segments=12, end_radius=0.43)
     elif name == 'ART_Signal_Car':
-        beveled_box(b, (0, 0, 0), (1.78, 0.62, 0.27), 'ART_SignalHousing', 0.085)
-        for x, color in ((-0.59, 'ART_SignalRed'), (0, 'ART_SignalYellow'), (0.59, 'ART_SignalGreen')):
-            signal_lens(b, x, 0, 0.192, color)
+        beveled_box(b, (0, 0, -0.05), (1.52, 0.40, 0.12), 'ART_SignalHousing', 0.05)
+        # Authored X ends up mirrored in the GLB, and the lenses face the GLB's -Z: authored -X is
+        # the left of whoever the lamps face. Japanese order from that side: green, yellow, red.
+        for x, color in ((-0.52, 'ART_SignalGreen'), (0, 'ART_SignalYellow'), (0.52, 'ART_SignalRed')):
+            cylinder(b, (x, 0, -0.09), (x, 0, 0.075), 0.235, 'ART_SignalHousing', segments=28, bevel=0.02)
+            signal_lens(b, x, 0, 0.165, color, front=0.08, hood=0.26, arc=(-28, 208), hood_material='ART_SignalHood')
+        for x in (-0.46, 0.46):     # brackets up to the mast arm (0.43 m above the head's centre)
+            cylinder(b, (x, 0.19, -0.05), (x, 0.47, -0.05), 0.028, 'ART_Frame', segments=8)
     else:
-        beveled_box(b, (0, 0, 0), (0.427, 0.687, 0.235), 'ART_SignalHousing', 0.052)
-        for y, color, walking in ((0.162, 'ART_SignalRed', False), (-0.162, 'ART_SignalGreen', True)):
-            signal_lens(b, 0, y, 0.105, color, front=0.125)
-            person(b, 0, y, walking, 0.177)
+        beveled_box(b, (0, 0, 0), (0.40, 0.74, 0.20), 'ART_SignalHousingDark', 0.04)
+        square_lamp(b, 0.175, 'ART_SignalRed', False, 0.112)
+        square_lamp(b, -0.175, 'ART_SignalGreen', True, 0.112)
+
+
+def speed_sign(b, digits):
+    """A Japanese speed-limit sign as closed solids, sized like VRLearn's HK_Sign_Speed30 (pole
+    2.9 m, disc 0.6 m across at 2.45 m, facing +Z): red ring, white face, blue seven-segment
+    digits. `digits` is a two-character string read from the front."""
+    y = 2.45
+    cylinder(b, (0, 0, 0), (0, 2.9, 0), 0.035, 'HK_MetalLight', segments=10)
+    cylinder(b, (0, y, 0.03), (0, y, 0.05), 0.305, 'HK_MetalLight', segments=32)
+    cylinder(b, (0, y, 0.05), (0, y, 0.06), 0.3, 'HK_SignRed', segments=32)
+    cylinder(b, (0, y, 0.06), (0, y, 0.066), 0.23, 'HK_WhitePaint', segments=32)
+    on = {'0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg',
+          '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg'}
+    w, h, t = 0.05, 0.12, 0.03
+    for ox, digit in zip((0.08, -0.08), digits):     # +X is the reader's left from the front (+Z)
+        # seven segments; mirrored X: the reader's left is +X
+        seg = {'a': ((0, h), (2 * w, 0.0)), 'g': ((0, 0), (2 * w, 0.0)), 'd': ((0, -h), (2 * w, 0.0)),
+               'f': ((w, h / 2), (0.0, h)), 'b': ((-w, h / 2), (0.0, h)),
+               'e': ((w, -h / 2), (0.0, h)), 'c': ((-w, -h / 2), (0.0, h))}
+        for k, key in enumerate(on[digit]):
+            (cx, cy), (sx, sy) = seg[key]
+            # each segment a hair deeper than the last: touching segments share no corner (closed solids)
+            beveled_box(b, (ox + cx, y + cy, 0.068 + 0.0003 * k), (sx + t, sy + t, 0.005), 'HK_SignBlue', 0.002)
 
 
 def interpolate(profile, z):
@@ -357,6 +402,8 @@ def build(name, mesh_class):
             # Reflect Blender Y, which represents Unity depth, and fix winding.
             b.vertices = [(x, -y, z) for x, y, z in b.vertices]
             b.faces = [tuple(reversed(indices)) for indices in b.faces]
+    elif name in SIGN_MODELS:
+        speed_sign(b, name[-2:])
     elif name.startswith('HK_Truck'):
         truck(b, name)
     else:

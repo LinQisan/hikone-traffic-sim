@@ -47,7 +47,8 @@ COLORS = {
     'HK_Guard': (0.45, 0.36, 0.33),
     'ART_Frame': (0.27, 0.34, 0.45), 'ART_FrameLight': (0.52, 0.59, 0.65),
     'ART_LampGlow': (1.0, 0.87, 0.59), 'ART_LampBase': (0.48, 0.48, 0.57),
-    'ART_SignalHousing': (0.30, 0.36, 0.46),
+    'ART_SignalHousing': (0.55, 0.57, 0.57), 'ART_SignalHood': (0.50, 0.52, 0.53),
+    'ART_SignalHousingDark': (0.25, 0.25, 0.27), 'ART_SignalHoodDark': (0.22, 0.23, 0.26),
     'ART_SignalRed': (0.94, 0.19, 0.16), 'ART_SignalYellow': (1.0, 0.77, 0.13),
     'ART_SignalGreen': (0.17, 0.76, 0.46), 'ART_SignalGlyph': (1.0, 0.96, 0.80),
     'ART_Glass': (0.35, 0.52, 0.66), 'ART_GlassLight': (0.65, 0.76, 0.81),
@@ -498,7 +499,7 @@ def main():
         with open(os.path.join(OUT, 'manifest.json')) as f:
             manifest = json.load(f)
     names = {file[:-4] for file in os.listdir(os.path.join(ROOT, 'data', 'models')) if file.endswith('.glb')}
-    names.update(abstract_props.SIGNAL_MODELS)
+    names.update(abstract_props.SIGNAL_MODELS, abstract_props.SIGN_MODELS)
     if args.only and set(args.only) - names:
         parser.error('Unknown models: ' + ', '.join(sorted(set(args.only) - names)))
     for name in sorted(names):

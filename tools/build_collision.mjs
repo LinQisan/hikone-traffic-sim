@@ -22,10 +22,11 @@ const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const { placement } = await import('../src/coords.js');
 const { Ground } = await import('../src/ground.js');
 const { CELL, BAND_LOW, BAND_HIGH, encodeBits } = await import('../src/obstacles.js');
+const { webLayout } = await import('../src/web-layout.js');
 
 const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
-const layout = read('layout.json'), map = read('map.json');
+const layout = webLayout(read('layout.json')), map = read('map.json');   // as the browser shows it
 const ground = new Ground(read('road_tiles.json'));
 const NOT_SOLID = /^HK_(Road|Ground|Water|Terrain)/;
 

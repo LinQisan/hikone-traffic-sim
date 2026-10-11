@@ -385,13 +385,14 @@
       }
     },
     "HK_Sign_Speed30": {
-      "triangles": 148,
-      "strokes": 1,
-      "bytes": 20276,
-      "remodeled": false,
+      "triangles": 1068,
+      "strokes": 0,
+      "bytes": 77376,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 142,
-        "bytes": 19876
+        "triangles": 1068,
+        "bytes": 77380
       }
     },
     "HK_Sign_Stop": {
@@ -539,25 +540,25 @@
       }
     },
     "ART_Signal_Car": {
-      "triangles": 1488,
+      "triangles": 2396,
       "strokes": 0,
-      "bytes": 107268,
+      "bytes": 169768,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1488,
-        "bytes": 107264
+        "triangles": 2396,
+        "bytes": 169772
       }
     },
     "ART_Signal_Pedestrian": {
-      "triangles": 1300,
+      "triangles": 948,
       "strokes": 0,
-      "bytes": 94484,
+      "bytes": 73944,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1300,
-        "bytes": 94952
+        "triangles": 948,
+        "bytes": 73948
       }
     },
     "ART_Signal_Support": {
@@ -569,6 +570,17 @@
       "lod": {
         "triangles": 44,
         "bytes": 3932
+      }
+    },
+    "HK_Sign_Speed40": {
+      "triangles": 1008,
+      "strokes": 0,
+      "bytes": 72984,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 1008,
+        "bytes": 72988
       }
     }
   }
