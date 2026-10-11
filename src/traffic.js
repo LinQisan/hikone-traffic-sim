@@ -26,7 +26,7 @@
 //                       (someone who waits at the kerb then sees it pass instead of waiting forever)
 //   holdMaxSeconds      a holding car goes anyway this long after it appeared (someone who waits for
 //                       it at the kerb then sees it turn in front of them)
-import { pointAlong, START_TRIGGER, isRepeating } from './shared/scenario.js';
+import { START_TRIGGER, isRepeating } from './shared/scenario.js';
 
 const NORMAL_PACE = 2.4;      // m/s: walking and riding in the app (player.js MOVE_SPEED)
 
@@ -58,6 +58,73 @@ export function meetPoint(route, spawn, goal) {
     travelled += seg;
   }
   return { ...best, dir };
+}
+
+// ------------------------------------------------------------------ turning like a car
+// A route is a polyline: its corners are rounded into arcs (radius up to TURN_RADIUS, never more
+// than ~half of the neighbouring segments) so that the heading changes continuously. The car's
+// rear and front axles both run on that path; the body points from the rear axle to the front one
+// (it swings into a turn behind its front wheels), and the front wheels steer along the path at
+// the front axle (they turn in before the body follows).
+export const TURN_RADIUS = 12;
+export const WHEELBASE = { sedan: 2.7, 'kei-tall': 2.52, 'kei-hatch': 2.52 };
+export const MAX_STEER = 38;                 // degrees
+
+/** The route with rounded corners, as a dense polyline with cumulative distances (s). */
+export function smoothRoute(route) {
+  const pts = route.filter((p, i) => i === 0 || Math.hypot(p.x - route[i - 1].x, p.z - route[i - 1].z) > 1e-6);
+  const out = [{ x: pts[0].x, z: pts[0].z }];
+  const seg = i => Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].z - pts[i].z);
+  for (let i = 1; i < pts.length - 1; i++) {
+    const a = pts[i - 1], b = pts[i], c = pts[i + 1];
+    const ux = (b.x - a.x) / seg(i - 1), uz = (b.z - a.z) / seg(i - 1);
+    const vx = (c.x - b.x) / seg(i), vz = (c.z - b.z) / seg(i);
+    const turn = Math.acos(Math.max(-1, Math.min(1, ux * vx + uz * vz)));
+    if (turn < 0.02) { out.push({ x: b.x, z: b.z }); continue; }
+    const t = Math.min(TURN_RADIUS * Math.tan(turn / 2), 0.45 * seg(i - 1), 0.45 * seg(i));
+    const r = t / Math.tan(turn / 2);
+    const p0 = { x: b.x - ux * t, z: b.z - uz * t };
+    const side = Math.sign(ux * vz - uz * vx);              // centre on the inside of the turn
+    const cx = p0.x - uz * r * side, cz = p0.z + ux * r * side;
+    const a0 = Math.atan2(p0.x - cx, p0.z - cz);
+    const steps = Math.max(2, Math.ceil(turn * r / 0.4));
+    for (let k = 0; k <= steps; k++) {
+      const ang = a0 - side * turn * k / steps;
+      out.push({ x: cx + r * Math.sin(ang), z: cz + r * Math.cos(ang) });
+    }
+  }
+  out.push({ x: pts.at(-1).x, z: pts.at(-1).z });
+  let total = 0;
+  out.forEach((p, i) => { if (i) total += Math.hypot(p.x - out[i - 1].x, p.z - out[i - 1].z); p.s = total; });
+  return out;
+}
+
+/** Point and heading at distance d along a smoothed path; beyond either end it goes on straight. */
+export function pathAt(path, d) {
+  let lo = 0, hi = path.length - 1;
+  if (d <= 0 || d >= path[hi].s) {
+    const [a, b] = d <= 0 ? [path[0], path[1]] : [path[hi - 1], path[hi]];
+    const l = Math.hypot(b.x - a.x, b.z - a.z) || 1, ux = (b.x - a.x) / l, uz = (b.z - a.z) / l;
+    const from = d <= 0 ? path[0] : path[hi], extra = d <= 0 ? d : d - path[hi].s;
+    return { x: from.x + ux * extra, z: from.z + uz * extra, yaw: Math.atan2(ux, uz) * 180 / Math.PI };
+  }
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (path[mid].s <= d) lo = mid; else hi = mid; }
+  const a = path[lo], b = path[hi], f = (d - a.s) / Math.max(1e-9, b.s - a.s);
+  return { x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f, yaw: Math.atan2(b.x - a.x, b.z - a.z) * 180 / Math.PI };
+}
+
+/**
+ * Where a car with its centre at distance d stands: centre between the axles, heading from rear
+ * to front axle, front-wheel steer angle (degrees, + = to the right). The steer is atan(L / R) for
+ * the path's radius R around the front axle (the bicycle model), averaged over one wheelbase so
+ * the wheels turn in smoothly as the front axle nears a bend and straighten as it leaves it.
+ */
+export function carPose(path, d, wheelbase) {
+  const rear = pathAt(path, d - wheelbase / 2), front = pathAt(path, d + wheelbase / 2);
+  const yaw = Math.atan2(front.x - rear.x, front.z - rear.z) * 180 / Math.PI;
+  const turn = ((pathAt(path, d + wheelbase).yaw - pathAt(path, d).yaw + 540) % 360) - 180;   // over L, centred on the front axle
+  const steer = Math.max(-MAX_STEER, Math.min(MAX_STEER, Math.atan(turn * Math.PI / 180) * 180 / Math.PI));
+  return { x: (rear.x + front.x) / 2, z: (rear.z + front.z) / 2, yaw, steer };
 }
 
 /** Outer size (width, height, length) per body; the web sedan stands in for the Unity prefabs' car. */
@@ -99,7 +166,10 @@ export class Traffic {
     this.plans = scenario.vehicles
       .map((v, index) => ({ v, index, next: v.start === START_TRIGGER ? null : v.delaySeconds, done: false }))
       .filter(p => p.v.route && p.v.route.length >= 2);
-    for (const p of this.plans) if (p.v.launch === 'meet') p.meet = meetPoint(p.v.route, scenario.spawn, scenario.goal);
+    for (const p of this.plans) {
+      p.path = smoothRoute(p.v.route);                       // what the cars actually drive
+      if (p.v.launch === 'meet') p.meet = meetPoint(p.path, scenario.spawn, scenario.goal);
+    }
     this.participant = null;
   }
 
@@ -217,14 +287,15 @@ export class Traffic {
   spawn(plan, at, meet = null) {
     const v = plan.v;
     const body = this.bodyFor(v);
-    const start = pointAlong(v.route, 0);
+    const wheelbase = WHEELBASE[body] ?? WHEELBASE.sedan;
+    const start = carPose(plan.path, 0, wheelbase);
     const car = {
       id: this.nextId++, vehicle: plan.index, name: v.name, accident: !!v.accident, body,
-      size: BODY_SIZE[body] ?? BODY_SIZE.sedan, born: at, speed: v.speedKmh / 3.6,
-      x: start.x, z: start.z, yaw: v.overrideYaw && !meet ? v.yaw : start.yaw,
+      size: BODY_SIZE[body] ?? BODY_SIZE.sedan, born: at, speed: v.speedKmh / 3.6, path: plan.path, wheelbase,
+      x: start.x, z: start.z, yaw: v.overrideYaw && !meet ? v.yaw : start.yaw, steer: start.steer,
       currentSpeed: meet ? meet.speed0 : 0, launched: meet ? meet.launched : true, alive: true, distance: 0,
       // where this route crosses the participant's path (lets an accident launch adopt the car)
-      crossing: plan.crossing ??= meetPoint(v.route, this.scenario.spawn, this.scenario.goal),
+      crossing: plan.crossing ??= meetPoint(plan.path, this.scenario.spawn, this.scenario.goal),
     };
     if (car.crossing.score > 1.5) car.crossing = null;
     if (meet) car.meet = plan.meet;
@@ -238,7 +309,6 @@ export class Traffic {
    * through a slower one).
    */
   move(car, dt) {
-    const route = this.scenario.vehicles[car.vehicle].route;
     let target = car.launched ? car.speed : 0;
     const a = car.yaw * Math.PI / 180, fx = Math.sin(a), fz = Math.cos(a);
     for (const other of this.cars) {
@@ -253,10 +323,8 @@ export class Traffic {
     const change = target - car.currentSpeed, before = car.currentSpeed;
     car.currentSpeed = Math.max(0, car.currentSpeed + Math.max(-8 * dt, Math.min(8 * dt, change)));
     car.distance += (before + car.currentSpeed) / 2 * dt;
-    const at = pointAlong(route, car.distance);
-    if (!at) { car.alive = false; return; }
-    car.x = at.x; car.z = at.z;
-    if (car.distance > 0.01) car.yaw = at.yaw;
+    if (car.distance > car.path.at(-1).s) { car.alive = false; return; }
+    if (car.distance > 0.01) Object.assign(car, carPose(car.path, car.distance, car.wheelbase));
     if (car.swerve) {
       car.lateral = Math.min(1.8, car.lateral + 3 * dt);
       const a = car.yaw * Math.PI / 180;

@@ -62,6 +62,7 @@ test('leaving/restarting replay disposes its animal and overlays exactly once', 
   replay.start(recording, 1, null, 170);
   const geometries = new Set(), materials = new Set();
   replay.root.traverse(o => {
+    if (o.userData.shared) return;                  // shared shadow pools stay
     if (o.geometry) geometries.add(o.geometry);
     if (o.material) materials.add(o.material);
   });

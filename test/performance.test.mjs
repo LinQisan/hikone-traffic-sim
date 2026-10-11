@@ -11,6 +11,8 @@ registerHooks({ resolve(specifier, context, next) {
 } });
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+const { registerModel } = await import('../src/world.js');
+const { instance } = await import('../src/vehicles.js');
 const { environmentInstances, LOD_FAR, LOD_NEAR } = await import('../src/environment-instances.js');
 const { PigmentPalette, pigmentOf } = await import('../src/style.js');
 const { placement } = await import('../src/coords.js');
@@ -88,7 +90,7 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   environment.root.updateMatrixWorld(true);
   const viewFrustum = new THREE.Frustum().setFromProjectionMatrix(
     new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  const visible = environment.root.children.filter(m => m.visible && (!m.frustumCulled || viewFrustum.intersectsObject(m))).length;
+  const visible = environment.root.children.filter(m => m.visible && !m.userData.shadowOnly && (!m.frustumCulled || viewFrustum.intersectsObject(m))).length;
   assert.ok(visible < 180, `draw budget: ${visible}`);
   const drawn = a => [a.high, a.low].flatMap(m => Array.from({ length: m.count }, (_, i) => m.instanceMatrix.array[i * 16 + 12]));
   const tree = environment.assets.find(a => a.asset === 'HK_Tree_Cedar');
@@ -96,10 +98,30 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
     && !shadowFrustum.intersectsSphere(new THREE.Sphere(p.center, p.radius + 1.5)));
   assert.ok(behind.length > 0 && behind.every(p => !drawn(tree).includes(p.matrix.elements[12])), 'far behind the viewer: not drawn');
   const lamp = environment.assets.find(a => a.asset === 'HK_StreetLamp');
+  const key = (array, i) => array[i * 16 + 12] + ',' + array[i * 16 + 14];
+  const casters = a => new Set(Array.from({ length: a.shadowMesh.userData.shadowCount }, (_, i) => key(a.shadowMesh.instanceMatrix.array, i)));
+  const inView = a => new Set([a.high, a.low].flatMap(m => Array.from({ length: m.count }, (_, i) => key(m.instanceMatrix.array, i))));
+  const own = p => key(p.matrix.elements, 0);
   const shading = lamp.placements.find(p => p.center.x < camera.position.x - 3 && shadowFrustum.containsPoint(p.center));
-  assert.ok(shading && drawn(lamp).includes(shading.matrix.elements[12]), 'a caster behind the viewer still casts its shadow');
-  assert.ok(lamp.high.userData.shadowCount + lamp.low.userData.shadowCount < lamp.high.count + lamp.low.count,
+  assert.ok(shading && casters(lamp).has(own(shading)) && !inView(lamp).has(own(shading)),
+    'a caster behind the viewer still casts its shadow (from the shadow list, not drawn in view)');
+  const listed = lamp.placements.filter(p => casters(lamp).has(own(p)));
+  assert.ok(listed.length > 0 && listed.length < lamp.placements.length && listed.every(p => shadowFrustum.intersectsSphere(new THREE.Sphere(p.center, p.radius + 1.5))),
     'the shadow pass draws only the casters inside the shadow camera');
+  // only the light LOD casts, from its own mesh; the view meshes never cast
+  for (const a of environment.assets.filter(a => a.shadow)) {
+    assert.ok(a.shadowMesh.castShadow && a.shadowMesh.geometry === a.low.geometry, `${a.asset}: shadow from the light LOD`);
+    assert.ok(!a.high.castShadow && !a.low.castShadow, `${a.asset}: view meshes do not cast`);
+  }
+  // the shadow-only mesh draws nothing in the view pass, and is ready again for the next shadow pass
+  const caster = lamp.shadowMesh, n = caster.count;
+  caster.onBeforeRender(); assert.equal(caster.count, 0);
+  caster.onAfterRender(); assert.equal(caster.count, n);
+  environment.casters(false);
+  assert.ok(environment.assets.every(a => !a.shadowMesh?.visible), 'casters hidden on ordinary frames (no view-pass cost)');
+  environment.casters(true);
+  assert.ok(lamp.shadowMesh.visible, 'and present on a frame that redraws the shadow map');
+  environment.casters(false);
 
   // stationary views do not rebuild; detail switches with hysteresis
   const builds = environment.builds;
@@ -117,6 +139,15 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   assert.equal(at(LOD_FAR + 3), true);
   assert.equal(at((LOD_FAR + LOD_NEAR) / 2), true, 'LOD hysteresis avoids flickering around the threshold');
   assert.equal(at(LOD_NEAR - 3), false);
+  // walking past LOD thresholds never changes the shadow casters: no shadow redraw while the box stays
+  camera.position.set(-55, 2.15, 23); camera.updateMatrixWorld();
+  environment.updateLOD(camera, null, shadowCamera);
+  let redraws = 0;
+  for (let x = -55; x < 35; x += 0.5) {
+    camera.position.set(x, 2.15, 23); camera.updateMatrixWorld();
+    if (environment.updateLOD(camera, null, shadowCamera)) redraws++;
+  }
+  assert.equal(redraws, 0, 'LOD switches along a 90 m walk leave the shadow map alone');
   for (const mesh of environment.root.children) mesh.geometry.dispose();
 });
 
@@ -154,7 +185,7 @@ test('packed normals/colours reduce bandwidth while preserving positions and pig
   geometry.dispose();
 });
 
-test('cached shadows still update for moving cars, camera motion and scene changes', () => {
+test('the shadow map holds only still things: redrawn on re-centring and changes, never for motion', () => {
   let skyRenders = 0;
   const renderer = { coordinateSystem: THREE.WebGLCoordinateSystem, xr: { enabled: true },
     getRenderTarget: () => null, getActiveCubeFace: () => 0, getActiveMipmapLevel: () => 0,
@@ -163,25 +194,28 @@ test('cached shadows still update for moving cars, camera motion and scene chang
   assert.equal(skyRenders, 6, 'sky is rendered to a cubemap once');
   assert.ok(scene.background.isCubeTexture && !scene.environment, 'no per-frame sky or diffuse PBR environment pass');
   const position = new THREE.Vector3(0, 0, 0), shadow = light.sun.shadow;
-  light.follow(position, false, 0);
+  light.follow(position);
   shadow.needsUpdate = false; // A render has consumed the invalidation.
-  light.follow(position, false, 1000);
-  assert.equal(shadow.needsUpdate, false, 'static scene reuses its shadow map');
-  light.follow(position, true, 1001);
-  assert.equal(shadow.needsUpdate, true, 'moving cars cannot freeze their shadows');
-  shadow.needsUpdate = false;
-  light.follow(position, true, 1010);
-  assert.equal(shadow.needsUpdate, false, 'shadow refresh is capped independently of head tracking');
-  light.follow(position, true, 1090);
-  assert.equal(shadow.needsUpdate, true);
-  shadow.needsUpdate = false;
-  light.follow(new THREE.Vector3(1, 0, 0), false, 1100);
+  for (let i = 0; i < 100; i++) light.follow(position);
+  assert.equal(shadow.needsUpdate, false, 'standing still (cars passing or not) reuses the shadow map');
+  light.follow(new THREE.Vector3(1, 0, 0));
   assert.equal(shadow.needsUpdate, false, 'small steps keep the cached map (no re-centring every step)');
-  light.follow(new THREE.Vector3(5, 0, 0), false, 1150);
+  light.follow(new THREE.Vector3(5, 0, 0));
   assert.equal(shadow.needsUpdate, true, 'shadow box follows a moving participant');
   shadow.needsUpdate = false; light.invalidate();
-  assert.equal(shadow.needsUpdate, true, 'adding/removing cars explicitly invalidates shadows');
+  assert.equal(shadow.needsUpdate, true, 'scene changes (a run starts, LOD switches) invalidate explicitly');
   assert.equal(skyRenders, 6);
+});
+
+test('moving vehicles do not cast into the shadow map: they carry a shadow pool; parked ones cast', () => {
+  registerModel('WEB_Sedan', [{ geometry: new THREE.BoxGeometry(1.76, 1.45, 4.6), material: new THREE.MeshLambertMaterial({ name: 'Box' }), matrix: new THREE.Matrix4() }]);
+  const moving = instance('WEB_Sedan', new Map(), { moving: true }), parked = instance('WEB_Sedan', new Map());
+  const casts = o => { let c = false; o.traverse(m => { if (m.isMesh && m.castShadow) c = true; }); return c; };
+  assert.equal(casts(moving), false);
+  const pool = moving.children.find(c => c.name === 'BlobShadow');
+  assert.ok(pool && pool.scale.x > 1.76 && pool.scale.z > 4.6 && pool.position.y < 0.05, 'a pool a little larger than the car, on the ground');
+  assert.equal(casts(parked), true);
+  assert.ok(!parked.children.some(c => c.name === 'BlobShadow'));
 });
 
 test('desktop resolution steps down on a slow GPU, recovers with headroom and does not oscillate', async () => {
@@ -197,6 +231,17 @@ test('desktop resolution steps down on a slow GPU, recovers with headroom and do
   assert.equal(r.scale, 1, 'headroom restores the full resolution');
   assert.equal(r.frame(1 / 20, 60000, true), false, 'VR or hidden tabs never change it');
   assert.equal(r.frame(2, 60000), false, 'stalls are ignored');
+  // a GPU that manages 60 fps below 0.9 but only 45 fps above: the scale must settle, not see-saw
+  // (each change resizes the canvas, a hitch) — the block grows each time a raise is undone
+  const borderline = new AdaptiveResolution();
+  let changes = 0, high = 0, frames = 0;
+  for (let t = 0; t < 600; t += 1 / 60) {
+    const fps = borderline.scale > 0.9 ? 45 : 60;
+    if (borderline.frame(1 / fps, t * 1000)) changes++;
+    frames++; if (borderline.scale > 0.9) high++;
+  }
+  assert.ok(changes <= 30, `10 minutes on a borderline GPU: ${changes} resizes (the fixed 15 s block made 194)`);
+  assert.ok(high / frames < 0.1, `rarely at the level the GPU cannot hold: ${(100 * high / frames).toFixed(1)} %`);
   const fixed = new AdaptiveResolution({ enabled: false });
   for (let i = 0; i < 100; i++) fixed.frame(1 / 10, i * 100);
   assert.equal(fixed.scale, 1);

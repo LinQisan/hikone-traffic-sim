@@ -22,7 +22,7 @@ export class Recorder {
   capture(time, head, cars) {
     if (!this.recording || time < this.next) return;
     this.next = time + SAMPLE_INTERVAL;
-    this.frames.push({ t: time, head: { ...head }, cars: cars.map(c => ({ id: c.id, x: c.x, z: c.z, yaw: c.yaw, body: c.body, accident: c.accident })) });
+    this.frames.push({ t: time, head: { ...head }, cars: cars.map(c => ({ id: c.id, x: c.x, z: c.z, yaw: c.yaw, steer: c.steer ?? 0, body: c.body, accident: c.accident })) });
     while (this.frames.length && this.frames[0].t < time - BUFFER_SECONDS) this.frames.shift();
   }
 
@@ -52,7 +52,8 @@ export function sample(track, t) {
   for (let i = 1; i < track.length; i++) {
     if (track[i].t >= t) {
       const a = track[i - 1], b = track[i], f = (t - a.t) / Math.max(1e-6, b.t - a.t);
-      return { t, x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f, yaw: a.yaw + deltaYaw(a.yaw, b.yaw) * f };
+      return { t, x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f, yaw: a.yaw + deltaYaw(a.yaw, b.yaw) * f,
+        steer: (a.steer ?? 0) + ((b.steer ?? 0) - (a.steer ?? 0)) * f };
     }
   }
   return track[track.length - 1];

@@ -33,15 +33,25 @@ export function decodeBits(runs, size) {
 export class Obstacles {
   constructor(collision) {
     this.grid = collision ? { ...collision, bits: decodeBits(collision.bits, collision.width * collision.height) } : null;
+    this.fixed = [];                     // always there (the signal posts)
     this.boxes = [];
+  }
+
+  /** Oriented boxes that stay for every run (same form as setParked). */
+  setFixed(list) {
+    this.fixed = list.map(Obstacles.box);
+    this.boxes = [...this.fixed, ...this.parked ?? []];
+  }
+
+  static box({ x, z, yaw, size }) {
+    const a = yaw * Math.PI / 180;
+    return { x, z, s: Math.sin(a), c: Math.cos(a), hw: size[0] / 2, hl: size[1] / 2 };
   }
 
   /** Parked vehicles: centre, yaw (Unity degrees) and footprint [width, length] in metres. */
   setParked(list) {
-    this.boxes = list.map(({ x, z, yaw, size }) => {
-      const a = yaw * Math.PI / 180;
-      return { x, z, s: Math.sin(a), c: Math.cos(a), hw: size[0] / 2, hl: size[1] / 2 };
-    });
+    this.parked = list.map(Obstacles.box);
+    this.boxes = [...this.fixed, ...this.parked];
   }
 
   cell(i, j) {
@@ -52,24 +62,39 @@ export class Obstacles {
   }
 
   /** Does a body of radius r standing at (x, z) touch anything solid? */
-  blocked(x, z, r) {
+  blocked(x, z, r) { return this.clearance(x, z, r) < r; }
+
+  /**
+   * Distance from (x, z) to the nearest solid thing, looking no further than r (returns r when
+   * nothing is that close). A body that starts touching something (a custom spawn next to a
+   * façade or a lamp post) may still move as long as the clearance does not shrink.
+   */
+  clearance(x, z, r) {
+    let best = r * r;
     for (const b of this.boxes) {
       // into the vehicle's frame: right = (cos, -sin), forward = (sin, cos)
       const dx = x - b.x, dz = z - b.z;
       const side = dx * b.c - dz * b.s, along = dx * b.s + dz * b.c;
       const ex = Math.max(0, Math.abs(side) - b.hw), ez = Math.max(0, Math.abs(along) - b.hl);
-      if (ex * ex + ez * ez < r * r) return true;
+      best = Math.min(best, ex * ex + ez * ez);
     }
     const g = this.grid;
-    if (!g) return false;
-    const i0 = Math.floor((x - r - g.xMin) / g.cell), i1 = Math.floor((x + r - g.xMin) / g.cell);
-    const j0 = Math.floor((z - r - g.zMin) / g.cell), j1 = Math.floor((z + r - g.zMin) / g.cell);
-    for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
-      if (!this.cell(i, j)) continue;
-      const cx = g.xMin + i * g.cell, cz = g.zMin + j * g.cell;
-      const ex = Math.max(cx - x, 0, x - cx - g.cell), ez = Math.max(cz - z, 0, z - cz - g.cell);
-      if (ex * ex + ez * ez < r * r) return true;
+    if (g) {
+      const i0 = Math.floor((x - r - g.xMin) / g.cell), i1 = Math.floor((x + r - g.xMin) / g.cell);
+      const j0 = Math.floor((z - r - g.zMin) / g.cell), j1 = Math.floor((z + r - g.zMin) / g.cell);
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+        if (!this.cell(i, j)) continue;
+        const cx = g.xMin + i * g.cell, cz = g.zMin + j * g.cell;
+        const ex = Math.max(cx - x, 0, x - cx - g.cell), ez = Math.max(cz - z, 0, z - cz - g.cell);
+        best = Math.min(best, ex * ex + ez * ez);
+      }
     }
-    return false;
+    return Math.sqrt(best);
+  }
+
+  /** May a body of radius r step from a to b? Yes when b is clear or no closer to anything than a. */
+  allows(ax, az, bx, bz, r) {
+    const after = this.clearance(bx, bz, r);
+    return after >= r || after >= this.clearance(ax, az, r) - 1e-9;
   }
 }

@@ -1,9 +1,15 @@
 // The city in few draw calls. Every asset's parts are merged into one geometry per detail level
 // (their colours become per-vertex pigment rows of one shared material), and all placements of
-// an asset draw as one InstancedMesh per level. The CPU picks, per frame, the placements in view
-// (or inside the sun's shadow box) and their detail level, so near objects keep every brush
-// stroke while distant ones use the light LOD. The few very large unique assets (raised road,
-// ground planes, castle-hill terrain) are cut into coarse world cells instead.
+// an asset draw as one InstancedMesh per level. The CPU picks the placements in view and their
+// detail level, so near objects keep every brush stroke while distant ones use the light LOD. The
+// few very large unique assets (raised road, ground planes, castle-hill terrain) are cut into
+// coarse world cells instead.
+//
+// Shadows: the sun's shadow map is drawn from the light LOD only, by a shadow-only InstancedMesh per
+// asset with its own list (every caster inside the shadow box). So the view's LOD switches (every
+// few metres while walking or riding) never change the shadow casters and never force the whole
+// shadow map to be redrawn; it is redrawn only when the shadow box itself moves. The light LOD
+// keeps every silhouette within 4 cm (art.test.mjs), well under a shadow-map texel (~9 cm).
 //
 // Why: on ANGLE/Metal (macOS) and on mobile GPUs each draw costs microseconds of driver time; the
 // earlier per-colour, per-object multi-draw issued about 3,900 draws per frame and the GPU sat idle.
@@ -152,6 +158,15 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
           root.add(mesh);
           return mesh;
         });
+        const [highMesh, lowMesh] = meshes;
+        if (shadow && highMesh && lowMesh) {
+          // only the light level casts; it stays in the scene for the shadow pass and draws nothing
+          // in the view while the cell is near (its draw range is emptied just before that draw)
+          highMesh.castShadow = false;
+          lowMesh.onBeforeShadow = () => { lowMesh.geometry.drawRange.count = Infinity; };
+          lowMesh.onBeforeRender = () => { lowMesh.geometry.drawRange.count = lowMesh.userData.near ? 0 : Infinity; };
+          lowMesh.userData.shadowOnly = true;
+        }
         const bounds = new THREE.Box3();
         for (const m of meshes) if (m) bounds.union(m.geometry.boundingBox);
         cells.push({ asset, key, highMesh: meshes[0], lowMesh: meshes[1], bounds, low: false });
@@ -167,29 +182,44 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       mesh.count = 0;
       mesh.visible = false;
       mesh.frustumCulled = false;                  // culled per placement below
-      mesh.castShadow = shadow; mesh.receiveShadow = true;
+      mesh.castShadow = false; mesh.receiveShadow = true;      // the shadow mesh below casts
       mesh.matrixAutoUpdate = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      // The list starts with the placements inside the shadow box; the shadow pass draws only those.
-      mesh.userData.drawCount = mesh.userData.shadowCount = 0;
-      mesh.onBeforeShadow = () => { mesh.count = mesh.userData.shadowCount; };
-      mesh.onAfterShadow = () => { mesh.count = mesh.userData.drawCount; };
+      mesh.userData.drawCount = 0;
       root.add(mesh);
       return mesh;
     });
+    // the casters: light LOD, every placement inside the shadow box; drawn by the shadow pass only
+    // (in the view pass its count is 0 for the draw, so nothing is drawn; three skips the GL call)
+    let shadowMesh = null;
+    if (shadow) {
+      shadowMesh = new THREE.InstancedMesh(levels[1].geometry, levels[1].material, items.length);
+      shadowMesh.name = asset + '/shadow';
+      shadowMesh.castShadow = true; shadowMesh.receiveShadow = false;
+      shadowMesh.frustumCulled = false; shadowMesh.matrixAutoUpdate = false;
+      shadowMesh.count = 0; shadowMesh.visible = false;
+      shadowMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      shadowMesh.userData.shadowOnly = true;
+      shadowMesh.userData.shadowCount = 0;
+      // hidden except on the frames that redraw the shadow map (casters(true)); then, in that frame's
+      // view pass, it draws nothing
+      shadowMesh.onBeforeRender = () => { shadowMesh.count = 0; };
+      shadowMesh.onAfterRender = () => { shadowMesh.count = shadowMesh.userData.shadowCount; };
+      root.add(shadowMesh);
+    }
     const sphere = levels[0].geometry.boundingSphere;
     const placements = items.map(item => {
       const m = placement(...item.p, item.r, item.s, new THREE.Matrix4());
       const center = sphere.center.clone().applyMatrix4(m);
       return { item, matrix: m, center, radius: sphere.radius * m.getMaxScaleOnAxis(), low: false };
     });
-    assets.push({ asset, shadow, high: levels[0], low: levels[1], placements });
+    assets.push({ asset, shadow, high: levels[0], low: levels[1], shadowMesh, placements });
   }
 
   const frustum = new THREE.Frustum(), second = new THREE.Frustum(), shadowFrustum = new THREE.Frustum();
   const projection = new THREE.Matrix4();
   const eye = new THREE.Vector3(), secondEye = new THREE.Vector3(), sphere = new THREE.Sphere();
-  const lastView = new Float32Array(64).fill(NaN), view = new Float32Array(64);
+  const lastView = new Float64Array(64).fill(NaN), view = new Float64Array(64);
   const look = new THREE.Vector3(), lastLook = new THREE.Vector3(), lastEye = new THREE.Vector3(Infinity, 0, 0);
   const frustumOf = (camera, f, position) => {
     camera.updateWorldMatrix(true, false);
@@ -205,7 +235,15 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
   let builds = 0;
   return {
     root, assets, cells,
-    get drawCalls() { return root.children.filter(m => m.visible).length; },
+    get drawCalls() { return root.children.filter(m => m.visible && !m.userData.shadowOnly).length; },
+    /**
+     * Shows the shadow casters for a frame that redraws the shadow map (call before rendering with
+     * the light's needsUpdate); hidden otherwise, they cost the view pass nothing.
+     */
+    casters(on) {
+      for (const a of assets) if (a.shadowMesh) a.shadowMesh.visible = on && a.shadowMesh.userData.shadowCount > 0;
+      for (const c of cells) if (c.lowMesh?.userData.shadowOnly) c.lowMesh.visible = c.low || on;
+    },
     get builds() { return builds; },
     objects: definitions.reduce((n, d) => n + d.items.length, 0),
     geometryBytes: root.children.reduce((sum, m) => sum + m.geometry.index.array.byteLength
@@ -220,47 +258,73 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       if (!root.visible) return false;
       frustumOf(camera, frustum, eye);
       if (secondCamera) frustumOf(secondCamera, second, secondEye);
-      if (shadowCamera) shadowFrustum.setFromProjectionMatrix(projection.multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
       view.fill(0);
       view.set(camera.projectionMatrix.elements, 16);
       if (secondCamera) view.set(secondCamera.matrixWorld.elements, 32);
-      if (shadowCamera) view.set(shadowCamera.matrixWorld.elements, 48);
       camera.getWorldDirection(look);
       let same = eye.distanceTo(lastEye) < MOVE_AGAIN && look.dot(lastLook) > TURN_AGAIN;
-      for (let i = 16; same && i < 64; i++) if (view[i] !== lastView[i]) same = false;
-      if (same) return false;
-      lastView.set(view); lastEye.copy(eye); lastLook.copy(look);
-      builds++;
-      let changed = false;
-      const near = p => Math.min(p.distanceTo(eye), secondCamera ? p.distanceTo(secondEye) : Infinity);
-      for (const a of assets) {
-        // per level: [inside the shadow frustum | in view only]; the shadow pass draws the first part
-        const lists = [[[], []], [[], []]];
-        for (const p of a.placements) {
-          p.distance = Math.max(0, near(p.center) - p.radius);
-          if (lodOf(p, p.distance)) changed = true;
-          sphere.set(p.center, p.radius + MARGIN + p.distance * TURN_MARGIN);
-          const box = a.shadow && shadowCamera && shadowFrustum.intersectsSphere(sphere);
-          if (box) lists[p.low ? 1 : 0][0].push(p);
-          else if (frustum.intersectsSphere(sphere) || (secondCamera && second.intersectsSphere(sphere))) lists[p.low ? 1 : 0][1].push(p);
-        }
-        [a.high, a.low].forEach((mesh, level) => {
-          const [box, view] = lists[level], array = mesh.instanceMatrix.array;
+      for (let i = 16; same && i < 48; i++) if (view[i] !== lastView[i]) same = false;
+      // the shadow list follows the shadow box only (it moves when the view re-centres)
+      let shadowMoved = false;
+      if (shadowCamera) {
+        shadowCamera.updateMatrixWorld();
+        for (let i = 0; i < 16; i++) if (shadowCamera.matrixWorld.elements[i] !== lastView[48 + i]) shadowMoved = true;
+      }
+      if (same && !shadowMoved) return false;
+      if (shadowMoved) {
+        lastView.set(shadowCamera.matrixWorld.elements, 48);
+        shadowFrustum.setFromProjectionMatrix(projection.multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
+        for (const a of assets) {
+          const mesh = a.shadowMesh;
+          if (!mesh) continue;
+          const array = mesh.instanceMatrix.array;
           let n = 0;
-          for (const p of box) array.set(p.matrix.elements, 16 * n++);
-          for (const p of view) array.set(p.matrix.elements, 16 * n++);
-          mesh.count = mesh.userData.drawCount = n;
-          mesh.userData.shadowCount = box.length;
-          mesh.visible = n > 0;
-          if (n) { mesh.instanceMatrix.clearUpdateRanges(); mesh.instanceMatrix.addUpdateRange(0, n * 16); mesh.instanceMatrix.needsUpdate = true; }
-        });
+          for (const p of a.placements) {
+            sphere.set(p.center, p.radius + MARGIN);
+            if (shadowFrustum.intersectsSphere(sphere)) array.set(p.matrix.elements, 16 * n++);
+          }
+          mesh.count = mesh.userData.shadowCount = n;
+          mesh.instanceMatrix.clearUpdateRanges();
+          if (n) { mesh.instanceMatrix.addUpdateRange(0, n * 16); mesh.instanceMatrix.needsUpdate = true; }
+        }
+      }
+      let changed = shadowMoved;
+      if (!same) {
+        lastView.set(view.subarray(0, 48)); lastEye.copy(eye); lastLook.copy(look);
+        builds++;
+        const near = p => Math.min(p.distanceTo(eye), secondCamera ? p.distanceTo(secondEye) : Infinity);
+        for (const a of assets) {
+          const lists = [[], []];
+          for (const p of a.placements) {
+            p.distance = Math.max(0, near(p.center) - p.radius);
+            lodOf(p, p.distance);
+            sphere.set(p.center, p.radius + MARGIN + p.distance * TURN_MARGIN);
+            if (frustum.intersectsSphere(sphere) || (secondCamera && second.intersectsSphere(sphere))) lists[p.low ? 1 : 0].push(p);
+          }
+          [a.high, a.low].forEach((mesh, level) => {
+            const list = lists[level], array = mesh.instanceMatrix.array;
+            let n = 0;
+            for (const p of list) array.set(p.matrix.elements, 16 * n++);
+            mesh.count = mesh.userData.drawCount = n;
+            if (n) { mesh.instanceMatrix.clearUpdateRanges(); mesh.instanceMatrix.addUpdateRange(0, n * 16); mesh.instanceMatrix.needsUpdate = true; }
+          });
+        }
+      }
+      for (const a of assets) {
+        a.high.visible = a.high.userData.drawCount > 0;
+        a.low.visible = a.low.userData.drawCount > 0;
       }
       for (const c of cells) {
         const d = Math.min(c.bounds.distanceToPoint(eye), secondCamera ? c.bounds.distanceToPoint(secondEye) : Infinity);
-        if (lodOf(c, d)) changed = true;
+        const switched = lodOf(c, d);
         // three culls cells by their bounds; a level without triangles in a cell draws nothing
         if (c.highMesh) c.highMesh.visible = !c.low;
-        if (c.lowMesh) c.lowMesh.visible = c.low;
+        if (c.lowMesh) {
+          c.lowMesh.userData.near = !c.low;
+          c.lowMesh.visible = c.low;          // a casting light level is shown for shadow frames by casters()
+        }
+        // a casting cell with only one level: its casters appear or vanish with the switch
+        if (switched && !c.lowMesh?.userData.shadowOnly && (c.highMesh?.castShadow || c.lowMesh?.castShadow)) changed = true;
       }
       return changed;
     },

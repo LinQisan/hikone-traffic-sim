@@ -19,7 +19,7 @@ registerHooks({ resolve(specifier, context, next) {
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const S = await import('../src/shared/scenario.js');
-const { Traffic, PLAYER_RADIUS, meetPoint, BODY_SIZE } = await import('../src/traffic.js');
+const { Traffic, PLAYER_RADIUS, meetPoint, smoothRoute, BODY_SIZE } = await import('../src/traffic.js');
 const { placement } = await import('../src/coords.js');
 
 const args = process.argv.slice(2);
@@ -209,7 +209,7 @@ for (const file of files) {
   const builtIn = Number(scenario.id.replace('builtin-', '')) - 1;
   const occluders = [...cityMeshes, ...parkedMeshes(builtIn)];
   // the first lane an accident car uses: stop 1.5 m before it (walking) / slow down 6 m before (bicycle)
-  const meets = scenario.vehicles.filter(v => v.accident).map(v => meetPoint(v.route, scenario.spawn, scenario.goal));
+  const meets = scenario.vehicles.filter(v => v.accident).map(v => meetPoint(smoothRoute(v.route), scenario.spawn, scenario.goal));
   const firstLane = Math.min(...meets.map(m => m.s));
   // walking: stop at the kerb, where the path first reaches the carriageway (04: before stepping out
   // from behind the truck, i.e. 1.7 m before the first lane the accident cars use, if that is later)

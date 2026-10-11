@@ -95,7 +95,7 @@ test('bicycle replay preserves independent gaze, rolling, grounded fall and exac
   assert.equal(replay.animal.bicycle.crank.rotation.x, 0);
   assert.ok(replay.animal.pivot.quaternion.angleTo(new THREE.Quaternion()) < 1e-6);
   const geometries = new Set(), materials = new Set();
-  replay.root.traverse(o => { if (o.geometry) geometries.add(o.geometry); if (o.material) materials.add(o.material); });
+  replay.root.traverse(o => { if (o.userData.shared) return; if (o.geometry) geometries.add(o.geometry); if (o.material) materials.add(o.material); });   // shared shadow pools stay
   let freedGeometry = 0, freedMaterial = 0;
   geometries.forEach(g => g.addEventListener('dispose', () => freedGeometry++));
   materials.forEach(m => m.addEventListener('dispose', () => freedMaterial++));

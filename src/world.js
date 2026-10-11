@@ -120,7 +120,6 @@ export function buildLight(scene, renderer, light) {
   const RECENTER = 4, texel = (sun.shadow.camera.right - sun.shadow.camera.left) / sun.shadow.mapSize.x;
   const lightZ = sun.userData.offset.clone().normalize();
   const lightX = new THREE.Vector3(0, 1, 0).cross(lightZ).normalize(), lightY = lightZ.clone().cross(lightX);
-  let lastShadow = -Infinity;
   return {
     sky, sun,
     /** The shadow camera as it stands (env culling keeps every caster inside it). */
@@ -130,8 +129,9 @@ export function buildLight(scene, renderer, light) {
      * Centres the shadow box on the participant. The centre moves in whole shadow-map texels of the
      * light's own axes (the basis three's lookAt gives the shadow camera), so re-centring never
      * shifts shadow edges by a fraction of a texel (that showed as shimmering while walking).
+     * Moving things never cast into this map, so it is redrawn only here and on LOD changes.
      */
-    follow(position, moving = false, now = 0) {
+    follow(position) {
       const moved = followed.distanceToSquared(position) > RECENTER * RECENTER;
       if (moved) {
         followed.copy(position);
@@ -142,10 +142,7 @@ export function buildLight(scene, renderer, light) {
         sun.updateMatrixWorld(); sun.target.updateMatrixWorld();
         sun.shadow.updateMatrices(sun);
       }
-      if (moved || (moving && now - lastShadow > 80)) {        // moving cars: about 12 Hz
-        sun.shadow.needsUpdate = true;
-        lastShadow = now;
-      }
+      if (moved) sun.shadow.needsUpdate = true;              // only still things cast (blob-shadow.js)
     }
   };
 }

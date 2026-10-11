@@ -8,6 +8,7 @@ import { crossesWall } from './shared/scenario.js';
 import { deltaYaw } from './analysis.js';
 import { toThree, yawToThree } from './coords.js';
 import { createReplayCyclist } from './replay-cyclist.js';
+import { withBlobShadow, alignBlobShadow } from './blob-shadow.js';
 
 export const MOVE_SPEED = 2.4;
 export const EYE_RATIO = 0.936;        // eye height / body height (ReplayMannequin.EyeRatio)
@@ -78,6 +79,7 @@ export class Player {
     this.rider?.root.removeFromParent();
     this.rider?.dispose();
     this.rider = createReplayCyclist(heightCm, { weightKg, firstPerson: true });
+    withBlobShadow(this.rider.root, 1.1, 2.2, 0.8);           // a moving bicycle: shadow pool (blob-shadow.js)
     this.rider.key = heightCm + '/' + weightKg;
     this.bicycle.root.add(this.rider.root);
   }
@@ -134,7 +136,7 @@ export class Player {
     const reach = (ddx, ddz) => {
       const l = Math.hypot(ddx, ddz) || 1;
       return !crossesWall(this.map, from, { x: this.x + ddx + ddx / l * 0.25, z: this.z + ddz + ddz / l * 0.25 })
-        && !this.obstacles?.blocked(this.x + ddx, this.z + ddz, BODY_RADIUS);
+        && (!this.obstacles || this.obstacles.allows(this.x, this.z, this.x + ddx, this.z + ddz, BODY_RADIUS));
     };
     let mx = 0, mz = 0;
     if (reach(dx, dz)) { mx = dx; mz = dz; }
@@ -166,7 +168,7 @@ export class Player {
     const rate = steer * Math.max(STAND_TURN, TURN_RATE * Math.min(1, Math.abs(v) / 1.2)) * (v < 0 ? -1 : 1);
     let turn = rate * dt;
     // a wheel may not swing into a building or a parked vehicle (it may turn away from one)
-    if (turn && this.wheelsBlocked(this.x, this.z, this.rideYaw + turn) && !this.wheelsBlocked(this.x, this.z, this.rideYaw)) turn = 0;
+    if (turn && !this.wheelsAllow(this.x, this.z, this.rideYaw, this.x, this.z, this.rideYaw + turn)) turn = 0;
     this.rideYaw = (this.rideYaw + turn + 360) % 360;
     this.yaw = (this.yaw + turn + 360) % 360;              // the head turns with the bicycle
     const a = this.rideYaw * Math.PI / 180, step = v * dt;
@@ -174,7 +176,7 @@ export class Player {
     const l = Math.hypot(dx, dz);
     const blocked = l > 0 && (crossesWall(this.map, { x: this.x, z: this.z },
       { x: this.x + dx + dx / l * 0.6, z: this.z + dz + dz / l * 0.6 })
-      || this.wheelsBlocked(this.x + dx, this.z + dz, this.rideYaw, Math.sign(v)));
+      || !this.wheelsAllow(this.x, this.z, this.rideYaw, this.x + dx, this.z + dz, this.rideYaw, Math.sign(v)));
     if (blocked) v = 0;
     else { this.x += dx; this.z += dz; this.distance += step; }
     this.rideSpeed = v;
@@ -182,23 +184,34 @@ export class Player {
     this.apply();
   }
 
-  /** Would the bicycle at (x, z) heading `yaw` touch an obstacle? `ahead` 1/-1: only that wheel. */
-  wheelsBlocked(x, z, yaw, ahead = 0) {
-    if (!this.obstacles) return false;
-    const a = yaw * Math.PI / 180, fx = Math.sin(a) * WHEEL_REACH, fz = Math.cos(a) * WHEEL_REACH;
-    return (ahead >= 0 && this.obstacles.blocked(x + fx, z + fz, WHEEL_RADIUS))
-      || (ahead <= 0 && this.obstacles.blocked(x - fx, z - fz, WHEEL_RADIUS))
-      || this.obstacles.blocked(x, z, BODY_RADIUS);
+  /**
+   * How far the bicycle at (x, z) heading `yaw` is from touching anything (negative: touching).
+   * `ahead` 1/-1: only that wheel and the rider.
+   */
+  wheelsClearance(x, z, yaw, ahead = 0) {
+    const a = yaw * Math.PI / 180, fx = Math.sin(a) * WHEEL_REACH, fz = Math.cos(a) * WHEEL_REACH, o = this.obstacles;
+    let c = o.clearance(x, z, BODY_RADIUS) - BODY_RADIUS;
+    if (ahead >= 0) c = Math.min(c, o.clearance(x + fx, z + fz, WHEEL_RADIUS) - WHEEL_RADIUS);
+    if (ahead <= 0) c = Math.min(c, o.clearance(x - fx, z - fz, WHEEL_RADIUS) - WHEEL_RADIUS);
+    return c;
+  }
+
+  /** May the bicycle move/turn from one pose to another? Yes when clear, or no closer to anything. */
+  wheelsAllow(x0, z0, yaw0, x1, z1, yaw1, ahead = 0) {
+    if (!this.obstacles) return true;
+    const after = this.wheelsClearance(x1, z1, yaw1, ahead);
+    return after >= 0 || after >= this.wheelsClearance(x0, z0, yaw0, ahead) - 1e-9;
   }
 
   apply() {
     const groundY = this.ground.heightAt(this.x, this.z);
-    this.rig.position.copy(toThree(this.x, groundY, this.z));
+    toThree(this.x, groundY, this.z, this.rig.position);
     this.camera.position.set(0, this.eye, 0);
     if (this.mode === 'bicycle') {
       this.rider.pose(this.distance, this.speed, 0, this.distance, deltaYaw(this.rideYaw, this.yaw) * Math.PI / 180 * -1);
       this.bicycle.root.position.copy(this.rig.position);
       this.bicycle.root.rotation.y = yawToThree(this.rideYaw);
+      alignBlobShadow(this.rider.root);
       // the eyes sit where the seated bear's head is, behind the bicycle's centre
       const e = this.rider.eye;
       this.camera.position.set(e.x * this.height, e.y * this.height, e.z * this.height).applyAxisAngle(UP, this.bicycle.root.rotation.y);

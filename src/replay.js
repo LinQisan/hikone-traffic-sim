@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { toThree, yawToThree } from './coords.js';
 import { instance, BODY_MODEL, paintFor } from './vehicles.js';
+import { withBlobShadow, alignBlobShadow } from './blob-shadow.js';
 import { sample, GAZE_HALF_ANGLE } from './analysis.js';
 import { createReplayAnimal, BEAR_EYE_HEIGHT } from './replay-animal.js';
 import { createReplayCyclist, ridingTrack, sampleRide } from './replay-cyclist.js';
@@ -52,7 +53,8 @@ export class Replay {
     for (const f of frames)
       for (const c of f.cars)
         if (!this.cars.has(c.id)) {
-          const mesh = instance(BODY_MODEL[c.body] ?? BODY_MODEL.sedan, this.materials, { paint: paintFor(c.id) });
+          // the same paint as on the street (app.js syncCars), front wheels that steer
+          const mesh = instance(BODY_MODEL[c.body] ?? BODY_MODEL.sedan, this.materials, { paint: paintFor(c.id * 7 + 3), steerable: true, moving: true });
           if (c.id === carId) {
             const pin = owned(new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 8), new THREE.MeshBasicMaterial({ color: 0xffb826 })));
             pin.name = 'ReplayContactPin';
@@ -75,6 +77,9 @@ export class Replay {
     fan.position.y = (this.animal.eyeHeight ?? BEAR_EYE_HEIGHT) * h;
     this.gaze = fan;
     this.figure.add(this.animal.root, ring, fan);
+    // the figure moves: a shadow pool, not the town's shadow map (blob-shadow.js)
+    // (the walking bear's root is scaled by the height; the cyclist's is not)
+    withBlobShadow(this.animal.root, this.rideTrack ? 1.1 : 0.8, this.rideTrack ? 2.2 : 0.8, this.rideTrack ? 0.8 : 0.45);
     this.root.add(this.figure);
     // the recorded travel path and the contact point
     const path = this.headTrack.map(p => toThree(p.x, this.ground.heightAt(p.x, p.z) + 0.08, p.z));
@@ -180,7 +185,7 @@ export class Replay {
     if (!track?.length || !this.cockpit) return;
     const c = sample(track, Math.max(track[0].t, Math.min(track.at(-1).t, t)));
     const car = this.cockpit.root;
-    car.position.copy(toThree(c.x, this.ground.heightAt(c.x, c.z), c.z));
+    toThree(c.x, this.ground.heightAt(c.x, c.z), c.z, car.position);
     car.rotation.set(0, yawToThree(c.yaw), 0);
     car.updateMatrixWorld();
     const e = this.cockpit.layout.eye;
@@ -213,8 +218,10 @@ export class Replay {
       const p = sample(track, t);
       mesh.visible = !!p;
       if (!p) continue;
-      mesh.position.copy(toThree(p.x, this.ground.heightAt(p.x, p.z), p.z));
+      toThree(p.x, this.ground.heightAt(p.x, p.z), p.z, mesh.position);
       mesh.rotation.set(0, yawToThree(p.yaw), 0);
+      mesh.userData.steer?.(p.steer ?? 0);
+      alignBlobShadow(mesh);
     }
     // from the driver's seat the car itself is the cockpit, not the outer body
     const driving = this.view === 'driver' && this.driverTrack?.length;
@@ -223,9 +230,10 @@ export class Replay {
     this.cockpit.root.visible = !!driving;
     const h = sample(this.headTrack, t);
     if (h) {
-      this.figure.position.copy(toThree(h.x, this.ground.heightAt(h.x, h.z), h.z));
+      toThree(h.x, this.ground.heightAt(h.x, h.z), h.z, this.figure.position);
       const ride = this.rideTrack ? sampleRide(this.rideTrack, t) : null;
       this.figure.rotation.set(0, yawToThree(ride?.yaw ?? h.yaw), 0);
+      alignBlobShadow(this.animal.root);
       const lookYaw = yawToThree(h.yaw - (ride?.yaw ?? h.yaw));
       this.gaze.rotation.y = lookYaw;
       const before = sample(this.headTrack, Math.max(this.start_, t - 0.05));

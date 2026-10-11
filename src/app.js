@@ -19,6 +19,8 @@ import { PerformanceProbe } from './performance.js';
 import { TouchControls, isTouchDevice } from './touch-controls.js';
 import { AdaptiveResolution } from './resolution.js';
 import { Obstacles } from './obstacles.js';
+import { setSunDirection, alignBlobShadow } from './blob-shadow.js';
+import { webLayout } from './web-layout.js';
 
 const $ = id => document.getElementById(id);
 // loading screen (index.html): data files are the first 15 %, the models the next 75 %, building the rest
@@ -74,8 +76,9 @@ const [sceneData, signalData, layout, map, roadTiles, scenarioIndex, collision] 
 const ground = new Ground(roadTiles);
 const materials = buildMaterials(sceneData.materials);
 const light = buildLight(scene, renderer, sceneData.light);
+setSunDirection(sceneData.light.direction);              // shadow pools of moving things fall like the town's shadows
 status('街の模型を読み込んでいます… / Loading the town…');
-const env = await buildEnvironment(scene, layout, materials);
+const env = await buildEnvironment(scene, webLayout(layout), materials);
 const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium'];
 await Promise.all(vehicleModels.map(name => model(name)));
 
@@ -93,6 +96,7 @@ for (const w of sceneData.blackWalls) {
 
 // buildings, walls, trees and posts at body height, plus the parked vehicles of each run
 const obstacles = new Obstacles(collision);
+obstacles.setFixed(signals.poles);                      // the signal posts
 const player = new Player(camera, renderer, map, ground, obstacles);
 player.reducedMotion = reducedMotion.matches;          // no roll of the view when the body falls
 reducedMotion.addEventListener?.('change', e => { player.reducedMotion = e.matches; });
@@ -114,6 +118,7 @@ addEventListener('keydown', e => {
 // ---------------------------------------------------------------- title
 let selected = scenarioIndex.find(e => e.template) ?? scenarioIndex[0];
 let customScenario = null;
+let customSource = 'ファイル';                          // where the custom scenario came from (title label)
 function renderTitle(focusSelected = false) {
   const list = $('scenarios');
   list.replaceChildren();
@@ -135,33 +140,44 @@ function renderTitle(focusSelected = false) {
       if (on && focusSelected) b.focus();
     }
   }
-  $('selected').textContent = customScenario ? `${params.get('play') === 'editor' ? 'エディタから' : 'ファイル'}：${customScenario.name}` : `${selected.name}`;
+  $('selected').textContent = customScenario ? `${customSource}：${customScenario.name}` : `${selected.name}`;
+}
+/** A scenario file's text → the scenario, or an Error listing what is wrong (the same checks as Unity). */
+function readScenario(text) {
+  const s = S.normalize(JSON.parse(String(text).replace(/^\uFEFF/, '')));
+  const errors = S.validate(s, map).filter(p => p.level === 'error').map(p => p.message);
+  if (errors.length) throw new Error(errors.join('\n'));
+  return s;
 }
 $('file').onchange = async ev => {
   const file = ev.target.files[0];
+  ev.target.value = '';                                   // choosing the same file again reloads it
   if (!file) return;
   try {
-    const s = S.normalize(JSON.parse(await file.text()));
-    const errors = S.validate(s, map).filter(p => p.level === 'error').map(p => p.message);
-    if (errors.length) throw new Error(errors.join('\n'));
-    customScenario = s;
+    customScenario = readScenario(await file.text());
+    customSource = 'ファイル';
     renderTitle();
-  } catch (e) { alert('読み込めません：\n' + e.message); }
+    announce(`ファイルの場面「${customScenario.name}」を選びました。開始を押してください。`);
+    $('start').focus({ preventScroll: true });
+  } catch (e) { alert(`「${file.name}」を読み込めません：\n${e.message}`); }
 };
 $('start').onclick = () => start();
 // "▶ ブラウザで試す" in the scenario editor (editor/): the scenario arrives through localStorage
+let editorProblem = null;
 if (params.get('play') === 'editor') {
   try {
-    const s = S.normalize(JSON.parse(localStorage.getItem('vrlearn.editor.play')));
-    const errors = S.validate(s, map).filter(p => p.level === 'error').map(p => p.message);
-    if (errors.length) throw new Error(errors.join('\n'));
-    customScenario = s;
-  } catch (e) { console.warn('editor scenario not loaded:', e); }
+    const text = localStorage.getItem('vrlearn.editor.play');
+    if (!text) throw new Error('エディタから渡された場面がありません。エディタでもう一度「▶ ブラウザで試す」を押してください。');
+    customScenario = readScenario(text);
+    customSource = 'エディタから';
+  } catch (e) { editorProblem = e.message; }
 }
 renderTitle();
 loading.done();
 $('title').hidden = false;
 $('start').focus({ preventScroll: true });
+// say why the editor's scenario is not the selected one, instead of silently showing a built-in one
+if (editorProblem) setTimeout(() => alert('エディタの場面を開けません：\n' + editorProblem), 0);
 
 // ---------------------------------------------------------------- run
 let state = 'title';
@@ -253,12 +269,14 @@ function syncCars() {
     live.add(car.id);
     let mesh = run.cars.get(car.id);
     if (!mesh) {
-      mesh = instance(BODY_MODEL[car.body] ?? BODY_MODEL.sedan, materials, { paint: paintFor(car.id * 7 + 3) });
+      mesh = instance(BODY_MODEL[car.body] ?? BODY_MODEL.sedan, materials, { paint: paintFor(car.id * 7 + 3), steerable: true, moving: true });
       run.cars.set(car.id, mesh);
       scene.add(mesh);
     }
-    mesh.position.copy(toThree(car.x, ground.heightAt(car.x, car.z), car.z));
+    toThree(car.x, ground.heightAt(car.x, car.z), car.z, mesh.position);   // in place: no per-frame garbage
     mesh.rotation.y = yawToThree(car.yaw);
+    mesh.userData.steer?.(car.steer ?? 0);
+    alignBlobShadow(mesh);
   }
   for (const [id, mesh] of run.cars) if (!live.has(id)) { scene.remove(mesh); run.cars.delete(id); }
 }
@@ -431,13 +449,14 @@ renderer.setAnimationLoop(() => {
   if (debugCamera) lightPosition.copy(debugCamera.position).setY(0);
   else if (state === 'replay') lightPosition.copy(replay.focus).setY(0);
   else lightPosition.set(-player.x, 0, player.z);
-  const moving = state === 'playing' && (run.cars.size > 0 || player.mode === 'bicycle' && player.speed > 0)
-    || state === 'replay' && !replay.atEnd;
-  light.follow(lightPosition, moving, updateStart);
+  // the shadow map holds only still things: it is redrawn when the view re-centres, never because
+  // something moves (cars, bicycles and the replay figure have shadow pools, blob-shadow.js)
+  light.follow(lightPosition);
   const view = debugCamera ?? (state === 'replay' ? replay.activeCamera : camera);
   const aspect = innerWidth / innerHeight;
   if (view.aspect !== aspect) { view.aspect = aspect; view.updateProjectionMatrix(); }
   if (env.updateLOD(view, null, light.shadowCamera)) light.invalidate();
+  env.casters(light.sun.shadow.needsUpdate);              // the shadow-only casters exist only for shadow frames
   const updateMs = performance.now() - updateStart;
   artRenderer.render(scene, view);
   probe.frame(elapsed, updateMs);

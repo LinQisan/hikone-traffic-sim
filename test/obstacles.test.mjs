@@ -93,3 +93,55 @@ test('a bicycle stops with its front wheel at a parked vehicle and can back away
   assert.ok(player.rideSpeed <= 0 && player.z < 3.9, 'pushed back');
   player.bicycle.dispose();
 });
+
+test('a body that starts touching something (a custom spawn by a façade) can step away, not further in', () => {
+  const o = new Obstacles(null);
+  o.setParked([{ x: 0, z: 1.1, yaw: 90, size: [2, 6] }]);         // z 0.1..2.1: 0.1 m ahead of the spawn
+  const player = makePlayer(o);
+  player.place(0, 0, 0, 170);
+  player.enabled = true;
+  player.stick = [0, 1];                                           // into it: refused
+  for (let i = 0; i < 30; i++) player.update(1 / 60);
+  assert.ok(player.z <= 1e-9, `went in to ${player.z}`);
+  player.stick = [0, -1];                                          // away from it: allowed
+  for (let i = 0; i < 30; i++) player.update(1 / 60);
+  assert.ok(player.z < -0.5, `stepped back to ${player.z}`);
+  player.bicycle.dispose();
+});
+
+test('a bicycle that starts with a wheel against something rides away from it', () => {
+  const o = new Obstacles(null);
+  o.setParked([{ x: 0, z: -1.5, yaw: 90, size: [2, 6] }]);        // z -2.5..-0.5: the rear wheel (z -0.8) is inside
+  const player = makePlayer(o);
+  player.place(0, 0, 0, 170, 'bicycle');
+  player.enabled = true;
+  player.keys.add('KeyW');
+  for (let i = 0; i < 120; i++) player.update(1 / 60);
+  assert.ok(player.z > 1, `rode to ${player.z}`);
+  player.bicycle.dispose();
+});
+
+test('the real town: a valid custom spawn on the pavement against a house front can walk off', async () => {
+  const player = makePlayer(town);
+  player.place(42.58, 15.5, 0, 170);                               // passes validation, touches the house behind
+  assert.ok(town.blocked(42.58, 15.5, BODY_RADIUS));
+  player.enabled = true;
+  player.stick = [0, 1];                                           // towards the road (+z)
+  for (let i = 0; i < 60; i++) player.update(1 / 60);
+  assert.ok(player.z > 16.5, `walked to ${player.z}`);
+  player.bicycle.dispose();
+});
+
+test('the signal posts are solid but stand clear of every scenario\'s way to the goal', async () => {
+  const { signalRigs, POLE } = await import('../src/signal-layout.js');
+  const posts = new Obstacles(null);
+  posts.setFixed(signalRigs(read('signals.json')).map(r => ({ x: r.pole.x, z: r.pole.z, yaw: 0, size: [POLE[r.kind].base * 2, POLE[r.kind].base * 2] })));
+  assert.equal(posts.fixed.length, 6);
+  assert.ok(posts.blocked(posts.fixed[0].x, posts.fixed[0].z, BODY_RADIUS));
+  for (const dir of ['scenarios', 'editor/templates'])
+    for (const f of fs.readdirSync(new URL('../data/' + dir, import.meta.url)).filter(f => f.endsWith('.json') && f !== 'index.json')) {
+      const s = S.normalize(read(`${dir}/${f}`)), a = s.spawn, b = s.goal, steps = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.1);
+      for (let i = 0; i <= steps; i++)
+        assert.ok(!posts.blocked(a.x + (b.x - a.x) * i / steps, a.z + (b.z - a.z) * i / steps, BODY_RADIUS), `${dir}/${f}`);
+    }
+});

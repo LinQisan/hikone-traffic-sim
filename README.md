@@ -33,6 +33,7 @@ node serve.mjs --host 0.0.0.0  # 同じ LAN のスマートフォンから http:
 - 地図上で **出発点・ゴール・トリガー** をドラッグで配置（□ で大きさ、○ で向き）
 - **車のルートを描く**：「✎ 車を描く」→ クリックで点を追加 → Enter / ダブルクリックで完了。組み込みの車線に 3 m 以内なら吸着（Alt で解除）。「組み込みの車線から追加」も可
 - 車ごとに：車種・車体（セダン / 軽）・速さ・出発の基準・待ち時間・繰り返し・事故車
+- **車とルートを削除**：車一覧の各行の「削除」。描いている途中でも削除でき、元に戻す / やり直すにも対応。点だけ消すには、地図上の点を選んで Delete / Backspace（ルートは 2 点以上必要）
 - **タイムライン**：▶ で車の動きを再生。事故車と体験者の線が交わる時刻を表示
 - **チェック**：Unity と同じ形式チェック＋地図チェック。クリックで該当箇所へ
 - **▶ ブラウザで試す**：いまの内容をシミュレーターで体験（新しいタブ、タイトルで「開始」）
@@ -74,9 +75,10 @@ node serve.mjs --host 0.0.0.0  # 同じ LAN のスマートフォンから http:
 `data/` は VRLearn（隣の `../VRLearn`、別の場所は `VRLEARN_ROOT` / `VRLEARN_WEB`）から作ります。
 
 1. Unity：`Tools/VRLearn/Web/Export Scene For Web` → `data/scene.json`、`data/signals.json`
-2. `blender -b --factory-startup --python tools/build_impressionist.py` → `data/models/impressionist/`（印象派の模型と遠景 LOD）
-3. `node tools/sync.mjs` → 配置・道路・地図（`map.json`・`map.png`）・テクスチャ・場面（組み込みは `events/` を優先）・エディタのひな形・`src/shared/scenario.js`
-4. `node tools/build_collision.mjs` → `data/collision.json`（建物・塀・木などの当たり判定。模型か配置を変えたとき）
+2. `blender -b --factory-startup --python tools/export_models.py` → `data/models/`（VRLearn の生成スクリプトで作る元の模型）
+3. `blender -b --factory-startup --python tools/build_impressionist.py` → `data/models/impressionist/`（実際に使う印象派の模型と遠景 LOD）
+4. `node tools/sync.mjs` → 配置・道路・地図（`map.json`・`map.png`）・テクスチャ・場面（組み込みは `events/` を優先）・エディタのひな形・`src/shared/scenario.js`
+5. `node tools/build_collision.mjs` → `data/collision.json`（建物・塀・木などの当たり判定。模型か配置を変えたとき）
 
 ## 作り
 
@@ -85,7 +87,8 @@ node serve.mjs --host 0.0.0.0  # 同じ LAN のスマートフォンから http:
 | `src/app.js` | 画面の流れ、入力、描画ループ |
 | `src/world.js`, `src/environment-instances.js` | 街：資産ごとに 1 回の InstancedMesh 描画、視錐台・影の範囲の選別、遠景 LOD |
 | `src/style.js`, `src/paint-texture.js` | 画風：共有の顔料マテリアル、筆の跡、描いた空 |
-| `src/traffic.js` | 車：出現、事故車のタイミング、車間、接触判定 |
+| `src/traffic.js`, `src/vehicles.js` | 車：出現、事故車のタイミング、車間、角を丸めた道筋と前輪の向き、接触判定 |
+| `src/signals.js`, `src/web-layout.js` | 京橋の信号（実際の写真どおりの柱・腕・札）、ブラウザ版だけの配置の調整（横断歩道標識を外す・25 号線は 40 km/h） |
 | `src/player.js`, `src/touch-controls.js` | 体験者：移動、自転車の操作、倒れる視点、タッチ操作 |
 | `src/obstacles.js` | 当たり判定：建物・塀・木（体の高さ 0.3〜1.8 m で切った 0.2 m の格子）と止まっている車 |
 | `src/replay.js`, `src/crash.js`, `src/cockpit.js` | リプレイ、倒れ方、運転者の視点 |
@@ -98,7 +101,7 @@ node serve.mjs --host 0.0.0.0  # 同じ LAN のスマートフォンから http:
 
 ## 性能
 
-1 フレーム約 120 描画（以前の約 3,900 から）、資産ごとの InstancedMesh、影は 12 Hz・影の範囲だけ、パソコンは動的解像度（FPS 表示の %）、スマートフォンはマルチサンプリングなし。`?quality=high` で高解像度固定、`?benchmark=1` で計測。詳細は [docs/performance.md](docs/performance.md)。
+1 フレーム約 120 描画（以前の約 3,900 から）、資産ごとの InstancedMesh、影は 12 Hz・影の範囲だけ、パソコンは動的解像度（FPS 表示の %）、スマートフォンはマルチサンプリングなし。`?quality=high` で高解像度固定、`?benchmark=1` で計測。詳細は [docs/art-and-performance.md](docs/art-and-performance.md)。
 
 ## テスト
 
@@ -112,6 +115,10 @@ npm test
 
 - 実験ではありません。CSV は書き出さず、Unity 版の VR 体験とはデータをまぜないでください。
 - 信号は表示だけで切り替わりません。音、雨・夜の設定はありません。
+
+## 開発者向け
+
+作業のきまりと手順は [AGENTS.md](AGENTS.md)、設計の理由は [DESIGN.md](DESIGN.md)、模型と性能の記録は [docs/art-and-performance.md](docs/art-and-performance.md)（いずれも英語）。
 
 ## ライセンス
 
