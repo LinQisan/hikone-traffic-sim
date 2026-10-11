@@ -335,19 +335,83 @@ def car(b, name):
 
 
 def truck(b, name):
+    """A Japanese box truck (アルミバン, like a Hino Ranger / Isuzu Forward), built so that every
+    part rests on the one below it — no gaps: two black chassis rails, a sub-frame of cross members
+    on them, the aluminium van box on the sub-frame. Cab-over cab with front wheel arches, grille
+    band, bumper, steps and mirrors on stays; single front and dual rear tyres under black fenders
+    with mud flaps; side guard rails, fuel tank, battery box; a rear underrun bar on brackets with
+    triple combination lamps and the plate; rear doors with lock rods, hinges and corner posts.
+    Outer extents (mirrors, bumper, plate, rear lamps, roof) stay those of the source model."""
     large = name == 'HK_Truck_Large'
-    length, w, h, cab_len, cab_h, radius = (11.8, 2.49, 3.62, 2.30, 3.05, 0.52) if large else (8.6, 2.30, 3.62, 1.95, 2.80, 0.46)
+    length, w, h, cab_len, cab_h, r = (11.8, 2.49, 3.62, 2.30, 3.05, 0.52) if large else (8.6, 2.30, 3.62, 1.95, 2.80, 0.46)
     half, hw = length / 2, w / 2
     # Author in the car's +Z convention, then rotate to the parked trucks' -X front.
     turn = lambda p: (-p[2], p[1], p[0])
+    box = lambda c, size, m, bevel=0.02: beveled_box(b, c, size, m, bevel, turn)
+    rail_top = 2 * r + 0.02                 # chassis rails
+    sub_top = rail_top + 0.14               # the body's sub-frame (cross members)
+    cargo_bottom = sub_top - 0.01           # the box sits on it (overlap, no seam)
+    cab_bottom = 2 * r + 0.08               # just above the front tyres: the wheel arch
+    front_axle = half - (1.35 if large else 1.15)
+    rear_axles = (-half + 3.10, -half + 1.80) if large else (-half + 2.30,)
+    cab_back = half - cab_len
+    cargo_front = cab_back - 0.18
+    rear = -half
+
+    # ---- chassis: rails from behind the bumper to the rear cross beam
+    rail_front, rail_back = half - 0.30, rear + 0.10
+    for side in (-1, 1):
+        box((side * 0.42, rail_top - 0.13, (rail_front + rail_back) / 2), (0.12, 0.26, rail_front - rail_back), 'ART_Chassis', 0.01)
+    box((0, rail_top - 0.11, rear + 0.16), (w - 0.24, 0.20, 0.10), 'ART_Chassis', 0.01)        # rear cross beam
+    # sub-frame: cross members across the rails, under the whole box
+    z = cargo_front - 0.15
+    while z > rear + 0.20:
+        box((0, (rail_top + sub_top) / 2 - 0.004, z), (w - 0.10, sub_top - rail_top + 0.012, 0.09), 'ART_Chassis', 0.008)
+        z -= 0.62
+    for side in (-1, 1):                    # the sub-frame's long sills on the rails
+        box((side * 0.42, (rail_top + sub_top) / 2, (cargo_front + rear) / 2 - 0.02), (0.14, sub_top - rail_top - 0.004, cargo_front - rear - 0.10), 'ART_Chassis', 0.008)
+
+    # ---- the van box: aluminium, rounded edges, edge rails, posts, rear doors
+    top = h - 0.002
+    rings = []
+    for zz in (rear, rear + 0.08, cargo_front - 0.08, cargo_front):
+        inset = 0.05 if zz in (rear, cargo_front) else 0
+        rings.append([(x, y + (cargo_bottom + top) / 2, zz)
+                      for x, y in outline(w - 2 * inset - 0.06, top - cargo_bottom - 2 * inset, 0.08)])
+    loft(b, rings, 'ART_Cargo', turn)
+    body_h, mid_y, mid_z, body_l = top - cargo_bottom, (cargo_bottom + top) / 2, (cargo_front + rear) / 2, cargo_front - rear
+    for side in (-1, 1):
+        box((side * (hw - 0.04), top - 0.07, mid_z), (0.07, 0.13, body_l - 0.02), 'ART_FrameLight', 0.015)       # top rail
+        box((side * (hw - 0.035), cargo_bottom + 0.08, mid_z), (0.07, 0.15, body_l - 0.04), 'ART_FrameLight', 0.015)   # bottom rail
+        for zz in (rear + 0.06, cargo_front - 0.06):                                                          # corner posts
+            box((side * (hw - 0.06), mid_y, zz), (0.11, body_h - 0.03, 0.11), 'ART_FrameLight', 0.02)
+        n = 3 if large else 2                                                                                  # a few side stiffeners
+        for k in range(1, n + 1):
+            box((side * (hw - 0.025), mid_y, rear + body_l * k / (n + 1)), (0.035, body_h - 0.34, 0.07), 'ART_FrameLight', 0.008)
+    box((0, top - 0.06, rear + 0.04), (w - 0.20, 0.12, 0.09), 'ART_FrameLight', 0.015)                   # rear door header
+    for side in (-1, 1):
+        box((side * (w / 4 - 0.02), mid_y - 0.02, rear - 0.006), (w / 2 - 0.15, body_h - 0.30, 0.024), 'ART_Cargo', 0.008)   # door leaf
+        for x in (side * 0.24, side * (hw - 0.38)):                                                           # lock rods with handles
+            cylinder(b, (x, cargo_bottom + 0.16, rear - 0.03), (x, top - 0.18, rear - 0.03), 0.018, 'ART_FrameLight', segments=8, transform=turn)
+            box((x + side * 0.07, mid_y - 0.25, rear - 0.035), (0.16, 0.05, 0.026), 'ART_FrameLight', 0.008)
+        for y in (cargo_bottom + 0.35, mid_y, top - 0.40):                                                    # hinges
+            box((side * (hw - 0.10), y, rear - 0.02), (0.12, 0.10, 0.03), 'ART_Chassis', 0.008)
+
+    # ---- cab-over cab: body above the wheel arch, lower panels in front of and behind it
     cab_center = half - cab_len / 2
     profile = [(-cab_len / 2, cab_h - 0.10), (-cab_len / 2 + 0.18, cab_h),
                (cab_len / 2 - 0.22, cab_h), (cab_len / 2, cab_h - 0.12)]
     rings = []
-    for z, top in profile:
-        rings.append([(x, y + (0.60 + top) / 2, z + cab_center)
-                      for x, y in outline(w, top - 0.60, 0.15)])
+    for zz, roof in profile:
+        rings.append([(x, y + (cab_bottom + roof) / 2, zz + cab_center)
+                      for x, y in outline(w, roof - cab_bottom, 0.15)])
     loft(b, rings, 'HK_KeiPaint', turn)
+    arch_front, arch_back = front_axle + r + 0.10, front_axle - r - 0.10
+    box((0, (0.40 + cab_bottom) / 2 + 0.01, (arch_front + half) / 2 - 0.01), (w - 0.02, cab_bottom - 0.40 + 0.04, half - arch_front - 0.02), 'HK_KeiPaint', 0.05)
+    box((0, (0.46 + cab_bottom) / 2 + 0.01, (cab_back + arch_back) / 2 + 0.01), (w - 0.04, cab_bottom - 0.46 + 0.04, arch_back - cab_back - 0.02), 'HK_KeiPaint', 0.04)
+    for side in (-1, 1):
+        box((side * (hw - 0.16), cab_bottom - 0.03, front_axle), (0.40, 0.05, 2 * r + 0.24), 'ART_Chassis', 0.01)   # arch liner
+        box((side * (hw + 0.005), 0.66, (cab_back + arch_back) / 2 + 0.01), (0.05, 0.07, arch_back - cab_back - 0.16), 'ART_Chassis', 0.01)  # step
     inside = (0, 1.6, cab_center)
     panel(b, [(-hw + 0.22, 1.72, half + 0.004), (hw - 0.22, 1.72, half + 0.004),
               (hw - 0.28, cab_h - 0.29, half + 0.004), (-hw + 0.28, cab_h - 0.29, half + 0.004)],
@@ -356,38 +420,45 @@ def truck(b, name):
         panel(b, [(side * hw, 1.63, half - cab_len + 0.24), (side * hw, 1.63, half - 0.27),
                   (side * hw, cab_h - 0.27, half - 0.34), (side * hw, cab_h - 0.27, half - cab_len + 0.24)],
               'ART_Glass', inside, turn)
-        beveled_box(b, (side * (hw + 0.22), cab_h - 0.54, half - 0.12),
-                    (0.14, 0.42, 0.11), 'ART_Frame', 0.035, turn)
-        beveled_box(b, (side * (hw + 0.10), cab_h - 0.31, half - 0.12),
-                    (0.26, 0.035, 0.035), 'ART_FrameLight', 0.007, turn)
-        beveled_box(b, (side * (hw - 0.38), 0.91, half + 0.025),
-                    (0.37, 0.20, 0.05), 'ART_LampGlow', 0.02, turn)
-    cargo_front = half - cab_len - 0.15
-    cargo_bottom = radius * 2 + 0.05
-    rings = []
-    for z in (-half, -half + 0.14, cargo_front - 0.12, cargo_front):
-        inset = 0.10 if z in (-half, cargo_front) else 0
-        rings.append([(x, y + (cargo_bottom + h) / 2, z)
-                      for x, y in outline(w - 2 * inset, h - cargo_bottom - 2 * inset, 0.12)])
-    loft(b, rings, 'ART_Cargo', turn)
-    # Large light planes suggest the cargo sides instead of rows of tiny ribs.
+        box((side * (hw + 0.22), cab_h - 0.54, half - 0.12), (0.14, 0.42, 0.11), 'ART_Chassis', 0.035)        # mirror
+        box((side * (hw + 0.10), cab_h - 0.31, half - 0.12), (0.26, 0.035, 0.035), 'ART_FrameLight', 0.007)  # its stay
+        box((side * (hw - 0.34), 0.86, half + 0.012), (0.40, 0.19, 0.05), 'ART_LampGlow', 0.02)             # headlight
+        box((side * (hw - 0.08), 0.86, half + 0.010), (0.10, 0.17, 0.04), 'ART_SignalYellow', 0.015)        # indicator
+    box((0, 1.22, half + 0.012), (w * 0.62, 0.34, 0.05), 'ART_Chassis', 0.02)                          # grille band
+    box((0, 0.53, half + 0.06), (w + 0.02, 0.26, 0.16), 'ART_FrameLight', 0.035)                       # bumper
+    box((0, 0.53, half + 0.15), (0.33, 0.17, 0.02), 'HK_PlateGreen', 0.005)                            # plate
+
+    # ---- wheels: single front, dual rear; black fenders and mud flaps over the rear axles
     for side in (-1, 1):
-        for fraction in (0.26, 0.57, 0.82):
-            z = -half + (cargo_front + half) * fraction
-            beveled_box(b, (side * (hw + 0.012), (cargo_bottom + h) / 2, z),
-                        (0.024, h - cargo_bottom - 0.40, 0.065), 'ART_FrameLight', 0.006, turn)
-    beveled_box(b, (0, radius + 0.12, 0), (w * 0.59, 0.24, length - 0.8), 'ART_Frame', 0.035, turn)
-    axles = (half - 1.35, -half + 3.10, -half + 1.80) if large else (half - 1.15, -half + 2.30)
-    for z in axles:
-        for side in (-1, 1):
-            wheel(b, side * (hw - 0.16), radius, z, radius, turn, width=0.30)
-    beveled_box(b, (0, 0.62, half + 0.06), (w + 0.02, 0.26, 0.16), 'ART_Frame', 0.035, turn)
-    beveled_box(b, (0, 0.64, half + 0.15), (0.33, 0.20, 0.02), 'HK_PlateGreen', 0.005, turn)
-    beveled_box(b, (0, 1.29, half + 0.022), (w * 0.56, 0.23, 0.044), 'ART_Frame', 0.008, turn)
+        wheel(b, side * (hw - 0.16), r, front_axle, r, turn, width=0.28)
+        for zz in rear_axles:
+            wheel(b, side * (hw - 0.14), r, zz, r, turn, width=0.24)
+            wheel(b, side * (hw - 0.41), r, zz, r, turn, width=0.24)
+        span_front, span_back = max(rear_axles) + r + 0.14, min(rear_axles) - r - 0.14
+        box((side * (hw - 0.28), 2 * r + 0.06, (span_front + span_back) / 2), (0.60, 0.05, span_front - span_back), 'ART_Chassis', 0.01)
+        box((side * (hw - 0.28), (0.22 + 2 * r + 0.06) / 2, span_back - 0.02), (0.56, 2 * r - 0.14, 0.025), 'ART_Chassis', 0.006)
+
+    # ---- between the axles: side guards on brackets, fuel tank, battery box
+    guard_front, guard_back = cab_back - 0.10, max(rear_axles) + r + 0.24
     for side in (-1, 1):
-        beveled_box(b, (side * (hw - 0.30), 0.75, -half - 0.03), (0.36, 0.16, 0.04),
-                    'ART_SignalRed', 0.012, turn)
-    beveled_box(b, (0, 0.51, -half + 0.05), (w - 0.10, 0.14, 0.12), 'ART_Frame', 0.015, turn)
+        for y in (0.50, 0.80):
+            box((side * (hw - 0.06), y, (guard_front + guard_back) / 2), (0.04, 0.09, guard_front - guard_back), 'ART_FrameLight', 0.01)
+        for zz in (guard_front - 0.15, (guard_front + guard_back) / 2, guard_back + 0.15):
+            box((side * (hw + 0.42) / 2, 0.83, zz), (hw - 0.44, 0.05, 0.06), 'ART_Chassis', 0.008)
+            box((side * (hw - 0.09), 0.66, zz), (0.03, 0.40, 0.05), 'ART_Chassis', 0.008)
+    tank_back = max(guard_back + 0.4, cab_back - 1.35)
+    cylinder(b, (-(hw - 0.38), 0.74, cab_back - 0.30), (-(hw - 0.38), 0.74, tank_back), 0.24, 'ART_FrameLight', segments=16, bevel=0.03, transform=turn)
+    box((hw - 0.40, 0.74, cab_back - 0.62), (0.44, 0.42, 0.62), 'ART_Chassis', 0.03)
+
+    # ---- rear: underrun bar on two brackets, lamp bars with triple lamps, plate
+    box((0, 0.50, rear + 0.02), (w - 0.14, 0.13, 0.10), 'ART_Chassis', 0.02)
+    for side in (-1, 1):
+        box((side * 0.42, (0.50 + rail_top) / 2, rear + 0.10), (0.08, rail_top - 0.50, 0.06), 'ART_Chassis', 0.01)
+        box((side * (hw - 0.42), 0.76, rear + 0.01), (0.66, 0.17, 0.06), 'ART_Chassis', 0.015)
+        for k, colour in enumerate(('ART_SignalRed', 'ART_SignalRed', 'ART_SignalYellow')):
+            x = side * (hw - 0.20 - 0.21 * k)
+            cylinder(b, (x, 0.76, rear - 0.015), (x, 0.76, rear - 0.05), 0.065, colour, segments=14, transform=turn)
+    box((0, 0.70, rear - 0.01), (0.33, 0.17, 0.02), 'HK_PlateGreen', 0.005)
 
 
 def build(name, mesh_class):

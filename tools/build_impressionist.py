@@ -52,7 +52,7 @@ COLORS = {
     'ART_SignalRed': (0.94, 0.19, 0.16), 'ART_SignalYellow': (1.0, 0.77, 0.13),
     'ART_SignalGreen': (0.17, 0.76, 0.46), 'ART_SignalGlyph': (1.0, 0.96, 0.80),
     'ART_Glass': (0.35, 0.52, 0.66), 'ART_GlassLight': (0.65, 0.76, 0.81),
-    'ART_Cargo': (0.80, 0.82, 0.82),
+    'ART_Cargo': (0.80, 0.82, 0.82), 'ART_Chassis': (0.17, 0.18, 0.22),
 }
 EMISSION = {
     'ART_LampGlow': ((1.0, 0.70, 0.32), 0.20),

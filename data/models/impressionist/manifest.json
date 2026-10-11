@@ -487,25 +487,25 @@
       }
     },
     "HK_Truck_Large": {
-      "triangles": 2304,
+      "triangles": 7844,
       "strokes": 0,
-      "bytes": 172424,
+      "bytes": 572724,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 2304,
-        "bytes": 182328
+        "triangles": 7844,
+        "bytes": 572728
       }
     },
     "HK_Truck_Medium": {
-      "triangles": 1968,
+      "triangles": 6752,
       "strokes": 0,
-      "bytes": 149128,
+      "bytes": 495344,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1968,
-        "bytes": 159928
+        "triangles": 6752,
+        "bytes": 495348
       }
     },
     "HK_Water": {
