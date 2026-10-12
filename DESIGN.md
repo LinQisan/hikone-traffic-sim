@@ -79,6 +79,7 @@ Why the browser port is built the way it is, and what it deliberately does not d
 
 - **One UI, two backends** answering the same `/api/…` calls: on the computer with VRLearn, `serve.mjs` reads and writes `VRLearn/Scenarios/` and offers "try in Unity" and "send to Quest"; on GitHub Pages or other devices, files stay in the browser's localStorage and leave as "⇩ JSON".
 - **Safety:** the local server answers only this computer, refuses cross-site writes and never serves `tools/`, `test/`, `server/` or dotfiles. Templates (`builtin-*`) are never overwritten.
+- **Easy to operate:** the top bar groups file, history, try and export actions (the danger action, delete, sits under the scene list); the map carries its tools (select / draw with their keys), zoom and fit, a layers menu and a legend of what the colours mean; the left panel lists scenes with two-line names and a four-step how-to; the inspector keeps the checks pinned below it; the timeline separates playback from the trigger settings. Controls are at least 36 px (44 px on touch screens); below 960 px the panels stack under the map.
 - **Templates are Unity's** (what the headset runs), not the re-timed `events/`: the editor serves the experiment's scenario work, and the browser's timing must not leak into it.
 
 ## 11. Publishing

@@ -21,83 +21,121 @@
       </svg>
       <span>シナリオエディタ <small>Scenario editor</small></span>
     </a>
-    <div class="file">
-      <span id="fileName">—</span>
-      <span id="dirty" class="dirty" hidden title="未保存の変更があります">●</span>
+
+    <div class="file" aria-live="polite">
+      <span class="file-line"><span id="fileName">—</span><span id="dirty" class="dirty" hidden title="未保存の変更があります">● 未保存</span></span>
+      <span id="status" class="status" title="チェックの結果（右下の一覧）"></span>
     </div>
-    <div class="actions">
-      <button id="btnNew" title="新しい場面">＋ 新規</button>
-      <button id="btnDuplicate" title="この場面を複製">複製</button>
-      <label class="button" title="JSON ファイルを読み込む">開く<input id="importFile" type="file" accept=".json,application/json"></label>
-      <button id="btnSave" class="primary" title="保存 (Ctrl+S)">保存</button>
-      <span class="sep"></span>
-      <button id="btnUndo" title="元に戻す (Ctrl+Z)">↶</button>
-      <button id="btnRedo" title="やり直す (Ctrl+Shift+Z)">↷</button>
-      <span class="sep"></span>
-      <button id="btnTry" class="accent" title="このままの内容をシミュレーターで体験（新しいタブ）">▶ ブラウザで試す</button>
-      <button id="btnPlay" class="server-only" title="保存して Unity エディタで再生">▶ Unityで試す</button>
-      <button id="btnQuest" class="server-only" title="保存済みの場面を USB / ワイヤレス adb でつないだ Quest にコピー">⇪ Questに送る</button>
-      <button id="btnDownload" title="この場面を JSON ファイルとして書き出す">⇩ JSON</button>
-      <button id="btnDelete" class="danger" title="この場面を削除">削除</button>
-    </div>
-    <div id="status" class="status"></div>
+
+    <nav class="actions" aria-label="ファイル">
+      <div class="group" role="group" aria-label="ファイル">
+        <button id="btnNew" type="button" title="新しい場面"><span class="i">＋</span><span class="t">新規</span></button>
+        <button id="btnDuplicate" type="button" title="この場面を複製"><span class="i">⧉</span><span class="t">複製</span></button>
+        <label class="button" title="JSON ファイルを読み込む"><span class="i">↑</span><span class="t">開く</span><input id="importFile" type="file" accept=".json,application/json"></label>
+        <button id="btnSave" type="button" class="primary" title="保存 (Ctrl+S)"><span class="i">✓</span><span class="t">保存</span></button>
+      </div>
+      <div class="group history" role="group" aria-label="編集の履歴">
+        <button id="btnUndo" type="button" title="元に戻す (Ctrl+Z)" aria-label="元に戻す"><span class="i">↶</span><span class="t">戻す</span></button>
+        <button id="btnRedo" type="button" title="やり直す (Ctrl+Shift+Z)" aria-label="やり直す"><span class="i">↷</span><span class="t">やり直す</span></button>
+      </div>
+      <div class="group try" role="group" aria-label="試す">
+        <button id="btnTry" type="button" class="accent" title="このままの内容をシミュレーターで体験（新しいタブ）"><span class="i">▶</span><span class="t">ブラウザで試す</span></button>
+        <button id="btnPlay" type="button" class="server-only" title="保存して Unity エディタで再生"><span class="i">▶</span><span class="t">Unityで試す</span></button>
+      </div>
+      <div class="group" role="group" aria-label="書き出し">
+        <button id="btnQuest" type="button" class="server-only" title="保存済みの場面を USB / ワイヤレス adb でつないだ Quest にコピー"><span class="i">⇪</span><span class="t">Quest</span></button>
+        <button id="btnDownload" type="button" title="この場面を JSON ファイルとして書き出す"><span class="i">⇩</span><span class="t">JSON</span></button>
+      </div>
+    </nav>
   </header>
 
   <main class="layout">
-    <aside class="panel left">
-      <section>
+    <aside class="panel left" aria-label="場面の一覧">
+      <section class="scenes">
         <h2>場面 <span id="mode" class="mode"></span></h2>
         <div id="scenarioList" class="list"></div>
+        <button id="btnDelete" type="button" class="danger wide" title="この場面を削除（ひな形は削除できません）">この場面を削除</button>
       </section>
-      <section>
-        <h2>表示</h2>
-        <label class="check"><input type="checkbox" id="layerSurfaces"> 路面（車道・歩道）</label>
-        <label class="check"><input type="checkbox" id="layerLanes" checked> 組み込みの車線</label>
-        <label class="check"><input type="checkbox" id="layerWalls" checked> 見えない壁</label>
-        <label class="check"><input type="checkbox" id="layerSignals"> 信号</label>
-        <label class="check"><input type="checkbox" id="snapLanes" checked> 車線に吸着（3 m 以内）</label>
-      </section>
-      <section class="help">
-        <h2>操作</h2>
-        <ul>
-          <li>ドラッグ：移動 / 空白をドラッグ：地図を動かす</li>
-          <li>ホイール：拡大・縮小</li>
-          <li>車を描く：クリックで点を追加、Enter / ダブルクリックで完了</li>
-          <li>ルート上をダブルクリック：点を追加 / 点を右クリック：削除</li>
-          <li>□ ハンドル：大きさ ○ ハンドル：向き</li>
-          <li>Space：再生 / Delete：削除 / Esc：選択解除</li>
-        </ul>
+      <section class="steps">
+        <h2>作り方</h2>
+        <ol>
+          <li><b>場面を選ぶ</b>：一覧から開く、または「＋ 新規」。ひな形は別の id で保存されます。</li>
+          <li><b>出発・ゴール・トリガー</b>を地図上でドラッグ（□ 大きさ ・ ○ 向き）。</li>
+          <li><b>✎ 車を描く</b>：クリックで点、Enter で完了。右の「車」で速さと<b>事故車</b>を指定。</li>
+          <li>下の <b>▶</b> で動きを確かめ、<b>チェック</b>が OK なら <b>▶ ブラウザで試す</b> → <b>保存</b>。</li>
+        </ol>
+        <details class="keys">
+          <summary>マウスとキーの操作</summary>
+          <ul>
+            <li>ドラッグ：移動 ・ 空白をドラッグ：地図を動かす ・ ホイール：拡大縮小</li>
+            <li>ルート上をダブルクリック：点を追加 ・ 点を右クリック：削除</li>
+            <li><kbd>V</kbd> 選択 ・ <kbd>C</kbd> 車を描く ・ <kbd>F</kbd> 全体表示</li>
+            <li><kbd>Space</kbd> 再生 ・ <kbd>Delete</kbd> 削除 ・ <kbd>Esc</kbd> 選択解除</li>
+            <li><kbd>Ctrl</kbd>+<kbd>S</kbd> 保存 ・ <kbd>Ctrl</kbd>+<kbd>Z</kbd> 元に戻す</li>
+          </ul>
+        </details>
       </section>
     </aside>
 
-    <section class="stage">
-      <svg id="map" tabindex="0"></svg>
-      <div class="tools">
-        <button id="toolSelect" class="tool active" title="選択・移動 (V)">↖ 選択</button>
-        <button id="toolDraw" class="tool" title="車のルートを描く (C)">✎ 車を描く</button>
-        <button id="btnFit" class="tool" title="全体を表示 (F)">⤢</button>
+    <section class="stage" aria-label="地図">
+      <svg id="map" tabindex="0" aria-label="彦根・京橋の地図"></svg>
+      <div class="tools" role="toolbar" aria-label="地図の道具">
+        <div class="segmented">
+          <button id="toolSelect" type="button" class="tool active" title="選択・移動 (V)"><span class="i">↖</span> 選択 <kbd>V</kbd></button>
+          <button id="toolDraw" type="button" class="tool" title="車のルートを描く (C)"><span class="i">✎</span> 車を描く <kbd>C</kbd></button>
+        </div>
       </div>
-      <div id="drawHint" class="hint" hidden>クリックで点を追加 ・ Enter / ダブルクリックで完了 ・ Esc で中止</div>
+      <div class="view-tools" role="toolbar" aria-label="表示">
+        <button id="btnZoomOut" type="button" class="tool icon" title="縮小" aria-label="縮小">−</button>
+        <button id="btnZoomIn" type="button" class="tool icon" title="拡大" aria-label="拡大">＋</button>
+        <button id="btnFit" type="button" class="tool icon" title="場面全体を表示 (F)" aria-label="場面全体を表示">⤢</button>
+        <details class="layers">
+          <summary class="tool" title="地図に重ねるもの">表示 ▾</summary>
+          <div class="layers-menu">
+            <label class="check"><input type="checkbox" id="layerSurfaces"> 路面（車道・歩道）</label>
+            <label class="check"><input type="checkbox" id="layerLanes" checked> 組み込みの車線</label>
+            <label class="check"><input type="checkbox" id="layerWalls" checked> 見えない壁</label>
+            <label class="check"><input type="checkbox" id="layerSignals"> 信号</label>
+            <hr>
+            <label class="check"><input type="checkbox" id="snapLanes" checked> 車線に吸着（3 m 以内）</label>
+          </div>
+        </details>
+      </div>
+      <div id="drawHint" class="hint" hidden>クリックで点を追加 ・ <kbd>Enter</kbd> / ダブルクリックで完了 ・ <kbd>Esc</kbd> で中止</div>
+      <ul class="legend" aria-label="凡例">
+        <li><i class="sw spawn"></i>出発</li>
+        <li><i class="sw goal"></i>ゴール</li>
+        <li><i class="sw trigger"></i>トリガー</li>
+        <li><i class="sw car"></i>車</li>
+        <li><i class="sw accident"></i>事故車</li>
+        <li><i class="sw lane"></i>車線</li>
+        <li><i class="sw wall"></i>見えない壁</li>
+      </ul>
       <div id="coords" class="coords"></div>
       <div id="loading" class="loading">地図を読み込み中…</div>
     </section>
 
-    <aside class="panel right">
-      <div id="inspector"></div>
-      <section>
+    <aside class="panel right" aria-label="編集">
+      <div id="inspector" class="inspector"></div>
+      <section class="checks">
         <h2>チェック <span id="problemCount" class="count"></span></h2>
         <div id="problems" class="problems"></div>
       </section>
     </aside>
   </main>
 
-  <footer class="timeline">
-    <button id="btnTimePlay" class="play" title="再生 / 一時停止 (Space)">▶</button>
-    <input type="range" id="timeSlider" min="0" max="40" step="0.05" value="0">
-    <span id="timeLabel" class="time">0.0 秒</span>
-    <label class="check"><input type="checkbox" id="triggerOn" checked> トリガーに入る</label>
-    <label class="num">時刻 <input type="number" id="triggerTime" step="0.5" min="0"> 秒</label>
-    <label class="check"><input type="checkbox" id="triggerAuto" checked> 歩く速さから推定</label>
+  <footer class="timeline" aria-label="タイムライン">
+    <div class="playback">
+      <button id="btnTimePlay" type="button" class="play" title="再生 / 一時停止 (Space)" aria-label="再生 / 一時停止">▶</button>
+      <input type="range" id="timeSlider" min="0" max="40" step="0.05" value="0" aria-label="時刻">
+      <span id="timeLabel" class="time">0.0 秒</span>
+    </div>
+    <fieldset class="trigger-box">
+      <legend>トリガー</legend>
+      <label class="check"><input type="checkbox" id="triggerOn" checked> 体験者が入る</label>
+      <label class="num">時刻 <input type="number" id="triggerTime" step="0.5" min="0"> 秒</label>
+      <label class="check"><input type="checkbox" id="triggerAuto" checked> 歩く速さから推定</label>
+    </fieldset>
     <span id="timelineInfo" class="info"></span>
   </footer>
 
@@ -107,13 +145,13 @@
     <div id="questStatus" class="quest-status">確認中…</div>
     <div id="questResult" class="quest-result"></div>
     <div class="dialog-buttons">
-      <button id="questRefresh">再確認</button>
-      <button id="questSend" class="primary">送る</button>
-      <button id="questClose">閉じる</button>
+      <button id="questRefresh" type="button">再確認</button>
+      <button id="questSend" type="button" class="primary">送る</button>
+      <button id="questClose" type="button">閉じる</button>
     </div>
   </dialog>
 
-  <div id="toast" class="toast" hidden></div>
+  <div id="toast" class="toast" role="status" hidden></div>
   <script type="module" src="app.js"></script>
 </body>
 </html>

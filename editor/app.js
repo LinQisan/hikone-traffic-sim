@@ -415,8 +415,13 @@ function onPointerUp() {
 function onWheel(event) {
   event.preventDefault();
   const rect = $('map').getBoundingClientRect();
-  const mx = event.clientX - rect.left, my = event.clientY - rect.top;
-  const factor = Math.exp(-event.deltaY * 0.0015);
+  zoomAt(Math.exp(-event.deltaY * 0.0015), event.clientX - rect.left, event.clientY - rect.top);
+}
+
+/** Zooms by `factor` keeping the map point under (mx, my) (pixels in the map; default: its centre) still. */
+function zoomAt(factor, mx = null, my = null) {
+  const rect = $('map').getBoundingClientRect();
+  mx ??= rect.width / 2; my ??= rect.height / 2;
   const scale = Math.min(12, Math.max(0.15, state.view.scale * factor));
   const f = scale / state.view.scale;
   state.view = { scale, tx: mx - (mx - state.view.tx) * f, ty: my - (my - state.view.ty) * f };
@@ -1211,6 +1216,10 @@ function wire() {
     else setTool('draw');
   };
   $('btnFit').onclick = fitScenario;
+  $('btnZoomIn').onclick = () => zoomAt(1.4);
+  $('btnZoomOut').onclick = () => zoomAt(1 / 1.4);
+  // the layers menu closes when clicking elsewhere
+  document.addEventListener('pointerdown', e => { const menu = document.querySelector('.layers'); if (menu?.open && !menu.contains(e.target)) menu.open = false; });
   $('btnNew').onclick = newScenario;
   $('btnDuplicate').onclick = duplicate;
   $('btnSave').onclick = save;
