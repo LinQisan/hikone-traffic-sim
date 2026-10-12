@@ -1,6 +1,6 @@
 # Art and performance notes
 
-How the web-authored models are built and checked, and how fast the scene renders. Design reasons are in [../DESIGN.md](../DESIGN.md); rules in [../AGENTS.md](../AGENTS.md). Raw benchmark samples are in [performance/](performance/).
+How the web-authored models are built and checked, and how fast the scene renders. Design reasons are in [../RATIONALE.md](../RATIONALE.md); rules in [../AGENTS.md](../AGENTS.md). Raw benchmark samples are in [performance/](performance/).
 
 ## 1. Models
 
@@ -19,7 +19,7 @@ Treat each object as a few weighty planes of colour: warm lamp glass, blue-viole
 
 **Signal posts** are built at run time in `src/signals.js` from the source rigs (`signalRigs` in `src/signal-layout.js`): each car head keeps its exact source position and facing. A 7.4 m tapered brown pole stands on the source pole spot, and a two-pipe mast arm reaches out to the head. A "彦根市 京橋 Kyobashi" plate sits on the pole top and a "歩車分離式 7:30–18:00" plate hangs under the head (canvas textures); pedestrian heads hang on brackets from a 3.75 m pole with a blue "歩車分離式" plate. Poles are solid (`obstacles.js`). Signal colours never receive decorative paint.
 
-**Car wheels:** `vehicles.js` `frontWheels` cuts the two front wheels (tyre and hub triangles) out of each car model once and puts them on pivots at the wheel centres, so live cars and replay copies can steer them (see DESIGN.md §5).
+**Car wheels:** `vehicles.js` `frontWheels` cuts the two front wheels (tyre and hub triangles) out of each car model once and puts them on pivots at the wheel centres, so live cars and replay copies can steer them (see RATIONALE.md §5).
 
 **Seams:** the bridge's abutment faces (`HK_StoneDark`) ended exactly at the road surface and their raised strokes poked 2–3 mm above the deck and the road tiles: a 4 mm sliver of dark stone across the road at each end of the bridge, a thin line at grazing angles. `build_impressionist.py` sinks those tops 3 cm below the deck (`SUNK_TOPS`). The castle-hill terrain's bank edge stood 14 cm proud of the carriageway at the bridge (a green lip seen from the castle side): `world.js` presses ground and terrain vertices that lie on a road just under it (`Ground.roadHeightAt`).
 

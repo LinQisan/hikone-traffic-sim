@@ -1,4 +1,4 @@
-# DESIGN.md — Hikone Traffic Simulator
+# RATIONALE.md — Hikone Traffic Simulator
 
 Why the browser port is built the way it is, and what it deliberately does not do. Rules and procedures are in [AGENTS.md](AGENTS.md), the user guide in [README.md](README.md) (Japanese), models and measurements in [docs/art-and-performance.md](docs/art-and-performance.md). If this file disagrees with the code, the code wins — update this file.
 

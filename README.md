@@ -119,7 +119,7 @@ npm test
 
 ## 開発者向け
 
-作業のきまりと手順は [AGENTS.md](AGENTS.md)、設計の理由は [DESIGN.md](DESIGN.md)、模型と性能の記録は [docs/art-and-performance.md](docs/art-and-performance.md)（いずれも英語）。
+作業のきまりと手順は [AGENTS.md](AGENTS.md)、設計の理由は [RATIONALE.md](RATIONALE.md)、模型と性能の記録は [docs/art-and-performance.md](docs/art-and-performance.md)（いずれも英語）。
 
 ## ライセンス
 
