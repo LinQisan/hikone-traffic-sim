@@ -21,6 +21,8 @@ Treat each object as a few weighty planes of colour: warm lamp glass, blue-viole
 
 **Car wheels:** `vehicles.js` `frontWheels` cuts the two front wheels (tyre and hub triangles) out of each car model once and puts them on pivots at the wheel centres, so live cars and replay copies can steer them (see DESIGN.md §5).
 
+**Seams:** the bridge's abutment faces (`HK_StoneDark`) ended exactly at the road surface and their raised strokes poked 2–3 mm above the deck and the road tiles: a 4 mm sliver of dark stone across the road at each end of the bridge, a thin line at grazing angles. `build_impressionist.py` sinks those tops 3 cm below the deck (`SUNK_TOPS`). The castle-hill terrain's bank edge stood 14 cm proud of the carriageway at the bridge (a green lip seen from the castle side): `world.js` presses ground and terrain vertices that lie on a road just under it (`Ground.roadHeightAt`).
+
 **Layout overrides** (`src/web-layout.js`): the four crosswalk signs at the signalised corners and the guide post at the bridge corner are hidden; Route 25's two speed signs are shown as `HK_Sign_Speed40`. `data/layout.json` stays generated.
 
 ### Building and checking

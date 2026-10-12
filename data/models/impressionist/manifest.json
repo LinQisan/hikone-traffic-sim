@@ -205,13 +205,13 @@
       }
     },
     "HK_Kyobashi": {
-      "triangles": 16628,
-      "strokes": 2699,
-      "bytes": 1125308,
+      "triangles": 16448,
+      "strokes": 2669,
+      "bytes": 1113520,
       "remodeled": false,
       "lod": {
-        "triangles": 1466,
-        "bytes": 124384
+        "triangles": 1439,
+        "bytes": 122828
       }
     },
     "HK_Machiya_A": {

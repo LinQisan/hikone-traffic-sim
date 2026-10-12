@@ -246,3 +246,9 @@ test('the browser leaves out the crosswalk signs and the guide post of the signa
     assert.equal(manifest.models[name].design, 'abstract-closed-solids-v2', `${name}: authored, digits read from the front`);
   }
 });
+
+test('the bridge abutments stay under the deck: no stone sliver across the road at the bridge ends', () => {
+  const top = material => Math.max(...triangles('HK_Kyobashi', material).flat().map(p => p[1]));
+  const deck = Math.min(...triangles('HK_Kyobashi', 'HK_Asphalt').flat().map(p => p[1]));
+  assert.ok(top('HK_StoneDark') < deck - 0.02, `abutment top ${top('HK_StoneDark').toFixed(3)} below the deck ${deck.toFixed(3)}`);
+});

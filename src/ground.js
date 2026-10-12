@@ -33,6 +33,11 @@ export class Ground {
 
   /** Highest road surface under (x, z), else the fallback ground. */
   heightAt(x, z) {
+    return this.roadHeightAt(x, z) ?? Ground.fallback(x, z);
+  }
+
+  /** Height of the road surface (carriageway, pavement, ramps) at (x, z), or null off the roads. */
+  roadHeightAt(x, z) {
     const tris = this.cells.get(Math.floor(x / CELL) + ',' + Math.floor(z / CELL));
     let best = -Infinity;
     if (tris) {
@@ -47,7 +52,7 @@ export class Ground {
         if (y > best) best = y;
       }
     }
-    return best > -Infinity ? best : Ground.fallback(x, z);
+    return best > -Infinity ? best : null;
   }
 
   static fallback(x, z) {

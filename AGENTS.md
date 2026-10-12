@@ -78,7 +78,7 @@ Design intent and trade-offs: [DESIGN.md](DESIGN.md). Models, their checks and r
 
 ## Verification
 
-- `npm test` — all suites (logic, traffic, events with real sight lines, bicycle, crash, replay, controls, art, performance, editor store/server/Quest). Current baseline: **77/77**. `test/obstacles.test.mjs` also checks that every scenario's spawn and straight way to the goal stay free of the collision grid — rebuild `collision.json` after model or layout changes. Editor server and Quest tests skip when VRLearn is not next to this repo.
+- `npm test` — all suites (logic, traffic, events with real sight lines, bicycle, crash, replay, controls, art, performance, editor store/server/Quest). Current baseline: **79/79**. `test/obstacles.test.mjs` also checks that every scenario's spawn and straight way to the goal stay free of the collision grid — rebuild `collision.json` after model or layout changes. Editor server and Quest tests skip when VRLearn is not next to this repo.
 - `node tools/check_events.mjs [--dir events] [id…]` (`--probe`, `--json`) for event work.
 - In a browser (`node serve.mjs`, or the `hikone-traffic-sim` entry of VRLearn's `.claude/launch.json`): load without console errors, play at least one walking and one cycling event, contact → replay (both views, restart) → results → title, goal → results. For layout changes also check a phone-sized viewport (touch controls) and the loading screen on a throttled network.
 - Headless Chrome screenshots are fine for looks; frame rates from a throttled laptop are not evidence — compare A/B on the same page.

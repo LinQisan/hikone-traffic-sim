@@ -79,7 +79,7 @@ const materials = buildMaterials(sceneData.materials);
 const light = buildLight(scene, renderer, sceneData.light);
 setSunDirection(sceneData.light.direction);              // shadow pools of moving things fall like the town's shadows
 status('街の模型を読み込んでいます… / Loading the town…');
-const env = await buildEnvironment(scene, webLayout(layout), materials);
+const env = await buildEnvironment(scene, webLayout(layout), materials, ground);
 const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium'];
 await Promise.all(vehicleModels.map(name => model(name)));
 

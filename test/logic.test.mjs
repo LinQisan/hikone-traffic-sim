@@ -113,3 +113,10 @@ test('lower kerbs: road level unchanged, pavement 15 cm above it, everything abo
   for (const h of shown.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a)).slice(0, 40))
     assert.ok(Math.abs(g.heightAt(h.p[0], h.p[2]) - h.p[1]) < 0.03, `${h.a} at ${h.p[0]}, ${h.p[2]}: ground ${g.heightAt(h.p[0], h.p[2]).toFixed(3)}, base ${h.p[1].toFixed(3)}`);
 });
+
+test('road height is known on the roads only (ground models are pressed under it)', () => {
+  const g = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  assert.ok(Math.abs(g.roadHeightAt(32, 37) - 0.01) < 1e-3, 'carriageway at the bridge approach');
+  assert.equal(g.roadHeightAt(0, -500), null, 'far off the roads');
+  assert.equal(g.heightAt(0, -500), Ground.fallback(0, -500));
+});

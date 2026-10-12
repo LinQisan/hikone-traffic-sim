@@ -413,6 +413,23 @@ def lamp():
     return abstract_props.build('HK_StreetLamp', BrushMesh)
 
 
+# The bridge's abutment faces (HK_StoneDark) end exactly at the road surface, and their raised
+# brush strokes reached 2-3 mm above the deck and the adjoining road tiles: a sliver of dark stone
+# along each end of the deck, seen at grazing angles as a thin line across the road. Their tops
+# are sunk below the deck (hidden under it; the visible stone below is unchanged).
+SUNK_TOPS = {'HK_Kyobashi': ('HK_StoneDark', 0.03)}
+
+
+def sink_tops(pts, depth):
+    out = []
+    for p in pts:
+        q = p.copy()
+        if q.z > -depth:                 # Blender z is Unity's height
+            q.z = -depth
+        out.append(q)
+    return out
+
+
 def rebuild(name):
     # Read the source in Blender so its transforms, handedness and primitive groups
     # are respected. Keep safety-relevant silhouettes and original road elevations.
@@ -426,6 +443,8 @@ def rebuild(name):
         for poly in ob.data.polygons:
             material = ob.data.materials[poly.material_index].name.split('.')[0]
             pts = [ob.matrix_world @ ob.data.vertices[i].co for i in poly.vertices]
+            if name in SUNK_TOPS and material == SUNK_TOPS[name][0]:
+                pts = sink_tops(pts, SUNK_TOPS[name][1])
             b.surface(pts, material)
     for ob in imported:
         bpy.data.objects.remove(ob, do_unlink=True)

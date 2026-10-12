@@ -71,7 +71,13 @@ export function material(materials, m) {
  * The city from layout.json items { a: asset, p: [x, y, z], r: yaw, s: scale }: one shared pigment
  * material, one InstancedMesh per asset and detail level (environment-instances.js).
  */
-export async function buildEnvironment(scene, layout, materials) {
+// ground models that must stay under the roads: where their surface reached above a road (the castle
+// terrain's bank edge at the bridge stood 14 cm proud of the carriageway, a green lip seen from the
+// castle side), their vertices are pressed just under it
+const UNDER_ROADS = /^HK_(Terrain|Ground)/;
+const UNDER = 0.02;
+
+export async function buildEnvironment(scene, layout, materials, ground = null) {
   const byAsset = new Map();
   for (const item of layout.items) {
     if (!byAsset.has(item.a)) byAsset.set(item.a, []);
@@ -81,12 +87,19 @@ export async function buildEnvironment(scene, layout, materials) {
   const resolve = parts => parts.map(part => ({ ...part, material: material(materials, part.material) }));
   // road-level objects (kerbed road tiles, raised roads, the bridge, the castle-hill terrain): every
   // vertex takes the browser's lower kerb height (kerb.js); they stand at one base height each
-  const lowerKerbs = (parts, base) => parts.map(part => {
+  const lowerKerbs = (parts, item, underRoads) => parts.map(part => {
+    const base = item.p[1];
     const geometry = part.geometry.clone(), position = geometry.getAttribute('position');
     const local = new THREE.Vector3(), world = new THREE.Vector3(), inverse = part.matrix.clone().invert();
+    const place = placement(...item.p, item.r, item.s), at = new THREE.Vector3();
     for (let i = 0; i < position.count; i++) {
       world.fromBufferAttribute(position, i).applyMatrix4(part.matrix);
       world.y = kerbY(base + world.y) - base;
+      if (underRoads) {
+        at.copy(world).applyMatrix4(place);                 // three.js world; Unity x = -x
+        const road = ground.roadHeightAt(-at.x, at.z);
+        if (road != null && at.y > road - UNDER) world.y = road - UNDER - base;
+      }
       local.copy(world).applyMatrix4(inverse);
       position.setXYZ(i, local.x, local.y, local.z);
     }
@@ -99,7 +112,8 @@ export async function buildEnvironment(scene, layout, materials) {
     if (items.some(i => i.mapVertices)) {
       const base = items[0].p[1];
       if (!items.every(i => i.mapVertices && i.p[1] === base && i.s[1] === 1)) throw new Error(`${asset}: road-level placements must share one base height`);
-      [high, low] = [lowerKerbs(high, base), lowerKerbs(low, base)];
+      const underRoads = !!ground && UNDER_ROADS.test(asset) && items.length === 1;
+      [high, low] = [lowerKerbs(high, items[0], underRoads), lowerKerbs(low, items[0], underRoads)];
     }
     return { asset, items, high: resolve(high), low: resolve(low) };
   }));
