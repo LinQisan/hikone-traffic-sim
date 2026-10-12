@@ -2,11 +2,11 @@
 
 Guide for AI coding agents and developers. Read **Hard rules** before changing anything. If this file disagrees with the code or the tests, the code wins — fix this file in the same change.
 
-Design intent and trade-offs: [RATIONALE.md](RATIONALE.md). Models, their checks and rendering measurements: [docs/art-and-performance.md](docs/art-and-performance.md). User guide: [README.md](README.md) (Japanese).
+Design intent and trade-offs: [RATIONALE.md](RATIONALE.md). Interface design language (colours, type, components, accessibility): [DESIGN.md](DESIGN.md). Models, their checks and rendering measurements: [docs/art-and-performance.md](docs/art-and-performance.md). User guide: [README.md](README.md) (Japanese).
 
-**Language:** code, comments, commit messages, this file, RATIONALE.md and `docs/` in English; README and UI text in Japanese (UI strings bilingual Japanese / English where space allows). Talk to the project owner in Chinese.
+**Language:** code, comments, commit messages, this file, RATIONALE.md, DESIGN.md and `docs/` in English; README and UI text in Japanese (UI strings bilingual Japanese / English where space allows). Talk to the project owner in Chinese.
 
-**Keeping the docs:** each fact lives in one place — rules and procedures here, reasons in RATIONALE.md, model details and measurements in `docs/art-and-performance.md`, usage in README. Update the right one in the same change as the code; do not add new files under `docs/` for one-off notes (extend the existing sections; raw benchmark samples go to `docs/performance/`).
+**Keeping the docs:** each fact lives in one place — rules and procedures here, reasons in RATIONALE.md, the interface's design language in DESIGN.md, model details and measurements in `docs/art-and-performance.md`, usage in README. Update the right one in the same change as the code; do not add new files under `docs/` for one-off notes (extend the existing sections; raw benchmark samples go to `docs/performance/`).
 
 ## At a glance
 

@@ -19,8 +19,9 @@ button { font: inherit; color: var(--text); background: var(--card); border: 1px
 button:hover { border-color: var(--accent); }
 button.primary { background: var(--amber); color: #0f172a; border-color: var(--amber); font-weight: 700; }
 .tile { text-align: left; display: flex; flex-direction: column; gap: 2px; }
-.tile.on { background: #0ea5e9; border-color: #7dd3fc; }
-.tile small { color: var(--sub); } .tile.on small { color: #e0f2fe; }
+/* selected: sky fill with dark ink (10.7:1; subtitle 5.7:1), like the active part of a segmented control */
+.tile.on { background: var(--accent); border-color: #e0f2fe; color: #0f172a; }
+.tile small { color: var(--sub); } .tile.on small { color: #0c4a6e; }
 aside { display: flex; flex-direction: column; gap: 12px; }
 aside label { display: flex; flex-direction: column; gap: 6px; color: var(--sub); }
 .body-inputs { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -96,7 +97,7 @@ button { touch-action: manipulation; }
   background: linear-gradient(90deg, #4ea596, #e0b47c, #eba091); transition: transform 0.35s ease; }
 .loader .step { margin: 10px 0 4px; font-size: 14px; }
 .loader .tip { margin: 6px 0 0; font-size: 13px; color: #5d5470; min-height: 2.6em; }
-.tip-label { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #4ea596; color: #fff; font-size: 11px; font-weight: 700; margin-right: 4px; }
+.tip-label { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #2f7a6e; color: #fff; font-size: 11px; font-weight: 700; margin-right: 4px; }
 .loaderror { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff; color: #7a2a20; text-align: left; font-size: 14px; }
 .loaderror p { margin: 0 0 10px; }
 .loading.failed .bear { animation-play-state: paused; }
@@ -117,8 +118,8 @@ button { touch-action: manipulation; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 :focus-visible { outline: 3px solid #fde68a; outline-offset: 2px; border-radius: 10px; }
 button:focus-visible, input:focus-visible { box-shadow: 0 0 0 5px rgba(253, 230, 138, 0.35); }
-.tile[aria-pressed="true"] { background: #0ea5e9; border-color: #7dd3fc; }
-.tile[aria-pressed="true"] small { color: #e0f2fe; }
+.tile[aria-pressed="true"] { background: var(--accent); border-color: #e0f2fe; color: #0f172a; }
+.tile[aria-pressed="true"] small { color: #0c4a6e; }
 body.touch button { min-height: 44px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001s !important; animation-iteration-count: 1 !important; transition-duration: 0.001s !important; }
