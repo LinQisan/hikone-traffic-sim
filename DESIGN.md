@@ -2,7 +2,7 @@
 
 The design language of the interface: colours, type, shapes, components, motion and accessibility, shared by the simulator (`index.html`, `style.css`) and the scenario editor (`editor/`, `editor/editor.css`). Follow it when you add or change any screen, so the two pages keep reading as one product.
 
-- **Scope:** the HTML interface only. The painted 3D town (impressionist look, the bear, the props) is explained in [RATIONALE.md](RATIONALE.md) §4, its models in [docs/art-and-performance.md](docs/art-and-performance.md).
+- **Scope:** the HTML interface only. The painted 3D town (impressionist look, the bear, the props) is explained in [RATIONALE.md](RATIONALE.md), its models in [docs/art-and-performance.md](docs/art-and-performance.md).
 - **Source of truth:** the tokens live as CSS custom properties at the top of `style.css` and `editor/editor.css`. This file says what each one is for. If the CSS and this file disagree, the CSS wins — fix this file in the same change.
 
 ## 1. Principles
@@ -95,7 +95,7 @@ The one light screen, on purpose: it is the first thing people see and should fe
 
 ## 9. Known gaps
 
-None at the moment. The last three (fixed 2026-10-12) were the selected scenario tile (white on `#0ea5e9`, 2.5:1 → dark ink on the sky fill, 10.7:1, subtitle `#0c4a6e` 5.7:1), the editor's accent button (white on `#0284c7`, 4.1:1 → on `#0369a1`, 5.9:1, darker on hover) and the loading tip label (white on `#4ea596`, 2.9:1 → on `#2f7a6e`, 5.1:1). List new ones here with their ratio and the fix to make.
+None. List new ones here with their contrast ratio and the fix to make.
 
 ## 10. Changing the design
 

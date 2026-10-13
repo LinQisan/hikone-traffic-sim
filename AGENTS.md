@@ -1,92 +1,38 @@
-# AGENTS.md — Hikone Traffic Simulator
+# AGENTS.md
 
-Guide for AI coding agents and developers. Read **Hard rules** before changing anything. If this file disagrees with the code or the tests, the code wins — fix this file in the same change.
+Browser port of [VRLearn](https://github.com/LinQisan/VRLearn) (Unity pedestrian traffic-safety VR): the Hikone Kyobashi scene, 10 accident events and custom scenario JSON, plus a scenario editor (`editor/`). three.js vendored, ES modules, **no build step, no npm dependencies**. A practice tool, not an experiment: it writes no data.
 
-Design intent and trade-offs: [RATIONALE.md](RATIONALE.md). Interface design language (colours, type, components, accessibility): [DESIGN.md](DESIGN.md). Models, their checks and rendering measurements: [docs/art-and-performance.md](docs/art-and-performance.md). User guide: [README.md](README.md) (Japanese).
+Talk to the owner in Chinese. Code, comments, commits and these docs in English; README and UI in Japanese.
 
-**Language:** code, comments, commit messages, this file, RATIONALE.md, DESIGN.md and `docs/` in English; README and UI text in Japanese (UI strings bilingual Japanese / English where space allows). Talk to the project owner in Chinese.
+## Commands
 
-**Keeping the docs:** each fact lives in one place — rules and procedures here, reasons in RATIONALE.md, the interface's design language in DESIGN.md, model details and measurements in `docs/art-and-performance.md`, usage in README. Update the right one in the same change as the code; do not add new files under `docs/` for one-off notes (extend the existing sections; raw benchmark samples go to `docs/performance/`).
+```bash
+npm test                          # all suites (includes the event checker); must pass
+node serve.mjs                    # http://127.0.0.1:8770/ ; --host 0.0.0.0 for phones
+node tools/check_events.mjs [id]  # event purposes, with real sight lines
+```
 
-## At a glance
+Data comes from `../VRLearn` (`VRLEARN_ROOT`), in this order — Unity `Tools/VRLearn/Web/Export Scene For Web` → `blender -b --factory-startup --python tools/export_models.py` → `… tools/build_impressionist.py [-- --only NAME…]` → `node tools/sync.mjs` → `node tools/build_collision.mjs` → `npm test`.
 
-- **What:** the browser port of [VRLearn](https://github.com/LinQisan/VRLearn) (pedestrian traffic-safety VR, Unity, Quest 2). The participant walks or rides a bicycle through the Hikone Kyobashi scene, meets the accident of one of 10 built-in events (or a custom scenario JSON), falls with the camera, then sees a replay (bird's-eye or driver view) and the results. Desktop and mobile browsers; **no VR** (use the Unity app for that).
-- **Not an experiment.** It is a viewer and practice tool: no CSV, no data collection. Never mix its use with the Unity experiment data.
-- **Stack:** three.js r186 vendored in `vendor/three/`, ES modules with an importmap, **no build step and no npm dependencies** (Node ≥ 22 for tests and tools only).
-- **Live site:** GitHub Pages publishes `main` at https://linqisan.github.io/hikone-traffic-sim/ (`.nojekyll`). **Pushing to `main` deploys.**
-- **Repository:** https://github.com/LinQisan/hikone-traffic-sim, default branch `main`. Expects VRLearn next to it at `../VRLearn` (`VRLEARN_ROOT` overrides) for data sync and the editor server.
+## Rules
 
-## Layout
+1. **Positions come from Unity.** Never move roads, placements, routes, spawns, goals, triggers, signals or black walls. All logic is in Unity coordinates; only `src/coords.js` converts to three.js.
+2. **Heights come from Unity too** (15 cm kerbs since VRLearn D37: carriageway 0.01, pavement 0.16, town 0.15). Never map or offset heights in the browser; the only height change is pressing ground models just under the roads (`world.js`).
+3. **Never hand-edit generated files:** `data/` and `src/shared/scenario.js` (a copy of VRLearn's `ScenarioModel/scenario.js` — change it there, with `CustomScenario.cs`, then sync). Web-only layout changes go in `src/web-layout.js`.
+4. **Events:** edit `events/`, never `data/scenarios/`. Each must pass the checker — going on without looking gets hit by that event's car, stopping at the kerb sees it and reaches the goal, cars appear hidden or far away. Accident cars launch by timing; they never chase.
+5. **Relative URLs only** — the site is served from a sub-path on GitHub Pages. **A push to `main` deploys it.**
+6. **Even frames:** about 120 draw calls; nothing moving casts into the sun's shadow map (use `withBlobShadow`); no per-frame allocation in hot paths; no post-processing. Measure rendering changes with `?benchmark=1`, A/B on the same page — absolute fps on this laptop is not evidence.
+7. **After model or layout changes** rebuild `data/collision.json`; every spawn and way to the goal must stay free (`test/obstacles.test.mjs`).
+8. **Keep accessibility working:** announcements, focus moves, keyboard play (Q/E look), 44 px touch targets, reduced motion, forced colours.
+9. **Every state can be left** to the menu, and the replay always reaches the results.
+10. **The editor server answers this computer only** and refuses cross-site writes; templates (`builtin-*`) are never overwritten. `editor/index.html` ids are bound by `editor/app.js` — restyle freely, keep the ids.
 
-| Path | Contents |
-| --- | --- |
-| `index.html`, `style.css` | The app shell: loading screen, title, HUD, touch controls, replay UI, results |
-| `src/` | Runtime modules (see Code map) |
-| `src/shared/scenario.js` | Scenario format, defaults and validation — a **copy** of VRLearn's `ScenarioModel/scenario.js` |
-| `editor/` | Scenario editor (`index.html`, `app.js`, `store.js` = browser-only backend, `editor.css`) |
-| `server/editor-api.mjs` | Local editor backend (VRLearn `Scenarios/`, Unity play, Quest sync over adb) |
-| `serve.mjs` | Static server + `/api/…` for the editor; port 8770, `--host 0.0.0.0` for phones on the LAN |
-| `events/builtin-01…10.json` | **Hand-authored** web timing of the 10 built-in events (source of `data/scenarios/builtin-*`) |
-| `data/` | **Generated** data (see Data pipeline) |
-| `tools/` | `sync.mjs`, `check_events.mjs`, `build_collision.mjs`, Blender scripts `export_models.py`, `build_impressionist.py`, `abstract_props.py` |
-| `test/` | `node:test` suites; `fake-adb.mjs` emulates a Quest |
-| `docs/` | `art-and-performance.md` (web-authored models, their checks, frame budget and measurements) and raw benchmark JSON in `docs/performance/` |
-| `vendor/three/` | three.js (MIT). Do not modify |
+## Before handing off
 
-## Code map
+- `npm test` and `git diff --check` pass; for visible changes, load the page without console errors and play a walking and a cycling event (headless Chrome screenshots are fine for looks).
+- Commit or push only when asked; never force-push.
+- Say what changed, what was verified, and what was not (e.g. no real phone).
 
-- **Flow (`src/app.js`):** loading → `title` → `playing` → `impact` → `replay` → `results` (and goal → `results`). The participant can leave to the menu at any time from `playing`, `impact` and `replay` (`leaveToMenu`: HUD and replay "メニュー" buttons, M, or Esc when the mouse is not locked). One state variable; do not add a competing state machine. Loading progress goes through `window.hikoneLoading` (inline script in `index.html`). Screen-reader announcements via `announce()`; focus moves to Start, Next and the results title.
-- **Coordinates (`src/coords.js`):** all logic runs in **Unity coordinates** (x right, y up, z forward; yaw in degrees clockwise from above, 0 = +z). Only drawing converts: `toThree(x, y, z) = (-x, y, z)`, `yawToThree = -yaw`. Models are exported with the same mirror.
-- **World (`src/world.js`, `src/environment-instances.js`, `src/ground.js`, `src/signals.js`):** the layout from `data/layout.json` drawn as one `InstancedMesh` per asset and LOD level, CPU frustum / shadow-range culling, LOD switch at 60 m with hysteresis (52.8 m), cells ≤ 128 m with 16-bit indices. The sun's shadow map holds only still things and is drawn from the light LOD by shadow-only instanced meshes (own list: every caster in the shadow box; shown only on shadow frames via `env.casters(needsUpdate)`), so view LOD switches never redraw it; it is redrawn when the shadow box re-centres (4 m, texel-snapped). Moving objects never cast into it — `withBlobShadow` (`src/blob-shadow.js`) gives them a shadow pool, aligned each frame with `alignBlobShadow`. Signals are display only (never switch); `src/signals.js` builds their posts and plates at run time from the source rigs (`signalRigs`), the heads come from `tools/abstract_props.py` (car lamps green–yellow–red from the left, seen from the front). `src/web-layout.js` (`webLayout`) is the web's own override of the generated layout — hidden props (`WEB_HIDDEN`) and swapped assets (`WEB_REPLACED`, e.g. the 40 km/h signs on Route 25) — used by the renderer and `build_collision.mjs`. Details: docs/art-and-performance.md §1.
-- **Look (`src/style.js`, `src/paint-texture.js`, `tools/build_impressionist.py`):** impressionist painting authored **in the geometry** (vertex pigments, raised brush meshes); `style.js` adds the shared `PigmentPalette` lookup, bristle relief and the painted sky. There is no screen-space post effect.
-- **Traffic (`src/traffic.js`, pure logic, no three.js):** vehicles appear at `route[0]`, accelerate at 8 m/s² to cruise speed (trapezoid integration, sub-steps ≤ 1/30 s), keep distance to the car ahead, spawn only when clear, stop at contact. Cars drive `smoothRoute(route)` (corners rounded into arcs ≤ 12 m radius), which cars, meet timing and the event checker share; `carPose` puts both axles on it and gives `yaw` and the front-wheel `steer` (RATIONALE.md §5). `vehicles.js` `instance(…, { steerable: true })` cuts the front wheels onto pivots (`frontWheels`); live cars and replay copies call `userData.steer`, and the recorder keeps `steer` per frame. Web-only vehicle fields (Unity ignores them): `launch: "meet"`, `meetOffsetSeconds`, `entrySpeedKmh`, `hold`, `holdMaxSeconds`, `launchAfterTriggerSeconds`, `noStop` — documented at the top of the file.
-- **Obstacles (`src/obstacles.js`, pure logic):** the body cannot pass the town or parked vehicles. `data/collision.json` is a 0.2 m grid over the map rectangle of everything solid between 0.3 m and 1.8 m above the ground (houses, walls, stone walls, gates, trees, hedges, fences, posts); parked vehicles of the run are oriented boxes from their models (`footprint()` in `app.js`). Walking body radius 0.25 m; a bicycle checks both wheels (0.8 m ahead/behind) and may not swing a wheel into anything. A move is allowed when it ends clear or no closer to anything (`Obstacles.allows`), so a custom spawn that touches a façade or a post never freezes the participant. The map's invisible walls stay separate (`crossesWall`).
-- **Participant (`src/player.js`, `src/touch-controls.js`, `src/bicycle.js`):** walking at `MOVE_SPEED` 2.4 m/s, eye height = height × `EYE_RATIO`; the bicycle is drawn in rider-height units but scaled to real size (`bicycleScale`: adult 26-inch, children proportional); bicycle steering model (looking back never turns the bike); fall with the body on contact (`knockDown`, no roll under `prefers-reduced-motion`); Q/E look; touch stick and drag-to-look.
-- **Replay (`src/replay.js`, `src/analysis.js`, `src/crash.js`, `src/cockpit.js`, `src/replay-animal.js`, `src/replay-cyclist.js`):** 20 Hz recording, 12 s buffer, window 8 s before to 1.6 s after contact. The participant is a bear sized from the menu height and weight; its reaction depends on where it was hit (`classifyCrash`: front / corner / side / bump). Views: bird's-eye or the accident car's driver seat (cockpit built to the car's size, right-hand drive). It stops on the last frame and waits for "結果へ"; restart resets everything.
-- **Results (`src/analysis.js`):** the same evaluation as the Unity app (time looking toward the car, last look, sideways checks on success).
-- **Performance (`src/resolution.js`, `src/performance.js`):** dynamic resolution on desktop, no MSAA on phones; `?quality=high` fixes full resolution, `?benchmark=1` records samples into `#fps[data-benchmark]`.
-- **Editor (`editor/`):** `index.html` keeps every element id the script binds (restyle freely in `editor.css`, but keep the ids); one UI, two backends answering the same `/api/…` calls: `server/editor-api.mjs` when served by `serve.mjs` on the machine with VRLearn (files in `VRLearn/Scenarios/`, "▶ Unityで試す", "⇪ Questに送る"), otherwise `editor/store.js` (localStorage; GitHub Pages and other devices). "▶ ブラウザで試す" hands the scenario to the simulator through `localStorage['vrlearn.editor.play']` and `?play=editor`.
-- **Debug API:** `window.vrlearn` (`select`, `start`, `knock()`, `simulate(seconds)`, `debugView(...)`, `replay`, `resolution`, …). Review URLs: `?view=street|architecture|foliage|bridge|lamp|signals|vehicles|ride|replay|replay-bicycle`, `&finish=off` (no paint).
+## Docs
 
-## Data pipeline
-
-`data/` is generated from VRLearn; never hand-edit it.
-
-| Output | Produced by |
-| --- | --- |
-| `data/scene.json`, `data/signals.json` | Unity `Tools/VRLearn/Web/Export Scene For Web` (VRLearn `WebSceneExporter`) |
-| `data/models/*.glb` (source meshes) | `Blender -b --factory-startup --python tools/export_models.py` (runs VRLearn's `Art/Hikone` generators) |
-| `data/models/impressionist/*.glb`, `*.lod.glb`, `manifest.json` (**used at runtime**) | `Blender -b --factory-startup --python tools/build_impressionist.py` (`--only <names>`, `--save-library`) |
-| `data/layout.json`, `road_tiles.json`, `map.json`, `map.png`, `textures/`, `scenarios/`, `editor/templates/`, `src/shared/scenario.js` | `node tools/sync.mjs` |
-| `data/collision.json` | `node tools/build_collision.mjs` (from `layout.json`, `road_tiles.json`, `map.json` and the impressionist models) |
-
-- `data/scenarios/builtin-*` come from `events/` (sync prefers them); custom files come from VRLearn `Scenarios/`.
-- `data/editor/templates/` are Unity's own templates (what the headset runs), **not** the re-timed `events/`.
-- Order after an environment change in VRLearn: Unity export → `export_models.py` → `build_impressionist.py` → `sync.mjs` → `build_collision.mjs` → `npm test`.
-
-## Hard rules
-
-1. **Positions come from Unity.** Placements, roads, routes, triggers, spawns, goals, signals and black walls are VRLearn's experiment geometry. The web port changes looks and event timing only, never where things are horizontally. Convert coordinates only through `src/coords.js`. The one vertical exception is the lower kerb (`src/kerb.js`: pavement 0.16 instead of 0.41): every consumer of heights — `Ground`, `webLayout` (whole objects move down), `world.js` (road-level objects map their vertices), `build_collision.mjs`, `check_events.mjs`, the black walls — must apply it; never mix Unity and browser heights.
-2. **Never hand-edit generated files** (everything in `data/`, and `src/shared/scenario.js`). Change the generator or the VRLearn source and regenerate. Scenario format changes are made in VRLearn's `ScenarioModel/scenario.js` together with its `CustomScenario.cs`, then synced.
-3. **Events serve their purpose — and nothing else.** Every built-in event must pass `node tools/check_events.mjs`: a participant who goes on without looking is hit by that event's accident car (not by other traffic); one who stops at the kerb and watches sees the car and reaches the goal; every car appears hidden or far away. Accident cars launch by timing (`meet`), they **never chase** the participant. Edit `events/`, not `data/scenarios/`.
-4. **No build step, no dependencies, relative paths.** The site runs from a sub-path on GitHub Pages; keep every URL relative (`./vendor/…`, `data/…`). Do not add npm packages or a bundler; three.js stays vendored at its version.
-5. **Keep the frame budget and even frames.** About 120 draw calls per frame; one `InstancedMesh` per asset and LOD; no per-frame allocation in hot paths (write positions in place); no screen-space post-processing. Nothing that moves may cast into the sun's shadow map (it would force shadow passes every few frames — judder behind a high fps): use `withBlobShadow`. Check `test/performance.test.mjs` and, for rendering changes, measure with `?benchmark=1` (same view, size and machine load; same-page A/B when the machine throttles) and update `docs/art-and-performance.md`.
-6. **Accessibility is a feature.** Keep the live-region announcements, focus moves, `aria-pressed` tiles, the visible focus ring, Q/E keyboard look, 44 px touch targets, `prefers-reduced-motion` (no camera roll, no animation) and `forced-colors` support working.
-7. **The editor server only serves this computer.** `server/editor-api.mjs` answers loopback requests only and refuses cross-site writes; `serve.mjs` refuses `tools/`, `test/`, `server/` and dotfiles. Keep both. Templates (`builtin-*`) are never overwritten.
-8. **Bodies do not pass through solid things, and every scenario stays playable.** After changing models, the layout or scenarios, rebuild `data/collision.json` and keep `test/obstacles.test.mjs` passing (spawns and ways to the goal free). The user can always leave to the menu (rule 9).
-9. **Replay must always reach the results, and every state can be left.** It waits on its last frame for the user, restart puts every object (bear, ring, cars, cockpit) back exactly once, and nothing in it can block "結果へ". `playing`, `impact` and `replay` can always be left to the menu, cleaning up cars, parked vehicles, the replay and the flash.
-
-## Verification
-
-- `npm test` — all suites (logic, traffic, events with real sight lines, bicycle, crash, replay, controls, art, performance, editor store/server/Quest). Current baseline: **79/79**. `test/obstacles.test.mjs` also checks that every scenario's spawn and straight way to the goal stay free of the collision grid — rebuild `collision.json` after model or layout changes. Editor server and Quest tests skip when VRLearn is not next to this repo.
-- `node tools/check_events.mjs [--dir events] [id…]` (`--probe`, `--json`) for event work.
-- In a browser (`node serve.mjs`, or the `hikone-traffic-sim` entry of VRLearn's `.claude/launch.json`): load without console errors, play at least one walking and one cycling event, contact → replay (both views, restart) → results → title, goal → results. For layout changes also check a phone-sized viewport (touch controls) and the loading screen on a throttled network.
-- Headless Chrome screenshots are fine for looks; frame rates from a throttled laptop are not evidence — compare A/B on the same page.
-- `git diff --check` before committing.
-
-## Git and delivery
-
-- Commit source, `events/`, regenerated `data/`, docs and tests. Never commit `node_modules/`, logs, `__pycache__/` or `.DS_Store`.
-- Commit or push only when asked; never force-push. Remember that a push to `main` republishes the site.
-- Commit messages end with the co-author line given by the session.
-- Every hand-off states what changed, what was verified and what was not (e.g. "not checked on a real phone").
+[RATIONALE.md](RATIONALE.md) why things are as they are · [DESIGN.md](DESIGN.md) interface design system · [docs/art-and-performance.md](docs/art-and-performance.md) models, checks, measurements · [README.md](README.md) user guide (Japanese). Each fact lives in one of them; update it with the code.
