@@ -1,8 +1,6 @@
-// Ground height in Unity coordinates from the original road meshes (Art/Hikone/road_tiles_geometry.json,
-// the collision truth of the Unity scene: carriageway 0.01, sidewalk 0.41, corner ramps), with the
-// town ground (0.40) and the Kyobashi deck elsewhere — all with the browser's lower kerbs (kerb.js:
-// pavement 0.16, town ground 0.15). Pure logic (node:test).
-import { kerbY } from './kerb.js';
+// Ground height in Unity coordinates from the road meshes (Art/Hikone/road_tiles_geometry.json, the
+// collision truth of the Unity scene: carriageway 0.01, 15 cm kerbs to the sidewalk at 0.16, corner
+// ramps), with the town ground (0.15) and the Kyobashi deck elsewhere. Pure logic (node:test).
 const CELL = 4;
 const TOWN_Z = 39.6;
 
@@ -11,10 +9,8 @@ export class Ground {
     this.cells = new Map();
     // { tile: [[ax, ay, az, bx, by, bz, cx, cy, cz], ...] }
     for (const tris of Object.values(roadTiles)) {
-      for (let t of tris) {
-        const [ax, ay0, az, bx, by0, bz, cx, cy0, cz] = t;
-        const ay = kerbY(ay0), by = kerbY(by0), cy = kerbY(cy0);
-        t = [ax, ay, az, bx, by, bz, cx, cy, cz];
+      for (const t of tris) {
+        const [ax, ay, az, bx, by, bz, cx, cy, cz] = t;
         const ux = bx - ax, uy = by - ay, uz = bz - az, vx = cx - ax, vy = cy - ay, vz = cz - az;
         const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
         const len = Math.hypot(nx, ny, nz);
@@ -57,7 +53,7 @@ export class Ground {
 
   static fallback(x, z) {
     // the bridge deck (carriageway 8 m, sidewalks either side) and the masugata road beyond it
-    if (z > TOWN_Z && z < 52 && x > 25 && x < 39) return kerbY(Math.abs(x - 32) < 4 ? 0.01 : 0.41);
-    return kerbY(0.4);
+    if (z > TOWN_Z && z < 52 && x > 25 && x < 39) return Math.abs(x - 32) < 4 ? 0.01 : 0.16;
+    return 0.15;
   }
 }

@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { signalPlacements, signalRigs, POLE, ARM_ABOVE_HEAD } from '../src/signal-layout.js';
-import { webLayout, WEB_HIDDEN, WEB_REPLACED } from '../src/web-layout.js';
+import { webLayout, WEB_HIDDEN } from '../src/web-layout.js';
 
 const modelRoot = new URL('../data/models/', import.meta.url);
 const glb = (name, painted = true) => {
@@ -230,7 +230,7 @@ test('signal posts stand on the source poles and face like the heads; the car la
   assert.ok(mean('ART_SignalGreen') > mean('ART_SignalYellow') && mean('ART_SignalYellow') > mean('ART_SignalRed'), 'green left, red right');
 });
 
-test('the browser leaves out the crosswalk signs and the guide post of the signalised corners, and shows 40 on Route 25', () => {
+test('no crosswalk signs or guide post at the signalised corners, and 40 on Route 25', () => {
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
   const shown = webLayout(layout);
   assert.equal(layout.items.length - shown.items.length, WEB_HIDDEN.length, 'every hidden entry matches exactly one item');
@@ -238,7 +238,7 @@ test('the browser leaves out the crosswalk signs and the guide post of the signa
   assert.ok(shown.items.some(i => i.a === 'HK_Sign_Speed30') && shown.items.some(i => i.a === 'HK_Sign_Stop'));
   // Route 25 along the moat shows 40 km/h (both of its speed signs), Castle Road keeps 30
   const forty = shown.items.filter(i => i.a === 'HK_Sign_Speed40');
-  assert.equal(forty.length, WEB_REPLACED.length);
+  assert.equal(forty.length, 2);
   assert.ok(forty.every(i => i.p[2] > 20 && i.p[2] < 32), 'on Route 25');
   for (const name of new Set(shown.items.map(i => i.a))) assert.ok(manifest.models[name], `${name}: built`);
   for (const name of ['HK_Sign_Speed30', 'HK_Sign_Speed40']) {

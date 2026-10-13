@@ -23,7 +23,6 @@ const { Traffic, PLAYER_RADIUS, meetPoint, smoothRoute, BODY_SIZE } = await impo
 const { placement } = await import('../src/coords.js');
 const { webLayout } = await import('../src/web-layout.js');
 const { Ground } = await import('../src/ground.js');
-const { kerbY, DROP } = await import('../src/kerb.js');
 
 const args = process.argv.slice(2);
 const dirArg = args.indexOf('--dir');
@@ -45,16 +44,15 @@ const glb = async name => {
   return parts;
 };
 const NOT_SOLID = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|ChainFence|Guardrail|StreetLamp|GuidePost|Hedge)/;
-// the city as the browser shows it: its layout overrides and lower kerbs (web-layout.js, kerb.js)
+// the city as the browser shows it (web-layout.js)
 const layout = webLayout(JSON.parse(fs.readFileSync(new URL('layout.json', data))));
 const ground = new Ground(JSON.parse(fs.readFileSync(new URL('road_tiles.json', data))));
 const cache = new Map();
 const cells = new Map();
-const addTriangles = (geometry, matrix, mapVertices = false) => {
+const addTriangles = (geometry, matrix) => {
   const g = geometry.index ? geometry.toNonIndexed() : geometry.clone();
   g.applyMatrix4(matrix);
   const p = g.attributes.position.array;
-  if (mapVertices) for (let i = 1; i < p.length; i += 3) p[i] = kerbY(p[i]);
   for (let i = 0; i < p.length; i += 9) {
     const key = Math.floor((p[i] + p[i + 3] + p[i + 6]) / 48) + ',' + Math.floor((p[i + 2] + p[i + 5] + p[i + 8]) / 48);
     if (!cells.has(key)) cells.set(key, []);
@@ -66,12 +64,12 @@ const m = new THREE.Matrix4();
 for (const item of layout.items) {
   if (NOT_SOLID.test(item.a)) continue;
   if (!cache.has(item.a)) cache.set(item.a, await glb(item.a));
-  for (const g of cache.get(item.a)) addTriangles(g, placement(...item.p, item.r, item.s, m), item.mapVertices);
+  for (const g of cache.get(item.a)) addTriangles(g, placement(...item.p, item.r, item.s, m));
 }
 // the black walls inside the gatehouses hide where cars appear and leave (scene.json blackWalls)
 for (const w of scene.blackWalls) {
   const g = new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05));
-  addTriangles(g, placement(w.x, w.y - DROP, w.z, w.yaw, [1, 1, 1], new THREE.Matrix4()));
+  addTriangles(g, placement(w.x, w.y, w.z, w.yaw, [1, 1, 1], new THREE.Matrix4()));
 }
 const cityMeshes = [...cells.values()].map(list => {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3));

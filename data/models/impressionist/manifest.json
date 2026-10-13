@@ -205,13 +205,13 @@
       }
     },
     "HK_Kyobashi": {
-      "triangles": 16448,
-      "strokes": 2669,
-      "bytes": 1113520,
+      "triangles": 15698,
+      "strokes": 2544,
+      "bytes": 1063936,
       "remodeled": false,
       "lod": {
-        "triangles": 1439,
-        "bytes": 122828
+        "triangles": 1397,
+        "bytes": 119940
       }
     },
     "HK_Machiya_A": {
@@ -265,23 +265,23 @@
       }
     },
     "HK_RoadRaised": {
-      "triangles": 129924,
-      "strokes": 21505,
-      "bytes": 9356516,
+      "triangles": 124380,
+      "strokes": 20606,
+      "bytes": 8981536,
       "remodeled": false,
       "lod": {
-        "triangles": 8964,
-        "bytes": 631148
+        "triangles": 8469,
+        "bytes": 596384
       }
     },
     "HK_RoadRaised_Honmachi": {
-      "triangles": 5825,
-      "strokes": 953,
-      "bytes": 391524,
+      "triangles": 5431,
+      "strokes": 893,
+      "bytes": 363920,
       "remodeled": false,
       "lod": {
-        "triangles": 467,
-        "bytes": 37548
+        "triangles": 406,
+        "bytes": 32244
       }
     },
     "HK_RoadSurf_Cross": {
@@ -335,13 +335,13 @@
       }
     },
     "HK_Road_Straight": {
-      "triangles": 7374,
-      "strokes": 1221,
-      "bytes": 492620,
+      "triangles": 6516,
+      "strokes": 1078,
+      "bytes": 435988,
       "remodeled": false,
       "lod": {
-        "triangles": 528,
-        "bytes": 40412
+        "triangles": 459,
+        "bytes": 36168
       }
     },
     "HK_Shrub": {
@@ -417,13 +417,13 @@
       }
     },
     "HK_Terrain_Castle": {
-      "triangles": 43412,
-      "strokes": 4832,
-      "bytes": 2397088,
+      "triangles": 42926,
+      "strokes": 4751,
+      "bytes": 2356480,
       "remodeled": false,
       "lod": {
-        "triangles": 17828,
-        "bytes": 679844
+        "triangles": 16199,
+        "bytes": 592492
       }
     },
     "HK_Tree_Cedar": {

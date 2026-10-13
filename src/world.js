@@ -5,7 +5,6 @@ import { placement } from './coords.js';
 import { LIGHT, painted, paintedSky, PigmentPalette } from './style.js';
 import { environmentInstances } from './environment-instances.js';
 import { packPigments } from './geometry-budget.js';
-import { kerbY } from './kerb.js';
 
 const NO_SHADOW = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)/;
 const loader = new GLTFLoader();
@@ -85,21 +84,17 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
   }
   // scene.json's pigments (and their emissive light) win over the GLB's own material
   const resolve = parts => parts.map(part => ({ ...part, material: material(materials, part.material) }));
-  // road-level objects (kerbed road tiles, raised roads, the bridge, the castle-hill terrain): every
-  // vertex takes the browser's lower kerb height (kerb.js); they stand at one base height each
-  const lowerKerbs = (parts, item, underRoads) => parts.map(part => {
+  // ground models pressed under the roads (one placement each)
+  const pressUnderRoads = (parts, item) => parts.map(part => {
     const base = item.p[1];
     const geometry = part.geometry.clone(), position = geometry.getAttribute('position');
     const local = new THREE.Vector3(), world = new THREE.Vector3(), inverse = part.matrix.clone().invert();
     const place = placement(...item.p, item.r, item.s), at = new THREE.Vector3();
     for (let i = 0; i < position.count; i++) {
       world.fromBufferAttribute(position, i).applyMatrix4(part.matrix);
-      world.y = kerbY(base + world.y) - base;
-      if (underRoads) {
-        at.copy(world).applyMatrix4(place);                 // three.js world; Unity x = -x
-        const road = ground.roadHeightAt(-at.x, at.z);
-        if (road != null && at.y > road - UNDER) world.y = road - UNDER - base;
-      }
+      at.copy(world).applyMatrix4(place);                   // three.js world; Unity x = -x
+      const road = ground.roadHeightAt(-at.x, at.z);
+      if (road != null && at.y > road - UNDER) world.y = road - UNDER - base;
       local.copy(world).applyMatrix4(inverse);
       position.setXYZ(i, local.x, local.y, local.z);
     }
@@ -109,12 +104,8 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
   const definitions = await Promise.all([...byAsset].map(async ([asset, items]) => {
     // unpacked: environment-instances re-packs while merging
     let [high, low] = await Promise.all([model(asset, 'high', { packed: false }), model(asset, 'low', { packed: false })]);
-    if (items.some(i => i.mapVertices)) {
-      const base = items[0].p[1];
-      if (!items.every(i => i.mapVertices && i.p[1] === base && i.s[1] === 1)) throw new Error(`${asset}: road-level placements must share one base height`);
-      const underRoads = !!ground && UNDER_ROADS.test(asset) && items.length === 1;
-      [high, low] = [lowerKerbs(high, items[0], underRoads), lowerKerbs(low, items[0], underRoads)];
-    }
+    if (ground && UNDER_ROADS.test(asset) && items.length === 1)
+      [high, low] = [pressUnderRoads(high, items[0]), pressUnderRoads(low, items[0])];
     return { asset, items, high: resolve(high), low: resolve(low) };
   }));
   const palette = new PigmentPalette();
@@ -137,7 +128,8 @@ export function buildLight(scene, renderer, light) {
   sky.geometry.dispose(); sky.material.dispose();
 
   scene.add(new THREE.HemisphereLight(rgb(LIGHT.sky), rgb(LIGHT.ground), LIGHT.hemisphere));
-  const sun = new THREE.DirectionalLight(rgb(LIGHT.sunColor), LIGHT.sunIntensity * light.intensity);
+  // the port's own sun (Unity's light now carries this sun converted to its Lambert, VRLearn D38)
+  const sun = new THREE.DirectionalLight(rgb(LIGHT.sunColor), LIGHT.sunIntensity);
   // Unity's light travels along its forward; three's points from position to target (x mirrored)
   const d = new THREE.Vector3(light.direction[0], -light.direction[1], -light.direction[2]).normalize();
   sun.userData.offset = d.multiplyScalar(80);

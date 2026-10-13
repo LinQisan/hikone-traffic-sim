@@ -35,9 +35,6 @@ const templateNames = fs.readdirSync(path.join(root, 'Scenarios', 'templates')).
 for (const f of templateNames) copy(`Scenarios/templates/${f}`, path.join(editorTemplates, f));
 fs.writeFileSync(path.join(editorTemplates, 'index.json'), JSON.stringify(templateNames, null, 2) + '\n');
 
-const textures = 'Assets/_Project/Hikone/Textures';
-for (const f of fs.readdirSync(path.join(root, textures)).filter(f => f.endsWith('.png')))
-  copy(`${textures}/${f}`, path.join(data, 'textures', f));
 
 // scenarios: the built-in templates and every custom file (maps/, hidden files and the schema skipped)
 const scenarioDir = path.join(data, 'scenarios');
@@ -62,5 +59,5 @@ for (const f of fs.readdirSync(path.join(root, 'Scenarios')).filter(f => f.endsW
 fs.writeFileSync(path.join(scenarioDir, 'index.json'), JSON.stringify(list, null, 2) + '\n');
 
 const missing = ['scene.json', 'models/HK_RoadSurf_Cross.glb', 'models/WEB_Sedan.glb'].filter(f => !fs.existsSync(path.join(data, f)));
-console.log(`synced from ${root}: layout, road tiles, map, ${list.length} scenarios, ${templateNames.length} editor templates, textures, shared/scenario.js`);
+console.log(`synced from ${root}: layout, road tiles, map, ${list.length} scenarios, ${templateNames.length} editor templates, shared/scenario.js`);
 if (missing.length) console.warn('still missing (run the Unity exporter / tools/export_models.py):', missing.join(', '));

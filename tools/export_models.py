@@ -29,7 +29,6 @@ import hk_lib  # noqa: E402
 # the generators read their geometry sources from the project
 hk_lib.ROOT = ROOT
 hk_lib.MODEL_DIR = OUT
-hk_lib.TEX_DIR = os.path.join(ROOT, "Assets", "_Project", "Hikone", "Textures")
 import hk_assets  # noqa: E402
 from hk_lib import MB, clear_asset  # noqa: E402
 

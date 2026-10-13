@@ -21,7 +21,6 @@ import { AdaptiveResolution } from './resolution.js';
 import { Obstacles } from './obstacles.js';
 import { setSunDirection, alignBlobShadow } from './blob-shadow.js';
 import { webLayout } from './web-layout.js';
-import { DROP } from './kerb.js';
 
 const $ = id => document.getElementById(id);
 // loading screen (index.html): data files are the first 15 %, the models the next 75 %, building the rest
@@ -90,7 +89,7 @@ const occluders = new THREE.Group();
 scene.add(occluders);
 for (const w of sceneData.blackWalls) {
   const wall = new THREE.Mesh(new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05)), painted(new THREE.MeshStandardMaterial({ color: 0x7a8599, roughness: 1 })));
-  wall.position.copy(toThree(w.x, w.y - DROP, w.z));        // inside the gatehouses, which stand lower (kerb.js)
+  wall.position.copy(toThree(w.x, w.y, w.z));                // inside the gatehouses
   wall.rotation.y = yawToThree(w.yaw);
   occluders.add(wall);
 }
