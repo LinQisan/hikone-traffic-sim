@@ -147,16 +147,17 @@ test('the lamp has an outward-facing bottom; lamp, signal shells and supports ar
   closed('ART_Signal_Support', 'ART_Frame');
 });
 
-test('all five vehicles have new closed hulls, sealed tyres and unchanged collision extents', () => {
+test('all five vehicles have closed hulls, sealed tyres and match the geometry ported to Unity', () => {
   for (const name of ['WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium']) {
     closed(name, 'HK_KeiPaint');
     closed(name, 'HK_Rubber');
     if (name.startsWith('HK_Truck')) closed(name, 'ART_Cargo');
     assert.equal(manifest.models[name].design, 'abstract-closed-solids-v2');
-    const original = glb(name, false).json;
-    assert.notEqual(manifest.models[name].triangles,
+    // VRLearn now generates these same hulls; its sedan uses the HK_Sedan asset name.
+    const original = glb(name === 'WEB_Sedan' ? 'HK_Sedan' : name, false).json;
+    assert.equal(manifest.models[name].triangles,
       original.meshes.flatMap(m => m.primitives).reduce((n, p) => n + original.accessors[p.indices].count / 3, 0),
-      `${name}: geometry was rebuilt`);
+      `${name}: the Unity source retains the same authored geometry`);
   }
 });
 

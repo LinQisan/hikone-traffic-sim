@@ -39,6 +39,8 @@ written = []
 def export_glb(ob, spacing_index=0):
     bpy.ops.object.select_all(action="DESELECT")
     ob.select_set(True)
+    for child in ob.children_recursive:
+        child.select_set(True)
     bpy.context.view_layer.objects.active = ob
     loc = ob.location.copy()
     ob.location = (0, 0, 0)

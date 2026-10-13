@@ -6,11 +6,13 @@ How the web-authored models are built and checked, and what the scene costs to r
 
 `tools/export_models.py` turns VRLearn's generators into `data/models/*.glb`; `tools/build_impressionist.py` rebuilds each into `data/models/impressionist/` (the runtime set: vertex pigments, brush strokes, a distant LOD, `manifest.json`). Houses and trees get new silhouettes. Lamps, signals, vehicles and speed signs are authored as closed solids in `tools/abstract_props.py`: a few weighty colour planes, only the outlines needed to read the object.
 
+The lamp and five vehicle generators were also ported to VRLearn's `Art/Hikone/hk_web_props.py` (D39). Raw exports now contain those same hulls; the Unity sedan is named `HK_Sedan`. The exporter includes mesh children, while Unity centres wheel pivots during prefab generation. The browser continues to use its existing impressionist models and steering code.
+
 Non-obvious conventions:
 
 - **Signals** follow street photographs of Kyobashi: car lamps read green–yellow–red from the left, seen from the front. Posts, mast arms and plates are built at run time (`src/signals.js`) on the source pole and head positions; the posts are solid. Signal colours never get decorative paint.
 - **Trucks** are Japanese aluminium vans with every part resting on the one below (no gaps); outer extents stay the source's.
-- **Speed signs:** 40 km/h is web-only (Route 25); the 30 sign is authored too because the converted source read mirrored.
+- **Speed signs:** 40 km/h is on Route 25 in both versions (VRLearn D38); the 30 sign is authored too because the converted source read mirrored.
 - **Car front wheels** are cut out of the models at run time (`frontWheels`) so they can steer.
 - **Seams:** the bridge abutment tops are sunk below the deck (`SUNK_TOPS` in `build_impressionist.py`), and ground/terrain vertices on a road are pressed just under it (`world.js`) — both had shown as lines across the road.
 - **Layout overrides** (the two props hidden at the bridge corner) live in `src/web-layout.js`; `data/layout.json` stays generated.
