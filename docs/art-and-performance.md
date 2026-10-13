@@ -8,6 +8,8 @@ How the web-authored models are built and checked, and what the scene costs to r
 
 The lamp and five vehicle generators were also ported to VRLearn's `Art/Hikone/hk_web_props.py` (D39). Raw exports now contain those same hulls; the Unity sedan is named `HK_Sedan`. The exporter includes mesh children, while Unity centres wheel pivots during prefab generation. The browser continues to use its existing impressionist models and steering code.
 
+VRLearn also ports the car/pedestrian heads through `hk_signals.py` and generates the brown poles, mast arms and baked plates at the same source anchors (D41). Unity runs a synchronized signal cycle; the browser's signals remain static. `data/signals.json` continues to hold the preserved original reference meshes and matrices, so exporting Unity's replacement never moves or duplicates the browser heads.
+
 Non-obvious conventions:
 
 - **Signals** follow street photographs of Kyobashi: car lamps read green–yellow–red from the left, seen from the front. Posts, mast arms and plates are built at run time (`src/signals.js`) on the source pole and head positions; the posts are solid. Signal colours never get decorative paint.
@@ -17,7 +19,7 @@ Non-obvious conventions:
 - **Seams:** the bridge abutment tops are sunk below the deck (`SUNK_TOPS` in `build_impressionist.py`), and ground/terrain vertices on a road are pressed just under it (`world.js`) — both had shown as lines across the road.
 - **Layout overrides** (the two props hidden at the bridge corner) live in `src/web-layout.js`; `data/layout.json` stays generated.
 
-Rebuild: `blender -b --factory-startup --python tools/build_impressionist.py -- --only NAME…` (`--save-library` also writes `abstract-props.blend`), then `node tools/build_collision.mjs` and `npm test`. `test/art.test.mjs` checks pigment, closed solids, LOD silhouettes (4 cm), road heights and vehicle outlines (8 mm), windscreens, signal anchors and lamp order, abutment tops and the overrides. Close-ups: `?view=lamp|lamp-top|signals|signals-back|vehicles|vehicles-back`, `&finish=off` for raw pigment.
+Rebuild: `blender -b --factory-startup --python tools/build_impressionist.py -- --only NAME…` (`--save-library` also writes `abstract-props.blend`), then `node tools/build_collision.mjs` and `node --test test/art.test.mjs test/obstacles.test.mjs`. Other checks depend on the affected behavior; see [AGENTS.md](../AGENTS.md#verification). `test/art.test.mjs` checks pigment, closed solids, LOD silhouettes (4 cm), road heights and vehicle outlines (8 mm), windscreens, signal anchors and lamp order, abutment tops and the overrides. Close-ups: `?view=lamp|lamp-top|signals|signals-back|vehicles|vehicles-back`, `&finish=off` for raw pigment.
 
 ## Performance
 

@@ -9,9 +9,9 @@ hk_lib.U); Blender's glTF export turns that into (-x, y, z). The web port theref
 world coordinates to three.js as (-x, y, z) and negates yaw, which keeps models and placements
 consistent (src/coords.js).
 
-Besides the project's models this adds web-only ones: a Japanese sedan (the Unity car prefabs use
-a third-party model that is not redistributed here). The traffic signals are not models: the
-Unity exporter writes their scene meshes into scene.json (signalMeshes).
+Besides the project's models this retains the legacy WEB_Sedan raw model. The runtime uses
+independently generated impressionist models. Unity's signal export preserves the original
+reference meshes and anchors in signals.json; the ported HK_Signal heads are also raw models.
 """
 import math
 import os

@@ -96,8 +96,8 @@ function accessor(file, index) {
   return Array.from({ length: a.count }, (_, i) => Array.from({ length: components }, (_, c) =>
     file.bytes[read](offset + i * (v.byteStride ?? components * size) + c * size)));
 }
-function triangles(name, materialName) {
-  const file = glb(name), result = [];
+function triangles(name, materialName, painted = true) {
+  const file = glb(name, painted), result = [];
   for (const mesh of file.json.meshes) for (const primitive of mesh.primitives) {
     if (file.json.materials[primitive.material].name !== materialName) continue;
     const positions = accessor(file, primitive.attributes.POSITION);
@@ -206,6 +206,16 @@ test('new signal heads retain the six original anchors and facing directions', (
     const red = triangles(name, 'ART_SignalRed').flat();
     assert.ok(Math.min(...red.map(p => p[2])) < Math.min(...housing.map(p => p[2])),
       'actual exported lenses protrude on the original negative-Z observer side');
+  }
+});
+
+test('signal heads share the geometry ported to Unity at millimetre precision', () => {
+  for (const kind of ['Car', 'Pedestrian']) {
+    const web = `ART_Signal_${kind}`, unity = `HK_Signal_${kind}`;
+    const materials = [...new Set(glb(web).json.materials.map(m => m.name))];
+    const points = faces => [...new Set(faces.flat().map(p => p.map(v => Math.round(v * 1000)).join(',')))].sort();
+    for (const material of materials)
+      assert.deepEqual(points(triangles(unity, material, false)), points(triangles(web, material)), `${kind}/${material}`);
   }
 });
 
