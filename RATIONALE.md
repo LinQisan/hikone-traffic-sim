@@ -14,7 +14,7 @@ People without a Quest try VRLearn's Hikone scene and its 10 accident events in 
 
 ## Relation to Unity
 
-Road geometry, placements, spawns and goals come from Unity and stay fixed. Owner-requested browser event route corrections are authored in `events/` against that carriageway; Unity's experiment routes and the editor's Unity templates stay unchanged. The scenario format is shared (`src/shared/scenario.js` = Unity's `CustomScenario.cs`), so editor files run on the Quest, and results use the same measures. Deliberately different: signals never switch; no sound, rain or night; no code-only behaviours of built-ins 06–08. **Kerbs are 15 cm in both**: the browser started it (Unity's 40 cm put the eyes ~2 m above the road and made cars look low) and Unity adopted it as data (VRLearn D37), so the browser no longer maps heights. **The look is shared too**: Unity paints its low-poly models with this port's pigments, brush and sky (VRLearn D38); the raised stroke geometry stays browser-only, too heavy for a Quest. Unity keeps the crosswalk sign and the guide post at the bridge corner because they hide one of scenario 05's appear/despawn points; the browser hides them (`src/web-layout.js`).
+This is an independent practice tool that originally imported Unity's geometry and scenario format; it need not match VRLearn. Built-in routes, timing, editor templates and lane presets belong to this project and come from `events/`. `node tools/sync.mjs --events-only` rebuilds them without a Unity checkout. A full sync still imports upstream assets and the compatible scenario model, so review it separately from browser event edits. The existing format supports the optional Unity/Quest bridge; web-only scheduling is not reproduced by Unity. Signals never switch; there is no sound, rain or night, and built-ins 06–08 use browser behaviours. **Kerbs are 15 cm** in the imported map (carriageway 0.01, pavement 0.16, town 0.15); keep geometry and rendering consistent. Unity has adopted some of this port's pigments and models, while the browser's raised stroke geometry stays local. The browser hides the crosswalk sign and bridge guide post in `src/web-layout.js`.
 
 ## Look
 
@@ -52,7 +52,7 @@ Tens of MB of models take time, so loading shows real progress, a friendly bear 
 
 ## Scenario editor
 
-One UI, two backends: on the computer with VRLearn it reads and writes `VRLearn/Scenarios/` and can play in Unity or send to a Quest; anywhere else files stay in the browser. Its templates are Unity's (what the headset runs), not the re-timed `events/`, so browser timing never leaks into experiment scenarios. The local server answers this computer only.
+One UI, two backends: on the computer with VRLearn it reads and writes custom files in `VRLearn/Scenarios/` and can play in Unity or send to a Quest; anywhere else files stay in the browser. Both backends use this project's map, built-in templates and lane presets. The templates are generated from the same `events/` as the simulator, and snapping guides and the lane menu use those corrected routes too. Trying a template in Unity first saves a custom copy, so the bridge cannot silently play an older Unity built-in. The local server answers this computer only.
 
 ## Publishing
 

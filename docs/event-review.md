@@ -1,6 +1,6 @@
 # Built-in event review — 2026-10-16
 
-All ten browser events were inspected on the map and played through contact, replay and results. The review uses `events/builtin-*.json`, which supplies `data/scenarios/` through `tools/sync.mjs`. The editor's default templates describe Unity's scheduling and can have different routes or vehicle counts.
+All ten browser events were inspected on the map and played through contact, replay and results. The review uses `events/builtin-*.json`, which supplies both `data/scenarios/` and `data/editor/templates/` through `tools/sync.mjs --events-only`. Both editor backends now open these browser events by default.
 
 ## Process and decisions
 
@@ -17,7 +17,7 @@ All ten browser events were inspected on the map and played through contact, rep
 | 09 | A westbound car passes first; an eastbound accident car then reaches the other lane. | Remove the westbound tail's dogleg and correct the accident car's east-side exit. Keep the 1.4 s lead and opposite-direction hazard. |
 | 10 | A bicycle riding on the right meets the eastbound traffic head-on. | Correct the opposing stream's east-side exit. Preserve the head-on hazard and careful passage along the road edge. |
 
-Following the owner's request to fix vehicles running on the pavement, browser event route points were corrected in `events/` and synced into `data/scenarios/`. Participant spawns, goals, triggers, parked vehicles, roads and Unity files stay unchanged. The editor's default Unity templates remain separate; import an event file to inspect the corrected browser route.
+Following the owner's request to fix vehicles running on the pavement, browser event route points were corrected in `events/` and synced into both generated scenario collections. Participant spawns, goals, triggers, parked vehicles, roads and Unity files were not changed by these corrections. Editor templates, lane presets and snapping guides use the corrected event routes.
 
 ## Steering correction
 
@@ -63,11 +63,11 @@ Times below are seconds from scenario start, with no initial waiting. Careful co
 - The east-side bend uses an 8 m inner approach for 01/06 and a 12 m outer exit centred at `(82, 16)` for eastbound routes across all ten scenarios. Intermediate points also keep the editor's car rectangle clear when its heading changes between segments.
 - The off-carriageway starts in 07/08 are intentional driveway approaches. The checker permits only the accident car's bounded crossing at that driveway (`x = -69…-63`, `z = 14…22.05`); it does not exempt the rest of either route or ordinary traffic.
 
-`tools/check_routes.mjs` checks all 23 vehicle routes. It samples every authored segment and the editor's 4.4 × 1.8 m rectangle, then samples the runtime path with each applicable vehicle body's corners, edge midpoints and centre at intervals no greater than 25 cm. Ordinary traffic checks all three body sizes. Accident cars check the sedan. Degenerate map triangles are excluded so they cannot incorrectly mark every point as road. All checked samples are clear after correction. A regression case specifically rejects a car whose centreline is clear but whose body crosses the kerb.
+`tools/check_routes.mjs` checks all 23 vehicle routes in both the simulator and editor collections by default (46 checks). It samples every authored segment and the editor's 4.4 × 1.8 m rectangle, then samples the runtime path with each applicable vehicle body's corners, edge midpoints and centre at intervals no greater than 25 cm. Ordinary traffic checks all three body sizes. Accident cars check the sedan. Degenerate map triangles are excluded so they cannot incorrectly mark every point as road. All checked samples are clear after correction. A regression case specifically rejects a car whose centreline is clear but whose body crosses the kerb.
 
 ## Reproducing the map review
 
-Open `events/builtin-XX.json` with the editor's **開く** control, select **車**, then select the accident car; enable **表示 → 路面** to inspect it against the road. The imported built-in ID becomes a custom ID. For the actual browser accident process, select that built-in event in the simulator.
+Open the editor and select a built-in from the left-hand list, select **車**, then select the accident car; enable **表示 → 路面** to inspect it against the road. No JSON import is needed. For the actual browser accident process, select that built-in event in the simulator.
 
 The editor's timeline, serialization and browser handoff use the shared Unity fields. They do not preserve/reproduce web-only `meet`, `hold` and timeout scheduling, so the imported timeline is useful for geometry inspection, not for validating these browser launch times. Keep the event source files as the timing authority.
 
@@ -77,7 +77,15 @@ The editor's timeline, serialization and browser handoff use the shared Unity fi
 - `node tools/check_routes.mjs --dir events`: 23/23 vehicle routes clear. Generated scenarios have the same geometry.
 - `node --test test/routes.test.mjs test/turning.test.mjs`: 17/17 passed.
 - `node --test test/logic.test.mjs`: 9/9 passed, including the short-record speed regression.
-- Final `npm test`: 94/94 passed, none skipped, including route bodies, event purposes, art and obstacle checks.
+- Initial route review `npm test`: 94/94 passed, none skipped, including route bodies, event purposes, art and obstacle checks.
 - All ten built-ins were imported into the map editor for route inspection with no console errors, and played in the browser through contact → replay → results. Event 02 also checked both replay views and restart. The runtime reported no console errors.
 - `git diff --check` passed. `node tools/build_collision.mjs` regenerated the collision grid; the output was unchanged because the town and road geometry stayed fixed.
 - Not checked on a real phone, Unity Editor or Quest. Careful completion and delayed-start comparisons above are automated simulations; the browser playthroughs used continuous forward movement.
+
+## Follow-up: default editor templates
+
+The first route review imported corrected event JSON into the editor but missed its default templates. The owner's follow-up screenshot exposed that `data/editor/templates/` and the local server still used older Unity routes. The editor's lane menu and snapping guides also retained those routes. The previous verification therefore did not cover the view users actually opened.
+
+Both backends now read this project's generated templates and lane presets. All built-ins come from `events/`, without a Unity-template fallback. `--events-only` also works with `VRLEARN_ROOT` pointing to a nonexistent project. New regressions first failed for the old default templates, local server responses and lane guides, then passed after correction. They verify the actual storage/API responses against the event sources and check complete vehicle bodies against the carriageway. The project no longer requires its routes or templates to match VRLearn.
+
+Follow-up verification: `npm test` passed 98/98 tests with none skipped; `node tools/check_routes.mjs` passed all 46 route checks, and the storage tests checked all 18 generated lane presets. An isolated rebuild test verified that `--events-only` works without Unity and preserves custom scenarios, the local map and scenario model. In headless Chrome, all ten defaults were opened from the left-hand list in both local-server mode and browser-only mode under a simulated GitHub Pages sub-path. The rendered polylines matched the corrected event files, the lane menu inserted the corrected points, and both modes had no console errors. The Unity bridge was checked with intercepted writes: it requests a custom browser copy rather than the old Unity template. The editor now declares an empty favicon to avoid the browser requesting a missing root icon. Physical phones, Unity playback and Quest hardware were not tested in this follow-up.
