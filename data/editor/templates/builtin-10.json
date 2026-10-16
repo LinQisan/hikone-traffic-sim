@@ -30,25 +30,49 @@
     },
     "vehicles": [
         {
-            "name": "車の流れ Acident_Left",
+            "name": "事故車（対向車の流れ）",
             "model": "Car_Left",
             "body": "",
             "route": [
                 {
                     "x": -107.87,
-                    "z": 27.99
+                    "z": 28.1
                 },
                 {
                     "x": -100.29,
-                    "z": 27.99
+                    "z": 28.1
+                },
+                {
+                    "x": -20,
+                    "z": 28.1
+                },
+                {
+                    "x": 16,
+                    "z": 28
                 },
                 {
                     "x": 80.51,
                     "z": 27.97
                 },
                 {
-                    "x": 93.67,
-                    "z": 17.92
+                    "x": 82,
+                    "z": 28
+                },
+                {
+                    "x": 86.59,
+                    "z": 27.09
+                },
+                {
+                    "x": 90.49,
+                    "z": 24.49
+                },
+                {
+                    "x": 93.09,
+                    "z": 20.59
+                },
+                {
+                    "x": 94,
+                    "z": 16
                 },
                 {
                     "x": 94.31,
@@ -57,11 +81,11 @@
             ],
             "speedKmh": 36.0,
             "start": "begin",
-            "delaySeconds": 1.0,
+            "delaySeconds": 3.0,
             "repeatMinSeconds": 4.0,
             "repeatMaxSeconds": 6.0,
             "stopOnTrigger": false,
-            "accident": false,
+            "accident": true,
             "overrideYaw": true,
             "yaw": 90.0
         },
@@ -71,7 +95,23 @@
             "body": "",
             "route": [
                 {
-                    "x": -19.0,
+                    "x": 29.92,
+                    "z": 4.36
+                },
+                {
+                    "x": 29.95,
+                    "z": 14
+                },
+                {
+                    "x": 27.5,
+                    "z": 21
+                },
+                {
+                    "x": 22,
+                    "z": 24.4
+                },
+                {
+                    "x": 10,
                     "z": 24.2
                 },
                 {
@@ -90,7 +130,7 @@
             "repeatMaxSeconds": 6.0,
             "stopOnTrigger": false,
             "accident": false,
-            "overrideYaw": true,
+            "overrideYaw": false,
             "yaw": -90.0
         }
     ]

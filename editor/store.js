@@ -1,6 +1,6 @@
 // Browser-only storage for the scenario editor (GitHub Pages, or no VRLearn project next to this
 // one): answers the same /api/… calls as server/editor-api.mjs. "My scenarios" live in this
-// browser's localStorage; the map and the Unity templates are static files under ../data.
+// browser's localStorage; the map and this project's event templates are static files under ../data.
 // Unity play and Quest sync need the local server and are not offered here.
 import { normalize, serialize, validate, ID_PATTERN } from '../src/shared/scenario.js';
 
@@ -26,7 +26,7 @@ async function json(rel) {
 
 let mapCache = null;
 async function loadMap() {
-  if (!mapCache) mapCache = { ...(await json('map.json')), imageUrl: new URL('map.png', DATA).href };
+  if (!mapCache) mapCache = { ...(await json('map.json')), lanes: await json('editor/lanes.json'), imageUrl: new URL('map.png', DATA).href };
   return mapCache;
 }
 

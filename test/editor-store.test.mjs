@@ -1,9 +1,10 @@
 // Browser-only storage of the scenario editor (editor/store.js): the same answers as the server,
-// kept in localStorage, with the map and the Unity templates read from data/.
+// kept in localStorage, with the map and this project's event templates read from data/.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
+import { inspectRoutes } from '../tools/check_routes.mjs';
 
 const memory = new Map();
 globalThis.localStorage = {
@@ -20,7 +21,7 @@ globalThis.fetch = async (url, options) => {
 };
 const { request } = await import('../editor/store.js');
 
-test('lists the ten Unity templates without errors and opens one', async () => {
+test('lists the ten browser event templates without errors and opens one', async () => {
   const map = await request('/api/map');
   assert.ok(map.surfaces?.length || map.roads || map.image, 'map.json is read');
   assert.match(map.imageUrl, /data\/map\.png$/);
@@ -30,6 +31,31 @@ test('lists the ten Unity templates without errors and opens one', async () => {
   assert.ok(templates.every(e => e.errors === 0), JSON.stringify(templates.filter(e => e.errors)));
   const one = await request('/api/scenario?path=templates/builtin-01.json');
   assert.equal(one.id, 'builtin-01');
+});
+
+test('every default editor template uses the corrected browser event and stays on the carriageway', async () => {
+  const map = await request('/api/map');
+  const templates = (await request('/api/scenarios')).filter(e => e.template);
+  assert.equal(templates.length, 10);
+  for (const entry of templates) {
+    const scenario = await request('/api/scenario?path=' + entry.path);
+    const bad = inspectRoutes(scenario, map).filter(r => r.violations);
+    assert.deepEqual(bad, [], `${entry.path}: ${JSON.stringify(bad)}`);
+    const event = JSON.parse(await fs.readFile(new URL('../events/' + entry.id + '.json', import.meta.url)));
+    assert.deepEqual(scenario, event, `${entry.path} must open the browser event, not an older Unity template`);
+  }
+});
+
+test('lane presets and snapping guides also use corrected event routes', async () => {
+  const map = await request('/api/map');
+  assert.ok(map.lanes.length > 0);
+  for (const lane of map.lanes) {
+    assert.match(lane.scenarioId ?? '', /^builtin-\d+$/, lane.id);
+    const event = JSON.parse(await fs.readFile(new URL('../events/' + lane.scenarioId + '.json', import.meta.url)));
+    assert.ok(event.vehicles.some(v => JSON.stringify(v.route) === JSON.stringify(lane.points)), lane.id);
+    const bad = inspectRoutes({ id: lane.scenarioId, vehicles: [{ name: lane.name, route: lane.points, accident: lane.accident }] }, map).filter(r => r.violations);
+    assert.deepEqual(bad, [], `${lane.id}: ${JSON.stringify(bad)}`);
+  }
 });
 
 test('saves, lists, reopens and deletes my scenarios in the browser', async () => {

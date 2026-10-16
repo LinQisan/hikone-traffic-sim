@@ -22,33 +22,104 @@
         "yaw": 0.0
     },
     "trigger": {
-        "x": 69.55,
-        "z": 25.75,
-        "width": 2.53,
-        "depth": 3.07,
+        "x": 69.7,
+        "z": 21.0,
+        "width": 4.0,
+        "depth": 1.5,
         "yaw": 0.0
     },
     "vehicles": [
+        {
+            "name": "先に通る車",
+            "model": "Car_Left",
+            "body": "",
+            "route": [
+                {
+                    "x": 45,
+                    "z": 28.4
+                },
+                {
+                    "x": 62.1,
+                    "z": 28.4
+                },
+                {
+                    "x": 80.51,
+                    "z": 28.4
+                },
+                {
+                    "x": 82,
+                    "z": 28
+                },
+                {
+                    "x": 86.59,
+                    "z": 27.09
+                },
+                {
+                    "x": 90.49,
+                    "z": 24.49
+                },
+                {
+                    "x": 93.09,
+                    "z": 20.59
+                },
+                {
+                    "x": 94,
+                    "z": 16
+                },
+                {
+                    "x": 94.36,
+                    "z": 0.72
+                }
+            ],
+            "speedKmh": 36.0,
+            "start": "begin",
+            "delaySeconds": 0.0,
+            "repeatMinSeconds": 0.0,
+            "repeatMaxSeconds": 0.0,
+            "stopOnTrigger": false,
+            "accident": false,
+            "overrideYaw": false,
+            "yaw": 0.0,
+            "launch": "meet",
+            "entrySpeedKmh": 36.0,
+            "meetOffsetSeconds": -1.6
+        },
         {
             "name": "事故車 1",
             "model": "Car_Left",
             "body": "",
             "route": [
                 {
-                    "x": 52.26,
-                    "z": 27.9
+                    "x": 45,
+                    "z": 28.4
                 },
                 {
                     "x": 62.1,
-                    "z": 27.9
+                    "z": 28.4
                 },
                 {
                     "x": 80.51,
-                    "z": 27.97
+                    "z": 28.4
                 },
                 {
-                    "x": 93.67,
-                    "z": 17.92
+                    "x": 82,
+                    "z": 28
+                },
+                {
+                    "x": 86.59,
+                    "z": 27.09
+                },
+                {
+                    "x": 90.49,
+                    "z": 24.49
+                },
+                {
+                    "x": 93.09,
+                    "z": 20.59
+                },
+                {
+                    "x": 94,
+                    "z": 16
                 },
                 {
                     "x": 94.36,
@@ -56,86 +127,17 @@
                 }
             ],
             "speedKmh": 36.0,
-            "start": "trigger",
-            "delaySeconds": 0.5,
+            "start": "begin",
+            "delaySeconds": 0.0,
             "repeatMinSeconds": 0.0,
             "repeatMaxSeconds": 0.0,
             "stopOnTrigger": false,
             "accident": true,
-            "overrideYaw": true,
-            "yaw": 90.0
-        },
-        {
-            "name": "事故車 2",
-            "model": "Car_Left",
-            "body": "",
-            "route": [
-                {
-                    "x": 22.26,
-                    "z": 27.9
-                },
-                {
-                    "x": 62.1,
-                    "z": 27.9
-                },
-                {
-                    "x": 80.51,
-                    "z": 27.97
-                },
-                {
-                    "x": 93.67,
-                    "z": 17.92
-                },
-                {
-                    "x": 94.36,
-                    "z": 0.72
-                }
-            ],
-            "speedKmh": 36.0,
-            "start": "trigger",
-            "delaySeconds": 0.52,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
-            "stopOnTrigger": false,
-            "accident": true,
-            "overrideYaw": true,
-            "yaw": 90.0
-        },
-        {
-            "name": "事故車 3",
-            "model": "Car_Left",
-            "body": "",
-            "route": [
-                {
-                    "x": 22.26,
-                    "z": 27.9
-                },
-                {
-                    "x": 62.1,
-                    "z": 27.9
-                },
-                {
-                    "x": 80.51,
-                    "z": 27.97
-                },
-                {
-                    "x": 93.67,
-                    "z": 17.92
-                },
-                {
-                    "x": 94.36,
-                    "z": 0.72
-                }
-            ],
-            "speedKmh": 36.0,
-            "start": "trigger",
-            "delaySeconds": 4.02,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
-            "stopOnTrigger": false,
-            "accident": true,
-            "overrideYaw": true,
-            "yaw": 90.0
+            "overrideYaw": false,
+            "yaw": 0.0,
+            "launch": "meet",
+            "entrySpeedKmh": 36.0,
+            "launchAfterTriggerSeconds": 2.5
         }
     ]
 }

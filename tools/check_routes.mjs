@@ -1,5 +1,5 @@
 // Checks complete browser event routes against the exported carriageway, including the car body.
-// node tools/check_routes.mjs [--dir events|data/scenarios]
+// node tools/check_routes.mjs [--dir events|data/scenarios|data/editor/templates]
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { BODY_SIZE, WHEELBASE, smoothRoute, carPose } from '../src/traffic.js';
@@ -71,15 +71,18 @@ export function inspectRoutes(scenario, map) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const dirIndex = process.argv.indexOf('--dir');
-  const dir = new URL('../' + (dirIndex >= 0 ? process.argv[dirIndex + 1] : 'data/scenarios') + '/', import.meta.url);
+  const dirs = dirIndex >= 0 ? [process.argv[dirIndex + 1]] : ['data/scenarios', 'data/editor/templates'];
   const map = JSON.parse(fs.readFileSync(new URL('../data/map.json', import.meta.url)));
   let failed = 0, checked = 0;
-  for (const file of fs.readdirSync(dir).filter(f => /^builtin-\d+\.json$/.test(f)).sort()) {
-    const scenario = JSON.parse(fs.readFileSync(new URL(file, dir)));
-    for (const r of inspectRoutes(scenario, map)) {
-      checked++;
-      if (r.violations) { failed++; console.error(`${scenario.id} ${r.name}: ${r.violations} off-road samples; first ${JSON.stringify(r.first)}`); }
-      else console.log(`${scenario.id} ${r.name}: clear`);
+  for (const folder of dirs) {
+    const dir = new URL('../' + folder + '/', import.meta.url);
+    for (const file of fs.readdirSync(dir).filter(f => /^builtin-\d+\.json$/.test(f)).sort()) {
+      const scenario = JSON.parse(fs.readFileSync(new URL(file, dir)));
+      for (const r of inspectRoutes(scenario, map)) {
+        checked++;
+        if (r.violations) { failed++; console.error(`${folder}/${scenario.id} ${r.name}: ${r.violations} off-road samples; first ${JSON.stringify(r.first)}`); }
+        else console.log(`${folder}/${scenario.id} ${r.name}: clear`);
+      }
     }
   }
   console.log(`${checked} vehicle routes checked; ${failed} failed`);

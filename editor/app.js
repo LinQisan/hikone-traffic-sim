@@ -727,7 +727,7 @@ function laneMenu() {
     state.selection = { kind: 'vehicle', index: s.vehicles.length - 1 };
     onScenarioChanged({ inspector: 'full' });
   } }, html('option', { value: '' }, '組み込みの車線から追加…'),
-    ...state.map.lanes.map(l => html('option', { value: l.id }, `${l.id}（${l.points.length} 点）`)));
+    ...state.map.lanes.map(l => html('option', { value: l.id }, `${l.name}（${l.points.length} 点）`)));
   return select;
 }
 
@@ -986,7 +986,8 @@ async function playInUnity() {
   const errors = S.validate(state.scenario, state.map).filter(p => p.level === 'error');
   if (errors.length) { toast(`エラー ${errors.length} 件を直してから試してください。`, true); return; }
   let path = state.file?.path;
-  if (!state.file?.template && (isDirty() || !state.file)) {
+  // Browser templates belong to this project; save a custom copy before sending one to Unity.
+  if (state.file?.template || isDirty() || !state.file) {
     if (!(await save())) return;
     path = state.file.path;
   }

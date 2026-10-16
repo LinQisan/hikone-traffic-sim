@@ -54,6 +54,19 @@ test('refuses unsafe paths, template ids and mismatched ids', { skip }, async ()
   assert.equal((await fetch(base + '/api/play', { method: 'POST', body: JSON.stringify({ path: '../AGENTS.md' }) })).status, 400);
 }));
 
+test('the local editor opens the same built-in events as the browser-only editor', { skip }, async () => withServer(async base => {
+  const map = await (await fetch(base + '/api/map')).json();
+  const lanes = JSON.parse(await fs.readFile(new URL('../data/editor/lanes.json', import.meta.url)));
+  assert.deepEqual(map.lanes, lanes, 'the server must use the browser lane presets and snapping guides');
+  const templates = (await (await fetch(base + '/api/scenarios')).json()).filter(e => e.template);
+  assert.equal(templates.length, 10);
+  for (const entry of templates) {
+    const scenario = await (await fetch(base + '/api/scenario?path=' + entry.path)).json();
+    const event = JSON.parse(await fs.readFile(new URL('../events/' + entry.id + '.json', import.meta.url)));
+    assert.deepEqual(scenario, event, entry.path);
+  }
+}));
+
 test('reports the server, leaves other paths to the static site and refuses other sites', { skip }, async () => withServer(async base => {
   assert.equal((await (await fetch(base + '/api/status')).json()).server, true);
   assert.equal((await fetch(base + '/api/map/image')).headers.get('content-type'), 'image/png');

@@ -1,12 +1,12 @@
 // Scenario editor API, served by ../serve.mjs next to the static site when the VRLearn Unity
 // project is on this computer (VRLEARN_ROOT, default ../VRLearn): it reads and writes the
-// project's Scenarios/ folder, asks the open Unity Editor to play a file and copies scenarios onto
+// project's custom Scenarios/ files, asks the open Unity Editor to play a file and copies scenarios onto
 // a Quest through adb. Without the project (or on GitHub Pages) the editor keeps its files in the
 // browser instead (editor/store.js answers the same calls). Only requests from this computer are
 // answered; writes from other sites are refused.
 //
 //   GET    /api/status                 { server, root } — whether the project was found
-//   GET    /api/map                    map.json of the Hikone map (from the project)
+//   GET    /api/map                    map.json of the browser's Hikone map
 //   GET    /api/map/image              map.png of the Hikone map
 //   GET    /api/scenarios              list of scenario files (+ validation summary)
 //   GET    /api/scenario?path=…        one file (path relative to Scenarios/)
@@ -23,20 +23,23 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { normalize, serialize, validate, ID_PATTERN, HIKONE_MAP } from '../src/shared/scenario.js';
+import { normalize, serialize, validate, ID_PATTERN } from '../src/shared/scenario.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
+const DATA = path.join(here, '..', 'data');
+const TEMPLATES = path.join(DATA, 'editor', 'templates');
 export const PROJECT = path.resolve(process.env.VRLEARN_ROOT || path.join(here, '..', '..', 'VRLearn'));
 export const SCENARIOS = path.join(PROJECT, 'Scenarios');
 /** The project is there: the API reads and writes its Scenarios/ folder. */
 export const available = existsSync(path.join(PROJECT, 'ProjectSettings')) && existsSync(SCENARIOS);
-const MAP_DIR = path.join(SCENARIOS, 'maps', HIKONE_MAP);
+const MAP_DIR = DATA;
 const PLAY_REQUEST = path.join(SCENARIOS, '.play-request.json');
 const run = promisify(execFile);
 
 let mapCache = null;
 async function loadMap() {
-  if (!mapCache) mapCache = JSON.parse(await fs.readFile(path.join(MAP_DIR, 'map.json'), 'utf8'));
+  if (!mapCache) mapCache = { ...JSON.parse(await fs.readFile(path.join(MAP_DIR, 'map.json'), 'utf8')),
+    lanes: JSON.parse(await fs.readFile(path.join(DATA, 'editor', 'lanes.json'), 'utf8')) };
   return mapCache;
 }
 
@@ -49,10 +52,9 @@ function inside(root, relative) {
 async function listScenarios() {
   const map = await loadMap().catch(() => null);
   const result = [];
-  for (const [folder, template] of [['', false], ['templates', true]]) {
-    const dir = path.join(SCENARIOS, folder);
+  for (const [dir, folder, template] of [[SCENARIOS, '', false], [TEMPLATES, 'templates', true]]) {
     let names = [];
-    try { names = (await fs.readdir(dir)).filter(n => n.endsWith('.json') && !n.startsWith('.') && !n.endsWith('.schema.json')); }
+    try { names = (await fs.readdir(dir)).filter(n => n.endsWith('.json') && n !== 'index.json' && !n.startsWith('.') && !n.endsWith('.schema.json')); }
     catch { continue; }
     for (const name of names.sort()) {
       const rel = folder ? `${folder}/${name}` : name;
@@ -218,7 +220,9 @@ async function route(req, res, url, p) {
   if (p === '/api/map' && req.method === 'GET') return send(res, 200, await loadMap());
   if (p === '/api/scenarios' && req.method === 'GET') return send(res, 200, await listScenarios());
   if (p === '/api/scenario' && req.method === 'GET') {
-    const file = inside(SCENARIOS, url.searchParams.get('path') ?? '');
+    const rel = url.searchParams.get('path') ?? '';
+    const template = rel.startsWith('templates/');
+    const file = inside(template ? TEMPLATES : SCENARIOS, template ? rel.slice('templates/'.length) : rel);
     if (!file || !file.endsWith('.json')) return send(res, 400, { error: 'bad path' });
     return serveFile(res, file);
   }

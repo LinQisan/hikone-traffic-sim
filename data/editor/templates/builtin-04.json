@@ -31,9 +31,13 @@
     "vehicles": [
         {
             "name": "事故車 1",
-            "model": "Car_Left",
+            "model": "Car_Right",
             "body": "",
             "route": [
+                {
+                    "x": 76,
+                    "z": 26.3
+                },
                 {
                     "x": 71.93,
                     "z": 26.25
@@ -59,119 +63,41 @@
                     "z": 23.4
                 },
                 {
-                    "x": 12.6,
-                    "z": 15.69
+                    "x": 20,
+                    "z": 24
                 },
                 {
-                    "x": 12.11,
-                    "z": 7.43
+                    "x": 16.94,
+                    "z": 23.39
+                },
+                {
+                    "x": 14.34,
+                    "z": 21.66
+                },
+                {
+                    "x": 12.61,
+                    "z": 19.06
+                },
+                {
+                    "x": 12,
+                    "z": 16
+                },
+                {
+                    "x": 12,
+                    "z": 8.5
                 }
             ],
             "speedKmh": 36.0,
-            "start": "trigger",
-            "delaySeconds": 0.5,
+            "start": "begin",
+            "delaySeconds": 0.0,
             "repeatMinSeconds": 0.0,
             "repeatMaxSeconds": 0.0,
             "stopOnTrigger": false,
             "accident": true,
-            "overrideYaw": true,
-            "yaw": -90.0
-        },
-        {
-            "name": "事故車 2",
-            "model": "Car_Left",
-            "body": "",
-            "route": [
-                {
-                    "x": 71.93,
-                    "z": 26.25
-                },
-                {
-                    "x": 69.88,
-                    "z": 26.24
-                },
-                {
-                    "x": 64.8,
-                    "z": 26.41
-                },
-                {
-                    "x": 51.95,
-                    "z": 26.39
-                },
-                {
-                    "x": 42.58,
-                    "z": 24.19
-                },
-                {
-                    "x": 24.22,
-                    "z": 23.4
-                },
-                {
-                    "x": 12.6,
-                    "z": 15.69
-                },
-                {
-                    "x": 12.11,
-                    "z": 7.43
-                }
-            ],
-            "speedKmh": 36.0,
-            "start": "trigger",
-            "delaySeconds": 4.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
-            "stopOnTrigger": false,
-            "accident": true,
-            "overrideYaw": true,
-            "yaw": -90.0
-        },
-        {
-            "name": "事故車 3",
-            "model": "Car_Left",
-            "body": "",
-            "route": [
-                {
-                    "x": 71.93,
-                    "z": 26.25
-                },
-                {
-                    "x": 69.88,
-                    "z": 26.24
-                },
-                {
-                    "x": 64.8,
-                    "z": 26.41
-                },
-                {
-                    "x": 51.95,
-                    "z": 26.39
-                },
-                {
-                    "x": 42.58,
-                    "z": 24.19
-                },
-                {
-                    "x": 24.22,
-                    "z": 23.4
-                },
-                {
-                    "x": 12.6,
-                    "z": 15.69
-                },
-                {
-                    "x": 12.11,
-                    "z": 7.43
-                }
-            ],
-            "speedKmh": 36.0,
-            "start": "trigger",
-            "delaySeconds": 11.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
-            "stopOnTrigger": false,
-            "accident": true,
-            "overrideYaw": true,
-            "yaw": -90.0
+            "overrideYaw": false,
+            "yaw": 0.0,
+            "launch": "meet",
+            "entrySpeedKmh": 36.0
         }
     ]
 }
