@@ -67,6 +67,27 @@ test('a car of the traffic drives the rounded route, its yaw never jumping', () 
   assert.ok(maxJump < 6, `yaw changes at most ${maxJump.toFixed(2)}° per frame at 30 km/h`);
 });
 
+test('a short lateral correction on a straight does not become a sharp steering manoeuvre', () => {
+  // Regression from the former westbound tail of events 06 and 09: a 27 cm step between straights.
+  const route = [{ x: 19.42, z: 24.19 }, { x: -6.08, z: 24.19 },
+    { x: -6.08, z: 23.92 }, { x: -109, z: 23.92 }];
+  const original = structuredClone(route);
+  const path = smoothRoute(route);
+  let maxSteer = 0, maxJump = 0, previous = carPose(path, 0, 2.7).yaw;
+  for (let d = 0; d < path.at(-1).s; d += 0.1) {
+    const pose = carPose(path, d, 2.7);
+    maxSteer = Math.max(maxSteer, Math.abs(pose.steer));
+    maxJump = Math.max(maxJump, Math.abs(dyaw(previous, pose.yaw)));
+    assert.ok(pose.z >= 23.92 - 1e-6 && pose.z <= 24.19 + 1e-6, 'stays within the original lane corridor');
+    previous = pose.yaw;
+  }
+  assert.ok(maxSteer < 3, `a minor lane correction needs little steering, got ${maxSteer.toFixed(1)}°`);
+  assert.ok(maxJump < 0.5, `heading changes gently, got ${maxJump.toFixed(2)}° per 10 cm`);
+  assert.deepEqual(route, original, 'the Unity control points are not edited');
+  assert.deepEqual([path[0].x, path[0].z], [route[0].x, route[0].z]);
+  assert.deepEqual([path.at(-1).x, path.at(-1).z], [route.at(-1).x, route.at(-1).z]);
+});
+
 test('the front wheels of each car model are cut out on pivots at the wheel centres and steer', async () => {
   const loader = new GLTFLoader();
   for (const name of ['WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch']) {

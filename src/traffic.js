@@ -70,9 +70,34 @@ export const TURN_RADIUS = 12;
 export const WHEELBASE = { sedan: 2.7, 'kei-tall': 2.52, 'kei-hatch': 2.52 };
 export const MAX_STEER = 38;                 // degrees
 
+/** Remove sub-30 cm polyline noise before rounding; endpoints and genuine bends stay put. */
+function routeKnots(route) {
+  const pts = route.filter((p, i) => i === 0 || Math.hypot(p.x - route[i - 1].x, p.z - route[i - 1].z) > 1e-6);
+  const keep = new Set([0, pts.length - 1]);
+  function split(first, last) {
+    const a = pts[first], b = pts[last], dx = b.x - a.x, dz = b.z - a.z;
+    const length2 = dx * dx + dz * dz;
+    let farthest = -1, maxDistance2 = 0.3 * 0.3;
+    for (let i = first + 1; i < last; i++) {
+      const p = pts[i], before = pts[i - 1], after = pts[i + 1];
+      // A route that turns back on itself is deliberate, even if all its points are collinear.
+      if ((p.x - before.x) * (after.x - p.x) + (p.z - before.z) * (after.z - p.z) < -1e-6) { farthest = i; break; }
+      const t = length2 > 0 ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / length2)) : 0;
+      const distance2 = (p.x - a.x - t * dx) ** 2 + (p.z - a.z - t * dz) ** 2;
+      if (distance2 > maxDistance2) { maxDistance2 = distance2; farthest = i; }
+    }
+    if (farthest < 0) return;
+    keep.add(farthest);
+    split(first, farthest);
+    split(farthest, last);
+  }
+  if (pts.length > 2) split(0, pts.length - 1);
+  return pts.filter((_, i) => keep.has(i));
+}
+
 /** The route with rounded corners, as a dense polyline with cumulative distances (s). */
 export function smoothRoute(route) {
-  const pts = route.filter((p, i) => i === 0 || Math.hypot(p.x - route[i - 1].x, p.z - route[i - 1].z) > 1e-6);
+  const pts = routeKnots(route);
   const out = [{ x: pts[0].x, z: pts[0].z }];
   const seg = i => Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].z - pts[i].z);
   for (let i = 1; i < pts.length - 1; i++) {
