@@ -14,7 +14,7 @@ People without a Quest try VRLearn's Hikone scene and its 10 accident events in 
 
 ## Relation to Unity
 
-Geometry, routes, spawns and goals come from Unity; the browser changes looks and timing, not positions. The scenario format is shared (`src/shared/scenario.js` = Unity's `CustomScenario.cs`), so editor files run on the Quest, and results use the same measures. Deliberately different: signals never switch; no sound, rain or night; no code-only behaviours of built-ins 06–08. **Kerbs are 15 cm in both**: the browser started it (Unity's 40 cm put the eyes ~2 m above the road and made cars look low) and Unity adopted it as data (VRLearn D37), so the browser no longer maps heights. **The look is shared too**: Unity paints its low-poly models with this port's pigments, brush and sky (VRLearn D38); the raised stroke geometry stays browser-only, too heavy for a Quest. Unity keeps the crosswalk sign and the guide post at the bridge corner because they hide one of scenario 05's appear/despawn points; the browser hides them (`src/web-layout.js`).
+Road geometry, placements, spawns and goals come from Unity and stay fixed. Owner-requested browser event route corrections are authored in `events/` against that carriageway; Unity's experiment routes and the editor's Unity templates stay unchanged. The scenario format is shared (`src/shared/scenario.js` = Unity's `CustomScenario.cs`), so editor files run on the Quest, and results use the same measures. Deliberately different: signals never switch; no sound, rain or night; no code-only behaviours of built-ins 06–08. **Kerbs are 15 cm in both**: the browser started it (Unity's 40 cm put the eyes ~2 m above the road and made cars look low) and Unity adopted it as data (VRLearn D37), so the browser no longer maps heights. **The look is shared too**: Unity paints its low-poly models with this port's pigments, brush and sky (VRLearn D38); the raised stroke geometry stays browser-only, too heavy for a Quest. Unity keeps the crosswalk sign and the guide post at the bridge corner because they hide one of scenario 05's appear/despawn points; the browser hides them (`src/web-layout.js`).
 
 ## Look
 
@@ -27,7 +27,8 @@ A soft, warm Renoir-like painting in which outlines and positions stay clear eno
 - The accident car leaves when a participant going on at the normal pace would meet it at the crossing point. Going on without looking meets the car; slowing or stopping sees it pass. It never chases — the participant's choice decides.
 - Cars appear hidden (buildings, parked trucks, the gatehouses' black walls) or far away, already moving; turning or parked cars wait in place; nobody waits forever.
 - The checker simulates hasty and careful participants with real sight lines, so tuning cannot silently break an event.
-- Cars turn like cars: corners become arcs, both axles follow the path, the front wheels steer before the body turns.
+- Route checks sample the authored line, the editor's car rectangle and all runtime body sizes along the full route. Only the bounded parking exits in 07/08 may cross the pavement; vehicles on bends must keep their complete bodies on the carriageway.
+- Cars turn like cars: corners become arcs, both axles follow the path, the front wheels steer before the body turns. Before rounding, the browser removes polyline deviations of at most 30 cm from its computed path, keeping the source control points and endpoints unchanged; tiny lane corrections must not become full-lock turns. The [event review](docs/event-review.md) records the route and timing checks.
 
 ## The body
 
