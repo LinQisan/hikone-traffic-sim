@@ -41,9 +41,10 @@ export class Recorder {
 }
 
 function speedKmh(track, atTime) {
-  const a = sample(track, atTime - 1), b = sample(track, atTime - 0.05);
-  if (!a || !b) return 0;
-  return Math.hypot(b.x - a.x, b.z - a.z) / 0.95 * 3.6;
+  // A hidden car may appear less than a second before contact (event 04).
+  const a = sample(track, Math.max(atTime - 1, track[0]?.t ?? atTime)), b = sample(track, atTime - 0.05);
+  if (!a || !b || b.t <= a.t) return 0;
+  return Math.hypot(b.x - a.x, b.z - a.z) / (b.t - a.t) * 3.6;
 }
 
 /** Linear sample of a [{ t, x, z }] track (null outside it). */

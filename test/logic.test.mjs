@@ -72,6 +72,17 @@ test('contact uses the body outline plus the participant radius', () => {
   assert.equal(t.hit(0, 1.2), null);
 });
 
+test('analysis measures a moving car that appeared less than a second before contact', () => {
+  const frames = Array.from({ length: 25 }, (_, i) => {
+    const t = i / 20;
+    return { t, head: { x: 0, z: t * 2.4, yaw: 0 },
+      cars: i >= 8 ? [{ id: 1, x: (t - 0.4) * 10, z: 4, yaw: 90 }] : [] };
+  });
+  const result = accidentAnalysis(frames, 1.2, 1);
+  assert.ok(Math.abs(result.vehicleKmh - 36) < 1e-6, 'uses the available moving track instead of reporting zero');
+  assert.ok(Math.abs(result.participantKmh - 8.64) < 1e-6, 'keeps the full window for the participant');
+});
+
 test('analysis: looking toward the car, side checks, verdicts and the placement cut', () => {
   assert.equal(deltaYaw(350, 10), 20);
   assert.equal(yawTo(0, 0, 1, 0), 90);
