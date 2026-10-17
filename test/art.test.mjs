@@ -4,7 +4,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { signalPlacements, signalRigs, POLE, ARM_ABOVE_HEAD } from '../src/signal-layout.js';
-import { webLayout, WEB_HIDDEN } from '../src/web-layout.js';
+import { webLayout, WEB_HIDDEN, isHidden } from '../src/web-layout.js';
+import { Ground } from '../src/ground.js';
 
 const modelRoot = new URL('../data/models/', import.meta.url);
 const glb = (name, painted = true) => {
@@ -28,7 +29,7 @@ const bounds = json => {
 
 test('every scene and vehicle asset has self-contained pigment geometry', () => {
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
-  const required = new Set([...layout.items.map(x => x.a), 'WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium', 'ART_Signal_Car', 'ART_Signal_Pedestrian', 'ART_Signal_Support']);
+  const required = new Set([...webLayout(layout).items.map(x => x.a), 'WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium', 'ART_Signal_Car', 'ART_Signal_Pedestrian', 'ART_Signal_Support']);
   for (const name of required) {
     assert.ok(manifest.models[name], `${name}: listed in the art set`);
     const { bytes, json } = glb(name);
@@ -56,7 +57,7 @@ test('the houses and tree silhouettes were rebuilt, including when the shader fi
 });
 
 test('distant meshes retain pigment, silhouettes and road heights with a smaller triangle budget', () => {
-  const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
+  const layout = webLayout(JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url))));
   let highTriangles = 0, lowTriangles = 0;
   for (const name of new Set(layout.items.map(x => x.a))) {
     const high = glb(name), low = glb(name + '.lod'), entry = manifest.models[name];
@@ -145,6 +146,10 @@ test('the lamp has an outward-facing bottom; lamp, signal shells and supports ar
   }
   closed('ART_Signal_Car', 'ART_SignalYellow');
   closed('ART_Signal_Support', 'ART_Frame');
+  for (const [name, materials] of [
+    ['ART_PathLamp', ['ART_LampBase', 'ART_LampGlow', 'ART_Frame']],
+    ['ART_UtilityPole', ['HK_MetalLight', 'HK_WhitePaint', 'ART_Frame']],
+  ]) for (const m of materials) closed(name, m);
 });
 
 test('all five vehicles have closed hulls, sealed tyres and match the geometry ported to Unity', () => {
@@ -187,18 +192,18 @@ test('front windscreens are outside the vehicle hull and visible from the front'
   }
 });
 
-test('new signal heads retain the six original anchors and facing directions', () => {
-  const data = JSON.parse(fs.readFileSync(new URL('../data/signals.json', import.meta.url)));
-  const heads = signalPlacements(data);
-  assert.equal(heads.length, 6);
+test('real-size vehicle heads face the four approaches and hang over the carriageway', () => {
+  const rigs = signalRigs(), heads = signalPlacements().filter(h => h.asset === 'ART_Signal_Car');
+  const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  assert.equal(heads.length, 4);
+  assert.equal(new Set(rigs.filter(r => r.head).map(r => r.facing.join(','))).size, 4, 'one vehicle head per approach');
   for (const head of heads) {
-    const original = data.parts.find(p => p.group === head.group && p.name === head.name);
-    assert.deepEqual(head.matrix.slice(12, 15), [-original.matrix[12], original.matrix[13], original.matrix[14]]);
-    // The original lens mesh sits on the cube's local -Z side.
-    const front = head.matrix.slice(8, 11).map(v => -v);
-    const expected = [original.matrix[8], -original.matrix[9], -original.matrix[10]];
-    assert.ok(dot(front, expected) > 0, 'new lens points toward the original observer side');
-    for (const offset of [0, 4, 8]) assert.ok(Math.abs(Math.hypot(...head.matrix.slice(offset, offset + 3)) - 1) < 1e-5,
+    const rig = rigs.find(r => r.id === head.group);
+    const y = ground.roadHeightAt(rig.head.x, rig.head.z);
+    assert.ok(y != null && y < 0.05, `${rig.id}: vehicle head hangs above the road, including its raised paint`);
+    assert.deepEqual(head.matrix.slice(12, 15), [-rig.head.x, rig.head.y, rig.head.z]);
+    assert.deepEqual([head.matrix[8], -head.matrix[10]], rig.facing, 'lenses face the approaching driver');
+    for (const offset of [0, 4, 8]) assert.equal(Math.hypot(...head.matrix.slice(offset, offset + 3)), 1,
       'a real-size housing is not scaled twice');
   }
   for (const [name, material] of [['ART_Signal_Car', 'ART_SignalHousing'], ['ART_Signal_Pedestrian', 'ART_SignalHousingDark']]) {
@@ -219,32 +224,59 @@ test('signal heads share the geometry ported to Unity at millimetre precision', 
   }
 });
 
-test('signal posts stand on the source poles and face like the heads; the car lamps read green, yellow, red from the left', () => {
-  const data = JSON.parse(fs.readFileSync(new URL('../data/signals.json', import.meta.url)));
-  const rigs = signalRigs(data);
-  assert.equal(rigs.length, 6);
-  assert.equal(rigs.filter(r => r.kind === 'car').length, 4);
+test('all five signal poles stand on pavement, and vehicle lamps read green, yellow, red from the left', () => {
+  const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  const rigs = signalRigs();
+  assert.equal(rigs.length, 5);
   for (const r of rigs) {
-    const parts = data.parts.filter(p => p.group === r.group);
-    const pole = parts.find(p => p.name === 'Pole2'), head = parts.find(p => p.name.startsWith('TrafficLight_'));
-    assert.deepEqual([r.pole.x, r.pole.z], [pole.matrix[12], pole.matrix[14]]);
-    assert.deepEqual([r.head.x, r.head.y, r.head.z], head.matrix.slice(12, 15));
-    assert.ok(Math.abs(Math.hypot(...r.facing) - 1) < 1e-9);
-    assert.ok(r.head.y + ARM_ABOVE_HEAD < POLE[r.kind].height || r.kind === 'pedestrian', 'the arm meets the pole below its top');
-    // the lenses look the way the source head's lens side does
-    const lens = signalPlacements(data).find(h => h.group === r.group).matrix;
-    const front = [lens[8], -lens[10]], l = Math.hypot(...front);       // three -Z axis → Unity
-    assert.ok(Math.abs(front[0] / l - r.facing[0]) < 1e-6 && Math.abs(front[1] / l - r.facing[1]) < 1e-6, `${r.group}: posts face like the head`);
+    for (let i = 0; i < 8; i++) {
+      const angle = i * Math.PI / 4, radius = POLE[r.kind].base + 0.05;
+      const y = ground.roadHeightAt(r.pole.x + Math.cos(angle) * radius, r.pole.z + Math.sin(angle) * radius);
+      assert.ok(y != null && Math.abs(y - 0.16) < 1e-6, `${r.id}: the entire post footprint stays on pavement`);
+    }
+    if (r.head) assert.ok(r.head.y + ARM_ABOVE_HEAD < r.height, 'the arm meets the pole below its top');
   }
   // Japanese order seen from the front (from local -Z looking +Z, right is local -X): green, yellow, red
   const mean = material => { const p = triangles('ART_Signal_Car', material).flat(); return p.reduce((s, q) => s + q[0], 0) / p.length; };
   assert.ok(mean('ART_SignalGreen') > mean('ART_SignalYellow') && mean('ART_SignalYellow') > mean('ART_SignalRed'), 'green left, red right');
 });
 
+test('five installations serve three crossings; only town-west has two pedestrian heads', () => {
+  const rigs = signalRigs(), heads = signalPlacements();
+  assert.equal(heads.length, 10, 'four vehicle heads and six pedestrian heads');
+  assert.equal(rigs.filter(r => r.head).length, 4);
+  const standalone = rigs.filter(r => !r.head);
+  assert.equal(standalone.length, 1, 'the east crossing has a separate walk-only pole');
+  assert.equal(standalone[0].id, 'town-east-walk');
+  assert.ok(standalone[0].pole.z > rigs.find(r => r.id === 'town-east').pole.z + 4,
+    'the independent crossing pole stays north of the Castle Road vehicle pole');
+  assert.deepEqual(rigs.filter(r => r.pedestrians.length === 2).map(r => r.id), ['town-west']);
+  const crossings = new Map();
+  for (const r of rigs) {
+    for (const [i, walk] of r.pedestrians.entries()) {
+      assert.ok(Math.hypot(walk.head.x - r.pole.x, walk.head.z - r.pole.z) < 0.8, 'a short bracket reaches its pole');
+      const placed = heads.find(h => h.group === r.id && h.name === `TrafficLight_Walk_${i}`);
+      assert.deepEqual(placed.matrix.slice(12, 15), [-walk.head.x, walk.head.y, walk.head.z]);
+      assert.deepEqual([placed.matrix[8], -placed.matrix[10]], walk.facing, 'lens faces across the crossing');
+      for (const offset of [0, 4, 8]) assert.equal(Math.hypot(...placed.matrix.slice(offset, offset + 3)), 1, 'unscaled housing');
+      if (!crossings.has(walk.crossing)) crossings.set(walk.crossing, []);
+      crossings.get(walk.crossing).push(walk);
+    }
+  }
+  assert.deepEqual([...crossings.keys()].sort(), ['east', 'south', 'west']);
+  for (const [id, pair] of crossings) {
+    assert.equal(pair.length, 2, `${id}: one pedestrian head at either end`);
+    const [a, b] = pair, across = [b.head.x - a.head.x, b.head.z - a.head.z];
+    assert.equal(dot(a.facing, b.facing), -1, `${id}: the pair faces opposite directions`);
+    assert.ok(dot(across, a.facing) > 0 && dot(across, b.facing) < 0, `${id}: faces its opposite crossing end`);
+  }
+});
+
 test('no crosswalk signs or guide post at the signalised corners, and 40 on Route 25', () => {
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
   const shown = webLayout(layout);
-  assert.equal(layout.items.length - shown.items.length, WEB_HIDDEN.length, 'every hidden entry matches exactly one item');
+  for (const h of WEB_HIDDEN) assert.equal(layout.items.filter(i => i.a === h.a
+    && Math.hypot(i.p[0] - h.x, i.p[2] - h.z) < 0.5).length, 1, 'the explicit hidden entry matches exactly one item');
   assert.ok(!shown.items.some(i => i.a === 'HK_Sign_Crosswalk' || i.a === 'HK_GuidePost'));
   assert.ok(shown.items.some(i => i.a === 'HK_Sign_Speed30') && shown.items.some(i => i.a === 'HK_Sign_Stop'));
   // Route 25 along the moat shows 40 km/h (both of its speed signs), Castle Road keeps 30
@@ -256,6 +288,14 @@ test('no crosswalk signs or guide post at the signalised corners, and 40 on Rout
     for (const material of ['HK_SignRed', 'HK_WhitePaint', 'HK_SignBlue', 'HK_MetalLight']) closed(name, material);
     assert.equal(manifest.models[name].design, 'abstract-closed-solids-v2', `${name}: authored, digits read from the front`);
   }
+});
+
+test('street furniture overrides are idempotent and preserve unrelated generated props', () => {
+  const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
+  const original = JSON.stringify(layout), shown = webLayout(layout);
+  assert.equal(JSON.stringify(layout), original, 'never mutates the generated source');
+  assert.deepEqual(webLayout(shown), shown, 'reapplying the browser layout does not duplicate poles or lamps');
+  for (const item of layout.items.filter(i => !isHidden(i))) assert.ok(shown.items.includes(item), 'unrelated source prop survives');
 });
 
 test('the bridge abutments stay under the deck: no stone sliver across the road at the bridge ends', () => {

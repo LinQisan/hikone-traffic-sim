@@ -11,7 +11,8 @@ VEHICLE_MODELS = ('WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 
 # speed signs authored here: 40 is web-only (VRLearn has none); 30 replaces the rebuilt source,
 # whose digits came out mirrored in the browser ("OE")
 SIGN_MODELS = ('HK_Sign_Speed30', 'HK_Sign_Speed40')
-MODEL_NAMES = (*SIGNAL_MODELS, *VEHICLE_MODELS, *SIGN_MODELS, 'HK_StreetLamp')
+STREET_MODELS = ('ART_UtilityPole', 'ART_PathLamp')
+MODEL_NAMES = (*SIGNAL_MODELS, *VEHICLE_MODELS, *SIGN_MODELS, *STREET_MODELS, 'HK_StreetLamp')
 
 
 def identity(p):
@@ -127,6 +128,36 @@ def lantern(b):
         for z in (1.02, 1.38):
             cylinder(b, (x, 4.25, z), (x * 1.22, 4.81, 1.2 + (z - 1.2) * 1.22),
                      0.023, 'ART_Frame', segments=6, end_radius=0.020)
+
+
+def street_furniture(b, name):
+    """The moat's low square path lights and the opposite bank's concrete distribution poles.
+    The pole's crossarms run across local Z; wire spans are authored separately in web-layout.js.
+    """
+    if name == 'ART_PathLamp':
+        beveled_box(b, (0, 0.09, 0), (0.25, 0.18, 0.25), 'ART_LampBase', 0.025)
+        beveled_box(b, (0, 1.35, 0), (0.12, 2.55, 0.12), 'ART_Frame', 0.012)
+        beveled_box(b, (0, 2.65, 0), (0.39, 0.10, 0.39), 'ART_Frame', 0.025)
+        beveled_box(b, (0, 2.92, 0), (0.34, 0.45, 0.34), 'ART_LampGlow', 0.014)
+        beveled_box(b, (0, 3.18, 0), (0.46, 0.10, 0.46), 'ART_Frame', 0.025)
+        for x in (-0.17, 0.17):
+            for z in (-0.17, 0.17):
+                cylinder(b, (x, 2.67, z), (x, 3.17, z), 0.017, 'ART_Frame', segments=6)
+        return
+    cylinder(b, (0, 0, 0), (0, 10.35, 0), 0.155, 'HK_MetalLight', segments=14, end_radius=0.095)
+    for y in (8.0, 9.8):
+        cylinder(b, (0, y, -1.1), (0, y, 1.1), 0.045, 'ART_Frame', segments=8)
+        for z in (-0.85, 0, 0.85):
+            cylinder(b, (0, y, z), (0, y + 0.25, z), 0.052, 'HK_WhitePaint', segments=8)
+            for dy in (0.06, 0.16):
+                cylinder(b, (0, y + dy, z), (0, y + dy + 0.025, z), 0.074, 'HK_WhitePaint', segments=8)
+    for z in (-0.42, 0.42):
+        cylinder(b, (0, 7.0, z), (0, 7.85, z), 0.18, 'HK_MetalLight', segments=12)
+    cylinder(b, (0, 7.0, -0.42), (0, 7.0, 0.42), 0.035, 'ART_Frame', segments=8)
+    # A few clamps and a conduit carry the silhouette without tiny individual fittings.
+    for y in (2.0, 6.9, 8.0, 9.8):
+        cylinder(b, (0, y, 0), (0, y + 0.06, 0), 0.16 if y < 3 else 0.13, 'ART_Frame', segments=12)
+    cylinder(b, (0.16, 0.3, 0), (0.16, 6.9, 0), 0.018, 'ART_Frame', segments=6)
 
 
 def signal_lens(b, x, y, radius, material, front=0.16, hood=0.15, arc=(18, 162), hood_material='ART_Frame'):
@@ -466,6 +497,8 @@ def build(name, mesh_class):
     b.abstract = True
     if name == 'HK_StreetLamp':
         lantern(b)
+    elif name in STREET_MODELS:
+        street_furniture(b, name)
     elif name in SIGNAL_MODELS:
         signals(b, name)
         if name != 'ART_Signal_Support':

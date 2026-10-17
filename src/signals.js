@@ -1,7 +1,5 @@
-// The Kyobashi signals as photographed: the new heads (models) at the source anchors, and posts
-// built here: tall brown poles with a two-pipe mast arm out to each car head, the intersection's
-// name plate on top, the "歩車分離式 7:30–18:00" plate under each car head and a blue plate by
-// each pedestrian head. Poles, arms and plates are merged into a few meshes (a handful of draws).
+// Five Kyobashi installations: four vehicle poles and the separate east-crossing lamp pole.
+// Only the town-west pole carries pedestrian heads for two different crossings.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { model, material } from './world.js';
@@ -11,11 +9,11 @@ import { signalPlacements, signalRigs, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } f
 
 const UP = new THREE.Vector3(0, 1, 0);
 
-/** Newly modeled solid housings, lenses, visors; posts and plates from the source rigs. */
-export async function buildSignals(scene, data, materials) {
+/** Instanced solid heads; merged static poles, brackets, lamps and plates. */
+export async function buildSignals(scene, materials, rigs = signalRigs()) {
   const root = new THREE.Group();
   root.name = 'AbstractTrafficSignals';
-  const placements = signalPlacements(data);
+  const placements = signalPlacements(rigs);
   const byAsset = new Map();
   for (const placement of placements) {
     if (!byAsset.has(placement.asset)) byAsset.set(placement.asset, []);
@@ -35,7 +33,6 @@ export async function buildSignals(scene, data, materials) {
       root.add(mesh);
     }
   }
-  const rigs = signalRigs(data);
   for (const mesh of buildPosts(rigs)) root.add(mesh);
   scene.add(root);
   return { root, placements, rigs, heads: placements.length,
@@ -44,11 +41,12 @@ export async function buildSignals(scene, data, materials) {
 }
 
 function buildPosts(rigs) {
-  const metal = [], back = [], plates = { name: [], phase: [], walk: [] };
+  const brown = [], grey = [], back = [], glass = [], plates = { name: [], phase: [], walk: [] };
   // a tube between two Unity points
   const tube = (list, a, b, r0, r1 = r0) => {
     const from = toThree(a.x, a.y, a.z), to = toThree(b.x, b.y, b.z);
     const d = new THREE.Vector3().subVectors(to, from), length = d.length();
+    if (length < 1e-6) return;
     const g = new THREE.CylinderGeometry(r1, r0, length, 14, 1);
     g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UP, d.normalize()));
     g.translate((from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2);
@@ -65,30 +63,72 @@ function buildPosts(rigs) {
     box.translate(0, 0, -0.016); box.rotateY(yaw); box.translate(p.x, p.y, p.z);
     back.push(box);
   };
+  const box = (list, c, size, yaw = 0) => {
+    const p = toThree(c.x, c.y, c.z), g = new THREE.BoxGeometry(...size);
+    g.rotateY(yaw); g.translate(p.x, p.y, p.z); list.push(g);
+  };
   for (const r of rigs) {
     const { head, facing, pole } = r, spec = POLE[r.kind];
+    const metal = r.style === 'truss' ? brown : grey;
     const P = (y, out = 0) => ({ x: pole.x + facing[0] * out, y, z: pole.z + facing[1] * out });
-    tube(metal, P(0), P(spec.height), spec.base, spec.top);
-    tube(metal, P(spec.height), P(spec.height + 0.06), spec.top + 0.015, 0.02);          // cap
-    if (r.kind === 'car') {
-      // the mast arm: a lower pipe level with the brackets, an upper one closing on it at the end
+    tube(metal, P(0.16), P(r.height), spec.base, spec.top);
+    tube(metal, P(r.height), P(r.height + 0.06), spec.top + 0.015, 0.02);
+    if (head) {
       const dx = head.x - pole.x, dz = head.z - pole.z, l = Math.hypot(dx, dz) || 1;
       const ux = dx / l, uz = dz / l, armY = head.y + ARM_ABOVE_HEAD, reach = l + ARM_BEYOND_HEAD;
-      const A = (s, y) => ({ x: pole.x + ux * s, y, z: pole.z + uz * s });
-      const upper = s => armY + 1.05 + (0.09 - 1.05) * Math.min(1, s / (reach - 0.15));   // height of the upper pipe
-      tube(metal, A(0, armY), A(reach, armY), 0.06, 0.045);
-      tube(metal, A(0, upper(0)), A(reach - 0.15, upper(reach - 0.15)), 0.04, 0.03);
-      for (const s of [0.35, 0.68]) tube(metal, A(reach * s, armY), A(reach * s, upper(reach * s)), 0.022);
-      tube(metal, A(0, armY - 0.18), A(0, armY + 1.2), spec.base + 0.03);                  // collar
-      // "歩車分離式 7:30–18:00" under the head, the name of the crossing on top of the pole
-      plate(plates.phase, { x: head.x + facing[0] * 0.06, y: head.y - 0.62, z: head.z + facing[1] * 0.06 }, facing, 1.05, 0.4);
-      plate(plates.name, P(spec.height - 0.6, spec.top + 0.03), facing, 0.36, 0.9);
-    } else {
-      // two short brackets from the pole to the back of the head; the blue plate on the pole's front
-      const rear = { x: head.x - facing[0] * 0.1, z: head.z - facing[1] * 0.1 };
-      for (const dy of [-0.22, 0.22]) tube(metal, P(head.y + dy), { x: rear.x, y: head.y + dy, z: rear.z }, 0.025);
-      plate(plates.walk, P(head.y, spec.base + 0.03), facing, 0.13, 0.6);
+      // Keep the mast behind the heads' mounting brackets, not through their front lenses.
+      const A = (s, y) => ({ x: pole.x + ux * s - facing[0] * 0.05, y,
+        z: pole.z + uz * s - facing[1] * 0.05 });
+      if (r.style === 'truss') {
+        const lower = s => armY - 0.95 * (1 - s / reach);
+        const upper = s => armY - 0.20 + 0.29 * s / reach;
+        tube(metal, A(0, lower(0)), A(reach, lower(reach)), 0.06, 0.045);
+        tube(metal, A(0, upper(0)), A(reach, upper(reach)), 0.04, 0.03);
+        for (const s of [0.35, 0.68]) tube(metal, A(reach * s, lower(reach * s)), A(reach * s, upper(reach * s)), 0.022);
+        // Thin tension cable above the paired pipes.
+        tube(metal, P(r.height - 0.1), A(reach, armY + 0.12), 0.008);
+      } else {
+        tube(metal, A(0, armY), A(reach, armY), 0.075, 0.055);
+        tube(metal, A(0, armY - 0.4), A(0.55, armY), 0.045);
+      }
+      tube(metal, P(armY - 0.22), P(armY + 0.18), spec.base + 0.018);
+      // The car model's two hanging brackets meet a crossbar behind the housing.
+      const right = [-facing[1], facing[0]];
+      const H = (side, y) => ({ x: head.x + right[0] * side - facing[0] * 0.05, y,
+        z: head.z + right[1] * side - facing[1] * 0.05 });
+      tube(metal, H(-0.64, armY), H(0.64, armY), 0.028);
+      tube(metal, A(l, r.style === 'truss' ? armY - 0.95 * (1 - l / reach) : armY), H(0, armY), 0.03);
+      const phaseY = head.y + (r.phase === 'below' ? -0.62 : 0.79);
+      plate(plates.phase, { x: head.x + facing[0] * 0.06, y: phaseY, z: head.z + facing[1] * 0.06 }, facing, 1.5, 0.46);
+      for (const side of [-0.57, 0.57]) tube(metal, H(side, armY), H(side, phaseY), 0.017);
     }
+    if (r.lampFacing) {
+      const [lx, lz] = r.lampFacing;
+      const L = (s, y) => ({ x: pole.x + lx * s, y, z: pole.z + lz * s });
+      tube(metal, P(r.height - 0.25), L(1.15, r.height + 0.12), 0.045);
+      const yaw = Math.atan2(-lx, lz);
+      box(back, L(1.35, r.height + 0.12), [0.42, 0.12, 0.58], yaw);
+      box(glass, L(1.35, r.height + 0.052), [0.34, 0.018, 0.46], yaw);
+    }
+    if (r.nameHeight != null) {
+      const f = r.nameFacing, c = { x: pole.x + f[0] * 0.17, y: r.nameHeight, z: pole.z + f[1] * 0.17 };
+      plate(plates.name, c, f, ...(r.nameSize ?? [0.96, 0.72]));
+      for (const dy of [-0.23, 0.23]) tube(metal, P(c.y + dy), { ...c, y: c.y + dy }, 0.018);
+    }
+    // Each explicitly authored pedestrian head uses short upper/lower brackets on its pole.
+    for (const walk of r.pedestrians) {
+      const rear = { x: walk.head.x - walk.facing[0] * 0.1, z: walk.head.z - walk.facing[1] * 0.1 };
+      for (const dy of [-0.42, 0.42]) {
+        const y = walk.head.y + dy;
+        tube(metal, P(y), { x: rear.x, y, z: rear.z }, 0.025);
+        tube(metal, { x: rear.x, y, z: rear.z }, { x: rear.x, y: walk.head.y + Math.sign(dy) * 0.31, z: rear.z }, 0.025);
+      }
+      plate(plates.walk, { x: pole.x + walk.facing[0] * 0.18 - walk.side[0] * 0.16,
+        y: walk.head.y, z: pole.z + walk.facing[1] * 0.18 - walk.side[1] * 0.16 }, walk.facing, 0.18, 0.72);
+    }
+    // Clamps and the slim control box read as part of the shared installation.
+    for (const y of [2.4, 3.3]) tube(metal, P(y - 0.035), P(y + 0.035), spec.base + 0.025);
+    box(metal, P(3.75, -0.17), [0.22, 0.48, 0.16]);
   }
   const meshes = [];
   const add = (list, mat, name) => {
@@ -102,8 +142,18 @@ function buildPosts(rigs) {
     meshes.push(mesh);
   };
   const lambert = (name, options) => painted(new THREE.MeshLambertMaterial({ name, ...options }));
-  add(metal, lambert('ART_SignalPole', { color: new THREE.Color().setRGB(0.36, 0.29, 0.25, THREE.SRGBColorSpace) }), 'SignalPosts');
-  add(back, lambert('ART_SignalPlateBack', { color: new THREE.Color().setRGB(0.52, 0.53, 0.53, THREE.SRGBColorSpace) }), 'SignalPlateBacks');
+  // Bake the support colours into one static mesh, including town masts and lamp undersides.
+  const solids = [];
+  for (const [list, rgb] of [[brown, [0.36, 0.29, 0.25]], [grey, [0.49, 0.48, 0.44]],
+    [back, [0.52, 0.53, 0.53]], [glass, [0.88, 0.86, 0.71]]]) {
+    const color = new THREE.Color().setRGB(...rgb, THREE.SRGBColorSpace);
+    for (const g of list) {
+      const values = new Float32Array(g.attributes.position.count * 3);
+      for (let i = 0; i < values.length; i += 3) { values[i] = color.r; values[i + 1] = color.g; values[i + 2] = color.b; }
+      g.setAttribute('color', new THREE.BufferAttribute(values, 3)); solids.push(g);
+    }
+  }
+  add(solids, lambert('ART_SignalPole', { vertexColors: true }), 'SignalPosts');
   add(plates.name, lambert('ART_SignalPlateName', { map: plateTexture('name') }), 'SignalNamePlates');
   add(plates.phase, lambert('ART_SignalPlatePhase', { map: plateTexture('phase') }), 'SignalPhasePlates');
   add(plates.walk, lambert('ART_SignalPlateWalk', { map: plateTexture('walk') }), 'SignalWalkPlates');
@@ -113,7 +163,7 @@ function buildPosts(rigs) {
 // The plates' faces, drawn once (bilingual name plate, the phase plate, the pedestrian plate).
 const FONT = '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif';
 function plateTexture(kind) {
-  const [w, h] = { name: [160, 400], phase: [420, 160], walk: [64, 300] }[kind];
+  const [w, h] = { name: [400, 300], phase: [600, 184], walk: [100, 400] }[kind];
   const canvas = document.createElement('canvas');
   canvas.width = w; canvas.height = h;
   const g = canvas.getContext('2d');
@@ -122,19 +172,23 @@ function plateTexture(kind) {
     g.fillStyle = '#f4f6f4'; g.fillRect(0, 0, w, h);
     g.strokeStyle = '#2f5fae'; g.lineWidth = 6; g.strokeRect(8, 8, w - 16, h - 16);
     g.fillStyle = '#2f5fae';
-    g.font = `600 22px ${FONT}`; g.fillText('彦根市', w / 2, 38);
-    g.font = `700 96px ${FONT}`; g.fillText('京', w / 2, 120); g.fillText('橋', w / 2, 230);
-    g.font = `600 26px ${FONT}`; g.fillText('Kyobashi', w / 2, 340);
+    g.font = `600 30px ${FONT}`; g.fillText('彦根市', w / 2, 42);
+    g.font = `700 112px ${FONT}`; g.fillText('京 橋', w / 2, 143);
+    g.font = `500 49px ${FONT}`; g.fillText('Kyobashi', w / 2, 239);
   } else if (kind === 'phase') {
     g.fillStyle = '#d8652d'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#eef2f0'; g.fillRect(12, 12, w - 24, h - 24);
+    g.fillStyle = '#eda36a'; g.fillRect(12, 12, w - 24, h - 24);
+    g.strokeStyle = '#2652a3'; g.lineWidth = 5; g.strokeRect(8, 8, w - 16, h - 16);
     g.fillStyle = '#2652a3';
-    g.font = `800 62px ${FONT}`; g.fillText('歩車分離式', w / 2, 58);
-    g.font = `700 44px ${FONT}`; g.fillText('7:30 − 18:00', w / 2, 118);
+    g.font = `800 70px ${FONT}`; g.fillText('歩車分離式', w / 2, 61);
+    g.font = `700 54px ${FONT}`; g.fillText('7:30 − 18:00', w / 2, 141);
   } else {
-    g.fillStyle = '#2652a3'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#f4f6f4'; g.font = `700 40px ${FONT}`;
-    [...'歩車分離式'].forEach((c, i) => g.fillText(c, w / 2, 40 + i * 55));
+    g.fillStyle = '#f4eee0'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = '#2652a3'; g.lineWidth = 5; g.strokeRect(5, 5, w - 10, h - 10);
+    g.fillStyle = '#2652a3'; g.font = `700 57px ${FONT}`;
+    [...'歩車分離式'].forEach((c, i) => g.fillText(c, 60, 47 + i * 75));
+    g.save(); g.translate(19, h / 2); g.rotate(-Math.PI / 2);
+    g.font = `500 22px ${FONT}`; g.fillText('7:30 − 18:00', 0, 0); g.restore();
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;

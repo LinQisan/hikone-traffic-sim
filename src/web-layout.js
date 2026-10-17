@@ -1,8 +1,5 @@
-// The web port's own choices on top of VRLearn's layout (data/layout.json stays generated): props
-// that the real Kyobashi crossing does not have are left out of the browser scene. The Unity app
-// keeps these two because they hide one of scenario 05's vehicle appear/despawn points (VRLearn
-// occlusion check); the browser is not an experiment. Positions are unchanged. Pure logic
-// (renderer, collision builder, event checker and tests share it).
+// Browser-owned street furniture on top of the generated layout. Rendering, collision and sight
+// lines use this same pure transformation; no upstream Unity placement is edited.
 
 /** Left out, matched by asset and position (Unity x, z, within 0.5 m). */
 export const WEB_HIDDEN = [
@@ -14,7 +11,30 @@ export const WEB_HIDDEN = [
 ];
 
 const near = (item, h) => h.a === item.a && Math.hypot(item.p[0] - h.x, item.p[2] - h.z) < 0.5;
-export const isHidden = item => WEB_HIDDEN.some(h => near(item, h));
+// The imported ten-metre lamp grid is absent along the moat and on the bridge. The extra pair
+// immediately south of the junction also duplicates the lamps on the two signal installations.
+const automaticLamp = item => item.a === 'HK_StreetLamp' && (
+  item.p[2] === 21 || item.p[2] === 31 || item.p[2] >= 39 ||
+  ((item.p[0] === 27 || item.p[0] === 37) && item.p[2] > 0));
+export const isHidden = item => WEB_HIDDEN.some(h => near(item, h)) || automaticLamp(item);
 
-/** The layout as the browser shows it: VRLearn's layout without the hidden props. */
-export const webLayout = layout => ({ ...layout, items: layout.items.filter(item => !isHidden(item)) });
+const streetItem = (a, x, z) => ({ a, p: [x, 0.16, z], r: 0, s: [1, 1, 1], g: 'WebStreet' });
+// October 2024 Street View: low square lamps on the moat bank, distribution poles on the
+// building bank east of the crossing. Positions fit the existing map, not survey coordinates.
+export const WEB_STREET_ITEMS = [
+  ...[-90, -58, -26, 6, 55, 87].map(x => streetItem('ART_PathLamp', x, 33)),
+  ...[49.5, 74, 101].map(x => streetItem('ART_UtilityPole', x, 19)),
+];
+
+const powerPoles = WEB_STREET_ITEMS.filter(i => i.a === 'ART_UtilityPole');
+const overheadWires = powerPoles.slice(1).flatMap((pole, i) => [8.25, 10.05].flatMap(y =>
+  [-0.85, 0, 0.85].map(z => ({
+    a: [powerPoles[i].p[0], y + 0.16, powerPoles[i].p[2] + z],
+    b: [pole.p[0], y + 0.16, pole.p[2] + z], sag: 0.45,
+  }))));
+
+/** Idempotent, with the same physical props for the renderer and collision builder. */
+export const webLayout = layout => ({ ...layout,
+  items: [...layout.items.filter(item => item.g !== 'WebStreet' && !isHidden(item)), ...WEB_STREET_ITEMS],
+  overheadWires,
+});

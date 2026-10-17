@@ -1,55 +1,53 @@
-// Pure placement conversion for the newly authored signal models. Preserve the
-// source head/pole anchors and orientations, while removing the old cube scale.
-export const SIGNAL_SIZE = {
-  ART_Signal_Car: [1.78, 0.62, 0.19],
-  ART_Signal_Pedestrian: [0.4269878566265106, 0.6871233582496643, 0.2046535462141037],
-};
+// Browser-owned layout, checked from both the junction and Castle Road in October 2024
+// Street View. Positions fit the imported map's pavement; the old cube anchors do not.
+const INSTALLATIONS = [
+  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [26.6, 36.6], height: 5.6,
+    vehicle: [29.1, 4.7, 36.6], facing: [0, -1], phase: 'below',
+    nameHeight: 4.15, nameFacing: [1, 0],
+    walks: [{ crossing: 'west', facing: [0, -1], side: [-1, 0] }] },
+  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [37.4, 36.6], height: 5.6,
+    vehicle: [37.4, 4.7, 33], facing: [-1, 0], phase: 'below',
+    nameHeight: 5.45, nameFacing: [-1, 0],
+    walks: [{ crossing: 'east', facing: [0, -1], side: [1, 0] }] },
+  { id: 'town-west', corner: 'southwest', style: 'mast', pole: [26.6, 15.4], height: 6.4,
+    vehicle: [26.6, 4.7, 19], facing: [1, 0], phase: 'above', lampFacing: [0, 1],
+    walks: [{ crossing: 'west', facing: [0, 1], side: [-1, 0] },
+      { crossing: 'south', facing: [1, 0], side: [0, 1] }] },
+  { id: 'town-east', corner: 'southeast', style: 'mast', pole: [37.4, 15.4], height: 5.6,
+    vehicle: [34.7, 4.7, 15.4], facing: [0, 1], phase: 'above',
+    walks: [{ crossing: 'south', facing: [-1, 0], side: [0, 1] }] },
+  // The east crossing ends at a separate lamp/name-board pole in front of the machiya.
+  { id: 'town-east-walk', corner: 'southeast-walk', style: 'lamp', pole: [42.6, 20.6], height: 6.4,
+    facing: [0, 1], lampFacing: [1, 0], nameHeight: 5.5, nameFacing: [0, -1], nameSize: [1.1, 0.48],
+    walks: [{ crossing: 'east', facing: [0, 1], side: [-1, 0] }] },
+];
 
-export function signalPlacements(data) {
-  return data.parts.flatMap(part => {
-    const asset = part.name.startsWith('TrafficLight_Car') ? 'ART_Signal_Car' :
-      part.name === 'TrafficLight_Walk' ? 'ART_Signal_Pedestrian' : null;
-    if (!asset) return []; // Old light meshes are replaced by the head's new discs; poles by signalRigs.
-    const size = SIGNAL_SIZE[asset];
-    // M_three = mirrorX * M_Unity * inverseSourceScale * mirrorX.
-    // The GLBs are already authored with their local X mirrored.
-    const matrix = part.matrix.map((value, i) => {
-      const row = i % 4, column = Math.floor(i / 4);
-      return value * (row === 0 ? -1 : 1) * (column === 0 ? -1 : 1) / (column < 3 ? size[column] : 1);
-    });
-    return [{ asset, matrix, group: part.group, name: part.name }];
-  });
+export const POLE = {
+  car: { base: 0.15, top: 0.1 },
+  pedestrian: { base: 0.12, top: 0.08 },
+};
+export const ARM_ABOVE_HEAD = 0.47;
+export const ARM_BEYOND_HEAD = 0.85;
+
+/** Five physical installations in Unity metres: four vehicle poles and one walk-only lamp. */
+export function signalRigs() {
+  return INSTALLATIONS.map(({ pole, vehicle, walks, ...config }) => ({
+    ...config, group: config.id, kind: vehicle ? 'car' : 'pedestrian',
+    pole: { x: pole[0], z: pole[1] },
+    head: vehicle ? { x: vehicle[0], y: vehicle[1], z: vehicle[2] } : null,
+    pedestrians: walks.map(({ facing, side, crossing }) => ({ facing, side, crossing,
+      head: { x: pole[0] + side[0] * 0.56 + facing[0] * 0.14,
+        y: 2.85, z: pole[1] + side[1] * 0.56 + facing[1] * 0.14 } })),
+  }));
 }
 
-// Kyobashi's signal posts as photographed (Unity coordinates, metres): a tall brown pole on the
-// source pole's spot and a long two-pipe mast arm out to the source head, which keeps its exact
-// position; pedestrian heads sit on short brackets from a lower pole.
-export const POLE = {
-  car: { height: 7.4, base: 0.15, top: 0.11 },
-  pedestrian: { height: 3.75, base: 0.1, top: 0.085 },
-};
-export const ARM_ABOVE_HEAD = 0.47;      // the head hangs from brackets this far below the arm's axis
-export const ARM_BEYOND_HEAD = 0.85;     // the arm reaches past the head's centre to its far end
-
-/**
- * One rig per signal group: { kind, head: {x, y, z}, facing: [x, z] (where the lenses look,
- * towards the people they are for), pole: {x, z} }. The lenses sit on the source cube's local -Z
- * side (see signalPlacements), so they look along the head's -Z axis.
- */
-export function signalRigs(data) {
-  const groups = new Map();
-  for (const part of data.parts) {
-    if (!groups.has(part.group)) groups.set(part.group, []);
-    groups.get(part.group).push(part);
-  }
-  const at = part => ({ x: part.matrix[12], y: part.matrix[13], z: part.matrix[14] });
-  return [...groups].flatMap(([group, parts]) => {
-    const head = parts.find(p => p.name.startsWith('TrafficLight_'));
-    const pole = parts.find(p => p.name === 'Pole2');
-    if (!head || !pole) return [];
-    const fx = -head.matrix[8], fz = -head.matrix[10], l = Math.hypot(fx, fz) || 1;
-    const p = at(pole);
-    return [{ kind: head.name === 'TrafficLight_Walk' ? 'pedestrian' : 'car', group,
-      head: at(head), facing: [fx / l, fz / l], pole: { x: p.x, z: p.z } }];
-  });
+/** Real-size heads. GLB lenses face local -Z; mirror the Unity placement into three.js. */
+export function signalPlacements(rigs = signalRigs()) {
+  const place = (asset, head, [fx, fz], group, name) => ({ asset, group, name,
+    matrix: [-fz, 0, -fx, 0, 0, 1, 0, 0, fx, 0, -fz, 0, -head.x, head.y, head.z, 1] });
+  return rigs.flatMap(r => [
+    ...(r.head ? [place('ART_Signal_Car', r.head, r.facing, r.group, 'TrafficLight_Car')] : []),
+    ...r.pedestrians.map((walk, i) => place('ART_Signal_Pedestrian', walk.head, walk.facing,
+      r.group, `TrafficLight_Walk_${i}`)),
+  ]);
 }

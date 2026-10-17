@@ -70,8 +70,8 @@ addEventListener('resize', () => {
 });
 
 status('データを読み込んでいます… / Loading data…');
-const [sceneData, signalData, layout, map, roadTiles, scenarioIndex, collision] = await Promise.all([
-  json('data/scene.json'), json('data/signals.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json'),
+const [sceneData, layout, map, roadTiles, scenarioIndex, collision] = await Promise.all([
+  json('data/scene.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json'),
   json('data/collision.json')]);
 const ground = new Ground(roadTiles);
 const materials = buildMaterials(sceneData.materials);
@@ -83,8 +83,8 @@ const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck
 await Promise.all(vehicleModels.map(name => model(name)));
 
 status('街を組み立てています… / Building the town…');
-// New closed signal models retain the source's installation matrices.
-const signals = await buildSignals(scene, signalData, materials);
+// Five browser-owned installations, placed on the pavement beside their crossings.
+const signals = await buildSignals(scene, materials);
 const occluders = new THREE.Group();
 scene.add(occluders);
 for (const w of sceneData.blackWalls) {
@@ -493,11 +493,13 @@ window.vrlearn = {
 const review = new URLSearchParams(location.search);
 const reviewViews = {
   street: [55, 2.15, 23, 0, 2.8, 27, 62],
+  'street-east': [30, 2.15, 26, 80, 2.8, 26, 62],
   architecture: [51.7, 2.4, 29, 51.7, 4.0, 14, 55],
   foliage: [38, 2.0, 36, 26, 5.0, 46, 65],
   bridge: [32, 2.0, 37, 32, 3.0, 65, 62],
+  'signals-layout': [56, 24, 49, 33, 1.5, 26, 52],
 };
-const propCamera = propReview(review.get('view'), scene, materials);
+const propCamera = await propReview(review.get('view'), scene, materials);
 if (propCamera) {
   env.root.visible = signals.root.visible = occluders.visible = false;
   window.vrlearn.debugView(...propCamera);

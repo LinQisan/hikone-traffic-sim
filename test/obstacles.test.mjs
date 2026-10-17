@@ -12,6 +12,7 @@ const THREE = await import('three');
 const { Obstacles, encodeBits, decodeBits } = await import('../src/obstacles.js');
 const { Player, BODY_RADIUS } = await import('../src/player.js');
 const S = await import('../src/shared/scenario.js');
+const { webLayout } = await import('../src/web-layout.js');
 
 const read = name => JSON.parse(fs.readFileSync(new URL('../data/' + name, import.meta.url)));
 const collision = read('collision.json');
@@ -55,6 +56,12 @@ test('every scenario starts on free ground and its straight way to the goal is n
     n++;
   }
   assert.ok(n >= 20);
+});
+
+test('authored street furniture is included in the same collision grid the browser uses', () => {
+  const furniture = webLayout(read('layout.json')).items.filter(i => i.g === 'WebStreet');
+  assert.ok(furniture.some(i => i.a === 'ART_UtilityPole') && furniture.some(i => i.a === 'ART_PathLamp'));
+  for (const item of furniture) assert.ok(town.blocked(item.p[0], item.p[2], BODY_RADIUS), `${item.a}: solid at its rendered position`);
 });
 
 test('a parked vehicle is an oriented box the body stays out of', () => {
@@ -135,8 +142,11 @@ test('the real town: a valid custom spawn on the pavement against a house front 
 test('the signal posts are solid but stand clear of every scenario\'s way to the goal', async () => {
   const { signalRigs, POLE } = await import('../src/signal-layout.js');
   const posts = new Obstacles(null);
-  posts.setFixed(signalRigs(read('signals.json')).map(r => ({ x: r.pole.x, z: r.pole.z, yaw: 0, size: [POLE[r.kind].base * 2, POLE[r.kind].base * 2] })));
-  assert.equal(posts.fixed.length, 6);
+  posts.setFixed(signalRigs().map(r => ({ x: r.pole.x, z: r.pole.z, yaw: 0, size: [POLE[r.kind].base * 2, POLE[r.kind].base * 2] })));
+  assert.equal(posts.fixed.length, 5);
+  for (const p of posts.fixed) assert.ok(!town.blocked(p.x, p.z, p.hw), 'a signal pole is not inside an existing building or prop');
+  for (const p of read('signals.json').parts.filter(p => p.name === 'Pole2' && p.group.includes('/TrafficLight_Walk@')))
+    assert.ok(!posts.blocked(p.matrix[12], p.matrix[14], BODY_RADIUS), 'removed standalone walk poles no longer block the pavement');
   assert.ok(posts.blocked(posts.fixed[0].x, posts.fixed[0].z, BODY_RADIUS));
   for (const dir of ['scenarios', 'editor/templates'])
     for (const f of fs.readdirSync(new URL('../data/' + dir, import.meta.url)).filter(f => f.endsWith('.json') && f !== 'index.json')) {

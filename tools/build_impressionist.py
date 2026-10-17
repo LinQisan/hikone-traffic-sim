@@ -518,7 +518,7 @@ def main():
         with open(os.path.join(OUT, 'manifest.json')) as f:
             manifest = json.load(f)
     names = {file[:-4] for file in os.listdir(os.path.join(ROOT, 'data', 'models')) if file.endswith('.glb')}
-    names.update(abstract_props.SIGNAL_MODELS, abstract_props.SIGN_MODELS)
+    names.update(abstract_props.SIGNAL_MODELS, abstract_props.SIGN_MODELS, abstract_props.STREET_MODELS)
     if args.only and set(args.only) - names:
         parser.error('Unknown models: ' + ', '.join(sorted(set(args.only) - names)))
     for name in sorted(names):

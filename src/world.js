@@ -5,6 +5,7 @@ import { placement } from './coords.js';
 import { LIGHT, painted, paintedSky, PigmentPalette } from './style.js';
 import { environmentInstances } from './environment-instances.js';
 import { packPigments } from './geometry-budget.js';
+import { buildOverheadWires } from './overhead-wires.js';
 
 const NO_SHADOW = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)/;
 const loader = new GLTFLoader();
@@ -110,6 +111,12 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
   }));
   const palette = new PigmentPalette();
   const env = environmentInstances(definitions, palette, asset => !NO_SHADOW.test(asset), m => m.side);
+  const wires = buildOverheadWires(layout.overheadWires ?? []);
+  if (wires) {
+    env.root.add(wires);
+    env.geometryBytes += wires.geometry.index.array.byteLength
+      + Object.values(wires.geometry.attributes).reduce((bytes, a) => bytes + a.array.byteLength, 0);
+  }
   scene.add(env.root);
   return Object.assign(env, { palette, assetCount: byAsset.size, style: 'mesh-pigment-impasto' });
 }

@@ -582,6 +582,28 @@
         "triangles": 1008,
         "bytes": 72988
       }
+    },
+    "ART_PathLamp": {
+      "triangles": 380,
+      "strokes": 0,
+      "bytes": 30512,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 380,
+        "bytes": 30516
+      }
+    },
+    "ART_UtilityPole": {
+      "triangles": 924,
+      "strokes": 0,
+      "bytes": 64552,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 924,
+        "bytes": 64556
+      }
     }
   }
 }

@@ -18,9 +18,10 @@ const { PigmentPalette, pigmentOf } = await import('../src/style.js');
 const { placement } = await import('../src/coords.js');
 const { buildLight } = await import('../src/world.js');
 const { packPigments } = await import('../src/geometry-budget.js');
+const { webLayout } = await import('../src/web-layout.js');
 
 test('the instanced city keeps every placement and triangle, draws in few calls and switches detail', async () => {
-  const layout = JSON.parse(await fs.readFile(new URL('../data/layout.json', import.meta.url)));
+  const layout = webLayout(JSON.parse(await fs.readFile(new URL('../data/layout.json', import.meta.url))));
   const loader = new GLTFLoader();
   const definitions = await Promise.all([...new Set(layout.items.map(i => i.a))].map(async asset => {
     const parts = async suffix => {

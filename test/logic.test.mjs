@@ -114,7 +114,9 @@ test('15 cm kerbs: the layout stands on the ground as VRLearn generated it', asy
   // every house stands on the ground (not floating, not sunk) and keeps VRLearn's height
   for (const h of shown.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a)).slice(0, 40))
     assert.ok(Math.abs(g.heightAt(h.p[0], h.p[2]) - h.p[1]) < 0.03, `${h.a} at ${h.p[0]}, ${h.p[2]}: ground ${g.heightAt(h.p[0], h.p[2]).toFixed(3)}, base ${h.p[1].toFixed(3)}`);
-  assert.ok(shown.items.every(i => layout.items.some(j => j.a === i.a && j.p.every((v, k) => v === i.p[k]))), 'positions as generated');
+  assert.ok(shown.items.filter(i => i.g !== 'WebStreet').every(i => layout.items.some(j => j.a === i.a && j.p.every((v, k) => v === i.p[k]))), 'imported positions as generated');
+  for (const item of shown.items.filter(i => i.g === 'WebStreet'))
+    assert.ok(Math.abs(g.heightAt(item.p[0], item.p[2]) - item.p[1]) < 0.02, `${item.a} rests on the pavement`);
 });
 
 test('road height is known on the roads only (ground models are pressed under it)', () => {
