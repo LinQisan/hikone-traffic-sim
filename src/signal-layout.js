@@ -23,16 +23,23 @@ const INSTALLATIONS = [
 ];
 
 // The blue direction sign cantilevered from Castle Road's west pavement just south of the
-// junction (October 2024 Castle Road panorama), facing traffic leaving the junction southward.
+// junction: double-sided on a brown post (October 2024 panorama facing south; 18 October 2026
+// photograph facing north).
 export const GUIDE_SIGNS = [
   { id: 'castle-road-guide', pole: [25.6, 6], height: 6.5, board: [27.7, 5.55, 6], size: [2.6, 1.7],
     facing: [0, 1] },
+];
+// The square lantern lamp at Castle Road's east kerb carries the blue pedestrian-and-bicycle disc
+// facing northbound walkers (18 October 2026 photograph).
+export const LANTERNS = [
+  { id: 'castle-road-lantern', pole: [36.9, 3.0], height: 3.9, disc: { height: 2.55, facing: [0, -1] } },
 ];
 
 export const POLE = {
   car: { base: 0.15, top: 0.1 },
   pedestrian: { base: 0.12, top: 0.08 },
   guide: { base: 0.16, top: 0.12 },
+  lantern: { base: 0.08, top: 0.065 },
 };
 export const ARM_ABOVE_HEAD = 0.47;
 export const ARM_BEYOND_HEAD = 0.85;

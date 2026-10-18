@@ -668,16 +668,26 @@ def inner_banks_mesh(b):
 
 
 def bridge_mesh(b):
-    # The reference bridge has substantial stone balusters and two thick horizontal rails.
-    # Keep the 34.4 m authored deck and regular spacing instead of stretching a short prop.
-    from streetscape import bridge_posts
+    # 18 October 2026 photographs: a weathered timber-style balustrade (top and bottom rails with
+    # close balusters) between round grey posts with onion-shaped giboshi caps, every ~4.3 m.
+    # Keep the 34.4 m authored deck; the four shaped newels stand at its ends.
+    from streetscape import bridge_posts, lathe
+    from abstract_props import cylinder
+    giboshi = [(1.02, 0.16), (1.07, 0.17), (1.11, 0.11), (1.19, 0.15), (1.29, 0.17),
+               (1.39, 0.12), (1.47, 0.05), (1.52, 0.01)]
     for x in (25.25, 38.75):
-        for z in [39.6 + i * 2.15 for i in range(17)]:
+        for z in [39.6 + i * 4.3 for i in range(1, 8)]:
             base = walk_height(x, z)
-            b.box((x, base + 0.58, z), (0.28, 1.16, 0.28), 'HK_Stone')
-            b.box((x, base + 1.18, z), (0.35, 0.12, 0.35), 'ART_StoneLight')
-        for y in (0.41, 0.97):
-            b.box((x, y, 56.8), (0.23, 0.19, 34.4), 'HK_Stone')
+            cylinder(b, (x, base, z), (x, base + 1.02, z), 0.15, 'HK_Stone', segments=12)
+            lathe(b, x, z, [(base + y, r) for y, r in giboshi], 'ART_StoneLight')
+        b.box((x, 0.95, 56.8), (0.13, 0.13, 34.4), 'HK_WoodDark')
+        b.box((x, 0.30, 56.8), (0.12, 0.10, 34.4), 'HK_WoodDark')
+        for i in range(77):
+            z = 39.8 + i * 0.45
+            if any(abs(z - (39.6 + k * 4.3)) < 0.25 for k in range(9)):
+                continue
+            base = walk_height(x, z)
+            b.box((x, max(base, 0.35) + 0.27, z), (0.07, 0.54, 0.07), 'HK_WoodDark')
     b.box((32, -0.28, 56.8), (14, 0.50, 34.4), 'HK_StoneDark')
     # Keep the separately modelled stone newels at both banks.
     before = len(b.vertices)

@@ -132,6 +132,8 @@ export function roadLayout(layout) {
     ['HK_Sign_Paired30', 39.35, -30, 0],
     ['HK_Sign_NoParking', 25.6, 38.9, 150],
     ['HK_Sign_ParkingDirection', -79, 32.3, 90],
+    // 30 km/h for northbound Castle Road traffic, beside the corner house (18 October 2026 photograph)
+    ['HK_Sign_Speed30', 27.5, 1.5, 180],
   ]) items.push({ a, p: [x, 0.16, z], r, s: [1, 1, 1], g: 'Signs' });
   // A broad-leaf belt, interrupted by the north approach and the visible long-house frontage.
   // These represent canopy masses, not an invented inventory of individual surveyed trees.

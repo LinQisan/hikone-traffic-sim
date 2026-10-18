@@ -722,13 +722,13 @@
       }
     },
     "ART_KyobashiBridge": {
-      "triangles": 36484,
-      "strokes": 5588,
-      "bytes": 2438848,
+      "triangles": 38726,
+      "strokes": 5135,
+      "bytes": 2626164,
       "remodeled": false,
       "lod": {
-        "triangles": 5053,
-        "bytes": 364384
+        "triangles": 9839,
+        "bytes": 719600
       }
     },
     "ART_KyobashiLand": {
