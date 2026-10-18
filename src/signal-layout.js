@@ -22,9 +22,17 @@ const INSTALLATIONS = [
     walks: [{ crossing: 'east', facing: [0, 1], side: [-1, 0] }] },
 ];
 
+// The blue direction sign cantilevered from Castle Road's west pavement just south of the
+// junction (October 2024 Castle Road panorama), facing traffic leaving the junction southward.
+export const GUIDE_SIGNS = [
+  { id: 'castle-road-guide', pole: [25.6, 6], height: 6.5, board: [27.7, 5.55, 6], size: [2.6, 1.7],
+    facing: [0, 1] },
+];
+
 export const POLE = {
   car: { base: 0.15, top: 0.1 },
   pedestrian: { base: 0.12, top: 0.08 },
+  guide: { base: 0.16, top: 0.12 },
 };
 export const ARM_ABOVE_HEAD = 0.47;
 export const ARM_BEYOND_HEAD = 0.85;

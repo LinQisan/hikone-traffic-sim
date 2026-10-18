@@ -5,7 +5,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { model, material } from './world.js';
 import { painted } from './style.js';
 import { toThree } from './coords.js';
-import { signalPlacements, signalRigs, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
+import { signalPlacements, signalRigs, GUIDE_SIGNS, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -37,11 +37,13 @@ export async function buildSignals(scene, materials, rigs = signalRigs()) {
   scene.add(root);
   return { root, placements, rigs, heads: placements.length,
     /** Footprints of the poles for obstacles.js (Unity x, z, yaw, [width, length]). */
-    poles: rigs.map(r => { const d = POLE[r.kind].base * 2; return { x: r.pole.x, z: r.pole.z, yaw: 0, size: [d, d] }; }) };
+    poles: [...rigs.map(r => ({ x: r.pole.x, z: r.pole.z, kind: r.kind })),
+      ...GUIDE_SIGNS.map(s => ({ x: s.pole[0], z: s.pole[1], kind: 'guide' }))]
+      .map(({ x, z, kind }) => { const d = POLE[kind].base * 2; return { x, z, yaw: 0, size: [d, d] }; }) };
 }
 
 function buildPosts(rigs) {
-  const brown = [], grey = [], back = [], glass = [], plates = { name: [], phase: [], walk: [] };
+  const brown = [], grey = [], back = [], glass = [], plates = { name: [], phase: [], walk: [], guide: [] };
   // a tube between two Unity points
   const tube = (list, a, b, r0, r1 = r0) => {
     const from = toThree(a.x, a.y, a.z), to = toThree(b.x, b.y, b.z);
@@ -130,6 +132,18 @@ function buildPosts(rigs) {
     for (const y of [2.4, 3.3]) tube(metal, P(y - 0.035), P(y + 0.035), spec.base + 0.025);
     box(metal, P(3.75, -0.17), [0.22, 0.48, 0.16]);
   }
+  // Galvanised cantilever: the arm carries the board over the west lane, held by two short hangers.
+  for (const s of GUIDE_SIGNS) {
+    const [px, pz] = s.pole, [bx, by, bz] = s.board, [w, h] = s.size;
+    tube(grey, { x: px, y: 0.16, z: pz }, { x: px, y: s.height, z: pz }, POLE.guide.base, POLE.guide.top);
+    const armY = by + h / 2 + 0.25, far = bx + w / 2 - 0.15;
+    tube(grey, { x: px, y: armY, z: pz }, { x: far, y: armY, z: pz }, 0.085, 0.06);
+    tube(grey, { x: px, y: armY - 0.75, z: pz }, { x: px + 1.1, y: armY, z: pz }, 0.04);
+    for (const dx of [-w / 3, w / 3]) {
+      tube(grey, { x: bx + dx, y: armY, z: pz }, { x: bx + dx, y: by + h / 2 - 0.05, z: bz - s.facing[1] * 0.05 }, 0.025);
+    }
+    plate(plates.guide, { x: bx, y: by, z: bz }, s.facing, w, h);
+  }
   const meshes = [];
   const add = (list, mat, name) => {
     if (!list.length) return;
@@ -157,13 +171,14 @@ function buildPosts(rigs) {
   add(plates.name, lambert('ART_SignalPlateName', { map: plateTexture('name') }), 'SignalNamePlates');
   add(plates.phase, lambert('ART_SignalPlatePhase', { map: plateTexture('phase') }), 'SignalPhasePlates');
   add(plates.walk, lambert('ART_SignalPlateWalk', { map: plateTexture('walk') }), 'SignalWalkPlates');
+  add(plates.guide, lambert('ART_GuideSignFace', { map: plateTexture('guide') }), 'GuideSignFaces');
   return meshes;
 }
 
 // The plates' faces, drawn once (bilingual name plate, the phase plate, the pedestrian plate).
 const FONT = '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif';
 function plateTexture(kind) {
-  const [w, h] = { name: [400, 300], phase: [600, 184], walk: [100, 400] }[kind];
+  const [w, h] = { name: [400, 300], phase: [600, 184], walk: [100, 400], guide: [520, 340] }[kind];
   const canvas = document.createElement('canvas');
   canvas.width = w; canvas.height = h;
   const g = canvas.getContext('2d');
@@ -182,6 +197,25 @@ function plateTexture(kind) {
     g.fillStyle = '#2652a3';
     g.font = `800 70px ${FONT}`; g.fillText('歩車分離式', w / 2, 61);
     g.font = `700 54px ${FONT}`; g.fillText('7:30 − 18:00', w / 2, 141);
+  } else if (kind === 'guide') {
+    // Only the destinations legible in the October 2024 panorama; no invented distances.
+    g.fillStyle = '#2459a8'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = '#f2f4f2'; g.lineWidth = 6; g.strokeRect(9, 9, w - 18, h - 18);
+    g.fillStyle = g.strokeStyle = '#f2f4f2';
+    g.lineWidth = 16; g.lineCap = 'butt';
+    g.beginPath(); g.moveTo(440, 300); g.lineTo(440, 120); g.moveTo(448, 270); g.lineTo(150, 270); g.stroke();
+    g.beginPath(); g.moveTo(440, 82); g.lineTo(470, 128); g.lineTo(410, 128); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(108, 270); g.lineTo(152, 242); g.lineTo(152, 298); g.closePath(); g.fill();
+    g.textAlign = 'right';
+    g.font = `700 52px ${FONT}`; g.fillText('東近江', 400, 52);
+    g.font = `500 22px ${FONT}`; g.fillText('Higashiomi', 400, 92);
+    g.textAlign = 'left';
+    g.fillStyle = '#2f7d57'; g.fillRect(34, 118, 228, 58);
+    g.strokeRect(34, 118, 228, 58);
+    g.fillStyle = '#f2f4f2';
+    g.font = `700 40px ${FONT}`; g.fillText('E1 名神', 48, 145);
+    g.font = `700 54px ${FONT}`; g.fillText('国道8号', 36, 212);
+    g.font = `500 24px ${FONT}`; g.fillText('Route 8', 196, 250);
   } else {
     g.fillStyle = '#f4eee0'; g.fillRect(0, 0, w, h);
     g.strokeStyle = '#2652a3'; g.lineWidth = 5; g.strokeRect(5, 5, w - 10, h - 10);

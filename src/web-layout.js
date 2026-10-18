@@ -37,6 +37,10 @@ export const WEB_FRONTAGES = [
   { x: 58.14, z: 15.45, from: 'HK_Machiya_A_Narrow', to: 'ART_EavesStorehouse', scale: [0.75, 1, 1] },
   { x: 63.96, z: 15.6, from: 'HK_Kura', to: 'ART_ThreeStorey', scale: [1, 1, 1] },
   { x: 18.6, z: 15.6, from: 'HK_Kura', to: 'ART_WestCorner', position: [16.6, 0.15, 15.6], absoluteScale: [1, 1, 1] },
+  // Castle Road's first east-side houses stand at the pavement like the rest of the street
+  // (overhead image); the imported pair was set back 3–6 m. x is before the Castle Road drift.
+  { x: 45.508, z: -2.826, from: 'HK_Kura', to: 'HK_Kura', position: [42.4, 0.15, -2.826], absoluteScale: [1, 1, 1] },
+  { x: 48.735, z: -10.14, from: 'HK_Machiya_A_Narrow', to: 'HK_Machiya_A_Narrow', position: [42.4, 0.15, -9.8], absoluteScale: [1, 1, 1] },
 ];
 export const frontageAt = item => WEB_FRONTAGES.find(f => item.a === f.from
   && Math.hypot(item.p[0] - f.x, item.p[2] - f.z) < 0.01);

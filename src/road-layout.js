@@ -95,6 +95,9 @@ export function roadLayout(layout) {
       // The Route 25 row stands at the back of the narrowed footway.
       if (item.r === 0 && z > 14.5 && z < 16.5) item.p[2] += frontageShift(item.a, x, item.s[0]);
     }
+    // Imported cedars and pines scattered through the town blocks are absent from the overhead
+    // image, where the blocks are roofs with occasional broad garden trees.
+    if (item.a === 'HK_Tree_Cedar' || item.a === 'HK_Tree_Pine') continue;
     if (item.g === 'Trees' && (Math.abs(z + 64) < 7 || Math.abs(x - castleX(z)) < 11
       || (x > -107 && x < -32 && z > -43 && z < 16))) continue;
     if (item.g === 'Signs') {
@@ -148,11 +151,18 @@ export function roadLayout(layout) {
   items.push({ a: 'ART_ParkingPavilion', p: [-65, 0.01, 14.6], r: 0, s: [1, 1, 1], g: 'WebFrontage' });
   for (const x of [-87, -79, -71, -55, -47, -39])
     items.push({ a: 'ART_ClippedHedge', p: [x, 0.15, 18.85], r: 0, s: [1, 1, 1], g: 'WebParking' });
-  // Castle Road's formal street-tree row has high clear trunks and low hedge beds.
-  for (const [side, zs] of [[-1, [-10, -29, -47, -82, -103]], [1, [-13, -32, -51, -85, -106]]]) {
+  // Castle Road's formal street-tree rows: near-continuous canopies at ~9.5 m on both kerbs,
+  // from just south of the junction crossing, broken only by the Honmachi cross street.
+  for (const [side, start] of [[-1, -1], [1, 0]]) {
+    const zs = [];
+    for (let z = start; z > -114; z -= 9.5) if (Math.abs(z + 64) > 8.5) zs.push(z);
     for (const [i, z] of zs.entries()) items.push({ a: 'ART_TownTree', p: [castleX(z) + side * 5.6, 0.16, z],
       r: side < 0 ? 180 : 0, s: [0.9 + i % 2 * 0.12, 0.94 + i % 3 * 0.05, 1], g: 'WebTownTrees' });
   }
+  // Close the frontage gaps beside the junction: both sides are continuous eaves-on houses.
+  for (const [a, side, z] of [['HK_Machiya_B', -1, -2.8], ['HK_Machiya_A', -1, -10.4],
+    ['HK_Machiya_A_Narrow', 1, -16.3]])
+    items.push({ a, p: [castleX(z) + side * 10.4, 0.15, z], r: side < 0 ? 90 : 270, s: [1, 1, 1], g: 'WebFrontage' });
   items.push(...CASTLE_ITEMS);
   // Continue the town frontage along the gently bending bank, instead of across the road.
   const facades = ['HK_Machiya_A', 'HK_Kura', 'HK_Machiya_A_Narrow', 'HK_Machiya_B'];
