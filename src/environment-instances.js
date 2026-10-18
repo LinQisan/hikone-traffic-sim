@@ -27,6 +27,14 @@ const MOVE_AGAIN = 0.25, TURN_AGAIN = Math.cos(0.5 * Math.PI / 180), TURN_MARGIN
 /** The attribute as plain floats (normalized integers scaled back), without per-element getters. */
 function floats(attribute) {
   if (!attribute.isInterleavedBufferAttribute && attribute.array instanceof Float32Array) return attribute.array;
+  // GLBs store byte normals/pigments (tools/quantize_glb.py): rescale in one pass.
+  const scale = { Int8Array: 127, Uint8Array: 255 }[attribute.array.constructor.name];
+  if (scale && attribute.normalized && !attribute.isInterleavedBufferAttribute
+    && attribute.array.length === attribute.count * attribute.itemSize) {
+    const source = attribute.array, out = new Float32Array(source.length);
+    for (let i = 0; i < source.length; i++) out[i] = Math.max(source[i] / scale, -1);
+    return out;
+  }
   const out = new Float32Array(attribute.count * attribute.itemSize);
   for (let i = 0; i < attribute.count; i++) for (let c = 0; c < attribute.itemSize; c++)
     out[i * attribute.itemSize + c] = attribute.getComponent(i, c);

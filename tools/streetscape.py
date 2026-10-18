@@ -110,16 +110,12 @@ def bridge_posts(b):
 def moat_chain(b, lod=False):
     box(b, (-1, 0.37, 0), (0.24, 0.74, 0.24), 'ART_StoneLight', 0.035)
     box(b, (-1, 0.77, 0), (0.22, 0.06, 0.22), 'HK_Stone', 0.018)
-    if lod:
-        pts = [(-0.99 + 1.98 * i / 8, 0.60 - 0.16 * (1 - ((-0.99 + 1.98 * i / 8) / 0.99) ** 2), 0)
-               for i in range(9)]
-        for a, c in zip(pts, pts[1:]):
-            cylinder(b, a, c, 0.014, 'ART_Chain', segments=6)
-        return
-    for i in range(25):
-        x = -0.94 + 1.88 * i / 24
-        y = 0.60 - 0.16 * (1 - (x / 0.94) ** 2)
-        ring(b, (x, y, 0), 0.052, 0.025, 0.007, 'ART_Chain', i % 2 == 0, segments=8)
+    # A sagging chain read as one dark line. Individually modelled links (1,700 triangles per
+    # 2 m) were invisible beyond a few metres yet cost ~12 % of a street view's triangles.
+    pts = [(-0.99 + 1.98 * i / 8, 0.60 - 0.16 * (1 - ((-0.99 + 1.98 * i / 8) / 0.99) ** 2), 0)
+           for i in range(9)]
+    for a, c in zip(pts, pts[1:]):
+        cylinder(b, a, c, 0.016 if lod else 0.018, 'ART_Chain', segments=6 if lod else 8)
 
 
 def tiled_roof(b, width, front, back, eave, rise, gable=False):

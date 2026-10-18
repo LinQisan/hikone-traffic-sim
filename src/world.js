@@ -4,7 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placement } from './coords.js';
 import { LIGHT, painted, paintedSky, PigmentPalette } from './style.js';
 import { environmentInstances } from './environment-instances.js';
-import { packPigments } from './geometry-budget.js';
+import { packPigments, compactAttributes } from './geometry-budget.js';
 import { buildOverheadWires } from './overhead-wires.js';
 import { CameraObstacles } from './camera-obstacles.js';
 import { APPROACH_BUILDINGS } from './castle-approach.js';
@@ -18,7 +18,7 @@ async function loadParts(name, detail, packed) {
   const gltf = await loader.loadAsync(`data/models/impressionist/${name}${detail === 'low' ? '.lod' : ''}.glb`);
   gltf.scene.updateMatrixWorld(true);
   const parts = [];
-  gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: packed ? packPigments(o.geometry) : o.geometry,
+  gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: packed ? packPigments(compactAttributes(o.geometry)) : compactAttributes(o.geometry),
     material: o.material, matrix: o.matrixWorld.clone() }); });
   return parts;
 }

@@ -865,6 +865,9 @@ def export_plan(markings=()):
                 walls=water_walls, lanes=[], signals=signals)
     with open(path, 'w') as f:
         json.dump(meta, f, separators=(',', ':'))
+    # The simulator needs only the water walls; map.json's ~1 MB of surfaces serve the editor.
+    with open(os.path.join(ROOT, 'data', 'walls.json'), 'w') as f:
+        json.dump(dict(world=WORLD, walls=water_walls), f, separators=(',', ':'))
     # Road heights are needed immediately by paving generators. The plan image waits until
     # every requested model is exported, so new frontages have their final GLB bounds.
     _pending_image = (meta, roads, walks, markings)

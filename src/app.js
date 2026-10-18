@@ -71,8 +71,9 @@ addEventListener('resize', () => {
 });
 
 status('データを読み込んでいます… / Loading data…');
+// walls.json: the water walls the participant cannot cross (map.json's surfaces are editor-only).
 const [sceneData, layout, map, roadTiles, scenarioIndex, collision] = await Promise.all([
-  json('data/scene.json'), json('data/layout.json'), json('data/map.json'), json('data/road_tiles.json'), json('data/scenarios/index.json'),
+  json('data/scene.json'), json('data/layout.json'), json('data/walls.json'), json('data/road_tiles.json'), json('data/scenarios/index.json'),
   json('data/collision.json')]);
 const ground = new Ground(roadTiles);
 const materials = buildMaterials(sceneData.materials);

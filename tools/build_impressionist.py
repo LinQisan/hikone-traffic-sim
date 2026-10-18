@@ -20,6 +20,7 @@ import abstract_props
 import streetscape
 import moat_art
 import road_network
+import quantize_glb
 import hikone_castle
 import castle_approach
 
@@ -597,6 +598,7 @@ def main():
             bpy.ops.export_scene.gltf(filepath=path, use_selection=True, export_format='GLB',
                                       export_yup=True, export_materials='EXPORT', export_normals=True,
                                       export_texcoords=False, export_all_vertex_colors=True)
+            quantize_glb.quantize(path)  # byte normals/pigments, as the browser keeps them
             if distant:
                 manifest['models'][name]['lod'] = {'triangles': sum(len(p.vertices) - 2 for p in ob.data.polygons),
                                                   'bytes': os.path.getsize(path)}

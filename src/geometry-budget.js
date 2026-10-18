@@ -17,6 +17,22 @@ export function geometryBytes(root, includeInstances = false) {
   return bytes;
 }
 
+/**
+ * GLB byte normals/pigments arrive 4-byte strided (an interleaved view; tools/quantize_glb.py).
+ * Copy them into compact attributes of the same type, so merging, cutting and vehicle splits see
+ * plain arrays and the padding byte is not kept resident.
+ */
+export function compactAttributes(geometry) {
+  for (const [name, attribute] of Object.entries(geometry.attributes)) {
+    if (!attribute.isInterleavedBufferAttribute) continue;
+    const { data, offset, itemSize, count } = attribute, stride = data.stride, source = data.array;
+    const array = new source.constructor(count * itemSize);
+    for (let i = 0; i < count; i++) for (let c = 0; c < itemSize; c++) array[i * itemSize + c] = source[i * stride + offset + c];
+    geometry.setAttribute(name, new THREE.BufferAttribute(array, itemSize, attribute.normalized));
+  }
+  return geometry;
+}
+
 export function packPigments(geometry) {
   for (const [name, Type, maximum] of [['normal', Int8Array, 127], ['color', Uint8Array, 255]]) {
     const source = geometry.getAttribute(name);
