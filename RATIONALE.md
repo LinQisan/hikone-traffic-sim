@@ -46,11 +46,20 @@ The overview plans against the recorded approach, car and posed landing before p
 copies of the town's low-detail silhouettes retain roofs, trees and signal poles independently of
 render culling; parked vehicles and recorded traffic also obstruct the view. The planner prefers
 one clear three-quarter angle for the complete clip, raises or moves it when necessary, and checks
-the translation between camera positions as well as the subject sight lines. It anticipates turns,
-smooths focus and distance, and validates that smoothing again. If no continuous clear connection
-exists, an angle change is preferred away from contact. Buildings stay visible. Portrait resizing
-replans the framing and reserves the area covered by replay controls; reduced motion prefers a stationary wide shot. Normal playback only
-interpolates the precomputed track, without scene raycasts or new camera vectors each frame.
+the translation between camera positions as well as the subject sight lines. Turn costs are per
+second, so an angle change happens on the slower approach rather than in the dense samples around
+contact. The planned key poses then become one continuous orbit: focus, heading, pitch and boom
+length are resampled on a uniform 1/30 s clock and Gaussian-smoothed there (a positional blend
+would cut chords across a turn). The boom is dilated by the full kernel radius before easing, so
+the camera pulls back ahead of a widening shot (the arriving car) and never closer than any shot
+needs. The smoothed path is re-validated at every key pose; where it fails, smoothing softens only
+around that moment. A move still faster than a whip pan becomes a clean cut instead. If no
+continuous clear connection exists, an angle change is preferred away from contact. Buildings stay
+visible. Portrait resizing replans the framing and reserves the area covered by replay controls;
+reduced motion prefers a stationary wide shot. Normal playback evaluates a Catmull-Rom spline
+through the precomputed samples (continuous velocity), without scene raycasts or new camera vectors
+each frame. On the built-in walking events, peak camera acceleration fell from up to ~3,700 m/s²
+(velocity jumps at every 0.2 s key) to under ~60 m/s².
 
 ## Performance
 

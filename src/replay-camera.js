@@ -3,6 +3,9 @@
 import * as THREE from 'three';
 
 const STEP = 0.2, CHECK_STEP = 0.05, MARGIN = 0.76;
+// Playback path: uniform samples, and smoothing widths in seconds of replay time.
+const PATH_STEP = 1 / 30;
+const SMOOTH = { focus: 0.3, turn: 0.55, boom: 0.6 }, SOFTEN_WIDTH = 0.4, WHIP_SPEED = 40;
 const UP = new THREE.Vector3(0, 1, 0);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const angleDelta = (a, b) => Math.atan2(Math.sin(a - b), Math.cos(a - b));
@@ -139,8 +142,8 @@ export class ReplayCamera {
       chosen = candidate.poses; break;
     }
     if (!chosen) chosen = this.route(shots, candidates);
-    this.track = this.stabilize(chosen, shots);
-    this.index = 0;
+    this.track = chosen;
+    this.path = this.smoothPath(chosen, shots);
     this.frame(this.samples[0].t);
   }
 
@@ -159,29 +162,122 @@ export class ReplayCamera {
     return true;
   }
 
-  stabilize(track, shots) {
-    // Ease changes in velocity and zoom with anticipation, then validate the smoothed path again.
-    // Never smooth across a necessary cut, nor accept an ease that clips a roof or a subject.
-    for (const radius of [0.8, 0.4, 0.2]) {
-      const eased = track.map((pose, i) => {
-        const position = new THREE.Vector3(), focus = new THREE.Vector3();
-        let weight = 0;
-        for (let j = i; j >= 0 && pose.t - track[j].t <= radius; j--) {
-          if (j < i && track[j + 1].cut) break;
-          const w = 1 - (pose.t - track[j].t) / (radius + 0.01);
-          position.addScaledVector(track[j].position, w); focus.addScaledVector(track[j].focus, w); weight += w;
-        }
-        for (let j = i + 1; j < track.length && track[j].t - pose.t <= radius && !track[j].cut; j++) {
-          const w = 1 - (track[j].t - pose.t) / (radius + 0.01);
-          position.addScaledVector(track[j].position, w); focus.addScaledVector(track[j].focus, w); weight += w;
-        }
-        return { ...pose, position: position.divideScalar(weight), focus: focus.divideScalar(weight) };
-      });
-      if (!eased.every((p, i) => this.clear(p.position, shots[i].targets, shots[i].blockers) && this.fits(p, shots[i].bounds))) continue;
-      if (!eased.every((p, i) => !i || p.cut || this.edge(eased[i - 1], p, shots[i - 1], shots[i]))) continue;
-      return eased;
+  // The planned key poses become a continuous orbit: focus, heading, pitch and boom length are
+  // resampled on a uniform clock and smoothed there (positions would cut chords across a turn).
+  // The boom is dilated before smoothing, so the camera pulls back ahead of a widening shot and
+  // returns slowly. Smoothing never crosses a cut; a smoothed path is re-validated at every key
+  // pose and softened step by step only where that is needed to stay clear and framed.
+  smoothPath(track, shots) {
+    // A move that stays faster than a whip pan after local softening reads worse than an edit:
+    // make it a clean cut (visibility still wins) and smooth both sides fully.
+    for (let pass = 0; pass < 4; pass++) {
+      const path = this.segmentsOf(track, shots);
+      const whip = this.whip(path, track);
+      if (whip < 0) return path;
+      track[whip].cut = true;
     }
-    return track;
+    return this.segmentsOf(track, shots);
+  }
+
+  /** Index of the first key reached by a smoothed move faster than WHIP_SPEED, or -1. */
+  whip(path, track) {
+    for (const segment of path) {
+      for (let k = 1; k < segment.points.length; k++) {
+        if (segment.points[k].position.distanceTo(segment.points[k - 1].position) <= WHIP_SPEED * segment.h) continue;
+        const t = segment.t0 + k * segment.h;
+        const i = track.findIndex(pose => pose.t >= t - 1e-9);
+        return i > 0 ? i : -1;
+      }
+    }
+    return -1;
+  }
+
+  segmentsOf(track, shots) {
+    const segments = [];
+    for (let i = 0; i < track.length; i++) if (!i || track[i].cut) segments.push([i, i]); else segments.at(-1)[1] = i;
+    return segments.map(([first, last]) => {
+      // Full smoothing everywhere; where a key pose fails, soften only around that moment.
+      const t0 = track[first].t, t1 = track[last].t, n = Math.max(1, Math.ceil((t1 - t0) / PATH_STEP)) + 1;
+      const h = n > 1 ? (t1 - t0) / (n - 1) : 0, strength = new Float32Array(n).fill(1);
+      const soften = (times, factor) => {
+        for (const time of times) for (let k = 0; k < n; k++)
+          strength[k] *= 1 - factor * Math.exp(-0.5 * ((t0 + k * h - time) / SOFTEN_WIDTH) ** 2);
+      };
+      let segment = null;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        segment = this.orbit(track, first, last, strength);
+        const failed = this.failures(segment, track, shots, first, last);
+        if (!failed.length) return segment;
+        soften(failed, attempt < 7 ? 0.6 : 1);
+      }
+      return this.orbit(track, first, last, strength);
+    });
+  }
+
+  orbit(track, first, last, strength) {
+    const keys = track.slice(first, last + 1).map(pose => {
+      this.offset.subVectors(pose.position, pose.focus);
+      const length = this.offset.length() || 1;
+      return { t: pose.t, focus: pose.focus, angle: Math.atan2(this.offset.x, this.offset.z),
+        pitch: Math.asin(clamp(this.offset.y / length, -1, 1)), length };
+    });
+    for (let i = 1; i < keys.length; i++) keys[i].angle = keys[i - 1].angle + angleDelta(keys[i].angle, keys[i - 1].angle);
+    const t0 = keys[0].t, t1 = keys.at(-1).t, n = Math.max(1, Math.ceil((t1 - t0) / PATH_STEP)) + 1;
+    const h = n > 1 ? (t1 - t0) / (n - 1) : 0;
+    const channels = { x: [], y: [], z: [], angle: [], pitch: [], length: [] };
+    for (let k = 0, j = 0; k < n; k++) {
+      const t = t0 + k * h;
+      while (j + 1 < keys.length - 1 && keys[j + 1].t <= t) j++;
+      const a = keys[j], b = keys[Math.min(j + 1, keys.length - 1)];
+      const u = b.t > a.t ? clamp((t - a.t) / (b.t - a.t), 0, 1) : 0;
+      channels.x.push(a.focus.x + (b.focus.x - a.focus.x) * u);
+      channels.y.push(a.focus.y + (b.focus.y - a.focus.y) * u);
+      channels.z.push(a.focus.z + (b.focus.z - a.focus.z) * u);
+      channels.angle.push(a.angle + (b.angle - a.angle) * u);
+      channels.pitch.push(a.pitch + (b.pitch - a.pitch) * u);
+      channels.length.push(a.length + (b.length - a.length) * u);
+    }
+    const widths = seconds => Array.from(strength, s => (h > 0 ? seconds * s / h : 0));
+    const focusWidth = widths(SMOOTH.focus), turnWidth = widths(SMOOTH.turn), boomWidth = widths(SMOOTH.boom);
+    for (const axis of ['x', 'y', 'z']) channels[axis] = gaussian(channels[axis], focusWidth);
+    channels.angle = gaussian(channels.angle, turnWidth);
+    channels.pitch = gaussian(channels.pitch, turnWidth);
+    // Never closer than any shot needs within the kernel's reach, then a soft ease of that
+    // envelope: dilating by the full (unsoftened) kernel radius keeps the eased boom at or above
+    // every sample's need, so the final clamp is only a guard and adds no kink.
+    const needed = channels.length.slice(), reach = h > 0 ? Math.ceil(3 * SMOOTH.boom / h) : 0;
+    channels.length = gaussian(dilate(channels.length, reach), boomWidth)
+      .map((length, k) => Math.max(length, needed[k]));
+    const points = [];
+    for (let k = 0; k < n; k++) {
+      const focus = new THREE.Vector3(channels.x[k], channels.y[k], channels.z[k]);
+      const c = Math.cos(channels.pitch[k]);
+      const position = new THREE.Vector3(Math.sin(channels.angle[k]) * c, Math.sin(channels.pitch[k]),
+        Math.cos(channels.angle[k]) * c).multiplyScalar(channels.length[k]).add(focus);
+      points.push({ position, focus });
+    }
+    return { t0, t1, h, points };
+  }
+
+  /** Smoothed pose at a recorded key time (validation only; playback uses spline()). */
+  at(segment, t) {
+    const u = segment.h > 0 ? clamp((t - segment.t0) / segment.h, 0, segment.points.length - 1) : 0;
+    const k = Math.min(Math.floor(u), segment.points.length - 1), f = u - k;
+    const a = segment.points[k], b = segment.points[Math.min(k + 1, segment.points.length - 1)];
+    return { t, position: a.position.clone().lerp(b.position, f), focus: a.focus.clone().lerp(b.focus, f) };
+  }
+
+  /** Key times where the smoothed path is blocked, unframed or crosses an obstacle. */
+  failures(segment, track, shots, first, last) {
+    const failed = [];
+    let previous = null;
+    for (let i = first; i <= last; i++) {
+      const pose = this.at(segment, track[i].t);
+      if (!this.clear(pose.position, shots[i].targets, shots[i].blockers) || !this.fits(pose, shots[i].bounds)) failed.push(pose.t);
+      else if (previous && !this.edge(previous, pose, shots[i - 1], shots[i])) failed.push(previous.t, pose.t);
+      previous = pose;
+    }
+    return failed;
   }
 
   route(shots, candidates) {
@@ -204,7 +300,10 @@ export class ReplayCamera {
           const turn = Math.abs(angleDelta(from.angle, node.angle));
           const lift = Math.abs(from.pitch - node.pitch);
           const move = from.position.distanceTo(node.position);
-          const change = (turn * 16 + lift * 24 + move * 0.1) * (this.reducedMotion ? 3 : 1);
+          // Per second, not per sample: around contact the keys are 4x denser, and a turn there
+          // would otherwise cost as little as one spread over the slower approach.
+          const pace = STEP / Math.max(CHECK_STEP, shots[i].t - shots[i - 1].t);
+          const change = (turn * 16 + lift * 24 + move * 0.1) * pace * (this.reducedMotion ? 3 : 1);
           const base = from.cost + local + change;
           if (base >= node.cost) continue;
           const continuous = turn < 0.6 && lift < 0.3 && move < 7 && this.edge(from, node, shots[i - 1], shots[i]);
@@ -238,17 +337,58 @@ export class ReplayCamera {
   frame(t) {
     if (!this.track.length) return;
     if (this.aspect !== this.camera.aspect) this.plan();
-    let i = this.index;
-    if (t < this.track[i].t) i = 0;
-    while (i + 1 < this.track.length && t >= this.track[i + 1].t) i++;
-    this.index = i;
-    const a = this.track[i], b = this.track[Math.min(i + 1, this.track.length - 1)];
-    const u = b.t > a.t && !b.cut ? clamp((t - a.t) / (b.t - a.t), 0, 1) : 0;
-    this.camera.position.lerpVectors(a.position, b.position, u);
-    this.focus.lerpVectors(a.focus, b.focus, u);
+    // Before a cut the previous segment holds its last pose, as a cut would in an edit.
+    let segment = this.path[0];
+    for (const candidate of this.path) if (t >= candidate.t0) segment = candidate;
+    this.spline(segment, t, this.camera.position, this.focus);
     this.camera.lookAt(this.focus);
     this.camera.updateMatrixWorld();
   }
+
+  /** Centripetal-free uniform Catmull-Rom between path samples: continuous velocity. */
+  spline(segment, t, position, focus) {
+    const points = segment.points, last = points.length - 1;
+    const u = segment.h > 0 ? clamp((t - segment.t0) / segment.h, 0, last) : 0;
+    const k = Math.min(Math.floor(u), Math.max(0, last - 1)), f = u - k;
+    const p0 = points[Math.max(0, k - 1)], p1 = points[k], p2 = points[Math.min(last, k + 1)], p3 = points[Math.min(last, k + 2)];
+    catmullRom(position, p0.position, p1.position, p2.position, p3.position, f);
+    catmullRom(focus, p0.focus, p1.focus, p2.focus, p3.focus, f);
+  }
+}
+
+function catmullRom(out, a, b, c, d, f) {
+  const f2 = f * f, f3 = f2 * f;
+  const wa = -0.5 * f3 + f2 - 0.5 * f, wb = 1.5 * f3 - 2.5 * f2 + 1;
+  const wc = -1.5 * f3 + 2 * f2 + 0.5 * f, wd = 0.5 * f3 - 0.5 * f2;
+  return out.set(a.x * wa + b.x * wb + c.x * wc + d.x * wd, a.y * wa + b.y * wb + c.y * wc + d.y * wd,
+    a.z * wa + b.z * wb + c.z * wc + d.z * wd);
+}
+
+/**
+ * Truncated, renormalized Gaussian blur of a uniformly sampled channel. `sigmas` gives each
+ * output sample its own width (in samples), so smoothing can soften locally around a tight spot.
+ */
+function gaussian(values, sigmas) {
+  return values.map((value, i) => {
+    const sigma = sigmas[i];
+    if (!(sigma > 0.25)) return value;
+    const radius = Math.ceil(sigma * 3);
+    let sum = 0, weight = 0;
+    for (let j = Math.max(0, i - radius); j <= Math.min(values.length - 1, i + radius); j++) {
+      const w = Math.exp(-0.5 * ((j - i) / sigma) ** 2);
+      sum += values[j] * w; weight += w;
+    }
+    return sum / weight;
+  });
+}
+
+/** Running maximum over ±radius samples: the boom never shortens before a wider shot needs it. */
+function dilate(values, r) {
+  return values.map((value, i) => {
+    let max = value;
+    for (let j = Math.max(0, i - r); j <= Math.min(values.length - 1, i + r); j++) max = Math.max(max, values[j]);
+    return max;
+  });
 }
 
 export function replaySampleTimes(start, end, impact) {

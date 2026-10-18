@@ -166,6 +166,31 @@ test('a blind corner anticipates an angle change without cuts or oscillating bet
   }
 });
 
+test('playback keeps a continuous velocity when the shot widens for the arriving car', () => {
+  // The accident car enters the framed part of the recording at once: the old piecewise-linear
+  // track jumped back in 0.2 s (accelerations of thousands of m/s²). The boom now eases out early.
+  const impact = 3, times = replaySampleTimes(0, 5, impact);
+  const shots = times.map(t => {
+    const px = t < impact ? 0 : Math.min(3, (t - impact) * 4), pz = t < impact ? t * 1.3 - 3.9 : 0, car = 30 - t * 10;
+    const s = sample(t, px, pz);
+    if (Math.abs(car) < 32) { s.bounds.union(new THREE.Box3(vector(car - 2.2, 0, -1), vector(car + 2.2, 1.5, 1))); s.targets.push(vector(car, 0.8, 0)); }
+    return { ...s, blockers: [] };
+  });
+  const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 500);
+  const director = new ReplayCamera(camera, flat, null);
+  director.start(shots, impact, 0.6);
+  assert.equal(director.track.filter(p => p.cut).length, 0);
+  const dt = 1 / 60, positions = [];
+  for (let t = 0; t <= 5; t += dt) { director.frame(t); positions.push(camera.position.clone()); }
+  let peak = 0;
+  for (let i = 2; i < positions.length; i++) {
+    const a = positions[i].clone().sub(positions[i - 1]).sub(positions[i - 1].clone().sub(positions[i - 2])).divideScalar(dt * dt);
+    peak = Math.max(peak, a.length());
+  }
+  assert.ok(peak < 80, `camera acceleration stays gentle (peak ${peak.toFixed(0)} m/s²)`);
+  for (const shot of shots) { director.frame(shot.t); assertFramed(camera, shot.bounds); }
+});
+
 test('an enclosed custom recording still has a finite stable camera and can reach its end', () => {
   const director = new ReplayCamera(new THREE.PerspectiveCamera(), flat, { cameraClear: () => true, clear: () => false });
   director.start(Array.from({ length: 11 }, (_, i) => sample(i / 5)), 1, 0);
