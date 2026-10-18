@@ -27,6 +27,8 @@ export const WEB_STREET_ITEMS = [
   ...[-90, -58, -26, 6, 55, 87].map(x => streetItem('ART_PathLamp', x, moatPathEdge(x) + 0.3)),
   // On the narrowed footway the poles stand at its kerb side, clear of the frontage eaves.
   ...[49.5, 74, 101].map(x => streetItem('ART_UtilityPole', x, 19 + 2.55 * townTaper(x))),
+  // The glazed display case on the apron at the east end of the corner shop (18 October 2026 photo).
+  { a: 'ART_DisplayKiosk', p: [47.2, 0.15, 17.0], r: 0, s: [1, 1, 1], g: 'WebStreet' },
 ];
 
 // Differentiate the junction frontages. The western compound replaces two isolated sheds;

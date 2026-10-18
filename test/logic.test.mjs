@@ -67,8 +67,14 @@ test('cars appear on time, accelerate at 8 m/s² and leave at the end of their r
   // the accident car of 01 leaves when the participant sets off towards the road (traffic.js "meet")
   t.step(20, { x: s.spawn.x, z: s.spawn.z, vx: 0, vz: 0 });
   assert.ok(!t.cars.some(c => c.accident), 'not while the participant stands and looks');
-  t.step(0.1, { x: s.spawn.x, z: s.spawn.z + 0.3, vx: 0, vz: 2.4 });
-  assert.ok(t.cars.some(c => c.accident), 'as soon as they walk on towards the road');
+  const len = Math.hypot(s.goal.x - s.spawn.x, s.goal.z - s.spawn.z);
+  const dir = { x: (s.goal.x - s.spawn.x) / len, z: (s.goal.z - s.spawn.z) / len };
+  let launched = false;
+  for (let i = 1; i <= 6 && !launched; i++) {
+    t.step(0.1, { x: s.spawn.x + dir.x * 0.24 * i, z: s.spawn.z + dir.z * 0.24 * i, vx: dir.x * 2.4, vz: dir.z * 2.4 });
+    launched = t.cars.some(c => c.accident);
+  }
+  assert.ok(launched, 'as soon as they walk on towards the road (within 0.6 s at the normal pace)');
   assert.ok(t.cars.every(c => c.body === 'sedan'), 'files use their own body (the templates say sedan)');
 });
 

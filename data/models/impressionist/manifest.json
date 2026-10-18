@@ -712,13 +712,13 @@
       }
     },
     "ART_KyobashiBanks": {
-      "triangles": 2938,
+      "triangles": 5084,
       "strokes": 0,
-      "bytes": 232036,
+      "bytes": 399368,
       "remodeled": false,
       "lod": {
-        "triangles": 2938,
-        "bytes": 232040
+        "triangles": 5084,
+        "bytes": 399372
       }
     },
     "ART_KyobashiBridge": {
@@ -732,23 +732,23 @@
       }
     },
     "ART_KyobashiLand": {
-      "triangles": 39787,
-      "strokes": 5750,
-      "bytes": 2673700,
+      "triangles": 39697,
+      "strokes": 5735,
+      "bytes": 2668768,
       "remodeled": false,
       "lod": {
-        "triangles": 7444,
-        "bytes": 539032
+        "triangles": 7438,
+        "bytes": 539640
       }
     },
     "ART_KyobashiRoads": {
-      "triangles": 77454,
-      "strokes": 10708,
-      "bytes": 5565588,
+      "triangles": 77372,
+      "strokes": 10697,
+      "bytes": 5560124,
       "remodeled": false,
       "lod": {
-        "triangles": 17223,
-        "bytes": 1288764
+        "triangles": 17201,
+        "bytes": 1287264
       }
     },
     "ART_KyobashiWater": {
@@ -913,6 +913,17 @@
       "lod": {
         "triangles": 12513,
         "bytes": 1082596
+      }
+    },
+    "ART_DisplayKiosk": {
+      "triangles": 1870,
+      "strokes": 0,
+      "bytes": 143244,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 1870,
+        "bytes": 143248
       }
     }
   }

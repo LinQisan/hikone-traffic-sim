@@ -59,8 +59,43 @@ def north_shore(x):
     return 74 + 0.7 * moat_bend(x) + max(0, min(1, (-x - 15) / 60)) * 10
 
 
+# The castle-side bank and the masugata walls at the bridge's north end stand ~4.5 m above the
+# road (18 October 2026 photographs; formerly 3 m). Same profile in src/road-layout.js.
+BANK_RISE = 4.2
+
+
 def north_bank_height(x, z):
-    return 0.15 + 3 * max(0, min(1, (32 - (z - north_shore(x))) / 12))
+    return 0.15 + BANK_RISE * max(0, min(1, (32 - (z - north_shore(x))) / 12))
+
+
+def masonry(b, a, c, low, high, seed, inset=(0.0, 0.0)):
+    """Irregular coursed stones (nozura-zumi) on a wall from a to c, as coplanar painted cells.
+    `low`/`high` give the bottom/top height at a parameter t along the wall; `inset` offsets the
+    face along its normal (x, z) so cells sit just proud of a base face."""
+    rng = random.Random(seed)
+    length = math.dist(a, c)
+    if length < 0.3:
+        return
+    lo, hi = min(low(0), low(1)), max(high(0), high(1))
+    y = lo
+    while y < hi - 0.05:
+        row = min(hi - y, rng.uniform(0.65, 1.05))
+        t = rng.uniform(-0.6, 0) / length
+        while t < 1:
+            t2 = min(1, t + rng.uniform(0.7, 1.9) / length)
+            t0 = max(0, t)
+            if t2 - t0 > 0.05 / length:
+                pts = []
+                for tt in (t0, t2):
+                    px, pz = a[0] + (c[0] - a[0]) * tt + inset[0], a[1] + (c[1] - a[1]) * tt + inset[1]
+                    pts.append((px, pz, max(low(tt), y + 0.03), min(high(tt), y + row - 0.03)))
+                if all(top - bottom > 0.08 for _, _, bottom, top in pts):
+                    (x0, z0, b0, t0y), (x1, z1, b1, t1y) = pts
+                    tone = rng.random()
+                    material = 'ART_StoneLight' if tone < 0.4 else 'HK_Stone' if tone < 0.85 else 'HK_StoneDark'
+                    b.face([(x0, b0, z0), (x0, t0y, z0), (x1, t1y, z1), (x1, b1, z1)], material, False)
+            t = t2
+        y += row
 
 
 def walk_height(x, z):
@@ -86,6 +121,9 @@ def sample(points, step=2):
     return out + [points[-1]]
 
 
+# Route 25 crossing centres and the stop bars 2 m before them (shared with tools/moat_art.py).
+WALK_CROSSINGS = (19.7, 44.3)
+STOP_BARS = (16.4, 47.6)
 NORTH = [tuple(p) for p in approach_data()['north']]
 MAIN = [(x, 26 + moat_bend(x)) for x in range(-220, 201, 2)]
 SOUTH = [(castle_x(z), z) for z in range(-155, 17, 2)] + [(32, 26), (32, 39.6)]
@@ -513,8 +551,9 @@ def roads_mesh(b):
             if points:
                 b.face(points, material, strokes=False)
     # Four crossings are visible in the close overhead image, including the bridge entrance.
+    # The Route 25 crossings lie just beyond the kerb returns, 24.6 m apart (overhead: ~24.3 m).
     for z in [22.5 + i * 0.85 for i in range(9)]:
-        for x in (23.3, 40.7):
+        for x in WALK_CROSSINGS:
             face(b, [(x - 1.3, z), (x + 1.3, z), (x + 1.3, z + 0.43), (x - 1.3, z + 0.43)], 0.022, 'HK_WhitePaint')
     for x in [28.4 + i * 0.85 for i in range(9)]:
         face(b, [(x, 16.4), (x + 0.43, 16.4), (x + 0.43, 19.0), (x, 19.0)], 0.022, 'HK_WhitePaint')
@@ -522,13 +561,14 @@ def roads_mesh(b):
     # Approach centre and edge lines follow the bend instead of tile repeats.
     for a, c in zip(MAIN, MAIN[1:]):
         x = (a[0] + c[0]) / 2
-        if 20 < x < 44 or x >= 199:
+        if WALK_CROSSINGS[0] - 1.3 < x < WALK_CROSSINGS[1] + 1.3 or x >= 199:
             continue
         for offset in (-3.55, 3.55):
             if offset < 0 and (-101 < x < -93 or -32 < x < -24 or 128 < x < 136):
                 continue
             paint(b, (a[0], a[1] + offset), (c[0], c[1] + offset))
-        if (x < -130 and int((x + 160) / 5) % 2 == 0 or -20 <= x <= 20 or 44 <= x < 54
+        if (x < -130 and int((x + 160) / 5) % 2 == 0 or -20 <= x <= STOP_BARS[0]
+                or STOP_BARS[1] <= x < 54
                 or x > 84 and int((x - 84) / 6) % 2 == 0):
             paint(b, a, c)
     # The western parking frontage also has a tapered central hatch, visible in Street View.
@@ -624,30 +664,49 @@ def inner_moat():
 
 def banks_mesh(b):
     # Coarse stone faces give the sloped wall its scale without thousands of separate rocks.
-    rng = random.Random(712)
+    # Courses and stone widths vary, as in the castle's nozura-zumi walls (18 October 2026 photos).
+    top = 0.15 + BANK_RISE
+    shore = lambda u: north_shore(u)
     for x in range(-220, 200, 2):
         if 24 <= x < 40:
             continue
         a, c = (x, moat_edge(x)), (x + 2, moat_edge(x + 2))
         b.face([(a[0], -1.35, a[1]), (c[0], -1.35, c[1]),
                 (c[0], 0.15, c[1]), (a[0], 0.15, a[1])], 'HK_StoneDark', False)
-        shore = lambda u: north_shore(u)
-        b.face([(x, -1.35, shore(x)), (x, 3.15, shore(x) + 4),
-                (x + 2, 3.15, shore(x + 2) + 4), (x + 2, -1.35, shore(x + 2))], 'HK_StoneDark', False)
-        for row in range(5):
-            low, high = -1.35 + row * 0.9, -1.35 + (row + 1) * 0.9
-            left, right = x + 0.035, x + 1.965
-            def stone_point(u, y):
-                return u, y, shore(u) + 4 * (y + 1.35) / 4.5 - 0.018
-            p = [stone_point(left, low + 0.04), stone_point(left + rng.uniform(0, 0.15), high - 0.035),
-                 stone_point(right - rng.uniform(0, 0.15), high - 0.035), stone_point(right, low + 0.04)]
-            b.face(p, 'HK_Stone' if (x + row) % 4 else 'ART_StoneLight', False)
-    # Retaining faces use the same pavement/terrain boundary as their adjoining tops.
-    for destination, points, material in surface_steps():
+        b.face([(x, -1.35, shore(x)), (x, top, shore(x) + 4),
+                (x + 2, top, shore(x + 2) + 4), (x + 2, -1.35, shore(x + 2))], 'HK_StoneDark', False)
+    rng = random.Random(712)
+    stone_point = lambda u, y: (u, y, shore(u) + 4 * (y + 1.35) / (top + 1.35) - 0.018)
+    y = -1.35
+    while y < top - 0.1:
+        row = min(top - y, rng.uniform(0.7, 1.1))
+        for lo, hi in ((-220, 24), (40, 200)):
+            u = lo - rng.uniform(0, 1.2)
+            while u < hi:
+                u2 = min(hi, u + rng.uniform(1.0, 2.4))
+                l, r = max(lo, u) + 0.04, u2 - 0.04
+                if r - l > 0.3:
+                    lean = rng.uniform(-0.12, 0.12)
+                    tone = rng.random()
+                    material = 'ART_StoneLight' if tone < 0.35 else 'HK_Stone' if tone < 0.88 else 'HK_StoneDark'
+                    b.face([stone_point(l, y + 0.04), stone_point(l + lean, y + row - 0.035),
+                            stone_point(r + lean, y + row - 0.035), stone_point(r, y + 0.04)], material, False)
+                u = u2
+        y += row
+    # Retaining faces use the same pavement/terrain boundary as their adjoining tops; the tall
+    # masugata walls beside the north approach carry the same irregular courses.
+    for i, (destination, points, material) in enumerate(surface_steps()):
         if destination == 'banks':
             points = approach_side(points, False)
             if points:
                 b.face(points, material, strokes=False)
+            if len(points) == 4 and max(p[1] for p in points) - min(p[1] for p in points) > 1.2:
+                (ax, la, az), (_, ha, _), (bx, hb, bz), (_, lb, _) = points
+                length = math.hypot(bx - ax, bz - az)
+                if length > 0.3:
+                    n = ((bz - az) / length * 0.015, -(bx - ax) / length * 0.015)
+                    masonry(b, (ax, az), (bx, bz), lambda t: la + (lb - la) * t,
+                            lambda t: ha + (hb - ha) * t, 9000 + i, n)
 
 
 def inner_banks_mesh(b):

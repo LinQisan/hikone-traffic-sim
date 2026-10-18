@@ -44,7 +44,7 @@ export const northShore = x => 74 + 0.7 * moatBend(x) + Math.max(0, Math.min(1, 
 // in tools/road_network.py; planting/ground agreement is checked on the exported geometry.
 export function northBankHeight(x, z) {
   const d = z - northShore(x);
-  return 0.15 + 3 * Math.max(0, Math.min(1, (32 - d) / 12));
+  return 0.15 + 4.2 * Math.max(0, Math.min(1, (32 - d) / 12));  // BANK_RISE in tools/road_network.py
 }
 
 function inside(x, z, polygon) {
@@ -97,7 +97,7 @@ export function roadLayout(layout) {
     }
     // Imported cedars and pines scattered through the town blocks are absent from the overhead
     // image, where the blocks are roofs with occasional broad garden trees.
-    if (item.a === 'HK_Tree_Cedar' || item.a === 'HK_Tree_Pine') continue;
+    if (item.g === 'Trees' && (item.a === 'HK_Tree_Cedar' || item.a === 'HK_Tree_Pine')) continue;
     if (item.g === 'Trees' && (Math.abs(z + 64) < 7 || Math.abs(x - castleX(z)) < 11
       || (x > -107 && x < -32 && z > -43 && z < 16))) continue;
     if (item.g === 'Signs') {

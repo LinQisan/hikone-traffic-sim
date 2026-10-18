@@ -2,16 +2,17 @@
 // Street View. Positions fit the imported map's pavement; the old cube anchors do not.
 // Reviewed again against 18 October 2026 photographs from all four corners. Far-side heads hang
 // over the lane they control (Japanese practice); the bridge poles stand on the moat-bank corners
-// outside the bridge newels, and the town poles at the kerb-return apexes.
+// outside the bridge newels, and the town poles at the kerb-return apexes. Pedestrian heads line
+// up with the Route 25 crossings at x 19.7 and 44.3 (tools/road_network.py WALK_CROSSINGS).
 const INSTALLATIONS = [
   // Over the bridge's northbound lane for traffic arriving from Castle Road; name board faces west.
-  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [24.6, 35.6], height: 5.8,
+  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [22.4, 35.6], height: 5.8,
     vehicle: [30.2, 4.7, 35.6], facing: [0, -1], phase: 'below',
     nameHeight: 4.15, nameFacing: [-1, 0],
     walks: [{ crossing: 'west', facing: [0, -1], side: [-1, 0] }] },
   // A long truss over the eastbound lane; name board faces Castle Road (south).
-  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [40.2, 35.6], height: 6.0,
-    vehicle: [40.2, 4.7, 28.6], facing: [-1, 0], phase: 'below',
+  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [43.2, 35.6], height: 6.0,
+    vehicle: [43.2, 4.7, 28.6], facing: [-1, 0], phase: 'below',
     nameHeight: 5.6, nameFacing: [0, -1],
     walks: [{ crossing: 'east', facing: [0, -1], side: [1, 0] }] },
   // The mast reaches over the westbound lane; a second head at its end faces southbound traffic.
@@ -25,7 +26,7 @@ const INSTALLATIONS = [
     vehicle: [38.7, 4.7, 20.05], facing: [1, 0], phase: null, lampFacing: [-0.71, 0.71],
     walks: [{ crossing: 'south', facing: [-1, 0], side: [0, -1] }] },
   // The east crossing ends at a separate lamp/name-board pole in front of the machiya.
-  { id: 'town-east-walk', corner: 'southeast-walk', style: 'lamp', pole: [42.6, 20.6], height: 6.4,
+  { id: 'town-east-walk', corner: 'southeast-walk', style: 'lamp', pole: [44.9, 20.6], height: 6.4,
     facing: [0, 1], lampFacing: [0, 1], nameHeight: 5.5, nameFacing: [1, 0], nameSize: [1.1, 0.48],
     walks: [{ crossing: 'east', facing: [0, 1], side: [-1, 0] }] },
 ];
@@ -39,6 +40,10 @@ export const GUIDE_SIGNS = [
 ];
 // The square lantern lamp at Castle Road's east kerb carries the blue pedestrian-and-bicycle disc
 // facing northbound walkers (18 October 2026 photograph).
+// The 京橋口 bus stop at the town-side kerb, east of the parking office (18 October 2026 photograph).
+export const BUS_STOPS = [
+  { id: 'kyobashiguchi-bus', pole: [6.4, 21.25], facing: [1, 0] },
+];
 export const LANTERNS = [
   { id: 'castle-road-lantern', pole: [36.9, 3.0], height: 3.9, disc: { height: 2.55, facing: [0, -1] } },
 ];
@@ -48,6 +53,7 @@ export const POLE = {
   pedestrian: { base: 0.12, top: 0.08 },
   guide: { base: 0.16, top: 0.12 },
   lantern: { base: 0.08, top: 0.065 },
+  bus: { base: 0.05, top: 0.05 },
 };
 export const ARM_ABOVE_HEAD = 0.47;
 export const ARM_BEYOND_HEAD = 0.85;

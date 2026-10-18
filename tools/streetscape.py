@@ -12,7 +12,7 @@ MODELS = ('ART_CornerShop', 'ART_WhiteStorehouse', 'ART_EavesStorehouse', 'ART_T
           'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_TownTree',
           'HK_Sign_ParkingDirection',
           'ART_WestCorner', 'HK_Sign_Paired30', 'HK_Sign_Paired40', 'HK_Sign_NoParking',
-          'ART_PavingDetails', 'ART_KeiBox', 'HK_ChainFence')
+          'ART_PavingDetails', 'ART_KeiBox', 'HK_ChainFence', 'ART_DisplayKiosk')
 
 
 def outward_face(b, points, material, inside):
@@ -397,7 +397,8 @@ def paving(b):
                 rect(x, z, 0.596, 0.30, 'ART_Tactile')
                 for dz in (-0.095, 0, 0.095):
                     rect(x, z + dz, 0.54, 0.025, 'ART_TactileRidge', 0.004)
-    for x in (24, 40):
+    from road_network import WALK_CROSSINGS
+    for x in WALK_CROSSINGS:
         for z in (19.55, 32.45):
             for dx in (-0.45, -0.15, 0.15, 0.45):
                 rect(x + dx, z, 0.296, 0.60, 'ART_Tactile')
@@ -423,6 +424,39 @@ def paving(b):
         ring(b, (x, h + 0.004, z), 0.29, 0.29, 0.006, 'ART_Chain', vertical=False, segments=32)
         for dx in (-0.15, 0, 0.15):
             rect(x + dx, z, 0.035, 0.42, 'ART_Chain', 0.004)
+
+
+def display_kiosk(b):
+    # 18 October 2026 photograph: a small glazed display case on a ribbed steel base, dark timber
+    # corner posts, a shoji-like back and a shallow metal gable. Its campaign lettering is omitted.
+    w, d = 1.5, 0.9
+    box(b, (0, 0.38, 0), (w, 0.6, d), 'HK_MetalLight', 0.01)
+    for y in [0.14 + i * 0.1 for i in range(6)]:
+        box(b, (0, y, d / 2 + 0.006), (w - 0.06, 0.018, 0.012), 'ART_FrameLight', 0.002)
+        for side in (-1, 1):
+            box(b, (side * (w / 2 + 0.006), y, 0), (0.012, 0.018, d - 0.06), 'ART_FrameLight', 0.002)
+    box(b, (0, 0.72, 0), (w + 0.06, 0.08, d + 0.06), 'HK_WoodDark', 0.01)
+    box(b, (0, 1.17, -d / 2 + 0.05), (w - 0.1, 0.84, 0.03), 'HK_Shoji', 0.005)
+    for x in (-0.25, 0.25):
+        box(b, (x, 1.17, -d / 2 + 0.07), (0.025, 0.84, 0.02), 'HK_WoodLight', 0.003)
+    box(b, (0, 1.17, d / 2 - 0.02), (w - 0.1, 0.84, 0.012), 'ART_GlassLight', 0.002)
+    for side in (-1, 1):
+        box(b, (side * (w / 2 - 0.02), 1.17, 0.03), (0.012, 0.84, d - 0.16), 'ART_GlassLight', 0.002)
+    for sx in (-1, 1):
+        for sz in (-1, 1):
+            box(b, (sx * (w / 2 - 0.04), 0.84, sz * (d / 2 - 0.04)), (0.08, 1.68, 0.08), 'HK_WoodDark', 0.01)
+    box(b, (0, 1.66, 0), (w + 0.04, 0.09, d + 0.04), 'HK_WoodDark', 0.01)
+    # Gable roof with the ridge along the front, overhanging all round.
+    hw, eave, ridge, over = w / 2 + 0.14, 1.72, 1.97, d / 2 + 0.2
+    inside = (0, eave + 0.05, 0)
+    for side in (-1, 1):
+        outward_face(b, [(-hw, eave, side * over), (hw, eave, side * over), (hw, ridge, 0), (-hw, ridge, 0)],
+                     'HK_Metal', inside)
+        outward_face(b, [(-hw, eave - 0.02, side * over), (hw, eave - 0.02, side * over),
+                         (hw, ridge - 0.02, 0), (-hw, ridge - 0.02, 0)], 'HK_WoodDark', (0, ridge + 1, 0))
+    for sx in (-1, 1):
+        outward_face(b, [(sx * (w / 2), eave - 0.04, -over + 0.12), (sx * (w / 2), eave - 0.04, over - 0.12),
+                         (sx * (w / 2), ridge - 0.04, 0)], 'HK_WoodDark', (0, eave, 0))
 
 
 def kei_box(b):
@@ -458,6 +492,8 @@ def build(name, mesh_class, lod=False):
         paving(b)
     elif name == 'ART_KeiBox':
         kei_box(b)
+    elif name == 'ART_DisplayKiosk':
+        display_kiosk(b)
     elif name == 'ART_WestCorner':
         west_corner(b)
     elif name == 'ART_NorthLonghouse':

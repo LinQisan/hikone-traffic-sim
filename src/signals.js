@@ -5,7 +5,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { model, material } from './world.js';
 import { painted } from './style.js';
 import { toThree } from './coords.js';
-import { signalPlacements, signalRigs, GUIDE_SIGNS, LANTERNS, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
+import { signalPlacements, signalRigs, GUIDE_SIGNS, LANTERNS, BUS_STOPS, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -39,7 +39,8 @@ export async function buildSignals(scene, materials, rigs = signalRigs()) {
     /** Footprints of the poles for obstacles.js (Unity x, z, yaw, [width, length]). */
     poles: [...rigs.map(r => ({ x: r.pole.x, z: r.pole.z, kind: r.kind })),
       ...GUIDE_SIGNS.map(s => ({ x: s.pole[0], z: s.pole[1], kind: 'guide' })),
-      ...LANTERNS.map(s => ({ x: s.pole[0], z: s.pole[1], kind: 'lantern' }))]
+      ...LANTERNS.map(s => ({ x: s.pole[0], z: s.pole[1], kind: 'lantern' })),
+      ...BUS_STOPS.map(s => ({ x: s.pole[0], z: s.pole[1], kind: 'bus' }))]
       .map(({ x, z, kind }) => { const d = POLE[kind].base * 2; return { x, z, yaw: 0, size: [d, d] }; }) };
 }
 
@@ -195,6 +196,24 @@ function buildPosts(rigs) {
     rim.rotateX(Math.PI / 2); rim.translate(0, 0, -0.012); rim.rotateY(yaw); rim.translate(c.x, c.y, c.z);
     back.push(rim);
   }
+  // Bus stop: a slim grey pole on a weighted base, the round stop plate and the timetable box.
+  for (const s of BUS_STOPS) {
+    const [px, pz] = s.pole, [fx, fz] = s.facing, yaw = Math.atan2(-fx, fz);
+    box(grey, { x: px, y: 0.2, z: pz }, [0.42, 0.08, 0.42]);
+    tube(grey, { x: px, y: 0.24, z: pz }, { x: px, y: 2.62, z: pz }, POLE.bus.base);
+    const disc = toThree(px + fx * 0.04, 2.3, pz + fz * 0.04);
+    for (const turn of [1, -1]) {
+      const c = toThree(px + fx * (0.04 + turn * 0.02), 2.3, pz + fz * (0.04 + turn * 0.02));
+      const g = atlas(new THREE.CircleGeometry(0.27, 28), [0.52, 0.262, 0.77, 0.512]);
+      g.rotateY(yaw + (turn < 0 ? Math.PI : 0)); g.translate(c.x, c.y, c.z); plates.guide.push(g);
+    }
+    const rim = new THREE.CylinderGeometry(0.28, 0.28, 0.03, 28);
+    rim.rotateX(Math.PI / 2); rim.rotateY(yaw); rim.translate(disc.x, disc.y, disc.z); back.push(rim);
+    box(back, { x: px, y: 1.45, z: pz }, [0.34, 0.86, 0.12], yaw);
+    for (const turn of [1, -1])
+      plate(plates.guide, { x: px + fx * turn * 0.065, y: 1.45, z: pz + fz * turn * 0.065 }, [fx * turn, fz * turn],
+        0.3, 0.8, [0.52, 0.524, 0.77, 1]);
+  }
   const meshes = [];
   const add = (list, mat, name) => {
     if (!list.length) return;
@@ -286,6 +305,21 @@ function plateTexture(kind) {
       g.textAlign = 'right'; g.font = `700 54px ${FONT}`; g.fillText('国道8号', 484, 150);
       g.font = `500 24px ${FONT}`; g.fillText('Route 8', 484, 200);
     });
+    // Bus stop plate (京橋口, 湖国バス) and its timetable panel, as photographed.
+    g.save(); g.translate(671, 398);
+    g.fillStyle = '#f4f4ee'; g.beginPath(); g.arc(0, 0, 128, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#2459a8'; g.lineWidth = 12; g.beginPath(); g.arc(0, 0, 120, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#2459a8'; g.fillRect(-112, 14, 224, 58);
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `700 54px ${FONT}`; g.fillText('京橋口', 0, -36);
+    g.fillStyle = white; g.font = `700 36px ${FONT}`; g.fillText('湖国バス', 0, 43);
+    g.restore();
+    g.save(); g.translate(541, 540);
+    g.fillStyle = '#f2efe2'; g.fillRect(0, 0, 260, 490);
+    g.fillStyle = '#e8b13a'; g.fillRect(14, 14, 232, 60);
+    g.fillStyle = '#d9d4c4';
+    for (let y = 92; y < 470; y += 34) g.fillRect(18, y, 224, 20);
+    g.restore();
     // 自転車及び歩行者専用: white adult-and-child walking above a bicycle on blue
     g.save(); g.translate(671, 128);
     g.fillStyle = white; g.beginPath(); g.arc(0, 0, 128, 0, Math.PI * 2); g.fill();

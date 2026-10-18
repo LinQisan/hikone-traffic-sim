@@ -17,7 +17,8 @@ export const MOAT_BANK_ITEMS = [
   broad(47.0, 38.1, -10, 0.95, 0.95), broad(53.3, 38.4, 8, 1.06, 1.02),
   airy(62.5, 38.2, -12, 0.77, 0.86),
   broad(72.0, 38.3, 11, 1.02, 0.94), broad(78.0, 38.5, -7, 1.04, 1.00),
-  broad(87.0, 38.4, 8, 1.12, 0.96), airy(94.0, 38.2, -9, 0.90, 1.02),
+  // A large black pine leans from the bank over the footway (18 October 2026 photograph).
+  broad(87.0, 38.4, 8, 1.12, 0.96), plant('HK_Tree_Pine', 97.0, 38.3, 300, [1.2, 1.15, 1.2]),
   broad(108.0, 38.4, 7, 1.05, 0.98), airy(116.0, 38.1, -11, 0.87, 0.95),
   broad(124.0, 38.4, 9, 1.08, 1.03), airy(137.0, 38.2, -10, 0.92, 0.97),
   // Low, irregular patches leave the bridge approaches and the main path open.

@@ -11,18 +11,18 @@
     "map": "hikone-kyobashi",
     "playerMode": "walking",
     "spawn": {
-        "x": 38.94,
-        "z": 35.94
+        "x": 45.3,
+        "z": 35.4
     },
     "goal": {
-        "x": 40,
-        "z": 17,
+        "x": 44.3,
+        "z": 18.3,
         "width": 5.06,
         "depth": 1,
         "yaw": 180
     },
     "trigger": {
-        "x": 40,
+        "x": 44.3,
         "z": 30.2,
         "width": 4.95,
         "depth": 4.88,

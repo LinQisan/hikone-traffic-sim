@@ -67,8 +67,9 @@ def road_paint(b, details_only=False):
         polygon(clip(clip(wedge, v, True), v + 0.21, False))
 
     # Stop bars are behind the crosswalks, leaving the crossing surfaces intact.
-    strip((44.0, 22.50), (44.0, 25.85), 0.35)
-    strip((18.7, 26.15), (18.7, 29.50), 0.35)
+    from road_network import STOP_BARS
+    strip((STOP_BARS[1], 22.50), (STOP_BARS[1], 25.85), 0.35)
+    strip((STOP_BARS[0], 26.15), (STOP_BARS[0], 29.50), 0.35)
     strip((28.50, 14.10), (31.85, 14.10), 0.35)
     strip((32.15, 37.75), (35.50, 37.75), 0.35)
 
@@ -81,7 +82,7 @@ def road_paint(b, details_only=False):
             polygon([transform(p) for p in [(-0.35, 0), (-0.13, 0), (-0.13, -0.65),
                                             (0.20, -0.65), (-0.25, -1.12), (-0.70, -0.65), (-0.35, -0.65)]])
 
-    arrow(49.7, 23.8, (-1, 0), turn=True)
+    arrow(52.6, 23.8, (-1, 0), turn=True)
     arrow(-12.0, 28.0, (1, 0))
     arrow(30.0, 11.0, (0, 1))
 
