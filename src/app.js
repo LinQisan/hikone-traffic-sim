@@ -11,7 +11,7 @@ import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, successV
   SECONDS_BEFORE_IMPACT, SECONDS_AFTER_IMPACT, BUFFER_SECONDS } from './analysis.js';
 import { instance, BODY_MODEL, paintFor } from './vehicles.js';
 import { Replay } from './replay.js';
-import { painted, paint, PaintRenderer } from './style.js';
+import { paint, PaintRenderer } from './style.js';
 import { buildSignals } from './signals.js';
 import { propReview } from './prop-review.js';
 import { replayReviewFrames } from './replay-review.js';
@@ -21,6 +21,7 @@ import { AdaptiveResolution } from './resolution.js';
 import { Obstacles } from './obstacles.js';
 import { setSunDirection, alignBlobShadow } from './blob-shadow.js';
 import { webLayout } from './web-layout.js';
+import { geometryBytes } from './geometry-budget.js';
 
 const $ = id => document.getElementById(id);
 // loading screen (index.html): data files are the first 15 %, the models the next 75 %, building the rest
@@ -62,7 +63,7 @@ renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.toneMappingExposure = 1.08;
 $('view').append(renderer.domElement);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.08, 500);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.08, 900);
 addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
@@ -78,21 +79,17 @@ const materials = buildMaterials(sceneData.materials);
 const light = buildLight(scene, renderer, sceneData.light);
 setSunDirection(sceneData.light.direction);              // shadow pools of moving things fall like the town's shadows
 status('街の模型を読み込んでいます… / Loading the town…');
-const env = await buildEnvironment(scene, webLayout(layout), materials, ground);
+const townLayout = webLayout(layout);
+// Opt-in A/B inspection of the landmark's workload on the same camera and renderer settings.
+const measuredLayout = params.has('benchmark') && params.get('landmarks') === 'off'
+  ? { ...townLayout, items: townLayout.items.filter(item => item.g !== 'WebLandmark') } : townLayout;
+const env = await buildEnvironment(scene, measuredLayout, materials, ground);
 const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium'];
 await Promise.all(vehicleModels.map(name => model(name)));
 
 status('街を組み立てています… / Building the town…');
 // Five browser-owned installations, placed on the pavement beside their crossings.
 const signals = await buildSignals(scene, materials);
-const occluders = new THREE.Group();
-scene.add(occluders);
-for (const w of sceneData.blackWalls) {
-  const wall = new THREE.Mesh(new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05)), painted(new THREE.MeshStandardMaterial({ color: 0x7a8599, roughness: 1 })));
-  wall.position.copy(toThree(w.x, w.y, w.z));                // inside the gatehouses
-  wall.rotation.y = yawToThree(w.yaw);
-  occluders.add(wall);
-}
 
 // buildings, walls, trees and posts at body height, plus the parked vehicles of each run
 const obstacles = new Obstacles(collision);
@@ -102,7 +99,16 @@ player.reducedMotion = reducedMotion.matches;          // no roll of the view wh
 reducedMotion.addEventListener?.('change', e => { player.reducedMotion = e.matches; });
 scene.add(player.rig);
 scene.add(player.bicycle.root);
-const replay = new Replay(scene, materials, ground);
+env.cameraObstacles.addRoot(signals.root);
+const replay = new Replay(scene, materials, ground, env.cameraObstacles);
+replay.setReducedMotion(reducedMotion.matches);
+reducedMotion.addEventListener?.('change', e => { replay.setReducedMotion(e.matches); });
+const replayViewport = () => {
+  if ($('replayui').hidden) return;
+  replay.setViewport(innerWidth / innerHeight, (innerHeight - $('replayui').getBoundingClientRect().top + 12) / innerHeight);
+};
+new ResizeObserver(replayViewport).observe($('replayui'));
+addEventListener('resize', replayViewport);
 const flash = $('flash');
 const touchDevice = isTouchDevice();
 document.body.classList.toggle('touch', touchDevice);
@@ -200,7 +206,7 @@ async function start(again = false) {
   run = {
     scenario, entry, heightCm, weightKg, time: 0,
     traffic: new Traffic(scenario, { seed: (Date.now() & 0xffffff) + 1, builtInMix: !!entry.template }),
-    recorder: new Recorder(), cars: new Map(), parked: new THREE.Group(), impact: null,
+    recorder: new Recorder(), cars: new Map(), carFrame: 0, participant: {}, parked: new THREE.Group(), impact: null,
   };
   // parked cars and trucks of a built-in scenario (Unity's ScenarioHost objects); they are solid
   const footprints = [];
@@ -264,21 +270,21 @@ function toTitle() {
 }
 
 function syncCars() {
-  const live = new Set();
+  const frame = ++run.carFrame;
   for (const car of run.traffic.cars) {
-    live.add(car.id);
     let mesh = run.cars.get(car.id);
     if (!mesh) {
       mesh = instance(BODY_MODEL[car.body] ?? BODY_MODEL.sedan, materials, { paint: paintFor(car.id * 7 + 3), steerable: true, moving: true });
       run.cars.set(car.id, mesh);
       scene.add(mesh);
     }
+    mesh.userData.trafficFrame = frame;
     toThree(car.x, ground.heightAt(car.x, car.z), car.z, mesh.position);   // in place: no per-frame garbage
     mesh.rotation.y = yawToThree(car.yaw);
     mesh.userData.steer?.(car.steer ?? 0);
     alignBlobShadow(mesh);
   }
-  for (const [id, mesh] of run.cars) if (!live.has(id)) { scene.remove(mesh); run.cars.delete(id); }
+  for (const [id, mesh] of run.cars) if (mesh.userData.trafficFrame !== frame) { scene.remove(mesh); run.cars.delete(id); }
 }
 
 function onImpact(car) {
@@ -304,15 +310,18 @@ function beginReplay() {
   run.frames = run.recorder.window(t - SECONDS_BEFORE_IMPACT, t + SECONDS_AFTER_IMPACT, t);
   for (const mesh of run.cars.values()) mesh.visible = false;
   player.bicycle.root.visible = false;
-  replay.start(run.frames, t, run.impact.car.id, run.heightCm, run.scenario.playerMode, run.weightKg);
+  $('replayui').hidden = false;
+  $('replayname').textContent = run.scenario.playerMode === 'bicycle'
+    ? '自転車のリプレイ / Bicycle replay' : '事故のリプレイ / Accident replay';
+  $('next').textContent = 'スキップ / Skip';
+  $('rhint').textContent = '最後まで再生して停止します。スキップをクリックすると結果へ進みます。';
+  replayViewport();
+  replay.start(run.frames, t, run.impact.car.id, run.heightCm, run.scenario.playerMode, run.weightKg, run.parked);
   light.invalidate();
   state = 'replay';
   announce('リプレイです。俯瞰か運転者の視点で見られます。 / Replay.');
   $('next').focus({ preventScroll: true });
   $('hud').hidden = true;
-  $('replayui').hidden = false;
-  $('replayname').textContent = run.scenario.playerMode === 'bicycle'
-    ? '自転車のリプレイ / Bicycle replay' : '事故のリプレイ / Accident replay';
 }
 
 function showResults(success) {
@@ -397,7 +406,8 @@ addEventListener('keydown', e => {
 const timer = new THREE.Timer();
 timer.connect(document);
 const probe = new PerformanceProbe($('fps'), renderer, new URLSearchParams(location.search).has('benchmark'),
-  { geometryBytes: env.geometryBytes, placements: env.objects, meshes: env.root.children.length });
+  () => ({ geometryBytes: env.geometryBytes, sceneBufferBytes: geometryBytes(scene, true),
+    placements: env.objects, meshes: env.root.children.length }));
 const lightPosition = new THREE.Vector3();
 let debugCamera = null;
 let fpsTime = 0, fpsFrames = 0;
@@ -410,7 +420,9 @@ function tick(dt) {
     // the participant's position and velocity time the event's accident car (traffic.js "meet")
     const vx = (player.x - run.lastX) / dt, vz = (player.z - run.lastZ) / dt;
     run.lastX = player.x; run.lastZ = player.z;
-    run.traffic.step(dt, { x: player.x, z: player.z, vx, vz });
+    const participant = run.participant;
+    participant.x = player.x; participant.z = player.z; participant.vx = vx; participant.vz = vz;
+    run.traffic.step(dt, participant);
     syncCars();
     run.recorder.capture(run.time, player.head(), run.traffic.cars);
     const hit = run.traffic.hit(player.x, player.z);
@@ -465,7 +477,7 @@ renderer.setAnimationLoop(() => {
 });
 // debugging and tests
 window.vrlearn = {
-  scene, camera, renderer, player, obstacles, env, signals, ground, start, toTitle, resolution, replay,
+  scene, camera, renderer, player, obstacles, env, signals, ground, start, toTitle, resolution, replay, benchmark: probe,
   select(id) { selected = scenarioIndex.find(e => e.id === id) ?? selected; customScenario = null; renderTitle(); },
   get run() { return run; }, get state() { return state; },
   setPainted,
@@ -478,7 +490,7 @@ window.vrlearn = {
   /** Look from (x, y, z) at (tx, ty, tz) in Unity coordinates (comparisons with Unity screenshots); null to stop. */
   debugView(x, y, z, tx, ty, tz, fov = 60) {
     if (x == null) { debugCamera = null; return; }
-    debugCamera ??= new THREE.PerspectiveCamera(fov, innerWidth / innerHeight, 0.1, 500);
+    debugCamera ??= new THREE.PerspectiveCamera(fov, innerWidth / innerHeight, 0.1, 900);
     debugCamera.fov = fov;
     debugCamera.position.copy(toThree(x, y, z));
     debugCamera.lookAt(toThree(tx, ty, tz));
@@ -494,6 +506,21 @@ const review = new URLSearchParams(location.search);
 const reviewViews = {
   street: [55, 2.15, 23, 0, 2.8, 27, 62],
   'street-east': [30, 2.15, 26, 80, 2.8, 26, 62],
+  'street-corner': [32, 2.15, 34, 49, 3.2, 14, 63],
+  'street-west-corner': [33, 3.0, 34, 16, 3.3, 10, 62],
+  'moat-overhead': [64, 95, -18, 60, 0.15, 35, 52],
+  'road-network': [22, 130, -28, 22, 0.15, 42, 74],
+  'moat-detail': [66, 52, -2, 64, 0.15, 34, 52],
+  'bridge-detail': [23.2, 2.2, 32, 30, 1.2, 44, 52],
+  'north-bank': [32, 2.1, 53, 30, 4.0, 91, 68],
+  'castle-road': [33, 2.1, 12, 36, 3.5, -65, 66],
+  'parking-frontage': [-30, 2.2, 26, -78, 2.5, 16.5, 60],
+  'castle-panorama': [32, 2.1, 34, -264, 61, 395, 60],
+  'castle-detail': [-241.5, 67, 357, -264, 60.5, 395, 52],
+  'castle-site': [-130, 205, 240, -264, 35, 395, 60],
+  'castle-approach': [105, 180, 50, -105, 0.15, 230, 62],
+  'saigo-gate': [1.5, 2.0, 123, -8, 2.8, 130, 65],
+  'otemon-bridge': [-177, 7, 193, -157, 3.0, 239, 62],
   architecture: [51.7, 2.4, 29, 51.7, 4.0, 14, 55],
   foliage: [38, 2.0, 36, 26, 5.0, 46, 65],
   bridge: [32, 2.0, 37, 32, 3.0, 65, 62],
@@ -501,7 +528,7 @@ const reviewViews = {
 };
 const propCamera = await propReview(review.get('view'), scene, materials);
 if (propCamera) {
-  env.root.visible = signals.root.visible = occluders.visible = false;
+  env.root.visible = signals.root.visible = false;
   window.vrlearn.debugView(...propCamera);
 } else if (reviewViews[review.get('view')]) window.vrlearn.debugView(...reviewViews[review.get('view')]);
 if (review.get('finish') === 'off') setPainted(false);

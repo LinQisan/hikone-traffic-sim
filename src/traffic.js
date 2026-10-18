@@ -125,18 +125,22 @@ export function smoothRoute(route) {
 }
 
 /** Point and heading at distance d along a smoothed path; beyond either end it goes on straight. */
-export function pathAt(path, d) {
+export function pathAt(path, d, out = {}) {
   let lo = 0, hi = path.length - 1;
   if (d <= 0 || d >= path[hi].s) {
     const [a, b] = d <= 0 ? [path[0], path[1]] : [path[hi - 1], path[hi]];
     const l = Math.hypot(b.x - a.x, b.z - a.z) || 1, ux = (b.x - a.x) / l, uz = (b.z - a.z) / l;
     const from = d <= 0 ? path[0] : path[hi], extra = d <= 0 ? d : d - path[hi].s;
-    return { x: from.x + ux * extra, z: from.z + uz * extra, yaw: Math.atan2(ux, uz) * 180 / Math.PI };
+    out.x = from.x + ux * extra; out.z = from.z + uz * extra; out.yaw = Math.atan2(ux, uz) * 180 / Math.PI;
+    return out;
   }
   while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (path[mid].s <= d) lo = mid; else hi = mid; }
   const a = path[lo], b = path[hi], f = (d - a.s) / Math.max(1e-9, b.s - a.s);
-  return { x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f, yaw: Math.atan2(b.x - a.x, b.z - a.z) * 180 / Math.PI };
+  out.x = a.x + (b.x - a.x) * f; out.z = a.z + (b.z - a.z) * f; out.yaw = Math.atan2(b.x - a.x, b.z - a.z) * 180 / Math.PI;
+  return out;
 }
+
+const rearPoint = {}, frontPoint = {}, nextPoint = {}, centrePoint = {};
 
 /**
  * Where a car with its centre at distance d stands: centre between the axles, heading from rear
@@ -144,12 +148,13 @@ export function pathAt(path, d) {
  * the path's radius R around the front axle (the bicycle model), averaged over one wheelbase so
  * the wheels turn in smoothly as the front axle nears a bend and straighten as it leaves it.
  */
-export function carPose(path, d, wheelbase) {
-  const rear = pathAt(path, d - wheelbase / 2), front = pathAt(path, d + wheelbase / 2);
+export function carPose(path, d, wheelbase, out = {}) {
+  const rear = pathAt(path, d - wheelbase / 2, rearPoint), front = pathAt(path, d + wheelbase / 2, frontPoint);
   const yaw = Math.atan2(front.x - rear.x, front.z - rear.z) * 180 / Math.PI;
-  const turn = ((pathAt(path, d + wheelbase).yaw - pathAt(path, d).yaw + 540) % 360) - 180;   // over L, centred on the front axle
+  const turn = ((pathAt(path, d + wheelbase, nextPoint).yaw - pathAt(path, d, centrePoint).yaw + 540) % 360) - 180;   // over L, centred on the front axle
   const steer = Math.max(-MAX_STEER, Math.min(MAX_STEER, Math.atan(turn * Math.PI / 180) * 180 / Math.PI));
-  return { x: (rear.x + front.x) / 2, z: (rear.z + front.z) / 2, yaw, steer };
+  out.x = (rear.x + front.x) / 2; out.z = (rear.z + front.z) / 2; out.yaw = yaw; out.steer = steer;
+  return out;
 }
 
 /** Outer size (width, height, length) per body; the web sedan stands in for the Unity prefabs' car. */
@@ -234,7 +239,7 @@ export class Traffic {
     if (this.frozen) {
       // contact: everything stops except a car that does not (noStop), which drives on
       for (const car of this.cars) if (this.scenario.vehicles[car.vehicle].noStop) this.move(car, dt);
-      this.cars = this.cars.filter(c => c.alive);
+      this.removeDead();
       return;
     }
     if (dt > 1 / 30 + 1e-9) {                 // long steps (tests, tab switches): in small pieces
@@ -261,7 +266,13 @@ export class Traffic {
     }
     // a car born during this step drives only the part of the step since it appeared
     for (const car of this.cars) this.move(car, Math.max(0, Math.min(dt, this.time - car.born)));
-    this.cars = this.cars.filter(c => c.alive);
+    this.removeDead();
+  }
+
+  removeDead() {
+    let count = 0;
+    for (let i = 0; i < this.cars.length; i++) if (this.cars[i].alive) this.cars[count++] = this.cars[i];
+    this.cars.length = count;
   }
 
   /** Is a car within a car length of this vehicle's first route point? */
@@ -349,7 +360,7 @@ export class Traffic {
     car.currentSpeed = Math.max(0, car.currentSpeed + Math.max(-8 * dt, Math.min(8 * dt, change)));
     car.distance += (before + car.currentSpeed) / 2 * dt;
     if (car.distance > car.path.at(-1).s) { car.alive = false; return; }
-    if (car.distance > 0.01) Object.assign(car, carPose(car.path, car.distance, car.wheelbase));
+    if (car.distance > 0.01) carPose(car.path, car.distance, car.wheelbase, car);
     if (car.swerve) {
       car.lateral = Math.min(1.8, car.lateral + 3 * dt);
       const a = car.yaw * Math.PI / 180;

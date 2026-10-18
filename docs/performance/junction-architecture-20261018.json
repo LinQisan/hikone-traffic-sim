@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-18",
+  "view": "moat-overhead",
+  "url": "?view=moat-overhead&quality=high&benchmark=1",
+  "baseline": "Working tree after the overhead road reconstruction, before junction architecture and regulatory-sign refinement",
+  "conditions": "Same Chrome tab, camera, fixed quality and 3072 \u00d7 1584 backing buffer. Both samples taken while generation and tests were idle.",
+  "before": {
+    "geometryBytes": 23161791,
+    "placements": 908,
+    "meshes": 212,
+    "frames": 480,
+    "fps": 59.99550033751938,
+    "medianMs": 16.69999998807907,
+    "p95Ms": 17.899999976158142,
+    "updateMs": 0.07520833338300387,
+    "calls": 80,
+    "triangles": 306765,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "after": {
+    "geometryBytes": 25030049,
+    "placements": 906,
+    "meshes": 218,
+    "frames": 468,
+    "fps": 58.62678041251102,
+    "medianMs": 17,
+    "p95Ms": 27.5,
+    "updateMs": 0.48589743692905474,
+    "calls": 82,
+    "triangles": 296802,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "note": "Five junction frontages, paired regulatory signs, stone bridge rails and continuous Castle Road markings. Distant architecture omits tile rolls and inner window slats while retaining roof/eave silhouettes. Two additional draw calls and larger buffers; fewer visible triangles. The higher tail timing does not establish a smoothness improvement. No real phone or headset measured."
+}

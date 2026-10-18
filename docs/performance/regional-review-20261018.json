@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-18",
+  "view": "moat-overhead",
+  "url": "?view=moat-overhead&quality=high&benchmark=1",
+  "baseline": "Working tree after junction architecture/sign refinement, before the regional review",
+  "conditions": "Same Chrome tab, camera, fixed quality, and 3072 \u00d7 1584 backing buffer. Generation and tests were idle during each sample.",
+  "before": {
+    "geometryBytes": 25030049,
+    "placements": 906,
+    "meshes": 218,
+    "frames": 480,
+    "fps": 59.99850003758847,
+    "medianMs": 16.69999998807907,
+    "p95Ms": 18.099999994039536,
+    "updateMs": 0.10437499992549419,
+    "calls": 82,
+    "triangles": 296802,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "after": {
+    "geometryBytes": 18719984,
+    "placements": 457,
+    "meshes": 211,
+    "frames": 470,
+    "fps": 58.750734384136024,
+    "medianMs": 14.5,
+    "p95Ms": 34.900000005960464,
+    "updateMs": 1.2112765967211825,
+    "calls": 85,
+    "triangles": 216830,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "note": "Regional changes include a fourth marked crossing, flush bridge margins, stone retaining banks with static shadows, broad canopy masses, formal town trees, low western frontage and parking service details. Buffers, placements and visible triangles decrease; draws increase from 82 to 85. Median and tail timing move in different directions, so this does not establish an overall smoothness improvement. No real phone or headset measured."
+}

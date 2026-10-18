@@ -43,7 +43,7 @@ const glb = async name => {
   gltf.scene.traverse(o => { if (o.isMesh) parts.push(o.geometry.clone().applyMatrix4(o.matrixWorld)); });
   return parts;
 };
-const NOT_SOLID = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|ChainFence|Guardrail|StreetLamp|GuidePost|Hedge)/;
+const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|ChainFence|Guardrail|StreetLamp|GuidePost|Hedge)|ART_Kyobashi(Roads|Land|Water))/;
 // the city as the browser shows it (web-layout.js)
 const layout = webLayout(JSON.parse(fs.readFileSync(new URL('layout.json', data))));
 const ground = new Ground(JSON.parse(fs.readFileSync(new URL('road_tiles.json', data))));
@@ -65,11 +65,6 @@ for (const item of layout.items) {
   if (NOT_SOLID.test(item.a)) continue;
   if (!cache.has(item.a)) cache.set(item.a, await glb(item.a));
   for (const g of cache.get(item.a)) addTriangles(g, placement(...item.p, item.r, item.s, m));
-}
-// the black walls inside the gatehouses hide where cars appear and leave (scene.json blackWalls)
-for (const w of scene.blackWalls) {
-  const g = new THREE.BoxGeometry(w.size[0], w.size[1], Math.max(w.size[2], 0.05));
-  addTriangles(g, placement(w.x, w.y, w.z, w.yaw, [1, 1, 1], new THREE.Matrix4()));
 }
 const cityMeshes = [...cells.values()].map(list => {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3));

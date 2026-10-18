@@ -1,4 +1,4 @@
-// The impressionist Hikone mesh set, instanced at the experiment's original placements.
+// Impressionist Hikone meshes at imported and browser-owned placements.
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { placement } from './coords.js';
@@ -6,24 +6,31 @@ import { LIGHT, painted, paintedSky, PigmentPalette } from './style.js';
 import { environmentInstances } from './environment-instances.js';
 import { packPigments } from './geometry-budget.js';
 import { buildOverheadWires } from './overhead-wires.js';
+import { CameraObstacles } from './camera-obstacles.js';
+import { APPROACH_BUILDINGS } from './castle-approach.js';
 
-const NO_SHADOW = /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)/;
+const NO_SHADOW = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/;
 const loader = new GLTFLoader();
 const models = new Map();
 const loaded = new Map();
+
+async function loadParts(name, detail, packed) {
+  const gltf = await loader.loadAsync(`data/models/impressionist/${name}${detail === 'low' ? '.lod' : ''}.glb`);
+  gltf.scene.updateMatrixWorld(true);
+  const parts = [];
+  gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: packed ? packPigments(o.geometry) : o.geometry,
+    material: o.material, matrix: o.matrixWorld.clone() }); });
+  return parts;
+}
 
 /** The parts (geometry, material, local matrix) of a model, loaded once. */
 export async function model(name, detail = 'high', { packed = true } = {}) {
   const key = name + '/' + detail + '/' + packed;
   if (!models.has(key)) {
-    models.set(key, loader.loadAsync(`data/models/impressionist/${name}${detail === 'low' ? '.lod' : ''}.glb`).then(gltf => {
-      gltf.scene.updateMatrixWorld(true);
-      const parts = [];
-      gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: packed ? packPigments(o.geometry) : o.geometry,
-        material: o.material, matrix: o.matrixWorld.clone() }); });
+    models.set(key, loadParts(name, detail, packed).then(parts => {
       if (detail === 'high') loaded.set(name, parts);
       return parts;
-    }));
+    }).catch(error => { models.delete(key); throw error; }));
   }
   return models.get(key);
 }
@@ -84,7 +91,7 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
     byAsset.get(item.a).push(item);
   }
   // scene.json's pigments (and their emissive light) win over the GLB's own material
-  const resolve = parts => parts.map(part => ({ ...part, material: material(materials, part.material) }));
+  const resolve = parts => parts.map(part => ({ ...part, material: materials.get(part.material.name) ?? part.material }));
   // ground models pressed under the roads (one placement each)
   const pressUnderRoads = (parts, item) => parts.map(part => {
     const base = item.p[1];
@@ -103,22 +110,23 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
     return { ...part, geometry };
   });
   const definitions = await Promise.all([...byAsset].map(async ([asset, items]) => {
-    // unpacked: environment-instances re-packs while merging
-    let [high, low] = await Promise.all([model(asset, 'high', { packed: false }), model(asset, 'low', { packed: false })]);
-    if (ground && UNDER_ROADS.test(asset) && items.length === 1)
+    // These are merge inputs, not reusable runtime models. Keeping them in the model cache
+    // retains both original GLBs alongside the merged city for the lifetime of the page.
+    let [high, low] = await Promise.all([loadParts(asset, 'high', false), loadParts(asset, 'low', false)]);
+    const background = items.every(item => item.g === 'WebLandmark');
+    if (ground && !background && UNDER_ROADS.test(asset) && items.length === 1)
       [high, low] = [pressUnderRoads(high, items[0]), pressUnderRoads(low, items[0])];
-    return { asset, items, high: resolve(high), low: resolve(low) };
+    return { asset, items, high: resolve(high), low: resolve(low), background,
+      batched: asset === 'ART_CastleApproach',
+      cameraSolids: asset === 'ART_CastleApproach' ? APPROACH_BUILDINGS : null };
   }));
   const palette = new PigmentPalette();
   const env = environmentInstances(definitions, palette, asset => !NO_SHADOW.test(asset), m => m.side);
   const wires = buildOverheadWires(layout.overheadWires ?? []);
-  if (wires) {
-    env.root.add(wires);
-    env.geometryBytes += wires.geometry.index.array.byteLength
-      + Object.values(wires.geometry.attributes).reduce((bytes, a) => bytes + a.array.byteLength, 0);
-  }
+  if (wires) env.root.add(wires);
   scene.add(env.root);
-  return Object.assign(env, { palette, assetCount: byAsset.size, style: 'mesh-pigment-impasto' });
+  return Object.assign(env, { palette, assetCount: byAsset.size, style: 'mesh-pigment-impasto',
+    cameraObstacles: new CameraObstacles(definitions) });
 }
 
 /** Bake the painted sky once; diffuse light and cached shadows follow the participant. */
@@ -145,6 +153,8 @@ export function buildLight(scene, renderer, light) {
   sun.shadow.autoUpdate = false;
   sun.shadow.needsUpdate = true;
   Object.assign(sun.shadow.camera, { left: -45, right: 45, top: 45, bottom: -45, near: 1, far: 220 });
+  // The first instance caster list is built before the renderer updates this camera.
+  sun.shadow.camera.updateProjectionMatrix();
   sun.shadow.bias = -0.0004;
   sun.shadow.normalBias = 0.03;
   scene.add(sun, sun.target);

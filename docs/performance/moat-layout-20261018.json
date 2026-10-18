@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-18",
+  "view": "street-east",
+  "url": "?view=street-east&benchmark=1",
+  "baseline": "Working tree with street-detail changes, before the moat markings and vegetation additions",
+  "conditions": "Same Chrome tab and viewport; benchmark mode disables dynamic resolution. The agent satellite-reference tab was closed before measuring.",
+  "before": {
+    "geometryBytes": 35549518,
+    "placements": 1220,
+    "meshes": 511,
+    "frames": 467,
+    "fps": 59.2617032347829,
+    "medianMs": 16.69999998807907,
+    "p95Ms": 19.299999982118607,
+    "updateMs": 0.1745182012847966,
+    "calls": 115,
+    "triangles": 465144,
+    "width": 1761,
+    "height": 908,
+    "multiDraw": true
+  },
+  "after": {
+    "geometryBytes": 36023525,
+    "placements": 1262,
+    "meshes": 530,
+    "frames": 449,
+    "fps": 56.22761539805957,
+    "medianMs": 16.799999982118607,
+    "p95Ms": 23.099999994039536,
+    "updateMs": 0.08864142495168079,
+    "calls": 124,
+    "triangles": 494511,
+    "width": 1761,
+    "height": 908,
+    "multiDraw": true
+  },
+  "note": "Added bank vegetation, continuous markings and an asphalt-only straight module. Measurements describe this laptop; real phones were not measured."
+}

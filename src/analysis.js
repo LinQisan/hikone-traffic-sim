@@ -50,14 +50,12 @@ function speedKmh(track, atTime) {
 /** Linear sample of a [{ t, x, z }] track (null outside it). */
 export function sample(track, t) {
   if (!track.length || t < track[0].t - 1e-6 || t > track[track.length - 1].t + 1e-6) return null;
-  for (let i = 1; i < track.length; i++) {
-    if (track[i].t >= t) {
-      const a = track[i - 1], b = track[i], f = (t - a.t) / Math.max(1e-6, b.t - a.t);
-      return { t, x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f, yaw: a.yaw + deltaYaw(a.yaw, b.yaw) * f,
-        steer: (a.steer ?? 0) + ((b.steer ?? 0) - (a.steer ?? 0)) * f };
-    }
-  }
-  return track[track.length - 1];
+  let lo = 1, hi = track.length;
+  while (lo < hi) { const mid = (lo + hi) >>> 1; if (track[mid].t < t) lo = mid + 1; else hi = mid; }
+  if (lo === track.length) return track[track.length - 1];
+  const a = track[lo - 1], b = track[lo], f = (t - a.t) / Math.max(1e-6, b.t - a.t);
+  return { t, x: a.x + (b.x - a.x) * f, z: a.z + (b.z - a.z) * f, yaw: a.yaw + deltaYaw(a.yaw, b.yaw) * f,
+    steer: (a.steer ?? 0) + ((b.steer ?? 0) - (a.steer ?? 0)) * f };
 }
 
 export const isLookingAt = (head, x, z) => {

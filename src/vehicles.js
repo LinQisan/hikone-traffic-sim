@@ -6,7 +6,7 @@ import { painted } from './style.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { withBlobShadow } from './blob-shadow.js';
 
-export const BODY_MODEL = { sedan: 'WEB_Sedan', 'kei-tall': 'HK_Kei_Tall', 'kei-hatch': 'HK_Kei_Hatch' };
+export const BODY_MODEL = { sedan: 'WEB_Sedan', 'kei-tall': 'ART_KeiBox', 'kei-hatch': 'HK_Kei_Hatch' };
 // pearl white, silver, black, ivory, pale pink, sky blue, mint, red (VehicleBodies.asset)
 export const PAINTS = [[0.93, 0.93, 0.91], [0.72, 0.73, 0.75], [0.08, 0.08, 0.09], [0.86, 0.81, 0.7],
   [0.9, 0.74, 0.76], [0.58, 0.72, 0.82], [0.65, 0.8, 0.72], [0.62, 0.1, 0.12]];

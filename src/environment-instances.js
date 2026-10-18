@@ -15,13 +15,14 @@
 // earlier per-colour, per-object multi-draw issued about 3,900 draws per frame and the GPU sat idle.
 import * as THREE from 'three';
 import { placement } from './coords.js';
+import { geometryBytes } from './geometry-budget.js';
 
 export const LOD_FAR = 60, LOD_NEAR = 52.8;       // hysteresis: switch out at 60 m, back in at 52.8 m
 const BIG = 100;                                  // assets wider than this are cut into cells
 const MARGIN = 1.5;                               // safety for fast turns and the camera's near plane
-// the lists are rebuilt only once the view has moved this far or turned this much (1–2 ms of CPU
-// each); the culling margin grows with distance to cover the turn in between
-const MOVE_AGAIN = 0.25, TURN_AGAIN = Math.cos(1 * Math.PI / 180), TURN_MARGIN = Math.tan(2 * Math.PI / 180);
+// Lists rebuild only after the view moves 25 cm or turns 1° (quaternion dots use half angles).
+// The culling margin grows with distance to cover the turn in between.
+const MOVE_AGAIN = 0.25, TURN_AGAIN = Math.cos(0.5 * Math.PI / 180), TURN_MARGIN = Math.tan(2 * Math.PI / 180);
 
 /** The attribute as plain floats (normalized integers scaled back), without per-element getters. */
 function floats(attribute) {
@@ -121,7 +122,9 @@ export function cutIntoCells(geometry, cellSize) {
 }
 
 /**
- * definitions: [{ asset, items, high: parts, low: parts }] with parts { geometry, material, matrix }.
+ * definitions: [{ asset, items, high: parts, low: parts, background?, batched? }] with parts { geometry, material, matrix }.
+ * Background landmarks retain one compact silhouette draw and their longer atmospheric range.
+ * Batched composites retain one draw with ordinary town fog, for low-polygon distant surroundings.
  * castsShadow(asset) → boolean. sideOf(material) → THREE side (scene pigments are single-sided).
  */
 export function environmentInstances(definitions, palette, castsShadow, sideFor = () => THREE.FrontSide) {
@@ -129,7 +132,7 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
   root.name = 'HikoneEnvironment';
   const assets = [], cells = [];
   const matrix = new THREE.Matrix4(), box = new THREE.Box3(), size = new THREE.Vector3();
-  for (const { asset, items, high, low } of definitions) {
+  for (const { asset, items, high, low, background = false, batched = false } of definitions) {
     const shadow = castsShadow(asset);
     box.makeEmpty();
     for (const part of high) {
@@ -137,7 +140,8 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       box.union(part.geometry.boundingBox.clone().applyMatrix4(part.matrix));
     }
     box.getSize(size);
-    if (items.length === 1 && Math.max(size.x, size.z) > BIG) {
+    // A distant, compact-polygon landmark hill is cheaper as one low-detail draw than many cells.
+    if (!background && !batched && items.length === 1 && Math.max(size.x, size.z) > BIG) {
       // Cap cells at 128 m: the 1.4 km ground otherwise submits 280 m of brush
       // geometry at once, including much that is outside the view or behind fog.
       const cellSize = Math.max(64, Math.min(128, Math.max(size.x, size.z) / 5));
@@ -173,11 +177,11 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       }
       continue;
     }
-    // Repeated or compact asset: one InstancedMesh per detail level, filled each frame.
+    // Repeated or compact asset: one InstancedMesh per detail level, updated on view changes.
     const side = sideFor(high[0].material);
     const levels = [high, low].map((parts, level) => {
       const geometry = mergeParts(parts, palette);
-      const mesh = new THREE.InstancedMesh(geometry, palette.material(side), items.length);
+      const mesh = new THREE.InstancedMesh(geometry, palette.material(side, false, background ? 0.55 : 1), items.length);
       mesh.name = asset + (level ? '/low' : '/high');
       mesh.count = 0;
       mesh.visible = false;
@@ -208,19 +212,20 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       root.add(shadowMesh);
     }
     const sphere = levels[0].geometry.boundingSphere;
-    const placements = items.map(item => {
+    const placements = items.map((item, index) => {
       const m = placement(...item.p, item.r, item.s, new THREE.Matrix4());
       const center = sphere.center.clone().applyMatrix4(m);
-      return { item, matrix: m, center, radius: sphere.radius * m.getMaxScaleOnAxis(), low: false };
+      return { item, index, matrix: m, center, radius: sphere.radius * m.getMaxScaleOnAxis(), low: false };
     });
-    assets.push({ asset, shadow, high: levels[0], low: levels[1], shadowMesh, placements });
+    assets.push({ asset, shadow, high: levels[0], low: levels[1], shadowMesh, placements,
+      highIndices: new Uint32Array(items.length).fill(0xffffffff), lowIndices: new Uint32Array(items.length).fill(0xffffffff) });
   }
 
   const frustum = new THREE.Frustum(), second = new THREE.Frustum(), shadowFrustum = new THREE.Frustum();
   const projection = new THREE.Matrix4();
   const eye = new THREE.Vector3(), secondEye = new THREE.Vector3(), sphere = new THREE.Sphere();
-  const lastView = new Float64Array(64).fill(NaN), view = new Float64Array(64);
-  const look = new THREE.Vector3(), lastLook = new THREE.Vector3(), lastEye = new THREE.Vector3(Infinity, 0, 0);
+  const lastView = new Float64Array(80).fill(NaN), view = new Float64Array(80);
+  const rotation = new THREE.Quaternion(), lastRotation = new THREE.Quaternion(), lastEye = new THREE.Vector3(Infinity, 0, 0);
   const frustumOf = (camera, f, position) => {
     camera.updateWorldMatrix(true, false);
     f.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
@@ -246,8 +251,7 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     },
     get builds() { return builds; },
     objects: definitions.reduce((n, d) => n + d.items.length, 0),
-    geometryBytes: root.children.reduce((sum, m) => sum + m.geometry.index.array.byteLength
-      + Object.values(m.geometry.attributes).reduce((bytes, a) => bytes + a.array.byteLength, 0), 0),
+    get geometryBytes() { return geometryBytes(root); },
     /**
      * Chooses the placements to draw and their detail for this view (and an optional second view);
      * casters inside `shadowCamera`'s frustum are always kept so shadows from behind the viewer
@@ -259,20 +263,25 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       frustumOf(camera, frustum, eye);
       if (secondCamera) frustumOf(secondCamera, second, secondEye);
       view.fill(0);
-      view.set(camera.projectionMatrix.elements, 16);
-      if (secondCamera) view.set(secondCamera.matrixWorld.elements, 32);
-      camera.getWorldDirection(look);
-      let same = eye.distanceTo(lastEye) < MOVE_AGAIN && look.dot(lastLook) > TURN_AGAIN;
-      for (let i = 16; same && i < 48; i++) if (view[i] !== lastView[i]) same = false;
+      view.set(camera.projectionMatrix.elements);
+      if (secondCamera) {
+        view.set(secondCamera.matrixWorld.elements, 16);
+        view.set(secondCamera.projectionMatrix.elements, 32);
+      }
+      camera.getWorldQuaternion(rotation);
+      let same = eye.distanceToSquared(lastEye) < MOVE_AGAIN * MOVE_AGAIN && Math.abs(rotation.dot(lastRotation)) > TURN_AGAIN;
+      for (let i = 0; same && i < 48; i++) if (view[i] !== lastView[i]) same = false;
       // the shadow list follows the shadow box only (it moves when the view re-centres)
       let shadowMoved = false;
       if (shadowCamera) {
         shadowCamera.updateMatrixWorld();
-        for (let i = 0; i < 16; i++) if (shadowCamera.matrixWorld.elements[i] !== lastView[48 + i]) shadowMoved = true;
+        view.set(shadowCamera.matrixWorld.elements, 48);
+        view.set(shadowCamera.projectionMatrix.elements, 64);
+        for (let i = 48; i < 80; i++) if (view[i] !== lastView[i]) shadowMoved = true;
       }
       if (same && !shadowMoved) return false;
       if (shadowMoved) {
-        lastView.set(shadowCamera.matrixWorld.elements, 48);
+        lastView.set(view);
         shadowFrustum.setFromProjectionMatrix(projection.multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
         for (const a of assets) {
           const mesh = a.shadowMesh;
@@ -290,24 +299,31 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       }
       let changed = shadowMoved;
       if (!same) {
-        lastView.set(view.subarray(0, 48)); lastEye.copy(eye); lastLook.copy(look);
+        lastView.set(view); lastEye.copy(eye); lastRotation.copy(rotation);
         builds++;
-        const near = p => Math.min(p.distanceTo(eye), secondCamera ? p.distanceTo(secondEye) : Infinity);
         for (const a of assets) {
-          const lists = [[], []];
+          let highCount = 0, lowCount = 0, highDirty = false, lowDirty = false;
           for (const p of a.placements) {
-            p.distance = Math.max(0, near(p.center) - p.radius);
+            p.distance = Math.max(0, Math.min(p.center.distanceTo(eye), secondCamera ? p.center.distanceTo(secondEye) : Infinity) - p.radius);
             lodOf(p, p.distance);
             sphere.set(p.center, p.radius + MARGIN + p.distance * TURN_MARGIN);
-            if (frustum.intersectsSphere(sphere) || (secondCamera && second.intersectsSphere(sphere))) lists[p.low ? 1 : 0].push(p);
+            if (!frustum.intersectsSphere(sphere) && !(secondCamera && second.intersectsSphere(sphere))) continue;
+            const mesh = p.low ? a.low : a.high, indices = p.low ? a.lowIndices : a.highIndices;
+            const n = p.low ? lowCount++ : highCount++;
+            if (indices[n] !== p.index) {
+              indices[n] = p.index;
+              mesh.instanceMatrix.array.set(p.matrix.elements, 16 * n);
+              if (p.low) lowDirty = true; else highDirty = true;
+            }
           }
-          [a.high, a.low].forEach((mesh, level) => {
-            const list = lists[level], array = mesh.instanceMatrix.array;
-            let n = 0;
-            for (const p of list) array.set(p.matrix.elements, 16 * n++);
-            mesh.count = mesh.userData.drawCount = n;
-            if (n) { mesh.instanceMatrix.clearUpdateRanges(); mesh.instanceMatrix.addUpdateRange(0, n * 16); mesh.instanceMatrix.needsUpdate = true; }
-          });
+          a.high.count = a.high.userData.drawCount = highCount;
+          a.low.count = a.low.userData.drawCount = lowCount;
+          if (highDirty) {
+            a.high.instanceMatrix.clearUpdateRanges(); a.high.instanceMatrix.addUpdateRange(0, highCount * 16); a.high.instanceMatrix.needsUpdate = true;
+          }
+          if (lowDirty) {
+            a.low.instanceMatrix.clearUpdateRanges(); a.low.instanceMatrix.addUpdateRange(0, lowCount * 16); a.low.instanceMatrix.needsUpdate = true;
+          }
         }
       }
       for (const a of assets) {

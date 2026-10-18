@@ -7,11 +7,26 @@ import { fileURLToPath } from 'node:url';
 import * as S from '../src/shared/scenario.js';
 import { Traffic, BODY_SIZE } from '../src/traffic.js';
 import { Ground } from '../src/ground.js';
-import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, deltaYaw, yawTo } from '../src/analysis.js';
+import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, deltaYaw, yawTo, sample } from '../src/analysis.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const data = f => JSON.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8'));
 const scenario = id => S.normalize(data(`scenarios/${id}.json`));
+
+test('track lookup preserves angular interpolation, duplicate-time boundaries and endpoint tolerance', () => {
+  const track = [{ t: 0, x: 0, z: 0, yaw: 350, steer: 0 },
+    { t: 1, x: 2, z: 4, yaw: 10, steer: 20 },
+    { t: 1, x: 3, z: 5, yaw: 20, steer: 30 },
+    { t: 2, x: 5, z: 7, yaw: 40, steer: 10 }];
+  assert.deepEqual(sample(track, 0.5), { t: 0.5, x: 1, z: 2, yaw: 360, steer: 10 });
+  assert.equal(sample(track, 1).x, 2, 'the first key at a duplicated timestamp wins');
+  assert.equal(sample(track, 1.5).x, 4);
+  assert.equal(sample(track, 2 + 0.5e-6), track.at(-1));
+  assert.equal(sample(track, -2e-6), null);
+  assert.equal(sample(track, 2 + 2e-6), null);
+  assert.equal(sample([], 0), null);
+  assert.equal(sample([track[0]], 0), track[0]);
+});
 
 test('the exported data is complete', () => {
   const scene = data('scene.json');
@@ -27,12 +42,16 @@ test('the exported data is complete', () => {
   assert.equal(data('scenarios/index.json').filter(e => e.template).length, 10);
 });
 
-test('ground heights match the Unity road colliders', () => {
+test('ground heights match the browser road plan', () => {
   const g = new Ground(data('road_tiles.json'));
   assert.ok(Math.abs(g.heightAt(32, 10) - 0.01) < 1e-3, 'carriageway 0.01');
   assert.ok(Math.abs(g.heightAt(40, 14) - 0.16) < 1e-3, 'sidewalk 0.16 (15 cm kerbs, as in Unity)');
   assert.ok(Math.abs(g.heightAt(60, 26) - 0.01) < 1e-3, 'Route 25');
   assert.equal(Ground.fallback(32, 45), 0.01, 'bridge deck carriageway');
+  for (const x of [26.2, 37.8]) for (const z of [44, 56, 70]) {
+    assert.ok(Math.abs(g.heightAt(x, z) - 0.01) < 1e-4, 'bridge margins are flush with the deck');
+    assert.equal(Ground.fallback(x, z), 0.01, 'partially loaded ground keeps the same deck level');
+  }
 });
 
 test('cars appear on time, accelerate at 8 m/s² and leave at the end of their route', () => {
@@ -105,7 +124,7 @@ test('analysis: looking toward the car, side checks, verdicts and the placement 
   assert.ok(c.checkedRight && !c.checkedLeft);
 });
 
-test('15 cm kerbs: the layout stands on the ground as VRLearn generated it', async () => {
+test('15 cm kerbs: the reviewed layout stands on the road plan', async () => {
   const { webLayout } = await import('../src/web-layout.js');
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
   const shown = webLayout(layout);
@@ -114,7 +133,6 @@ test('15 cm kerbs: the layout stands on the ground as VRLearn generated it', asy
   // every house stands on the ground (not floating, not sunk) and keeps VRLearn's height
   for (const h of shown.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a)).slice(0, 40))
     assert.ok(Math.abs(g.heightAt(h.p[0], h.p[2]) - h.p[1]) < 0.03, `${h.a} at ${h.p[0]}, ${h.p[2]}: ground ${g.heightAt(h.p[0], h.p[2]).toFixed(3)}, base ${h.p[1].toFixed(3)}`);
-  assert.ok(shown.items.filter(i => i.g !== 'WebStreet').every(i => layout.items.some(j => j.a === i.a && j.p.every((v, k) => v === i.p[k]))), 'imported positions as generated');
   for (const item of shown.items.filter(i => i.g === 'WebStreet'))
     assert.ok(Math.abs(g.heightAt(item.p[0], item.p[2]) - item.p[1]) < 0.02, `${item.a} rests on the pavement`);
 });
@@ -124,4 +142,15 @@ test('road height is known on the roads only (ground models are pressed under it
   assert.ok(Math.abs(g.roadHeightAt(32, 37) - 0.01) < 1e-3, 'carriageway at the bridge approach');
   assert.equal(g.roadHeightAt(0, -500), null, 'far off the roads');
   assert.equal(g.heightAt(0, -500), Ground.fallback(0, -500));
+});
+
+test('the overhead road plan connects the long bridge and through streets without the old return roads', () => {
+  const g = new Ground(data('road_tiles.json'));
+  for (const [x, z] of [[180, 42.73], [32, 65], [22, 88], [36.16, -64], [-100, -64], [-28, -20]])
+    assert.ok(Math.abs(g.roadHeightAt(x, z) - 0.01) < 1e-4, `connected carriageway at ${x},${z}`);
+  for (const [x, z] of [[92, 4], [10, 11], [55, 62], [10, -6]])
+    assert.equal(g.roadHeightAt(x, z), null, `obsolete grid road at ${x},${z} is gone`);
+  const map = data('map.json');
+  assert.ok(S.crossesWall(map, { x: 20, z: 38 }, { x: 20, z: 50 }), 'the moat cannot be walked across');
+  assert.ok(!S.crossesWall(map, { x: 32, z: 38 }, { x: 32, z: 75 }), 'the longer bridge remains open');
 });

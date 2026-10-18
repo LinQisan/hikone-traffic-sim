@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-18",
+  "view": "castle-panorama",
+  "method": "Same Chrome tab, quality=high, benchmark=1. Reload with landmarks=off, then without that opt-out; no concurrent builds/tests in the sampling window.",
+  "off": {
+    "geometryBytes": 18719984,
+    "placements": 457,
+    "meshes": 211,
+    "frames": 480,
+    "fps": 60.01425338522371,
+    "medianMs": 17.099999994039536,
+    "p95Ms": 27.69999998807907,
+    "updateMs": 0.5508333330353101,
+    "calls": 66,
+    "triangles": 219120,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "on": {
+    "geometryBytes": 21062523,
+    "placements": 459,
+    "meshes": 216,
+    "frames": 462,
+    "fps": 57.7435038557732,
+    "medianMs": 16.900000005960464,
+    "p95Ms": 33.70000001788139,
+    "updateMs": 0.7194805194289138,
+    "calls": 68,
+    "triangles": 231733,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "models": {
+    "ART_HikoneKeep": {
+      "triangles": 22726,
+      "strokes": 0,
+      "bytes": 1670920,
+      "remodeled": true,
+      "design": "hikone-landmark-v1",
+      "lod": {
+        "triangles": 5674,
+        "bytes": 428928
+      }
+    },
+    "HK_Terrain_Hikone": {
+      "triangles": 15444,
+      "strokes": 1512,
+      "bytes": 1099260,
+      "remodeled": true,
+      "design": "hikone-landmark-v1",
+      "lod": {
+        "triangles": 6939,
+        "bytes": 537924
+      }
+    }
+  },
+  "delta": {
+    "calls": 2,
+    "triangles": 12613,
+    "geometryBytes": 2342539
+  },
+  "limitation": "One desktop viewpoint; not evidence of phone/VR frame pacing. Nearby trees naturally occlude the keep at this eye position.",
+  "observation": "This sample has a slower p95 frame time with the landmark enabled; it does not establish unchanged smoothness."
+}

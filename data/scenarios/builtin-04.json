@@ -12,21 +12,21 @@
     "playerMode": "walking",
     "spawn": {
         "x": 62.62,
-        "z": 19.0
+        "z": 20.05
     },
     "goal": {
         "x": 63.63,
         "z": 31.77,
         "width": 5.06,
-        "depth": 1.0,
-        "yaw": 0.0
+        "depth": 1,
+        "yaw": 0
     },
     "trigger": {
         "x": 62.64,
         "z": 25.75,
         "width": 2.53,
         "depth": 3.07,
-        "yaw": 0.0
+        "yaw": 0
     },
     "vehicles": [
         {
@@ -63,41 +63,25 @@
                     "z": 23.4
                 },
                 {
-                    "x": 20,
-                    "z": 24
-                },
-                {
-                    "x": 16.94,
-                    "z": 23.39
-                },
-                {
-                    "x": 14.34,
-                    "z": 21.66
-                },
-                {
-                    "x": 12.61,
-                    "z": 19.06
-                },
-                {
                     "x": 12,
-                    "z": 16
+                    "z": 23.4
                 },
                 {
-                    "x": 12,
-                    "z": 8.5
+                    "x": -210,
+                    "z": 23.4
                 }
             ],
-            "speedKmh": 36.0,
+            "speedKmh": 36,
             "start": "begin",
-            "delaySeconds": 0.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
+            "delaySeconds": 0,
+            "repeatMinSeconds": 0,
+            "repeatMaxSeconds": 0,
             "stopOnTrigger": false,
             "accident": true,
             "overrideYaw": false,
-            "yaw": 0.0,
+            "yaw": 0,
             "launch": "meet",
-            "entrySpeedKmh": 36.0
+            "entrySpeedKmh": 36
         }
     ]
 }

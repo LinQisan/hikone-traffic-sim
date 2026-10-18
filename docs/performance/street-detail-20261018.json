@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-18",
+  "view": "street-east",
+  "url": "?view=street-east&benchmark=1",
+  "baselineCommit": "cf2036e",
+  "conditions": "Same Chrome tab and unchanged viewport, benchmark mode disables dynamic resolution; other rendering tabs closed.",
+  "before": {
+    "geometryBytes": 34253726,
+    "placements": 1219,
+    "meshes": 494,
+    "frames": 469,
+    "fps": 58.67267154563083,
+    "medianMs": 16.69999998807907,
+    "p95Ms": 17.600000023841858,
+    "updateMs": 0.11492537371893681,
+    "calls": 110,
+    "triangles": 509028,
+    "width": 1761,
+    "height": 908,
+    "multiDraw": true
+  },
+  "after": {
+    "geometryBytes": 35549518,
+    "placements": 1220,
+    "meshes": 511,
+    "frames": 343,
+    "fps": 42.84447331266896,
+    "medianMs": 19.400000005960464,
+    "p95Ms": 48,
+    "updateMs": 0.6583090374143061,
+    "calls": 115,
+    "triangles": 465144,
+    "width": 1761,
+    "height": 908,
+    "multiDraw": true
+  },
+  "repeat": {
+    "geometryBytes": 35549518,
+    "placements": 1220,
+    "meshes": 511,
+    "frames": 429,
+    "fps": 53.622318884215595,
+    "medianMs": 16.80000001192093,
+    "p95Ms": 39.5,
+    "updateMs": 0.7298368302397517,
+    "calls": 115,
+    "triangles": 465144,
+    "width": 1761,
+    "height": 908,
+    "multiDraw": true
+  },
+  "note": "Frame timing varied between runs; no smoothness improvement is claimed. Geometry and draw-call counts were stable. Real phones were not measured."
+}

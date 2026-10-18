@@ -7,7 +7,7 @@ import { BODY_SIZE, WHEELBASE, smoothRoute, carPose } from '../src/traffic.js';
 /** A bounded driveway crossing is intentional in 07/08; travel along the pavement is not. */
 function driveway(scenario, vehicle, x, z) {
   return ['builtin-07', 'builtin-08'].includes(scenario.id) && vehicle.accident
-    && x >= -69 && x <= -63 && z >= 14 && z <= 22.05;
+    && x >= -100 && x <= -94 && z >= 14 && z <= 22.05;
 }
 
 export function inspectRoutes(scenario, map) {

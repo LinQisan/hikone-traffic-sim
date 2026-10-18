@@ -12,6 +12,8 @@ import { createReplayCyclist, ridingTrack, sampleRide } from './replay-cyclist.j
 import { classifyCrash, crashMotion, bicycleMotion } from './crash.js';
 import { BODY_SIZE } from './traffic.js';
 import { buildCockpit } from './cockpit.js';
+import { ReplayCamera, replaySampleTimes } from './replay-camera.js';
+import { GroundContact } from './ground-contact.js';
 
 const SLOW_FROM = 0.8, SLOW_UNTIL = 0.4, SLOW_RATE = 0.45;
 const LIME = 0x7dff33, CONTACT = 0xff4033;
@@ -19,14 +21,29 @@ const UP = new THREE.Vector3(0, 1, 0), _box = new THREE.Box3();
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _v4 = new THREE.Vector3();
 const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion(), _q3 = new THREE.Quaternion();
 
+// Overlays and shadow pools are not solid bodies, and must not enlarge an occluding vehicle.
+function bodyBounds(root) {
+  const bounds = new THREE.Box3();
+  root.traverse(part => {
+    if (!part.isMesh || part.name === 'BlobShadow' || part.name === 'ReplayContactPin') return;
+    part.geometry.boundingBox ?? part.geometry.computeBoundingBox();
+    bounds.union(_box.copy(part.geometry.boundingBox).applyMatrix4(part.matrixWorld));
+  });
+  return bounds;
+}
+
 export class Replay {
-  constructor(scene, materials, ground) {
+  constructor(scene, materials, ground, cameraObstacles = null) {
     this.scene = scene;
     this.materials = materials;
     this.ground = ground;
-    this.camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 500);
+    this.camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 900);
+    this.overview = new ReplayCamera(this.camera, ground, cameraObstacles);
+    this.cameraObstacles = cameraObstacles;
+    this.focus = this.overview.focus;
+    this.reducedMotion = false;
     // the driver's view: from the accident car's driver seat (right-hand drive), along its travel
-    this.driverCamera = new THREE.PerspectiveCamera(50, 16 / 9, 0.05, 500);
+    this.driverCamera = new THREE.PerspectiveCamera(50, 16 / 9, 0.05, 900);
     this.view = 'overview';
 
     this.root = null;
@@ -34,7 +51,7 @@ export class Replay {
     this.atEnd = false;
   }
 
-  start(frames, impactTime, carId, heightCm, playerMode = 'walking', weightKg = 60) {
+  start(frames, impactTime, carId, heightCm, playerMode = 'walking', weightKg = 60, parked = null) {
     this.stop();
     this.frames = frames;
     this.impact = impactTime;
@@ -43,6 +60,7 @@ export class Replay {
     this.time = this.start_;
     this.atEnd = false;
     this.playing = true;
+    this.overview.obstacles = parked && this.cameraObstacles ? this.cameraObstacles.withRoot(parked) : this.cameraObstacles;
     this.root = new THREE.Group();
     this.scene.add(this.root);
     this.root.add(this.driverCamera);
@@ -66,11 +84,13 @@ export class Replay {
         }
     this.headTrack = frames.map(f => ({ t: f.t, ...f.head }));
     this.rideTrack = playerMode === 'bicycle' ? ridingTrack(this.headTrack, impactTime) : null;
-    this.rideCameraOffset = null;
     // A simple cream bear follows the participant; the ring/fan remain data overlays.
     const h = Math.max(0.9, Math.min(2.1, heightCm / 100));
     this.figure = new THREE.Group();
     this.animal = this.rideTrack ? createReplayCyclist(heightCm, { weightKg }) : createReplayAnimal(heightCm, { weightKg });
+    this.grounding = this.rideTrack
+      ? { rider: new GroundContact(this.animal.rider), bike: new GroundContact(this.animal.bike) }
+      : { body: new GroundContact(this.animal.pivot) };
     const ring = owned(new THREE.Mesh(new THREE.RingGeometry(0.45, 0.6, 32), new THREE.MeshBasicMaterial({ color: LIME, side: THREE.DoubleSide })));
     ring.rotation.x = -Math.PI / 2; ring.position.y = 0.03;
     const fan = owned(new THREE.Mesh(this.fanGeometry(6), new THREE.MeshBasicMaterial({ color: LIME, transparent: true, opacity: 0.35, side: THREE.DoubleSide, depthWrite: false })));
@@ -110,8 +130,8 @@ export class Replay {
     disc.visible = false;
     this.contact = disc;
     this.root.add(disc);
-    this.frame(this.start_);
-    // camera: across the car's direction of travel, from the side the participant came from
+    // Prefer a three-quarter angle across the car's path, from the participant's approach side.
+    // The director may lift or move this angle after checking the complete recorded movement.
     const car = this.cars.get(carId)?.track ?? [];
     const c1 = sample(car, impactTime) ?? at, c0 = sample(car, impactTime - 1) ?? c1;
     let vx = c1.x - c0.x, vz = c1.z - c0.z;
@@ -120,16 +140,38 @@ export class Replay {
     let sideX = -vz / len, sideZ = vx / len;
     const s0 = this.headTrack[0];
     if ((s0.x - at.x) * sideX + (s0.z - at.z) * sideZ < 0) { sideX = -sideX; sideZ = -sideZ; }
-    this.focus = toThree((at.x + c1.x) / 2, 0.4, (at.z + c1.z) / 2);
-    const distance = this.rideTrack ? 13 : 16, elevation = this.rideTrack ? 10 : 15;
-    this.camera.position.copy(toThree(at.x + sideX * distance, elevation, at.z + sideZ * distance));
-    this.camera.lookAt(this.focus);
-    if (this.rideTrack) {
-      this.impactTrack = car;
-      // Three-quarter view separates the two wheels and shows hands on the grips.
-      this.rideCameraOffset = toThree(sideX * 11 + vx / len * 8, elevation, sideZ * 11 + vz / len * 8);
-      this.frame(this.start_);
+    const angle = Math.atan2(-(sideX + vx / len * 0.45), sideZ + vz / len * 0.45);
+    const samples = [];
+    for (const t of replaySampleTimes(this.start_, this.end, impactTime)) {
+      this.frame(t);
+      this.root.updateWorldMatrix(true, true);
+      // Actual posed bounds include the thrown body and the bicycle after they separate.
+      const bounds = bodyBounds(this.animal.root);
+      const person = bodyBounds(this.rideTrack ? this.animal.rider : this.animal.pivot);
+      const centre = person.getCenter(new THREE.Vector3());
+      const targets = [centre, new THREE.Vector3(centre.x, person.min.y + 0.15, centre.z),
+        new THREE.Vector3(centre.x, person.max.y - 0.1, centre.z)];
+      const blockers = [];
+      for (const [id, { mesh, track }] of this.cars) if (sample(track, t)) {
+        blockers.push({ bounds: bodyBounds(mesh), ignoreFrom: id === carId ? 3 : Infinity });
+      }
+      const accident = this.cars.get(carId)?.mesh;
+      if (accident && sample(car, t)) {
+        const carBounds = bodyBounds(accident);
+        const carCentre = carBounds.getCenter(new THREE.Vector3());
+        if (centre.distanceTo(carCentre) < 32) {
+          bounds.union(carBounds);
+          // Front and rear targets keep the approaching vehicle readable, not just its roof pin.
+          const c = sample(car, t), a = yawToThree(c.yaw);
+          const forward = new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
+          targets.push(carCentre, carCentre.clone().addScaledVector(forward, this.driverSize[2] * 0.4),
+            carCentre.clone().addScaledVector(forward, -this.driverSize[2] * 0.4));
+        }
+      }
+      samples.push({ t, bounds, targets, blockers });
     }
+    this.overview.start(samples, impactTime, angle, this.reducedMotion);
+    this.frame(this.start_);
   }
 
   /**
@@ -147,7 +189,7 @@ export class Replay {
       return;
     }
     const yaw = this.figure.quaternion, inverse = _q1.copy(yaw).invert();
-    const dir = _v1.copy(toThree(this.crash.dir.x, 0, this.crash.dir.z));
+    const dir = toThree(this.crash.dir.x, 0, this.crash.dir.z, _v1);
     let axis;
     if (kind === 'bike') {
       // the bicycle goes down onto its side, towards where it is pushed
@@ -156,13 +198,12 @@ export class Replay {
     } else axis = _v4.crossVectors(UP, dir).normalize();
     const world = _q2.setFromAxisAngle(axis, m.tilt).multiply(_q3.setFromAxisAngle(UP, m.spin));
     group.quaternion.copy(inverse).multiply(world).multiply(yaw);
-    const offset = _v2.copy(toThree(m.x, m.y, m.z)).applyQuaternion(inverse).divideScalar(height);
+    const offset = toThree(m.x, m.y, m.z, _v2).applyQuaternion(inverse).divideScalar(height);
     group.position.copy(offset).add(centre).sub(_v3.copy(centre).applyQuaternion(group.quaternion));
     // on the ground the lowest point rests on the road at the landing place; in the air it only
     // must not sink below it
     base.updateWorldMatrix(true, true);
-    _box.setFromObject(group, true);
-    const below = this.ground.heightAt(h.x + m.x, h.z + m.z) - _box.min.y;
+    const below = this.ground.heightAt(h.x + m.x, h.z + m.z) - this.grounding[kind].minimumY();
     if (below > 0 || m.y === 0) group.position.y += below / height;
   }
 
@@ -173,6 +214,26 @@ export class Replay {
   setView(view) {
     this.view = view === 'driver' ? 'driver' : 'overview';
     if (this.playing) this.frame(this.time);
+  }
+
+  setReducedMotion(value) {
+    if (this.reducedMotion === value) return;
+    this.reducedMotion = value;
+    if (this.playing) {
+      this.overview.reducedMotion = value;
+      this.overview.plan();
+      this.frame(this.time);
+    }
+  }
+
+  /** Reserve the screen covered by the replay controls, including wrapped phone layouts. */
+  setViewport(aspect, bottomInset = 0) {
+    const inset = Math.max(0, Math.min(0.65, Math.ceil(bottomInset * 50) / 50));
+    if (this.camera.aspect === aspect && this.overview.bottomInset === inset) return;
+    this.overview.bottomInset = inset;
+    // Shift the lens, keeping the subject in the centre of the unobscured part of the canvas.
+    this.camera.setViewOffset(aspect, 1, 0, inset / 2, aspect, 1);
+    if (this.playing) { this.overview.plan(); this.frame(this.time); }
   }
 
   /**
@@ -249,19 +310,10 @@ export class Replay {
         this.applyCrash(this.animal.rider, this.animal.riderCentre, motion, h, 'rider');
         this.applyCrash(this.animal.bike, this.animal.bikeCentre, bicycleMotion(this.crash, s_), h, 'bike');
       } else this.applyCrash(this.animal.pivot, this.animal.centre, motion, h, 'body');
-      if (this.rideCameraOffset) {
-        // A rider can cover almost 20 m in the recording window. Follow the bike
-        // so it stays visible, and include the approaching car as it gets close.
-        const car = sample(this.impactTrack, t);
-        const blend = car ? Math.max(0, 1 - Math.hypot(car.x - h.x, car.z - h.z) / 10) * 0.5 : 0;
-        this.focus.copy(toThree(h.x + ((car?.x ?? h.x) - h.x) * blend,
-          this.ground.heightAt(h.x, h.z) + 0.8, h.z + ((car?.z ?? h.z) - h.z) * blend));
-        this.camera.position.copy(this.focus).add(this.rideCameraOffset);
-        this.camera.lookAt(this.focus);
-      }
     }
     this.contact.visible = t >= this.impact;
     this.placeDriver(t);
+    this.overview.frame(t);
   }
 
   /** Advance; returns the label shown above the replay. */
@@ -279,12 +331,16 @@ export class Replay {
 
   stop() {
     this.playing = false;
+    this.overview.track = [];
+    this.overview.samples = null;
+    this.overview.obstacles = this.cameraObstacles;
     if (this.cockpit) {
       this.cockpit.root.removeFromParent();
       this.cockpit.dispose();
       this.cockpit = null;
     }
     if (this.root) {
+      this.driverCamera.removeFromParent();
       // Vehicle buffers/materials are shared with live traffic. Dispose only replay-owned parts.
       this.animal?.dispose();
       for (const overlay of this.overlays) {
@@ -296,5 +352,9 @@ export class Replay {
       this.root = null;
       this.animal = null;
     }
+    this.cars?.clear();
+    this.frames = this.headTrack = this.rideTrack = this.driverTrack = null;
+    this.figure = this.gaze = this.contact = this.grounding = null;
+    this.crash = null;
   }
 }

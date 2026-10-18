@@ -19,6 +19,18 @@ const dyaw = (a, b) => ((b - a + 540) % 360) - 180;
 // a right-angle turn to the right: north 20 m, then east 20 m
 const corner = [{ x: 0, z: 0 }, { x: 0, z: 20 }, { x: 20, z: 20 }];
 
+test('pose output can reuse a car without replacing its simulation fields or sharing scratch results', () => {
+  const path = smoothRoute(corner), car = { id: 17, currentSpeed: 4 };
+  const expected = carPose(path, 12, 2.7);
+  assert.equal(carPose(path, 12, 2.7, car), car);
+  assert.deepEqual(car, { id: 17, currentSpeed: 4, ...expected });
+  carPose(path, 27, 2.52);
+  assert.deepEqual(car, { id: 17, currentSpeed: 4, ...expected }, 'later calls do not mutate an earlier result');
+  const point = {};
+  assert.equal(pathAt(path, -2, point), point);
+  assert.deepEqual(point, { x: 0, z: -2, yaw: 0 });
+});
+
 test('route corners become arcs: the heading turns smoothly and the path stays close to the route', () => {
   const path = smoothRoute(corner);
   let previous = pathAt(path, 0).yaw, maxStep = 0;
@@ -90,7 +102,7 @@ test('a short lateral correction on a straight does not become a sharp steering 
 
 test('the front wheels of each car model are cut out on pivots at the wheel centres and steer', async () => {
   const loader = new GLTFLoader();
-  for (const name of ['WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch']) {
+  for (const name of ['WEB_Sedan', 'HK_Kei_Tall', 'ART_KeiBox', 'HK_Kei_Hatch']) {
     const bytes = fs.readFileSync(new URL(`../data/models/impressionist/${name}.glb`, import.meta.url));
     const gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     gltf.scene.updateMatrixWorld(true);

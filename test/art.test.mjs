@@ -6,6 +6,8 @@ import fs from 'node:fs';
 import { signalPlacements, signalRigs, POLE, ARM_ABOVE_HEAD } from '../src/signal-layout.js';
 import { webLayout, WEB_HIDDEN, isHidden } from '../src/web-layout.js';
 import { Ground } from '../src/ground.js';
+import { moatBend, moatPathEdge } from '../src/road-layout.js';
+import { CASTLE_SITE } from '../src/castle-layout.js';
 
 const modelRoot = new URL('../data/models/', import.meta.url);
 const glb = (name, painted = true) => {
@@ -29,7 +31,7 @@ const bounds = json => {
 
 test('every scene and vehicle asset has self-contained pigment geometry', () => {
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
-  const required = new Set([...webLayout(layout).items.map(x => x.a), 'WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium', 'ART_Signal_Car', 'ART_Signal_Pedestrian', 'ART_Signal_Support']);
+  const required = new Set([...webLayout(layout).items.map(x => x.a), 'WEB_Sedan', 'HK_Kei_Tall', 'ART_KeiBox', 'HK_Kei_Hatch', 'HK_Truck_Large', 'HK_Truck_Medium', 'ART_Signal_Car', 'ART_Signal_Pedestrian', 'ART_Signal_Support']);
   for (const name of required) {
     assert.ok(manifest.models[name], `${name}: listed in the art set`);
     const { bytes, json } = glb(name);
@@ -108,6 +110,25 @@ function triangles(name, materialName, painted = true) {
   assert.ok(result.length > 0, `${name}/${materialName}: exported geometry exists`);
   return result;
 }
+
+test('the distant keep rests on its hill and does not replace the walkable Kyobashi background', () => {
+  const layout = webLayout(JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url))));
+  const map = JSON.parse(fs.readFileSync(new URL('../data/map.json', import.meta.url)));
+  const keep = layout.items.filter(i => i.a === 'ART_HikoneKeep');
+  const hill = layout.items.filter(i => i.a === 'HK_Terrain_Hikone');
+  assert.equal(keep.length, 1);
+  assert.equal(hill.length, 1);
+  const distance = Math.hypot(keep[0].p[0] - 32, keep[0].p[2] - 56.8);
+  assert.ok(distance > 420 && distance < 500, 'the real hilltop is hundreds of metres beyond the bridge');
+  const hillBounds = bounds(glb('HK_Terrain_Hikone').json);
+  assert.ok(hill[0].p[2] + hillBounds.min[2] > map.world.zMax, 'the background hill cannot fill or obstruct the practice map');
+  const cap = triangles('HK_Terrain_Hikone', 'ART_StoneLight').map(triangle => triangle.flatMap(([x, y, z]) => [-x, y, z]));
+  const surface = new Ground({ hill: cap });
+  const base = keep[0].p[1] + bounds(glb('ART_HikoneKeep').json).min[1];
+  for (const [x, z] of [[0, 0], [-10, -8], [10, -8], [-10, 8], [10, 8]])
+    assert.ok(Math.abs(surface.heightAt(x, z) + hill[0].p[1] - base) < 0.001, 'stone footings meet the authored hilltop');
+  assert.equal(keep[0].p[1], CASTLE_SITE.height);
+});
 const subtract = (a, b) => a.map((v, i) => v - b[i]);
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const dot = (a, b) => a.reduce((sum, v, i) => sum + v * b[i], 0);
@@ -146,6 +167,7 @@ test('the lamp has an outward-facing bottom; lamp, signal shells and supports ar
   }
   closed('ART_Signal_Car', 'ART_SignalYellow');
   closed('ART_Signal_Support', 'ART_Frame');
+  closed('HK_Kyobashi', 'ART_Patina');
   for (const [name, materials] of [
     ['ART_PathLamp', ['ART_LampBase', 'ART_LampGlow', 'ART_Frame']],
     ['ART_UtilityPole', ['HK_MetalLight', 'HK_WhitePaint', 'ART_Frame']],
@@ -241,8 +263,12 @@ test('all five signal poles stand on pavement, and vehicle lamps read green, yel
   assert.ok(mean('ART_SignalGreen') > mean('ART_SignalYellow') && mean('ART_SignalYellow') > mean('ART_SignalRed'), 'green left, red right');
 });
 
-test('five installations serve three crossings; only town-west has two pedestrian heads', () => {
+test('five installations retain six pedestrian heads; only town-west has two', () => {
   const rigs = signalRigs(), heads = signalPlacements();
+  const markers = JSON.parse(fs.readFileSync(new URL('../data/map.json', import.meta.url))).signals;
+  assert.equal(markers.length, rigs.length, 'the editor shows the actual installations');
+  for (const r of rigs) assert.ok(markers.some(m => Math.hypot(m.x - r.pole.x, m.z - r.pole.z) < 0.01),
+    `${r.id}: the editor marker matches its rendered pole`);
   assert.equal(heads.length, 10, 'four vehicle heads and six pedestrian heads');
   assert.equal(rigs.filter(r => r.head).length, 4);
   const standalone = rigs.filter(r => !r.head);
@@ -278,24 +304,117 @@ test('no crosswalk signs or guide post at the signalised corners, and 40 on Rout
   for (const h of WEB_HIDDEN) assert.equal(layout.items.filter(i => i.a === h.a
     && Math.hypot(i.p[0] - h.x, i.p[2] - h.z) < 0.5).length, 1, 'the explicit hidden entry matches exactly one item');
   assert.ok(!shown.items.some(i => i.a === 'HK_Sign_Crosswalk' || i.a === 'HK_GuidePost'));
-  assert.ok(shown.items.some(i => i.a === 'HK_Sign_Speed30') && shown.items.some(i => i.a === 'HK_Sign_Stop'));
-  // Route 25 along the moat shows 40 km/h (both of its speed signs), Castle Road keeps 30
-  const forty = shown.items.filter(i => i.a === 'HK_Sign_Speed40');
-  assert.equal(forty.length, 2);
-  assert.ok(forty.every(i => i.p[2] > 20 && i.p[2] < 32), 'on Route 25');
+  assert.ok(shown.items.some(i => i.a === 'HK_Sign_Paired30'));
+  assert.ok(!shown.items.some(i => i.a === 'HK_Sign_Stop'), 'unconfirmed imported parking-exit stop sign omitted');
+  // The confirmed eastern pair is 40; the western frontage carries a single no-parking disc.
+  const forty = shown.items.filter(i => i.a === 'HK_Sign_Paired40');
+  assert.equal(forty.length, 1);
+  assert.ok(forty.every(i => i.p[2] >= 20 && i.p[2] <= 32), 'on Route 25');
   for (const name of new Set(shown.items.map(i => i.a))) assert.ok(manifest.models[name], `${name}: built`);
-  for (const name of ['HK_Sign_Speed30', 'HK_Sign_Speed40']) {
+  for (const name of ['HK_Sign_Speed30', 'HK_Sign_Speed40', 'HK_Sign_Paired30', 'HK_Sign_Paired40']) {
     for (const material of ['HK_SignRed', 'HK_WhitePaint', 'HK_SignBlue', 'HK_MetalLight']) closed(name, material);
-    assert.equal(manifest.models[name].design, 'abstract-closed-solids-v2', `${name}: authored, digits read from the front`);
+    assert.equal(manifest.models[name].design, name.includes('Paired') ? 'street-view-details-v1' : 'abstract-closed-solids-v2',
+      `${name}: authored, digits read from the front`);
   }
+  for (const material of ['HK_SignRed', 'HK_SignBlue', 'HK_MetalLight']) closed('HK_Sign_NoParking', material);
 });
 
-test('street furniture overrides are idempotent and preserve unrelated generated props', () => {
+test('browser road and furniture overrides are idempotent and leave the imported source intact', () => {
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
   const original = JSON.stringify(layout), shown = webLayout(layout);
   assert.equal(JSON.stringify(layout), original, 'never mutates the generated source');
   assert.deepEqual(webLayout(shown), shown, 'reapplying the browser layout does not duplicate poles or lamps');
-  for (const item of layout.items.filter(i => !isHidden(i))) assert.ok(shown.items.includes(item), 'unrelated source prop survives');
+  assert.ok(!shown.items.some(i => i.g === 'Roads' || /GateHouse/.test(i.a)), 'the obsolete tile grid and invented gates are not displayed');
+  assert.ok(shown.items.some(i => i.a === 'ART_CornerShop'), 'the reviewed junction frontage survives');
+  assert.ok(shown.items.filter(i => ['Buildings', 'WebFrontage'].includes(i.g) && i.p[0] > 42)
+    .every(i => i.p[2] < 22 + moatBend(i.p[0])), 'the old return-road buildings cannot remain on the moat path');
+});
+
+test('the box kei keeps the tall-kei envelope and closed hull, including its front-facing windows', () => {
+  const before = bounds(glb('HK_Kei_Tall').json), after = bounds(glb('ART_KeiBox').json);
+  for (const end of ['min', 'max']) for (let axis = 0; axis < 3; axis++)
+    assert.ok(Math.abs(before[end][axis] - after[end][axis]) < 0.008, `${end}[${axis}]: existing collision envelope`);
+  for (const material of ['HK_KeiPaint', 'HK_Rubber', 'ART_Glass']) closed('ART_KeiBox', material);
+  const glass = rayDistance(triangles('ART_KeiBox', 'ART_Glass'), [0, 1.5, 5], [0, 0, -1]);
+  const hull = rayDistance(triangles('ART_KeiBox', 'HK_KeiPaint'), [0, 1.5, 5], [0, 0, -1]);
+  assert.ok(glass < hull, 'the windscreen is outside the body, visible to an approaching participant');
+});
+
+test('tactile paving, covers and drains follow the actual ground and never become body-height obstacles', () => {
+  const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  const file = glb('ART_PavingDetails');
+  let count = 0;
+  for (const p of file.json.meshes.flatMap(m => m.primitives)) for (const v of accessor(file, p.attributes.POSITION)) {
+    const y = ground.heightAt(-v[0], v[2]);
+    assert.ok(Math.abs(v[1] - y) < 0.025, `surface at ${v.map(n => n.toFixed(3))} follows ground ${y}`);
+    count++;
+  }
+  assert.ok(count > 1000, 'check the exported relief, not just the placement origin');
+});
+
+test('the road network has one paint layer, and its markings follow the generated carriageway', () => {
+  const base = glb('ART_MoatRoadSurface'), original = glb('HK_RoadSurf_Straight', false);
+  assert.ok(base.json.meshes.flatMap(m => m.primitives).every(p => base.json.materials[p.material].name === 'HK_Asphalt'),
+    'the repeating centre dash is absent from the replacement surface');
+  const sourceBounds = bounds({ meshes: original.json.meshes.map(m => ({ ...m,
+    primitives: m.primitives.filter(p => original.json.materials[p.material].name === 'HK_Asphalt') })), accessors: original.json.accessors });
+  const replacement = bounds(base.json);
+  for (const end of ['min', 'max']) for (const axis of [0, 2])
+    assert.ok(Math.abs(replacement[end][axis] - sourceBounds[end][axis]) < 0.008, 'same road footprint');
+  const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  const paint = glb('ART_KyobashiRoads');
+  let onMappedRoad = 0;
+  for (const p of paint.json.meshes.flatMap(m => m.primitives).filter(p => paint.json.materials[p.material].name === 'HK_WhitePaint')) for (const v of accessor(paint, p.attributes.POSITION)) {
+    const road = ground.roadHeightAt(-v[0], v[2]);
+    assert.notEqual(road, null, 'all rendered markings have a ground polygon');
+    assert.ok(road < 0.055 && Math.abs(v[1] - road) < 0.03,
+      `paint at ${[-v[0], v[1], v[2]].map(n => n.toFixed(3))} follows carriageway, ground ${road}`);
+    onMappedRoad++;
+  }
+  assert.ok(onMappedRoad > 100, 'audit the generated polygons, not only their placement origin');
+});
+
+test('the bridge entrance has its missing zebra, and the bridge itself has no centre dashes', () => {
+  const paint = triangles('ART_KyobashiRoads', 'HK_WhitePaint');
+  for (const x of [28.6, 30.3, 32.85, 35.4])
+    assert.ok(rayDistance(paint, [-x, 2, 34.2], [0, -1, 0]) < 2, 'the north zebra spans the bridge approach');
+  for (const z of [46, 55, 64]) {
+    assert.equal(rayDistance(paint, [-32, 2, z], [0, -1, 0]), Infinity, 'no invented centre dashes');
+    assert.ok(rayDistance(paint, [-35.62, 2, z], [0, -1, 0]) < 2, 'continuous edge line');
+  }
+});
+
+test('reviewed grove and town-tree roots rest on authoritative ground', () => {
+  const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  const shown = webLayout(JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url))));
+  const trees = shown.items.filter(i => ['WebGrove', 'WebTownTrees'].includes(i.g));
+  assert.ok(trees.length > 20, 'audit both the bank and street rows');
+  for (const item of trees)
+    assert.ok(Math.abs(item.p[1] - ground.heightAt(item.p[0], item.p[2])) < 0.025,
+      `${item.a} at ${item.p}: roots match the exported terrain`);
+});
+
+test('bank vegetation is grounded and leaves the riverside path and bridge approach clear at body height', () => {
+  const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
+  const layout = webLayout(JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url))));
+  const bank = layout.items.filter(i => i.g === 'WebBank');
+  assert.ok(bank.length > 0);
+  const cache = new Map();
+  for (const item of bank) {
+    assert.ok(Math.abs(item.p[1] - ground.heightAt(item.p[0], item.p[2])) < 0.02, 'roots touch the bank');
+    if (!cache.has(item.a)) {
+      const f = glb(item.a);
+      cache.set(item.a, f.json.meshes.flatMap(m => m.primitives).flatMap(p => accessor(f, p.attributes.POSITION)));
+    }
+    const angle = item.r * Math.PI / 180, c = Math.cos(angle), s = Math.sin(angle);
+    for (const v of cache.get(item.a)) {
+      const y = item.p[1] + v[1] * item.s[1];
+      if (y < item.p[1] + 0.3 || y > item.p[1] + 1.8) continue;
+      const x = item.p[0] - v[0] * item.s[0] * c + v[2] * item.s[2] * s;
+      const z = item.p[2] + v[0] * item.s[0] * s + v[2] * item.s[2] * c;
+      assert.ok(z - moatBend(x) > moatPathEdge(x) && (x < 24.2 || x > 41.3), 'only high crowns may overhang the curving path; trunks and shrubs stay clear');
+    }
+  }
 });
 
 test('the bridge abutments stay under the deck: no stone sliver across the road at the bridge ends', () => {

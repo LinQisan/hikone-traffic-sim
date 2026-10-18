@@ -1,6 +1,6 @@
-// Ground height in Unity coordinates from the road meshes (Art/Hikone/road_tiles_geometry.json, the
-// collision truth of the Unity scene: carriageway 0.01, 15 cm kerbs to the sidewalk at 0.16, corner
-// ramps), with the town ground (0.15) and the Kyobashi deck elsewhere. Pure logic (node:test).
+// Ground height in Unity coordinates from tools/road_network.py's road polygons:
+// carriageway 0.01, pavement 0.16, town 0.15, flush bridge margins and raised bank terrain.
+// Pure logic (node:test); terrain heights come from the authored geometry, not renderer offsets.
 const CELL = 4;
 const TOWN_Z = 39.6;
 
@@ -52,8 +52,9 @@ export class Ground {
   }
 
   static fallback(x, z) {
-    // the bridge deck (carriageway 8 m, sidewalks either side) and the masugata road beyond it
-    if (z > TOWN_Z && z < 52 && x > 25 && x < 39) return Math.abs(x - 32) < 4 ? 0.01 : 0.16;
+    // The bridge also has a fallback for partially loaded/custom ground data.
+    if (z > TOWN_Z && z < 74 && x > 25 && x < 39) return Math.abs(x - 32) < 4 ? 0.01
+      : 0.01 + 0.15 * Math.max(0, 1 - (z - TOWN_Z) / 1.4, 1 - (74 - z) / 1.4);
     return 0.15;
   }
 }

@@ -1,0 +1,863 @@
+{
+  "date": "2026-10-18",
+  "task": "Google Maps Kyobashi–Hikone Castle approach reconstruction",
+  "protocol": {
+    "browser": "Chrome 155, macOS, headless, WebGL/ANGLE",
+    "viewport": [
+      1280,
+      720
+    ],
+    "quality": "high",
+    "dynamicResolution": false,
+    "url": "?benchmark=1&quality=high",
+    "samePageAB": true,
+    "warmupSeconds": 2,
+    "samplingSeconds": 8,
+    "stationaryEnvironment": true,
+    "httpCacheDisabled": true,
+    "interception": "Both variants serve src/ and data/ from disk through the same Playwright route. Baseline is the complete dirty workspace snapshot before this task, not HEAD.",
+    "note": "Refresh-limited near 60 FPS. One load sample per variant and variable heap are descriptive, not evidence of speed or loading improvement."
+  },
+  "sources": [
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.2744,136.252&zoom=18&basemap=satellite",
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.2734,136.2524&zoom=19&basemap=satellite",
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.2751,136.2514&zoom=19&basemap=satellite",
+    "https://www.city.hikone.lg.jp/kanko/rekishi/9/5/7676.html",
+    "https://www.hikoneshi.com/sightseeing/article/kyobashi-guchi"
+  ],
+  "firstExtension": {
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "ready": 4362.299999982119,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 481,
+          "fps": 60.00124742718144,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.5,
+          "updateMs": 0.08024948011317025,
+          "calls": 92,
+          "triangles": 369097,
+          "width": 1280,
+          "height": 720,
+          "geometries": 114,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 4358.5,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 66218622,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "before",
+        "view": "north",
+        "ready": 4362.299999982119,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.00525045954932,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.80000001192093,
+          "updateMs": 0.061458333395421505,
+          "calls": 27,
+          "triangles": 95519,
+          "width": 1280,
+          "height": 720,
+          "geometries": 119,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 4358.5,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 67724105,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "before",
+        "view": "castle",
+        "ready": 4362.299999982119,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 59.99925000941959,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.045416665139297645,
+          "calls": 66,
+          "triangles": 214364,
+          "width": 1280,
+          "height": 720,
+          "geometries": 119,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 4358.5,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 58992006,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "before",
+        "view": "approach",
+        "ready": 4362.299999982119,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.0045003374806,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.04479166728754838,
+          "calls": 57,
+          "triangles": 111213,
+          "width": 1280,
+          "height": 720,
+          "geometries": 130,
+          "textures": 8,
+          "programs": 16,
+          "readyMs": 4358.5,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 58515920,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "ready": 6444.4000000059605,
+        "probe": {
+          "geometryBytes": 23145981,
+          "sceneBufferBytes": 24633713,
+          "placements": 456,
+          "meshes": 272,
+          "frames": 480,
+          "fps": 59.99925000941959,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.07666666582226753,
+          "calls": 106,
+          "triangles": 387048,
+          "width": 1280,
+          "height": 720,
+          "geometries": 149,
+          "textures": 8,
+          "programs": 18,
+          "readyMs": 6443.200000017881,
+          "resourceTransferBytes": 48957695,
+          "resourceBodyBytes": 48918695,
+          "heapBytes": 70585702,
+          "multiDraw": true
+        },
+        "meshes": 272,
+        "geometryBytes": 23145981
+      },
+      {
+        "stage": "after",
+        "view": "north",
+        "ready": 6444.4000000059605,
+        "probe": {
+          "geometryBytes": 23145981,
+          "sceneBufferBytes": 24633713,
+          "placements": 456,
+          "meshes": 272,
+          "frames": 480,
+          "fps": 60.001500037411525,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.05895833565543095,
+          "calls": 64,
+          "triangles": 122578,
+          "width": 1280,
+          "height": 720,
+          "geometries": 151,
+          "textures": 8,
+          "programs": 18,
+          "readyMs": 6443.200000017881,
+          "resourceTransferBytes": 48957695,
+          "resourceBodyBytes": 48918695,
+          "heapBytes": 68549227,
+          "multiDraw": true
+        },
+        "meshes": 272,
+        "geometryBytes": 23145981
+      },
+      {
+        "stage": "after",
+        "view": "castle",
+        "ready": 6444.4000000059605,
+        "probe": {
+          "geometryBytes": 23145981,
+          "sceneBufferBytes": 24633713,
+          "placements": 456,
+          "meshes": 272,
+          "frames": 480,
+          "fps": 59.99925000919607,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.200000017881393,
+          "updateMs": 0.048958333767950536,
+          "calls": 103,
+          "triangles": 250666,
+          "width": 1280,
+          "height": 720,
+          "geometries": 151,
+          "textures": 8,
+          "programs": 18,
+          "readyMs": 6443.200000017881,
+          "resourceTransferBytes": 48957695,
+          "resourceBodyBytes": 48918695,
+          "heapBytes": 65986906,
+          "multiDraw": true
+        },
+        "meshes": 272,
+        "geometryBytes": 23145981
+      },
+      {
+        "stage": "after",
+        "view": "approach",
+        "ready": 6444.4000000059605,
+        "probe": {
+          "geometryBytes": 23145981,
+          "sceneBufferBytes": 24633713,
+          "placements": 456,
+          "meshes": 272,
+          "frames": 480,
+          "fps": 60.00225008424405,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17,
+          "updateMs": 0.05187499970197677,
+          "calls": 92,
+          "triangles": 122011,
+          "width": 1280,
+          "height": 720,
+          "geometries": 160,
+          "textures": 8,
+          "programs": 18,
+          "readyMs": 6443.200000017881,
+          "resourceTransferBytes": 48957695,
+          "resourceBodyBytes": 48918695,
+          "heapBytes": 66036568,
+          "multiDraw": true
+        },
+        "meshes": 272,
+        "geometryBytes": 23145981
+      }
+    ],
+    "errors": []
+  },
+  "final": {
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "ready": 4321.0999999940395,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.0075009376172,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17,
+          "updateMs": 0.09041666835546494,
+          "calls": 92,
+          "triangles": 369097,
+          "width": 1280,
+          "height": 720,
+          "geometries": 114,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 4317.199999988079,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 66152958,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "before",
+        "view": "north",
+        "ready": 4321.0999999940395,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 479,
+          "fps": 60.00325696171095,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.07306889352818371,
+          "calls": 27,
+          "triangles": 95519,
+          "width": 1280,
+          "height": 720,
+          "geometries": 119,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 4317.199999988079,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 67618017,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "before",
+        "view": "castle",
+        "ready": 4321.0999999940395,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 481,
+          "fps": 60.002744408401995,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.06133056170231587,
+          "calls": 66,
+          "triangles": 214364,
+          "width": 1280,
+          "height": 720,
+          "geometries": 119,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 4317.199999988079,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 58395430,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "before",
+        "view": "approach",
+        "ready": 4321.0999999940395,
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.0075009376172,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.057083333283662795,
+          "calls": 57,
+          "triangles": 111213,
+          "width": 1280,
+          "height": 720,
+          "geometries": 130,
+          "textures": 8,
+          "programs": 16,
+          "readyMs": 4317.199999988079,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 59065053,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "ready": 3400.0999999940395,
+        "probe": {
+          "geometryBytes": 20435377,
+          "sceneBufferBytes": 21923493,
+          "placements": 456,
+          "meshes": 203,
+          "frames": 480,
+          "fps": 60.001500037411525,
+          "medianMs": 16.5,
+          "p95Ms": 17.69999998807907,
+          "updateMs": 0.08416666394720475,
+          "calls": 91,
+          "triangles": 385669,
+          "width": 1280,
+          "height": 720,
+          "geometries": 111,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 3398.699999988079,
+          "resourceTransferBytes": 43178356,
+          "resourceBodyBytes": 43139356,
+          "heapBytes": 67478602,
+          "multiDraw": true
+        },
+        "meshes": 203,
+        "geometryBytes": 20435377
+      },
+      {
+        "stage": "after",
+        "view": "north",
+        "ready": 3400.0999999940395,
+        "probe": {
+          "geometryBytes": 20435377,
+          "sceneBufferBytes": 21923493,
+          "placements": 456,
+          "meshes": 203,
+          "frames": 480,
+          "fps": 60.00900135033668,
+          "medianMs": 16.599999994039536,
+          "p95Ms": 17.30000001192093,
+          "updateMs": 0.05624999937911828,
+          "calls": 24,
+          "triangles": 104962,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 3398.699999988079,
+          "resourceTransferBytes": 43178356,
+          "resourceBodyBytes": 43139356,
+          "heapBytes": 68809097,
+          "multiDraw": true
+        },
+        "meshes": 203,
+        "geometryBytes": 20435377
+      },
+      {
+        "stage": "after",
+        "view": "castle",
+        "ready": 3400.0999999940395,
+        "probe": {
+          "geometryBytes": 20435377,
+          "sceneBufferBytes": 21923493,
+          "placements": 456,
+          "meshes": 203,
+          "frames": 480,
+          "fps": 60.00300015005221,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.399999976158142,
+          "updateMs": 0.06041666598369678,
+          "calls": 66,
+          "triangles": 225392,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 8,
+          "programs": 15,
+          "readyMs": 3398.699999988079,
+          "resourceTransferBytes": 43178356,
+          "resourceBodyBytes": 43139356,
+          "heapBytes": 62259794,
+          "multiDraw": true
+        },
+        "meshes": 203,
+        "geometryBytes": 20435377
+      },
+      {
+        "stage": "after",
+        "view": "approach",
+        "ready": 3400.0999999940395,
+        "probe": {
+          "geometryBytes": 20435377,
+          "sceneBufferBytes": 21923493,
+          "placements": 456,
+          "meshes": 203,
+          "frames": 480,
+          "fps": 60.0045003374806,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.06312500064571698,
+          "calls": 55,
+          "triangles": 123159,
+          "width": 1280,
+          "height": 720,
+          "geometries": 126,
+          "textures": 8,
+          "programs": 16,
+          "readyMs": 3398.699999988079,
+          "resourceTransferBytes": 43178356,
+          "resourceBodyBytes": 43139356,
+          "heapBytes": 62765734,
+          "multiDraw": true
+        },
+        "meshes": 203,
+        "geometryBytes": 20435377
+      }
+    ],
+    "errors": []
+  },
+  "assets": [
+    {
+      "asset": "ART_CastleApproach",
+      "before": null,
+      "after": {
+        "triangles": 14147,
+        "strokes": 0,
+        "bytes": 1202508,
+        "remodeled": true,
+        "design": "hikone-approach-v1",
+        "lod": {
+          "triangles": 12513,
+          "bytes": 1082596
+        }
+      }
+    },
+    {
+      "asset": "ART_KyobashiRoads",
+      "before": {
+        "triangles": 81603,
+        "strokes": 11522,
+        "bytes": 5822888,
+        "remodeled": false,
+        "lod": {
+          "triangles": 16794,
+          "bytes": 1251520
+        }
+      },
+      "after": {
+        "triangles": 82856,
+        "strokes": 11611,
+        "bytes": 5916744,
+        "remodeled": false,
+        "lod": {
+          "triangles": 17543,
+          "bytes": 1309616
+        }
+      }
+    },
+    {
+      "asset": "ART_KyobashiLand",
+      "before": {
+        "triangles": 42594,
+        "strokes": 6138,
+        "bytes": 2860456,
+        "remodeled": false,
+        "lod": {
+          "triangles": 8067,
+          "bytes": 581656
+        }
+      },
+      "after": {
+        "triangles": 39437,
+        "strokes": 5692,
+        "bytes": 2650288,
+        "remodeled": false,
+        "lod": {
+          "triangles": 7418,
+          "bytes": 537000
+        }
+      }
+    },
+    {
+      "asset": "ART_KyobashiBanks",
+      "before": {
+        "triangles": 2944,
+        "strokes": 0,
+        "bytes": 232432,
+        "remodeled": false,
+        "lod": {
+          "triangles": 2944,
+          "bytes": 232436
+        }
+      },
+      "after": {
+        "triangles": 2938,
+        "strokes": 0,
+        "bytes": 231964,
+        "remodeled": false,
+        "lod": {
+          "triangles": 2938,
+          "bytes": 231968
+        }
+      }
+    },
+    {
+      "asset": "ART_KyobashiWater",
+      "before": {
+        "triangles": 4754,
+        "strokes": 777,
+        "bytes": 316024,
+        "remodeled": false,
+        "lod": {
+          "triangles": 383,
+          "bytes": 27532
+        }
+      },
+      "after": {
+        "triangles": 4694,
+        "strokes": 767,
+        "bytes": 311992,
+        "remodeled": false,
+        "lod": {
+          "triangles": 377,
+          "bytes": 27064
+        }
+      }
+    },
+    {
+      "asset": "ART_KyobashiBridge",
+      "before": {
+        "triangles": 36484,
+        "strokes": 5588,
+        "bytes": 2438848,
+        "remodeled": false,
+        "lod": {
+          "triangles": 5053,
+          "bytes": 364384
+        }
+      },
+      "after": {
+        "triangles": 36484,
+        "strokes": 5588,
+        "bytes": 2438848,
+        "remodeled": false,
+        "lod": {
+          "triangles": 5053,
+          "bytes": 364384
+        }
+      }
+    },
+    {
+      "asset": "HK_Terrain_Hikone",
+      "before": {
+        "triangles": 15444,
+        "strokes": 1512,
+        "bytes": 1099260,
+        "remodeled": true,
+        "design": "hikone-landmark-v1",
+        "lod": {
+          "triangles": 6939,
+          "bytes": 537924
+        }
+      },
+      "after": {
+        "triangles": 14589,
+        "strokes": 1404,
+        "bytes": 1058604,
+        "remodeled": true,
+        "design": "hikone-landmark-v1",
+        "lod": {
+          "triangles": 6690,
+          "bytes": 537268
+        }
+      }
+    }
+  ],
+  "traffic": {
+    "ordinaryNorthernTailsOnly": true,
+    "allOtherEventFieldsUnchanged": true,
+    "events": [
+      "builtin-02",
+      "builtin-05"
+    ],
+    "fits": [
+      {
+        "id": "builtin-02",
+        "vehicle": "車の流れ Left2",
+        "late": 1.4,
+        "oldLength": 250.1954706718624,
+        "newLength": 250.19547071138786,
+        "practicePoseError": 1.0048591735576161e-14,
+        "violations": 0,
+        "first": null
+      },
+      {
+        "id": "builtin-02",
+        "vehicle": "車の流れ Right2",
+        "late": 1.4,
+        "oldLength": 248.5841089617686,
+        "newLength": 248.58410951676785,
+        "practicePoseError": 5.549992561423394e-7,
+        "violations": 0,
+        "first": null
+      },
+      {
+        "id": "builtin-05",
+        "vehicle": "車の流れ Left2",
+        "late": 1.4,
+        "oldLength": 250.1954706718624,
+        "newLength": 250.19547071138786,
+        "practicePoseError": 1.0048591735576161e-14,
+        "violations": 0,
+        "first": null
+      },
+      {
+        "id": "builtin-05",
+        "vehicle": "車の流れ Right2",
+        "late": 1.4,
+        "oldLength": 248.5841089617686,
+        "newLength": 248.58410951676785,
+        "practicePoseError": 5.549992561423394e-7,
+        "violations": 0,
+        "first": null
+      }
+    ]
+  },
+  "collision": {
+    "beforeBlocked": 154971,
+    "afterBlocked": 159862,
+    "added": 5623,
+    "removed": 732,
+    "bounds": {
+      "minX": -175.5,
+      "maxX": 184.5,
+      "minZ": 78.10000000000002,
+      "maxZ": 164.90000000000003
+    }
+  },
+  "validation": {
+    "fullTests": {
+      "command": "npm test",
+      "passed": 141,
+      "failed": 0,
+      "skipped": 0
+    },
+    "routes": {
+      "command": "node tools/check_routes.mjs",
+      "checked": 46,
+      "failed": 0
+    },
+    "event02": "\nbuiltin-02 交差点：横から曲がってくる車\n  naive          : HIT by 事故車 1 at 30 km/h after 12.7 m (seen 5.27 s before)\n  naive, 3 s late: HIT by 事故車 1 at 30 km/h after 12.7 m (seen 8.3 s before)\n  naive, 7 s late: HIT by 事故車 1 at 30 km/h after 12.7 m (seen 12.6 s before)\n  careful        : reached the goal; accident cars seen before passing: {\"1\":6.17}\n  spawns (naive) : ★事故車 1@0s 24m there from the start | 車の流れ Right2@5s 114.1m hidden\n",
+    "event05": "\nbuiltin-05 交差点：うしろから曲がってくる車\n  naive          : HIT by 事故車 1 at 22 km/h after 6.2 m (seen 2.57 s before)\n  naive, 3 s late: HIT by 事故車 1 at 22 km/h after 6.2 m (seen 5.6 s before)\n  naive, 7 s late: HIT by 事故車 1 at 22 km/h after 6.2 m (seen 9.9 s before)\n  careful        : reached the goal; accident cars seen before passing: {\"1\":3.77}\n  spawns (naive) : ★事故車 1@0s 4.3m there from the start\n",
+    "browser": {
+      "results": [
+        {
+          "id": "builtin-01",
+          "mode": "walking",
+          "movedMetres": 1.7181600000142687,
+          "keyboardLook": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "mode": "bicycle",
+          "movedMetres": 0.6270833333333276,
+          "keyboardLook": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-02",
+          "browserContact": true,
+          "replay": true,
+          "contact": {
+            "time": 5.343599999994026,
+            "car": "事故車 1",
+            "accident": true,
+            "kmh": 30.000000000000004
+          }
+        },
+        {
+          "id": "builtin-05",
+          "browserContact": true,
+          "replay": true,
+          "contact": {
+            "time": 2.716900000005956,
+            "car": "事故車 1",
+            "accident": true,
+            "kmh": 22
+          }
+        },
+        {
+          "view": "replay",
+          "driver": true,
+          "overview": true,
+          "restart": true,
+          "finished": true,
+          "results": true,
+          "menu": true
+        },
+        {
+          "view": "replay-bicycle",
+          "driver": true,
+          "overview": true,
+          "restart": true,
+          "finished": true,
+          "results": true,
+          "menu": true
+        }
+      ],
+      "portraitTargets": [
+        {
+          "id": "viewover",
+          "width": 128.078125,
+          "height": 44
+        },
+        {
+          "id": "viewdriver",
+          "width": 139.859375,
+          "height": 44
+        },
+        {
+          "id": "again",
+          "width": 192.09375,
+          "height": 44
+        },
+        {
+          "id": "next",
+          "width": 127.390625,
+          "height": 44
+        },
+        {
+          "id": "replaymenu",
+          "width": 158.953125,
+          "height": 44
+        }
+      ],
+      "forcedColorsAndReducedMotionMenu": true,
+      "errors": []
+    },
+    "review": {
+      "views": [
+        "castle-approach",
+        "saigo-gate",
+        "otemon-bridge",
+        "north-bank",
+        "castle-panorama",
+        "street",
+        "editor"
+      ],
+      "errors": []
+    },
+    "bankOpening": {
+      "geometryRegression": "Two additional tests cast front-facing rays through the former opening, for both detail levels. Bridge margins remain open; collision bits are unchanged by closure.",
+      "browserErrors": []
+    },
+    "diffCheck": true,
+    "pythonSyntax": true
+  },
+  "limitations": [
+    "Aerial outlines, registration, elevations and unseen facades are approximate, not surveyed.",
+    "New surroundings preserve the existing practice rectangle; no unrestricted castle exploration.",
+    "The northern unreviewed hill keeps its former outline.",
+    "No real phone or VR hardware measured."
+  ]
+}

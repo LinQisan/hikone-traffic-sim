@@ -17,8 +17,87 @@ const { environmentInstances, LOD_FAR, LOD_NEAR } = await import('../src/environ
 const { PigmentPalette, pigmentOf } = await import('../src/style.js');
 const { placement } = await import('../src/coords.js');
 const { buildLight } = await import('../src/world.js');
-const { packPigments } = await import('../src/geometry-budget.js');
+const { packPigments, geometryBytes } = await import('../src/geometry-budget.js');
 const { webLayout } = await import('../src/web-layout.js');
+const { PerformanceProbe } = await import('../src/performance.js');
+
+test('benchmark reset excludes warmup again and samples current resources rather than stale details', () => {
+  const element = { dataset: {} }, renderer = { info: { render: { calls: 3, triangles: 12 },
+    memory: { geometries: 2, textures: 1 }, programs: [{}] }, domElement: { width: 1280, height: 720 },
+    extensions: { has: () => false } };
+  let buffers = 10;
+  const probe = new PerformanceProbe(element, renderer, true, () => ({ geometryBytes: buffers }));
+  for (let i = 0; i < 700; i++) probe.frame(1 / 60, 0.2);
+  assert.equal(probe.report.calls, 3);
+  assert.equal(probe.report.geometryBytes, 10);
+  assert.equal(probe.report.textures, 1);
+  buffers = 20; renderer.info.render.calls = 4;
+  probe.reset();
+  assert.equal(element.dataset.benchmark, undefined);
+  probe.frame(1, 10); probe.frame(1, 10);
+  assert.equal(probe.samples.length, 0);
+  for (let i = 0; i < 600; i++) probe.frame(1 / 60, 0.1);
+  assert.equal(probe.report.calls, 4);
+  assert.equal(probe.report.geometryBytes, 20);
+  assert.ok(probe.report.updateMs < 0.11, 'the second warmup did not enter the result');
+});
+
+test('resident buffer accounting counts shared geometry once and includes optional instance storage', () => {
+  const geometry = new THREE.BoxGeometry(), material = new THREE.MeshBasicMaterial();
+  const root = new THREE.Group(), view = new THREE.InstancedMesh(geometry, material, 5);
+  const shadow = new THREE.InstancedMesh(geometry, material, 5);
+  root.add(view, shadow, new THREE.Mesh(geometry, material));
+  const bytes = geometry.index.array.byteLength + Object.values(geometry.attributes).reduce((sum, a) => sum + a.array.byteLength, 0);
+  assert.equal(geometryBytes(root), bytes);
+  assert.equal(geometryBytes(root, true), bytes + 2 * 5 * 16 * 4);
+  geometry.dispose(); material.dispose(); view.dispose(); shadow.dispose();
+});
+
+test('view changes preserve ordered instance buffers until visibility or LOD actually changes', () => {
+  const geometry = new THREE.BoxGeometry(), material = new THREE.MeshLambertMaterial({ name: 'Box' });
+  const parts = [{ geometry, material, matrix: new THREE.Matrix4() }];
+  const environment = environmentInstances([{ asset: 'Box', high: parts, low: parts,
+    items: [0, 1, 2].map(x => ({ p: [x, 0, -10], r: 0, s: [1, 1, 1] })) }], new PigmentPalette(), () => false);
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+  environment.updateLOD(camera);
+  const mesh = environment.assets[0].high, version = mesh.instanceMatrix.version;
+  camera.position.x = 0.5;
+  environment.updateLOD(camera);
+  assert.equal(environment.builds, 2, 'the moved view is checked');
+  assert.equal(mesh.count, 3);
+  assert.equal(mesh.instanceMatrix.version, version, 'identical ordered lists do not upload again');
+  camera.rotation.y = Math.PI;
+  environment.updateLOD(camera);
+  assert.equal(mesh.count, 0);
+  camera.rotation.y = 0;
+  environment.updateLOD(camera);
+  assert.equal(mesh.count, 3, 'returning to the view restores the cached list');
+  const m = new THREE.Matrix4();
+  for (let i = 0; i < mesh.count; i++) {
+    mesh.getMatrixAt(i, m);
+    assert.deepEqual(m.elements, environment.assets[0].placements[i].matrix.elements);
+  }
+});
+
+test('culling refreshes for camera roll, second-eye projection and shadow projection changes', () => {
+  const geometry = new THREE.BoxGeometry(), material = new THREE.MeshLambertMaterial({ name: 'Box' });
+  const parts = [{ geometry, material, matrix: new THREE.Matrix4() }];
+  const environment = environmentInstances([{ asset: 'Box', high: parts, low: parts,
+    items: [{ p: [0, 0, -10], r: 0, s: [1, 1, 1] }] }], new PigmentPalette(), () => true);
+  const camera = new THREE.PerspectiveCamera(60, 2, 0.1, 100), second = camera.clone();
+  const shadow = new THREE.OrthographicCamera(-20, 20, 20, -20, 0.1, 100);
+  environment.updateLOD(camera, second, shadow);
+  const builds = environment.builds;
+  camera.rotation.z = Math.PI / 2;
+  environment.updateLOD(camera, second, shadow);
+  assert.equal(environment.builds, builds + 1, 'roll changes the rectangular frustum');
+  second.fov = 90; second.updateProjectionMatrix();
+  environment.updateLOD(camera, second, shadow);
+  assert.equal(environment.builds, builds + 2);
+  shadow.far = 5; shadow.updateProjectionMatrix();
+  assert.equal(environment.updateLOD(camera, second, shadow), true);
+  assert.equal(environment.assets[0].shadowMesh.count, 0, 'the resized shadow volume excludes the old caster');
+});
 
 test('the instanced city keeps every placement and triangle, draws in few calls and switches detail', async () => {
   const layout = webLayout(JSON.parse(await fs.readFile(new URL('../data/layout.json', import.meta.url))));
@@ -32,13 +111,15 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
       gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: o.geometry, material: o.material, matrix: o.matrixWorld.clone() }); });
       return parts;
     };
-    return { asset, items: layout.items.filter(i => i.a === asset), high: await parts(''), low: await parts('.lod') };
+    const items = layout.items.filter(i => i.a === asset);
+    return { asset, items, high: await parts(''), low: await parts('.lod'), background: items.every(i => i.g === 'WebLandmark'),
+      batched: asset === 'ART_CastleApproach' };
   }));
   const palette = new PigmentPalette();
-  const noShadow = asset => /^HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)/.test(asset);
+  const noShadow = asset => /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/.test(asset);
   const environment = environmentInstances(definitions, palette, asset => !noShadow(asset));
   const shared = new Set(environment.root.children.map(m => m.material));
-  assert.ok(shared.size <= 3 && [...shared].every(m => m.name === 'HikonePigments'), 'one shared pigment shader (two depth biases)');
+  assert.ok(shared.size <= 4 && [...shared].every(m => m.name === 'HikonePigments'), 'shared pigment shader with ground depth biases and a distant-atmosphere variant');
 
   // every layout item is drawn exactly once, at its simulator placement
   const expected = new THREE.Matrix4();
@@ -53,7 +134,7 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   // Cells retain triangle winding and pigment rows, at the Float32 precision uploaded to the GPU.
   const signature = triangles => createHash('sha256').update(triangles.sort().join('\n')).digest('hex');
   const point = new THREE.Vector3();
-  for (const name of ['HK_RoadRaised', 'HK_GroundFar']) {
+  for (const name of ['ART_KyobashiRoads', 'ART_KyobashiLand']) {
     const definition = definitions.find(d => d.asset === name);
     placement(...definition.items[0].p, definition.items[0].r, definition.items[0].s, expected);
     for (const [detail, key] of [['high', 'highMesh'], ['low', 'lowMesh']]) {
@@ -88,18 +169,22 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   const shadowCamera = sun.shadow.camera, shadowFrustum = new THREE.Frustum().setFromProjectionMatrix(
     new THREE.Matrix4().multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
   assert.equal(environment.updateLOD(camera, null, shadowCamera), true);
+  for (const name of ['ART_HikoneKeep', 'HK_Terrain_Hikone'])
+    assert.ok(environment.assets.find(a => a.asset === name).placements[0].low,
+      `${name}: the distant landmark uses its light silhouette from the practice street`);
   environment.root.updateMatrixWorld(true);
   const viewFrustum = new THREE.Frustum().setFromProjectionMatrix(
     new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
   const visible = environment.root.children.filter(m => m.visible && !m.userData.shadowOnly && (!m.frustumCulled || viewFrustum.intersectsObject(m))).length;
   assert.ok(visible < 180, `draw budget: ${visible}`);
   const drawn = a => [a.high, a.low].flatMap(m => Array.from({ length: m.count }, (_, i) => m.instanceMatrix.array[i * 16 + 12]));
-  const tree = environment.assets.find(a => a.asset === 'HK_Tree_Cedar');
+  const tree = environment.assets.find(a => a.asset === 'ART_CastleGrove');
   const behind = tree.placements.filter(p => p.center.x < camera.position.x - 80
     && !shadowFrustum.intersectsSphere(new THREE.Sphere(p.center, p.radius + 1.5)));
   assert.ok(behind.length > 0 && behind.every(p => !drawn(tree).includes(p.matrix.elements[12])), 'far behind the viewer: not drawn');
-  const lamp = environment.assets.find(a => a.asset === 'HK_StreetLamp');
-  const key = (array, i) => array[i * 16 + 12] + ',' + array[i * 16 + 14];
+  const lamp = environment.assets.find(a => a.asset === 'ART_PathLamp');
+  // instance buffers are Float32; compare placements at that precision
+  const key = (array, i) => Math.fround(array[i * 16 + 12]) + ',' + Math.fround(array[i * 16 + 14]);
   const casters = a => new Set(Array.from({ length: a.shadowMesh.userData.shadowCount }, (_, i) => key(a.shadowMesh.instanceMatrix.array, i)));
   const inView = a => new Set([a.high, a.low].flatMap(m => Array.from({ length: m.count }, (_, i) => key(m.instanceMatrix.array, i))));
   const own = p => key(p.matrix.elements, 0);
@@ -195,6 +280,8 @@ test('the shadow map holds only still things: redrawn on re-centring and changes
   assert.equal(skyRenders, 6, 'sky is rendered to a cubemap once');
   assert.ok(scene.background.isCubeTexture && !scene.environment, 'no per-frame sky or diffuse PBR environment pass');
   const position = new THREE.Vector3(0, 0, 0), shadow = light.sun.shadow;
+  const clip = new THREE.Vector3(30, 0, -80).applyMatrix4(shadow.camera.projectionMatrix);
+  assert.ok(Math.abs(clip.x) < 1, 'the initial projection includes casters beyond the default 5 m half-width');
   light.follow(position);
   shadow.needsUpdate = false; // A render has consumed the invalidation.
   for (let i = 0; i < 100; i++) light.follow(position);

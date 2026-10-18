@@ -12,21 +12,21 @@
     "playerMode": "walking",
     "spawn": {
         "x": 62.62,
-        "z": 19.0
+        "z": 20.05
     },
     "goal": {
         "x": 63.63,
         "z": 31.77,
         "width": 5.06,
-        "depth": 1.0,
-        "yaw": 0.0
+        "depth": 1,
+        "yaw": 0
     },
     "trigger": {
         "x": 62.64,
         "z": 25.75,
         "width": 2.53,
         "depth": 3.07,
-        "yaw": 0.0
+        "yaw": 0
     },
     "vehicles": [
         {
@@ -35,28 +35,8 @@
             "body": "",
             "route": [
                 {
-                    "x": 90,
-                    "z": 4
-                },
-                {
-                    "x": 90,
-                    "z": 6.16
-                },
-                {
-                    "x": 90,
-                    "z": 16
-                },
-                {
-                    "x": 89.39,
-                    "z": 19.06
-                },
-                {
-                    "x": 87.66,
-                    "z": 21.66
-                },
-                {
-                    "x": 85.06,
-                    "z": 23.39
+                    "x": 94,
+                    "z": 24
                 },
                 {
                     "x": 82,
@@ -99,22 +79,23 @@
                     "z": 24.19
                 },
                 {
-                    "x": -109,
+                    "x": -210,
                     "z": 23.92
                 }
             ],
-            "speedKmh": 65.0,
+            "speedKmh": 65,
             "start": "begin",
-            "delaySeconds": 0.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
+            "delaySeconds": 0,
+            "repeatMinSeconds": 0,
+            "repeatMaxSeconds": 0,
             "stopOnTrigger": false,
             "accident": true,
             "overrideYaw": false,
-            "yaw": 0.0,
+            "yaw": 0,
             "launch": "meet",
-            "entrySpeedKmh": 65.0,
-            "noStop": true
+            "entrySpeedKmh": 65,
+            "noStop": true,
+            "hold": true
         }
     ]
 }

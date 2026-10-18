@@ -11,22 +11,22 @@
     "map": "hikone-kyobashi",
     "playerMode": "walking",
     "spawn": {
-        "x": 40.0,
-        "z": 14.0
+        "x": 40,
+        "z": 14
     },
     "goal": {
-        "x": 40.0,
-        "z": 32.0,
+        "x": 40,
+        "z": 32,
         "width": 5.06,
-        "depth": 1.0,
-        "yaw": 0.0
+        "depth": 1,
+        "yaw": 0
     },
     "trigger": {
         "x": 40.1,
         "z": 19.46,
         "width": 4.26,
         "depth": 4.28,
-        "yaw": 0.0
+        "yaw": 0
     },
     "vehicles": [
         {
@@ -35,12 +35,12 @@
             "body": "",
             "route": [
                 {
-                    "x": 8.01,
-                    "z": 8.74
+                    "x": -150,
+                    "z": 27.8
                 },
                 {
-                    "x": 8,
-                    "z": 20.2
+                    "x": -80,
+                    "z": 27.8
                 },
                 {
                     "x": 16,
@@ -51,39 +51,47 @@
                     "z": 27.97
                 },
                 {
-                    "x": 82,
+                    "x": 84,
                     "z": 28
                 },
                 {
-                    "x": 86.59,
-                    "z": 27.09
+                    "x": 90,
+                    "z": 28
                 },
                 {
-                    "x": 90.49,
-                    "z": 24.49
+                    "x": 100,
+                    "z": 28
                 },
                 {
-                    "x": 93.09,
-                    "z": 20.59
+                    "x": 110,
+                    "z": 28
                 },
                 {
-                    "x": 94,
-                    "z": 16
+                    "x": 120,
+                    "z": 28.505
                 },
                 {
-                    "x": 94.31,
-                    "z": 0.93
+                    "x": 140,
+                    "z": 32.056
+                },
+                {
+                    "x": 160,
+                    "z": 37.9
+                },
+                {
+                    "x": 185,
+                    "z": 46.434
                 }
             ],
-            "speedKmh": 36.0,
+            "speedKmh": 36,
             "start": "begin",
-            "delaySeconds": 5.0,
-            "repeatMinSeconds": 4.0,
-            "repeatMaxSeconds": 6.0,
+            "delaySeconds": 5,
+            "repeatMinSeconds": 4,
+            "repeatMaxSeconds": 6,
             "stopOnTrigger": false,
             "accident": false,
             "overrideYaw": true,
-            "yaw": 0.0
+            "yaw": 0
         },
         {
             "name": "車の流れ Right",
@@ -91,24 +99,24 @@
             "body": "",
             "route": [
                 {
-                    "x": 90,
-                    "z": 6.16
+                    "x": 185,
+                    "z": 43.499
                 },
                 {
-                    "x": 90,
-                    "z": 16
+                    "x": 160,
+                    "z": 34.024
                 },
                 {
-                    "x": 89.39,
-                    "z": 19.06
+                    "x": 140,
+                    "z": 28.061
                 },
                 {
-                    "x": 87.66,
-                    "z": 21.66
+                    "x": 120,
+                    "z": 24.501
                 },
                 {
-                    "x": 85.06,
-                    "z": 23.39
+                    "x": 100,
+                    "z": 23.995
                 },
                 {
                     "x": 82,
@@ -123,39 +131,23 @@
                     "z": 23.31
                 },
                 {
-                    "x": 20,
-                    "z": 24
-                },
-                {
-                    "x": 16.94,
-                    "z": 23.39
-                },
-                {
-                    "x": 14.34,
-                    "z": 21.66
-                },
-                {
-                    "x": 12.61,
-                    "z": 19.06
-                },
-                {
                     "x": 12,
-                    "z": 16
+                    "z": 23.4
                 },
                 {
-                    "x": 12,
-                    "z": 8.5
+                    "x": -210,
+                    "z": 23.4
                 }
             ],
-            "speedKmh": 36.0,
+            "speedKmh": 36,
             "start": "begin",
-            "delaySeconds": 5.0,
-            "repeatMinSeconds": 4.0,
-            "repeatMaxSeconds": 6.0,
+            "delaySeconds": 5,
+            "repeatMinSeconds": 4,
+            "repeatMaxSeconds": 6,
             "stopOnTrigger": true,
             "accident": false,
             "overrideYaw": true,
-            "yaw": 0.0
+            "yaw": 0
         },
         {
             "name": "事故車 1",
@@ -171,41 +163,25 @@
                     "z": 23.31
                 },
                 {
-                    "x": 20,
-                    "z": 24
-                },
-                {
-                    "x": 16.94,
-                    "z": 23.39
-                },
-                {
-                    "x": 14.34,
-                    "z": 21.66
-                },
-                {
-                    "x": 12.61,
-                    "z": 19.06
-                },
-                {
                     "x": 12,
-                    "z": 16
+                    "z": 23.4
                 },
                 {
-                    "x": 12,
-                    "z": 8.5
+                    "x": -210,
+                    "z": 23.4
                 }
             ],
-            "speedKmh": 36.0,
+            "speedKmh": 36,
             "start": "begin",
-            "delaySeconds": 0.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
+            "delaySeconds": 0,
+            "repeatMinSeconds": 0,
+            "repeatMaxSeconds": 0,
             "stopOnTrigger": false,
             "accident": true,
             "overrideYaw": false,
-            "yaw": 0.0,
+            "yaw": 0,
             "launch": "meet",
-            "entrySpeedKmh": 36.0
+            "entrySpeedKmh": 36
         }
     ]
 }

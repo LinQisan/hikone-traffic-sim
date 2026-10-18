@@ -1,6 +1,6 @@
 // Optional inspection views of the actual runtime GLBs, with no scenario changes.
 import * as THREE from 'three';
-import { instance } from './vehicles.js';
+import { instance, BODY_MODEL } from './vehicles.js';
 import { toThree, yawToThree } from './coords.js';
 import { createReplayAnimal } from './replay-animal.js';
 import { createReplayCyclist } from './replay-cyclist.js';
@@ -17,6 +17,8 @@ export async function propReview(view, scene, materials) {
     'lamp-top': [1.4, 5.9, 3.7, 0, 4.65, 1.2, 38],
     'path-lamp': [2.5, 2.4, 3.5, 0, 1.6, 0, 42],
     'utility-pole': [9, 7, 11, 0, 5.2, 0, 46],
+    storefront: [10, 5, 12, 0, 3.1, -1.0, 42],
+    'kei-box': [4.2, 2.1, 5.0, 0, 0.85, 0, 40],
     signals: [-9.4, 4.0, -3.8, 0, 3.1, -1.2, 44],
     'signals-back': [8.5, 4.0, 5.3, 0, 3.1, -1.2, 44],
     'signals-bridge-west': [7.2, 4.0, -7.3, 0.8, 3.1, 0, 44],
@@ -55,6 +57,8 @@ export async function propReview(view, scene, materials) {
   else if (view.startsWith('lamp')) add('HK_StreetLamp', 0, 0, 0);
   else if (view === 'path-lamp') add('ART_PathLamp', 0, 0, 0);
   else if (view === 'utility-pole') add('ART_UtilityPole', 0, 0, 0);
+  else if (view === 'storefront') add('ART_CornerShop', 0, 0, 0);
+  else if (view === 'kei-box') add('ART_KeiBox', 0, 0, 0, 0, [0.93, 0.93, 0.91]);
   else if (view.startsWith('signals')) {
     // Inspect the same complete assembly used on the street, centred on its pole.
     const id = view === 'signals-bridge-west' ? 'bridge-west' : view.includes('town') ? 'town-east' : view === 'signals-double' ? 'town-west'
@@ -65,7 +69,7 @@ export async function propReview(view, scene, materials) {
       pedestrians: rig.pedestrians.map(w => ({ ...w, head: centre(w.head) })) }]);
   } else {
     add('WEB_Sedan', -5, 0, 8, 0, [0.51, 0.66, 0.80]);
-    add('HK_Kei_Tall', 0, 0, 8, 0, [0.85, 0.55, 0.45]);
+    add(BODY_MODEL['kei-tall'], 0, 0, 8, 0, [0.85, 0.55, 0.45]);
     add('HK_Kei_Hatch', 5, 0, 8, 0, [0.60, 0.76, 0.61]);
     add('HK_Truck_Large', -4, 0, -1.5, 90, [0.74, 0.81, 0.88]);
     add('HK_Truck_Medium', 4, 0, -1.5, 90, [0.86, 0.75, 0.54]);

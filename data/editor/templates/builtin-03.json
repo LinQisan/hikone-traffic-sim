@@ -12,21 +12,21 @@
     "playerMode": "walking",
     "spawn": {
         "x": 69.53,
-        "z": 19.0
+        "z": 20.05
     },
     "goal": {
         "x": 70.54,
         "z": 31.77,
         "width": 5.06,
-        "depth": 1.0,
-        "yaw": 0.0
+        "depth": 1,
+        "yaw": 0
     },
     "trigger": {
         "x": 69.7,
-        "z": 21.0,
-        "width": 4.0,
-        "depth": 1.5,
-        "yaw": 0.0
+        "z": 21.4,
+        "width": 4,
+        "depth": 1.0,
+        "yaw": 0
     },
     "vehicles": [
         {
@@ -47,41 +47,49 @@
                     "z": 28.4
                 },
                 {
-                    "x": 82,
+                    "x": 84,
                     "z": 28
                 },
                 {
-                    "x": 86.59,
-                    "z": 27.09
+                    "x": 90,
+                    "z": 28
                 },
                 {
-                    "x": 90.49,
-                    "z": 24.49
+                    "x": 100,
+                    "z": 28
                 },
                 {
-                    "x": 93.09,
-                    "z": 20.59
+                    "x": 110,
+                    "z": 28
                 },
                 {
-                    "x": 94,
-                    "z": 16
+                    "x": 120,
+                    "z": 28.505
                 },
                 {
-                    "x": 94.36,
-                    "z": 0.72
+                    "x": 140,
+                    "z": 32.056
+                },
+                {
+                    "x": 160,
+                    "z": 37.9
+                },
+                {
+                    "x": 185,
+                    "z": 46.434
                 }
             ],
-            "speedKmh": 36.0,
+            "speedKmh": 36,
             "start": "begin",
-            "delaySeconds": 0.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
+            "delaySeconds": 0,
+            "repeatMinSeconds": 0,
+            "repeatMaxSeconds": 0,
             "stopOnTrigger": false,
             "accident": false,
             "overrideYaw": false,
-            "yaw": 0.0,
+            "yaw": 0,
             "launch": "meet",
-            "entrySpeedKmh": 36.0,
+            "entrySpeedKmh": 36,
             "meetOffsetSeconds": -1.6
         },
         {
@@ -102,41 +110,49 @@
                     "z": 28.4
                 },
                 {
-                    "x": 82,
+                    "x": 84,
                     "z": 28
                 },
                 {
-                    "x": 86.59,
-                    "z": 27.09
+                    "x": 90,
+                    "z": 28
                 },
                 {
-                    "x": 90.49,
-                    "z": 24.49
+                    "x": 100,
+                    "z": 28
                 },
                 {
-                    "x": 93.09,
-                    "z": 20.59
+                    "x": 110,
+                    "z": 28
                 },
                 {
-                    "x": 94,
-                    "z": 16
+                    "x": 120,
+                    "z": 28.505
                 },
                 {
-                    "x": 94.36,
-                    "z": 0.72
+                    "x": 140,
+                    "z": 32.056
+                },
+                {
+                    "x": 160,
+                    "z": 37.9
+                },
+                {
+                    "x": 185,
+                    "z": 46.434
                 }
             ],
-            "speedKmh": 36.0,
+            "speedKmh": 36,
             "start": "begin",
-            "delaySeconds": 0.0,
-            "repeatMinSeconds": 0.0,
-            "repeatMaxSeconds": 0.0,
+            "delaySeconds": 0,
+            "repeatMinSeconds": 0,
+            "repeatMaxSeconds": 0,
             "stopOnTrigger": false,
             "accident": true,
             "overrideYaw": false,
-            "yaw": 0.0,
+            "yaw": 0,
             "launch": "meet",
-            "entrySpeedKmh": 36.0,
+            "entrySpeedKmh": 36,
             "launchAfterTriggerSeconds": 2.5
         }
     ]

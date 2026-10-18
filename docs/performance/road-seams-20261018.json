@@ -1,0 +1,414 @@
+{
+  "date": "2026-10-18",
+  "scope": "Geometric repair of road/pavement/curb seams. Starting working tree includes the previous art/layout/runtime work; no upstream Unity files, scenario timing, renderer offsets or shadow-bias settings changed.",
+  "conditions": {
+    "browser": "Headless Chrome 155.0.8059.80 on macOS",
+    "viewport": [
+      1280,
+      720
+    ],
+    "quality": "high",
+    "benchmark": true,
+    "method": "Same Chrome page/process. Before samples fulfill the three affected high/low GLBs plus map/road/collision metadata from saved starting assets; runtime code and all other models are identical. HTTP cache and back-forward cache disabled. Two seconds warmup and eight seconds of samples; no builds or tests during measurement."
+  },
+  "source": {
+    "beforeRoadGeneratorSha256": "482e8a3ecc0c09cc4b8c635529d8b724f5833d0ca345d684c711d1fc7a854004",
+    "afterRoadGeneratorSha256": "3e637fb14082c2d4972bc693f67906b7c2f2ca6fcc4d89e9a140cbce93d143eb",
+    "meshBuilderSha256": "629fb36a11d4e98141f3fe1c354619af8df0089c0867e688543b7a88d95baf51"
+  },
+  "buildCommand": "blender -b --factory-startup --python tools/build_impressionist.py -- --only ART_KyobashiRoads ART_KyobashiLand ART_KyobashiBanks",
+  "assets": {
+    "ART_KyobashiRoads": {
+      "before": {
+        "triangles": 77966,
+        "strokes": 11787,
+        "bytes": 5535384,
+        "remodeled": false,
+        "lod": {
+          "triangles": 11663,
+          "bytes": 863200
+        }
+      },
+      "after": {
+        "triangles": 81603,
+        "strokes": 11522,
+        "bytes": 5822888,
+        "remodeled": false,
+        "lod": {
+          "triangles": 16794,
+          "bytes": 1251520
+        }
+      }
+    },
+    "ART_KyobashiLand": {
+      "before": {
+        "triangles": 42135,
+        "strokes": 6160,
+        "bytes": 2843948,
+        "remodeled": false,
+        "lod": {
+          "triangles": 7488,
+          "bytes": 557232
+        }
+      },
+      "after": {
+        "triangles": 42594,
+        "strokes": 6138,
+        "bytes": 2860456,
+        "remodeled": false,
+        "lod": {
+          "triangles": 8067,
+          "bytes": 581656
+        }
+      }
+    },
+    "ART_KyobashiBanks": {
+      "before": {
+        "triangles": 2920,
+        "strokes": 0,
+        "bytes": 230488,
+        "remodeled": false,
+        "lod": {
+          "triangles": 2920,
+          "bytes": 230492
+        }
+      },
+      "after": {
+        "triangles": 2944,
+        "strokes": 0,
+        "bytes": 232432,
+        "remodeled": false,
+        "lod": {
+          "triangles": 2944,
+          "bytes": 232436
+        }
+      }
+    }
+  },
+  "geometryAudit": {
+    "surfacePolygons": {
+      "road": 748,
+      "walk": 1085,
+      "curb": 1062,
+      "town": 1670,
+      "bank": 919
+    },
+    "exposedStepFaces": {
+      "roads/HK_Curb": 952,
+      "roads/HK_Sidewalk": 1080,
+      "banks/HK_Stone": 59
+    },
+    "weldToleranceMetres": 4e-05,
+    "curbWidthMetres": 0.12,
+    "carriagewayY": 0.01,
+    "pavementY": 0.16,
+    "bridge": "Existing flush margins and end ramps retained. Exposed sides meet the existing stone deck top at -0.03 m.",
+    "method": "One clipped, noded planar partition shared by rendered tops, ground triangles and the plan. Float32-aware ear triangulation retains boundary vertices. Cap footprint replaces pavement instead of overlapping it; only exposed height differences receive side faces, using existing mesh assets/materials."
+  },
+  "measurements": {
+    "results": [
+      {
+        "probe": {
+          "geometryBytes": 18852206,
+          "sceneBufferBytes": 20340898,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.00225008424405,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.299999982118607,
+          "updateMs": 0.08479166626930237,
+          "calls": 92,
+          "triangles": 365532,
+          "width": 1280,
+          "height": 720,
+          "geometries": 106,
+          "textures": 8,
+          "programs": 13,
+          "readyMs": 2628.199999988079,
+          "resourceTransferBytes": 38810148,
+          "resourceBodyBytes": 38772048,
+          "heapBytes": 74399822,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 18852206,
+        "stage": "before",
+        "view": "street"
+      },
+      {
+        "probe": {
+          "geometryBytes": 18852206,
+          "sceneBufferBytes": 20340898,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 59.9970001499478,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.055625000161429246,
+          "calls": 82,
+          "triangles": 213253,
+          "width": 1280,
+          "height": 720,
+          "geometries": 83,
+          "textures": 8,
+          "programs": 13,
+          "readyMs": 2773.0999999940395,
+          "resourceTransferBytes": 38810148,
+          "resourceBodyBytes": 38772048,
+          "heapBytes": 159332604,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 18852206,
+        "stage": "before",
+        "view": "moat-overhead"
+      },
+      {
+        "probe": {
+          "geometryBytes": 18852206,
+          "sceneBufferBytes": 20340898,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 59.994750459200716,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.060624999739229676,
+          "calls": 50,
+          "triangles": 126430,
+          "width": 1280,
+          "height": 720,
+          "geometries": 72,
+          "textures": 8,
+          "programs": 10,
+          "readyMs": 2440.7000000178814,
+          "resourceTransferBytes": 38810148,
+          "resourceBodyBytes": 38772048,
+          "heapBytes": 139469943,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 18852206,
+        "stage": "before",
+        "view": "bridge-detail"
+      },
+      {
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.00300015005221,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.06916666645556688,
+          "calls": 92,
+          "triangles": 369097,
+          "width": 1280,
+          "height": 720,
+          "geometries": 106,
+          "textures": 8,
+          "programs": 13,
+          "readyMs": 1051.5999999940395,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 63930876,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476,
+        "stage": "after",
+        "view": "street"
+      },
+      {
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 60.002250084467576,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.06854166717578968,
+          "calls": 82,
+          "triangles": 217733,
+          "width": 1280,
+          "height": 720,
+          "geometries": 83,
+          "textures": 8,
+          "programs": 13,
+          "readyMs": 1136.9000000059605,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 62835921,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476,
+        "stage": "after",
+        "view": "moat-overhead"
+      },
+      {
+        "probe": {
+          "geometryBytes": 19263476,
+          "sceneBufferBytes": 20752168,
+          "placements": 459,
+          "meshes": 216,
+          "frames": 480,
+          "fps": 59.99250093738283,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.05937500012417634,
+          "calls": 50,
+          "triangles": 128800,
+          "width": 1280,
+          "height": 720,
+          "geometries": 72,
+          "textures": 8,
+          "programs": 10,
+          "readyMs": 1047.4000000059605,
+          "resourceTransferBytes": 39876640,
+          "resourceBodyBytes": 39838540,
+          "heapBytes": 66760776,
+          "multiDraw": true
+        },
+        "meshes": 216,
+        "geometryBytes": 19263476,
+        "stage": "after",
+        "view": "bridge-detail"
+      }
+    ],
+    "errors": []
+  },
+  "verification": {
+    "fullRegression": {
+      "tests": 133,
+      "passed": 133,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 5151.497541
+    },
+    "focusedRegression": {
+      "tests": 48,
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0
+    },
+    "roadSeamCoverage": "Both high and low meshes: front-facing horizontal rays across more than 500 exported road-edge candidates per level; all curb cap triangles tested for true pavement height, single-layer top coverage and nondegenerate geometry; former pinhole at Unity (32.04618,84.969566667) has a solid top.",
+    "collision": {
+      "blockedBefore": 155055,
+      "blockedAfter": 154971,
+      "addedCells": 39,
+      "removedCells": 123,
+      "changedRegion": "Northern retaining walls only: added cell centres in x=15.3..29.1, z=78.5..97.5; removed in x=4.1..38.5, z=72.9..104.7. Spawn/goal obstacle and all event/route tests passed."
+    },
+    "browserFlows": {
+      "results": [
+        {
+          "id": "builtin-01",
+          "mode": "walking",
+          "movedMetres": 1.7375999999999632,
+          "keyboardLook": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "mode": "bicycle",
+          "movedMetres": 0.6270833333333276,
+          "keyboardLook": true,
+          "menu": true
+        },
+        {
+          "view": "replay",
+          "driver": true,
+          "overview": true,
+          "restart": true,
+          "finished": true,
+          "results": true,
+          "menu": true
+        },
+        {
+          "view": "replay-bicycle",
+          "driver": true,
+          "overview": true,
+          "restart": true,
+          "finished": true,
+          "results": true,
+          "menu": true
+        }
+      ],
+      "portraitTargets": [
+        {
+          "id": "viewover",
+          "width": 128.078125,
+          "height": 44
+        },
+        {
+          "id": "viewdriver",
+          "width": 139.859375,
+          "height": 44
+        },
+        {
+          "id": "again",
+          "width": 192.09375,
+          "height": 44
+        },
+        {
+          "id": "next",
+          "width": 127.390625,
+          "height": 44
+        },
+        {
+          "id": "replaymenu",
+          "width": 158.953125,
+          "height": 44
+        }
+      ],
+      "forcedColorsAndReducedMotionMenu": true,
+      "errors": []
+    },
+    "visuals": {
+      "viewpoints": {
+        "straight": [
+          55,
+          0.48,
+          28.7,
+          55,
+          0.12,
+          31.3,
+          55
+        ],
+        "corner": [
+          40.5,
+          0.7,
+          22.5,
+          38,
+          0.08,
+          20,
+          58
+        ],
+        "northBend": [
+          14,
+          0.7,
+          91,
+          18,
+          0.1,
+          92,
+          58
+        ]
+      },
+      "result": "Inspected before/after low-angle captures. Open sides no longer reveal sky. Junction caps and walls follow the curve and northern retaining faces meet the pavement. No page errors."
+    },
+    "diffCheck": "passed"
+  },
+  "notes": [
+    "Scene placements (459), environment meshes (216) and renderer texture counts (8) remain unchanged. Draws: street 92/92, overhead 82/82, bridge 50/50 (before/after).",
+    "Necessary side faces and conforming surface partitions add 411,270 bytes to deduplicated environment geometry storage (18,852,206 to 19,263,476; 2.18%). Measured submitted triangles increase 0.98% in street, 2.10% overhead and 1.87% bridge view. No FPS improvement is claimed.",
+    "No new material batches or scene objects. Existing shadow policy is retained; road and curb geometry still do not cast into the sun map. Existing static bank casters use their corrected geometry.",
+    "Real phones/headsets and peak VRAM were not measured. All output files were regenerated from local authoritative generators."
+  ]
+}

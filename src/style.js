@@ -56,6 +56,13 @@ const PIGMENTS = {
   HK_Sakura: [[1.0, 0.85, 0.76], [0.83, 0.55, 0.72]],
   HK_Grass: [[0.79, 0.78, 0.43], [0.39, 0.57, 0.57]],
   HK_Water: [[0.86, 0.84, 0.63], [0.42, 0.61, 0.83]],
+  ART_Plaster: [[1.0, 0.91, 0.71], [0.62, 0.73, 0.90]],
+  ART_Concrete: [[0.92, 0.81, 0.66], [0.60, 0.68, 0.83]],
+  ART_Timber: [[0.62, 0.46, 0.32], [0.43, 0.43, 0.55]],
+  ART_Tile: [[0.76, 0.64, 0.53], [0.47, 0.59, 0.78]],
+  ART_TileRidge: [[0.65, 0.58, 0.50], [0.43, 0.52, 0.70]],
+  ART_StoneLight: [[0.89, 0.81, 0.63], [0.55, 0.66, 0.83]],
+  ART_PathGreen: [[0.69, 0.75, 0.48], [0.40, 0.65, 0.70]],
 };
 
 /** The pigments a material name paints with: warm/cool dab colours and how strongly dabs show. */
@@ -63,8 +70,9 @@ export function pigmentOf(name) {
   const pigments = PIGMENTS[name];
   return {
     warm: pigments?.[0] ?? [0.76, 0.64, 0.49], cool: pigments?.[1] ?? [0.45, 0.55, 0.72],
-    // Abstract props use deliberate broad colour planes; signal colours stay legible.
-    dab: name.startsWith('ART_') || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12,
+    // Street-view architecture keeps the town's impressionist palette. Other abstract props
+    // use deliberate colour planes, including the unambiguous signal colours.
+    dab: (name.startsWith('ART_') && !pigments) || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12,
   };
 }
 
@@ -178,8 +186,8 @@ export class PigmentPalette {
    * back: low-detail ground cells overlap their high-detail neighbours at cell borders, and the
    * high-detail surface must always win there instead of flickering.
    */
-  material(side = THREE.FrontSide, behind = false) {
-    const key = side + (behind ? '/behind' : '');
+  material(side = THREE.FrontSide, behind = false, fogScale = 1) {
+    const key = side + (behind ? '/behind' : '') + (fogScale === 1 ? '' : '/horizon-' + fogScale);
     if (this.materials.has(key)) return this.materials.get(key);
     const material = new THREE.MeshLambertMaterial({
       name: 'HikonePigments', color: 0xffffff, vertexColors: true, side,
@@ -209,8 +217,12 @@ export class PigmentPalette {
           #define hkDabStrength vHkDab`,
         emissive: 'totalEmissiveRadiance += vHkEmissive;',
       });
+      // Keep the real four-hundred-metre placement. The distant hill/keep have a longer painted
+      // atmospheric range so the normal town fog does not erase them completely at 430 m.
+      if (fogScale !== 1) shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>',
+        `#include <fog_vertex>\n#ifdef USE_FOG\nvFogDepth *= ${fogScale.toFixed(3)};\n#endif`);
     };
-    material.customProgramCacheKey = () => 'hk-palette-v2';
+    material.customProgramCacheKey = () => 'hk-palette-v2-' + fogScale;
     this.materials.set(key, material);
     return material;
   }

@@ -1,0 +1,1221 @@
+{
+  "date": "2026-10-18",
+  "scope": "Runtime optimization against the starting working tree, including pre-existing uncommitted scene/art/layout/replay changes. No model, layout, scenario or collision data changed in this review.",
+  "conditions": {
+    "browser": "Headless Chrome 155.0.8059.80, macOS",
+    "viewport": [
+      1280,
+      720
+    ],
+    "quality": "high",
+    "benchmark": true,
+    "server": "127.0.0.1:8771",
+    "method": "Same Chrome process, context and page. Baseline source modules fulfilled from a saved starting snapshot; all data assets identical. HTTP cache and back-forward cache disabled. Two seconds warmup, eight seconds of frame sampling; no builds/tests during the final measurement windows. Other user applications remained open. Repeated timings are not an FPS or loading improvement claim."
+  },
+  "sourceDigests": {
+    "algorithm": "SHA-256 of sorted relative JS path + NUL + source bytes, concatenated across src/",
+    "baseline": "aa9df149777a81f3933b8be2a3e3c3283c167c2c66b99a8ab5d720c61821b75d",
+    "final": "554819d01a3eb07af7efead8fb101ce38845db51692c833c52b1466d78b8f60b"
+  },
+  "stages": {
+    "baseline": {
+      "stage": "baseline",
+      "results": [
+        {
+          "probe": {
+            "geometryBytes": 21062523,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 59.98650303672735,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "updateMs": 0.07062500007450581,
+            "calls": 92,
+            "triangles": 365532,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 99,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 90789383,
+          "loadResources": 38804209,
+          "loadMs": 1146.5,
+          "retainedMemory": {
+            "usedSize": 15464824,
+            "totalSize": 17080320,
+            "embedderHeapUsedSize": 1663608,
+            "backingStorageSize": 59233762
+          },
+          "readyMs": 2058.5,
+          "view": "street",
+          "wallMs": 11865,
+          "lodMicro": [
+            0.05280000001192093,
+            0.03660000002384186,
+            0.02819999998807907,
+            0.02819999998807907,
+            0.02980000001192093,
+            0.029399999976158143,
+            0.027800000011920928
+          ]
+        },
+        {
+          "probe": {
+            "geometryBytes": 21062523,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 479,
+            "fps": 60.002505323813104,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "updateMs": 0.08183716016671852,
+            "calls": 82,
+            "triangles": 213253,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 82,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 84939318,
+          "loadResources": 38804209,
+          "loadMs": 170.19999998807907,
+          "retainedMemory": {
+            "usedSize": 15182324,
+            "totalSize": 16556032,
+            "embedderHeapUsedSize": 1722088,
+            "backingStorageSize": 59233338
+          },
+          "readyMs": 1082,
+          "view": "moat-overhead",
+          "wallMs": 10903
+        },
+        {
+          "probe": {
+            "geometryBytes": 21062523,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 59.99625023436035,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "updateMs": 0.08104166692743699,
+            "calls": 63,
+            "triangles": 210722,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 69,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 74838594,
+          "loadResources": 38804209,
+          "loadMs": 163.2999999821186,
+          "retainedMemory": {
+            "usedSize": 15201276,
+            "totalSize": 16293888,
+            "embedderHeapUsedSize": 1589136,
+            "backingStorageSize": 59233340
+          },
+          "readyMs": 1058.5,
+          "view": "castle-panorama",
+          "wallMs": 10874
+        },
+        {
+          "probe": {
+            "geometryBytes": 21062523,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 446,
+            "fps": 59.283283708919065,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "updateMs": 0.6004484301858953,
+            "calls": 79.73991031390135,
+            "triangles": 179102.9192825112,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 280,
+          "materialCount": 46,
+          "uniqueBufferBytes": 21098402,
+          "rendererMemory": {
+            "geometries": 132,
+            "textures": 9
+          },
+          "programs": 25,
+          "heap": 83800064,
+          "loadResources": 38809157,
+          "loadMs": 148.2000000178814,
+          "retainedMemory": {
+            "usedSize": 16624420,
+            "totalSize": 17342464,
+            "embedderHeapUsedSize": 1735552,
+            "backingStorageSize": 60568001
+          },
+          "readyMs": 1041.9000000059605,
+          "view": "replay-bicycle",
+          "wallMs": 10875
+        }
+      ],
+      "errors": []
+    },
+    "stage1Residency": {
+      "stage": "stage1",
+      "results": [
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 59.99999999999999,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 18.200000017881393,
+            "updateMs": 0.08416666692743699,
+            "calls": 92,
+            "triangles": 365532,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 99,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 65124566,
+          "loadResources": 38805461,
+          "loadMs": 191,
+          "retainedMemory": {
+            "usedSize": 13288432,
+            "totalSize": 14196736,
+            "embedderHeapUsedSize": 1576632,
+            "backingStorageSize": 43416937
+          },
+          "readyMs": 1122.5999999940395,
+          "view": "street",
+          "wallMs": 10927,
+          "lodMicro": [
+            0.05380000001192093,
+            0.03519999998807907,
+            0.03,
+            0.03,
+            0.029600000023841857,
+            0.029599999964237213,
+            0.029
+          ]
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 60.00300015005221,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.30000001192093,
+            "updateMs": 0.07770833279937506,
+            "calls": 82,
+            "triangles": 213253,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 82,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 67025418,
+          "loadResources": 38805461,
+          "loadMs": 165.30000001192093,
+          "retainedMemory": {
+            "usedSize": 13062920,
+            "totalSize": 14196736,
+            "embedderHeapUsedSize": 1531080,
+            "backingStorageSize": 43416944
+          },
+          "readyMs": 1094.1000000238419,
+          "view": "moat-overhead",
+          "wallMs": 10925
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 60.015754135415825,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.400000005960464,
+            "updateMs": 0.0906250004346172,
+            "calls": 63,
+            "triangles": 210722,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 69,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 56894218,
+          "loadResources": 38805461,
+          "loadMs": 163.7000000178814,
+          "retainedMemory": {
+            "usedSize": 13074388,
+            "totalSize": 14196736,
+            "embedderHeapUsedSize": 1508328,
+            "backingStorageSize": 43416946
+          },
+          "readyMs": 1092.4000000059605,
+          "view": "castle-panorama",
+          "wallMs": 10907
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 427,
+            "fps": 59.36244456497947,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "updateMs": 0.5861826705848864,
+            "calls": 80.18032786885246,
+            "triangles": 182343.09367681498,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 280,
+          "materialCount": 46,
+          "uniqueBufferBytes": 21098402,
+          "rendererMemory": {
+            "geometries": 132,
+            "textures": 9
+          },
+          "programs": 25,
+          "heap": 120783668,
+          "loadResources": 38810409,
+          "loadMs": 147.10000002384186,
+          "retainedMemory": {
+            "usedSize": 14690396,
+            "totalSize": 16818176,
+            "embedderHeapUsedSize": 1672408,
+            "backingStorageSize": 44751607
+          },
+          "readyMs": 1075.4000000059605,
+          "view": "replay-bicycle",
+          "wallMs": 10910
+        }
+      ],
+      "errors": []
+    },
+    "stage2Culling": {
+      "stage": "stage2",
+      "results": [
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 60.00300015005221,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "updateMs": 0.0904166659961144,
+            "calls": 92,
+            "triangles": 365532,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 106,
+            "textures": 8
+          },
+          "programs": 15,
+          "heap": 65496622,
+          "loadResources": 38806234,
+          "loadMs": 2856.7000000178814,
+          "retainedMemory": {
+            "usedSize": 13539992,
+            "totalSize": 14721024,
+            "embedderHeapUsedSize": 1554848,
+            "backingStorageSize": 43420839
+          },
+          "readyMs": 3786.300000011921,
+          "view": "street",
+          "wallMs": 13585,
+          "lodMicro": [
+            0.043,
+            0.03040000003576279,
+            0.02339999997615814,
+            0.02360000002384186,
+            0.023599999964237214,
+            0.02360000002384186,
+            0.023
+          ]
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 60.00300015005221,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "updateMs": 0.08937499976406495,
+            "calls": 82,
+            "triangles": 213253,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 83,
+            "textures": 8
+          },
+          "programs": 16,
+          "heap": 57702722,
+          "loadResources": 38806234,
+          "loadMs": 179.7999999821186,
+          "retainedMemory": {
+            "usedSize": 13298792,
+            "totalSize": 13934592,
+            "embedderHeapUsedSize": 1580688,
+            "backingStorageSize": 43420846
+          },
+          "readyMs": 1120.199999988079,
+          "view": "moat-overhead",
+          "wallMs": 10928
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 60.002250084467576,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "updateMs": 0.08583333343267441,
+            "calls": 63,
+            "triangles": 210722,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 82,
+            "textures": 8
+          },
+          "programs": 15,
+          "heap": 63919187,
+          "loadResources": 38806234,
+          "loadMs": 165.7000000178814,
+          "retainedMemory": {
+            "usedSize": 13407660,
+            "totalSize": 14458880,
+            "embedderHeapUsedSize": 1540736,
+            "backingStorageSize": 43420848
+          },
+          "readyMs": 1070.300000011921,
+          "view": "castle-panorama",
+          "wallMs": 10912
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 424,
+            "fps": 59.541362991722465,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "updateMs": 0.6037735857491223,
+            "calls": 80.2877358490566,
+            "triangles": 183170.054245283,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 280,
+          "materialCount": 46,
+          "uniqueBufferBytes": 21098402,
+          "rendererMemory": {
+            "geometries": 133,
+            "textures": 9
+          },
+          "programs": 25,
+          "heap": 68273964,
+          "loadResources": 38811182,
+          "loadMs": 160.89999997615814,
+          "retainedMemory": {
+            "usedSize": 14872172,
+            "totalSize": 15769600,
+            "embedderHeapUsedSize": 1621712,
+            "backingStorageSize": 44755532
+          },
+          "readyMs": 1111.699999988079,
+          "view": "replay-bicycle",
+          "wallMs": 10939
+        }
+      ],
+      "errors": []
+    },
+    "final": {
+      "stage": "final",
+      "results": [
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "sceneBufferBytes": 20340898,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 480,
+            "fps": 59.99999999999999,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.80000001192093,
+            "updateMs": 0.08666666851689418,
+            "calls": 92,
+            "triangles": 365532,
+            "width": 1280,
+            "height": 720,
+            "geometries": 106,
+            "textures": 8,
+            "programs": 13,
+            "readyMs": 1039.0999999940395,
+            "resourceTransferBytes": 38810148,
+            "resourceBodyBytes": 38772048,
+            "heapBytes": 64879145,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 106,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 64879145,
+          "loadResources": 38810148,
+          "loadMs": 135.09999999403954,
+          "retainedMemory": {
+            "usedSize": 16139868,
+            "totalSize": 17342464,
+            "embedderHeapUsedSize": 1597192,
+            "backingStorageSize": 43424968
+          },
+          "readyMs": 1040.2000000178814,
+          "view": "street",
+          "wallMs": 10844,
+          "lodMicro": [
+            0.038400000035762785,
+            0.028599999964237212,
+            0.02240000003576279,
+            0.02180000001192093,
+            0.022799999952316283,
+            0.02280000001192093,
+            0.02280000001192093
+          ]
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "sceneBufferBytes": 20340898,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 457,
+            "fps": 57.13571294617741,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.5,
+            "updateMs": 0.08161925591316474,
+            "calls": 82,
+            "triangles": 213253,
+            "width": 1280,
+            "height": 720,
+            "geometries": 83,
+            "textures": 8,
+            "programs": 13,
+            "readyMs": 2017.199999988079,
+            "resourceTransferBytes": 38810148,
+            "resourceBodyBytes": 38772048,
+            "heapBytes": 99646562,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 83,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 99646562,
+          "loadResources": 38810148,
+          "loadMs": 133.30000001192093,
+          "retainedMemory": {
+            "usedSize": 15753356,
+            "totalSize": 16556032,
+            "embedderHeapUsedSize": 1548936,
+            "backingStorageSize": 43424580
+          },
+          "readyMs": 2018.5999999940395,
+          "view": "moat-overhead",
+          "wallMs": 11051
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "sceneBufferBytes": 20340898,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 477,
+            "fps": 59.629472210371354,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.599999994039536,
+            "updateMs": 0.07631027211183272,
+            "calls": 63,
+            "triangles": 210722,
+            "width": 1280,
+            "height": 720,
+            "geometries": 82,
+            "textures": 8,
+            "programs": 12,
+            "readyMs": 5626.899999976158,
+            "resourceTransferBytes": 38810148,
+            "resourceBodyBytes": 38772048,
+            "heapBytes": 64108514,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 82,
+            "textures": 8
+          },
+          "programs": 12,
+          "heap": 64108514,
+          "loadResources": 38810148,
+          "loadMs": 2677.0999999940395,
+          "retainedMemory": {
+            "usedSize": 15704032,
+            "totalSize": 16556032,
+            "embedderHeapUsedSize": 1603848,
+            "backingStorageSize": 43424638
+          },
+          "readyMs": 5628.5,
+          "view": "castle-panorama",
+          "wallMs": 15181
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "sceneBufferBytes": 21098402,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 339,
+            "fps": 50.66810151560428,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 50.60000002384186,
+            "updateMs": 0.2646017720741508,
+            "calls": 80.4424778761062,
+            "triangles": 184680.73156342184,
+            "width": 1280,
+            "height": 720,
+            "geometries": 134,
+            "textures": 9,
+            "programs": 24,
+            "readyMs": 2548.5,
+            "resourceTransferBytes": 38815096,
+            "resourceBodyBytes": 38776696,
+            "heapBytes": 75513012,
+            "multiDraw": true
+          },
+          "geometryCount": 280,
+          "materialCount": 46,
+          "uniqueBufferBytes": 21098402,
+          "rendererMemory": {
+            "geometries": 134,
+            "textures": 9
+          },
+          "programs": 24,
+          "heap": 75513012,
+          "loadResources": 38815096,
+          "loadMs": 871.4000000059605,
+          "retainedMemory": {
+            "usedSize": 17188024,
+            "totalSize": 17866752,
+            "embedderHeapUsedSize": 1630800,
+            "backingStorageSize": 44759264
+          },
+          "readyMs": 2550.0999999940395,
+          "view": "replay-bicycle",
+          "wallMs": 12269
+        }
+      ],
+      "errors": []
+    }
+  },
+  "repeatMeasurements": {
+    "baseline": {
+      "stage": "baseline-repeat",
+      "results": [
+        {
+          "probe": {
+            "geometryBytes": 21062523,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 440,
+            "fps": 55.00343771485718,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 17.600000023841858,
+            "updateMs": 0.07454545443708246,
+            "calls": 92,
+            "triangles": 365532,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 99,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 76790909,
+          "loadResources": 38804209,
+          "loadMs": 5378.799999982119,
+          "retainedMemory": {
+            "usedSize": 16547328,
+            "totalSize": 17342464,
+            "embedderHeapUsedSize": 1650128,
+            "backingStorageSize": 59233384
+          },
+          "readyMs": 6797.199999988079,
+          "view": "street",
+          "wallMs": 16526,
+          "lodMicro": [
+            0.08580000001192092,
+            0.05819999998807907,
+            0.049,
+            0.04959999996423721,
+            0.045400000035762784,
+            0.038,
+            0.03680000001192093
+          ]
+        },
+        {
+          "probe": {
+            "geometryBytes": 21062523,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 132,
+            "fps": 19.512771996181318,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 227.40000000596046,
+            "updateMs": 0.28939394020673,
+            "calls": 83.46212121212122,
+            "triangles": 208290.12121212122,
+            "width": 1280,
+            "height": 720,
+            "multiDraw": true
+          },
+          "geometryCount": 280,
+          "materialCount": 46,
+          "uniqueBufferBytes": 21098402,
+          "rendererMemory": {
+            "geometries": 131,
+            "textures": 9
+          },
+          "programs": 24,
+          "heap": 81123068,
+          "loadResources": 38809157,
+          "loadMs": 8116.4000000059605,
+          "retainedMemory": {
+            "usedSize": 17613856,
+            "totalSize": 18653184,
+            "embedderHeapUsedSize": 1780720,
+            "backingStorageSize": 60568058
+          },
+          "readyMs": 13902.09999999404,
+          "view": "replay-bicycle",
+          "wallMs": 23624
+        }
+      ],
+      "errors": []
+    },
+    "final": {
+      "stage": "final-repeat",
+      "results": [
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "sceneBufferBytes": 20340898,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 411,
+            "fps": 53.26939278076598,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.69999998807907,
+            "updateMs": 0.10097323658982622,
+            "calls": 92,
+            "triangles": 365532,
+            "width": 1280,
+            "height": 720,
+            "geometries": 106,
+            "textures": 8,
+            "programs": 13,
+            "readyMs": 14857.299999982119,
+            "resourceTransferBytes": 38810148,
+            "resourceBodyBytes": 38772048,
+            "heapBytes": 68260358,
+            "multiDraw": true
+          },
+          "geometryCount": 228,
+          "materialCount": 26,
+          "uniqueBufferBytes": 20340898,
+          "rendererMemory": {
+            "geometries": 106,
+            "textures": 8
+          },
+          "programs": 13,
+          "heap": 68260358,
+          "loadResources": 38810148,
+          "loadMs": 9888.299999982119,
+          "retainedMemory": {
+            "usedSize": 16418364,
+            "totalSize": 17342464,
+            "embedderHeapUsedSize": 1980624,
+            "backingStorageSize": 43424714
+          },
+          "readyMs": 14858.799999982119,
+          "view": "street",
+          "wallMs": 24274,
+          "lodMicro": [
+            0.054600000023841855,
+            0.03639999997615814,
+            0.024,
+            0.02360000002384186,
+            0.02619999998807907,
+            0.029200000047683715,
+            0.024599999964237212
+          ]
+        },
+        {
+          "probe": {
+            "geometryBytes": 18852206,
+            "sceneBufferBytes": 21098402,
+            "placements": 459,
+            "meshes": 216,
+            "frames": 70,
+            "fps": 11.105294052353305,
+            "medianMs": 17.19999998807907,
+            "p95Ms": 300.5,
+            "updateMs": 0.295714282989502,
+            "calls": 86.44285714285714,
+            "triangles": 227179.6857142857,
+            "width": 1280,
+            "height": 720,
+            "geometries": 132,
+            "textures": 9,
+            "programs": 23,
+            "readyMs": 3114.9000000059605,
+            "resourceTransferBytes": 38815096,
+            "resourceBodyBytes": 38776696,
+            "heapBytes": 104291843,
+            "multiDraw": true
+          },
+          "geometryCount": 280,
+          "materialCount": 46,
+          "uniqueBufferBytes": 21098402,
+          "rendererMemory": {
+            "geometries": 132,
+            "textures": 9
+          },
+          "programs": 23,
+          "heap": 68676256,
+          "loadResources": 38815096,
+          "loadMs": 1604.199999988079,
+          "retainedMemory": {
+            "usedSize": 17226228,
+            "totalSize": 17866752,
+            "embedderHeapUsedSize": 1687128,
+            "backingStorageSize": 44759338
+          },
+          "readyMs": 3117,
+          "view": "replay-bicycle",
+          "wallMs": 12861
+        }
+      ],
+      "errors": []
+    }
+  },
+  "microbenchmark": {
+    "protocol": "Same browser page at view=replay-bicycle. Nine synchronous batches of 500 replay.frame(3.5 + (i % 200) / 100) calls; discard the first batch for warmup. No renderer calls inside the batches. Culling batches in each report are 500 updates with camera x = -55 + (i % 200) * 0.3; first two batches are warmup and exclude GPU uploads.",
+    "baseline": {
+      "frameMs": [
+        0.3503999999761581,
+        0.315,
+        0.31580000001192093,
+        0.3155999999642372,
+        0.32180000001192094,
+        0.323,
+        0.32880000001192095,
+        0.31980000001192094,
+        0.324
+      ]
+    },
+    "final": {
+      "frameMs": [
+        0.06660000002384185,
+        0.04580000001192093,
+        0.04519999998807907,
+        0.04519999998807907,
+        0.04480000001192093,
+        0.04439999997615814,
+        0.04380000001192093,
+        0.04380000001192093,
+        0.04580000001192093
+      ]
+    },
+    "medianReplayMsBefore": 0.32080000001192094,
+    "medianReplayMsAfter": 0.045,
+    "replayReductionPercent": 85.97256857907489
+  },
+  "gpuTimer": {
+    "protocol": "EXT_disjoint_timer_query_webgl2, 120 valid samples per case, zero disjoint results. Fixed street camera or bicycle replay at t=4.7. Warm both shadow/caster caches, then render identical scenes; include replay.frame(4.7) in each replay CPU submission. No moving light or LOD rebuild in these steady-state draws. CPU submission includes renderer JavaScript/driver overhead; query time measures GPU work, excluding requestAnimationFrame scheduling gaps.",
+    "results": [
+      {
+        "available": true,
+        "view": "street",
+        "gpuMs": {
+          "mean": 3.7395465499999996,
+          "median": 4.172039,
+          "p95": 4.6518,
+          "samples": 120
+        },
+        "cpuSubmissionMs": {
+          "mean": 1.5316666662693024,
+          "median": 1.5999999940395355,
+          "p95": 1.800000011920929,
+          "samples": 120
+        },
+        "disjoint": 0,
+        "wallMs": 1986.2000000178814,
+        "calls": 92,
+        "triangles": 365532,
+        "width": 1280,
+        "height": 720,
+        "stage": "baseline"
+      },
+      {
+        "available": true,
+        "view": "replay-bicycle",
+        "gpuMs": {
+          "mean": 2.447404208333334,
+          "median": 2.762599,
+          "p95": 3.158559,
+          "samples": 120
+        },
+        "cpuSubmissionMs": {
+          "mean": 2.595833330353101,
+          "median": 2.699999988079071,
+          "p95": 2.9000000059604645,
+          "samples": 120
+        },
+        "disjoint": 0,
+        "wallMs": 1996.7999999821186,
+        "calls": 71,
+        "triangles": 112637,
+        "width": 1280,
+        "height": 720,
+        "stage": "baseline"
+      },
+      {
+        "available": true,
+        "view": "street",
+        "gpuMs": {
+          "mean": 3.6136191749999997,
+          "median": 3.947039,
+          "p95": 4.19336,
+          "samples": 120
+        },
+        "cpuSubmissionMs": {
+          "mean": 1.4558333337306977,
+          "median": 1.5,
+          "p95": 1.7000000178813934,
+          "samples": 120
+        },
+        "disjoint": 0,
+        "wallMs": 1985.9000000059605,
+        "calls": 92,
+        "triangles": 365532,
+        "width": 1280,
+        "height": 720,
+        "stage": "final"
+      },
+      {
+        "available": true,
+        "view": "replay-bicycle",
+        "gpuMs": {
+          "mean": 2.449160266666667,
+          "median": 2.77236,
+          "p95": 3.207519,
+          "samples": 120
+        },
+        "cpuSubmissionMs": {
+          "mean": 1.7466666671137014,
+          "median": 1.800000011920929,
+          "p95": 2,
+          "samples": 120
+        },
+        "disjoint": 0,
+        "wallMs": 1996,
+        "calls": 71,
+        "triangles": 112637,
+        "width": 1280,
+        "height": 720,
+        "stage": "final"
+      }
+    ]
+  },
+  "verification": {
+    "fullRegression": {
+      "tests": 129,
+      "passed": 129,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 3874.022109
+    },
+    "trafficDifferential": {
+      "scenarios": 10,
+      "seeds": [
+        1,
+        42,
+        12345
+      ],
+      "stepsPerCase": 2400,
+      "totalComparedSteps": 72000,
+      "stepPattern": "0.12 s every 27th step, otherwise 1/60 s; wait 2 s, advance toward goal at 2.4 m/s; trigger areas and freeze at contact. Compare time, trigger time, vehicle order/ID/body/pose/steer/speed/distance/accident/launch state and contact ID.",
+      "result": "Exact numeric equality"
+    },
+    "functional": {
+      "results": [
+        {
+          "id": "builtin-01",
+          "mode": "walking",
+          "movedMetres": 1.7126399999856599,
+          "keyboardLook": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "mode": "bicycle",
+          "movedMetres": 0.6270833333333276,
+          "keyboardLook": true,
+          "menu": true
+        },
+        {
+          "view": "replay",
+          "driver": true,
+          "overview": true,
+          "restart": true,
+          "finished": true,
+          "results": true,
+          "menu": true
+        },
+        {
+          "view": "replay-bicycle",
+          "driver": true,
+          "overview": true,
+          "restart": true,
+          "finished": true,
+          "results": true,
+          "menu": true
+        }
+      ],
+      "portraitTargets": [
+        {
+          "id": "viewover",
+          "width": 128.078125,
+          "height": 44
+        },
+        {
+          "id": "viewdriver",
+          "width": 139.859375,
+          "height": 44
+        },
+        {
+          "id": "again",
+          "width": 192.09375,
+          "height": 44
+        },
+        {
+          "id": "next",
+          "width": 127.390625,
+          "height": 44
+        },
+        {
+          "id": "replaymenu",
+          "width": 158.953125,
+          "height": 44
+        }
+      ],
+      "forcedColorsAndReducedMotionMenu": true,
+      "errors": []
+    },
+    "replayLifecycle": [
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      },
+      {
+        "geometries": 100,
+        "textures": 9,
+        "programs": 15,
+        "driverDetached": true,
+        "recordingReleased": true
+      }
+    ],
+    "pixelComparison": {
+      "protocol": "1280x720, hidden HUD/loading/probe text, fixed review cameras; walking/bicycle replay at 4.7 s. Refresh both versions caster lists after bringing the sun projection up to date, then render cached shadows. Separately document the initial-shadow correction.",
+      "results": {
+        "street": {
+          "changedPixels": 0,
+          "totalPixels": 921600,
+          "meanChannelDifference": 0.0,
+          "bounds": null
+        },
+        "moat-overhead": {
+          "changedPixels": 0,
+          "totalPixels": 921600,
+          "meanChannelDifference": 0.0,
+          "bounds": null
+        },
+        "castle-panorama": {
+          "changedPixels": 0,
+          "totalPixels": 921600,
+          "meanChannelDifference": 0.0,
+          "bounds": null
+        },
+        "replay": {
+          "changedPixels": 0,
+          "totalPixels": 921600,
+          "meanChannelDifference": 0.0,
+          "bounds": null
+        },
+        "replay-bicycle": {
+          "changedPixels": 0,
+          "totalPixels": 921600,
+          "meanChannelDifference": 0.0,
+          "bounds": null
+        }
+      }
+    },
+    "diffCheck": "passed"
+  },
+  "notes": [
+    "Environment geometryBytes changed counting rules: 21,062,523 previously counted shared shadow geometry twice; 18,852,206 now deduplicates it. This 2,210,317-byte reporting change is not a physical memory saving.",
+    "Scene geometry and instance array bytes are unchanged: 20,340,898 in static views, 21,098,402 in bicycle replay. Renderer memory counts are uploaded objects, not exact VRAM bytes.",
+    "Retained backingStorageSize after explicit HeapProfiler.collectGarbage falls by about 15.81 MB (26.7%) in static views. It excludes GPU VRAM and does not measure peak loading memory.",
+    "The configured sun-camera projection is now updated before the first caster list; opening roof shadows can be more complete. This can initially upload more caster geometry. All ordinary static draw and triangle counts remain unchanged.",
+    "Frame and load timings varied sharply. Interleaved repeat street FPS was 55.00/53.27, replay FPS 19.51/11.11 and replay p95 227.4/300.5 ms (baseline/final). Do not hide these worse after samples or infer a general FPS improvement. The separate fixed-scene GPU queries took about two seconds for 120 draws in each case and showed similar GPU costs.",
+    "A later read-only macOS pmset diagnostic reported CPU_Speed_Limit=55, CPU_Scheduler_Limit=100 and 12 available CPUs, without a recorded thermal warning. This is context for timing variability, not proof of its cause.",
+    "Transfer remains about 38.8 MB with HTTP cache disabled. Repeats include 6.8-14.9 second readiness outliers. No loading-time improvement is established.",
+    "Real phones/headsets, peak memory, exact VRAM and sustained device thermal behavior were not tested. Browser touch emulation is not a real-phone measurement."
+  ]
+}

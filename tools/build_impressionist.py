@@ -17,6 +17,11 @@ import bmesh
 from mathutils import Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import abstract_props
+import streetscape
+import moat_art
+import road_network
+import hikone_castle
+import castle_approach
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'models', 'impressionist')
@@ -53,6 +58,16 @@ COLORS = {
     'ART_SignalGreen': (0.17, 0.76, 0.46), 'ART_SignalGlyph': (1.0, 0.96, 0.80),
     'ART_Glass': (0.35, 0.52, 0.66), 'ART_GlassLight': (0.65, 0.76, 0.81),
     'ART_Cargo': (0.80, 0.82, 0.82), 'ART_Chassis': (0.17, 0.18, 0.22),
+    'ART_Patina': (0.38, 0.50, 0.43), 'ART_Bronze': (0.39, 0.34, 0.24),
+    'ART_StoneLight': (0.72, 0.71, 0.65), 'ART_Chain': (0.27, 0.28, 0.27),
+    'ART_Tile': (0.41, 0.46, 0.57), 'ART_TileRidge': (0.34, 0.37, 0.48),
+    'ART_Plaster': (0.91, 0.85, 0.71), 'ART_Timber': (0.34, 0.29, 0.33),
+    'ART_Window': (0.32, 0.47, 0.59), 'ART_Concrete': (0.73, 0.70, 0.66),
+    'ART_Menu': (0.21, 0.27, 0.25), 'ART_Tactile': (0.77, 0.70, 0.48),
+    'ART_TactileRidge': (0.85, 0.79, 0.57), 'ART_Joint': (0.55, 0.53, 0.47),
+    'ART_Drain': (0.18, 0.20, 0.20),
+    'ART_PathGreen': (0.45, 0.65, 0.57),
+    'ART_Sand': (0.76, 0.68, 0.52), 'ART_RedRoof': (0.53, 0.31, 0.29),
 }
 EMISSION = {
     'ART_LampGlow': ((1.0, 0.70, 0.32), 0.20),
@@ -110,14 +125,15 @@ class BrushMesh:
         self.smooth.append(smooth)
         self.details.append(detail)
 
-    def face(self, pts, material, strokes=True):
+    def face(self, pts, material, strokes=True, pigment=None):
         pts = [U(p) for p in reversed(pts)]
-        self.surface(pts, material, strokes)
+        self.surface(pts, material, strokes, pigment)
 
-    def surface(self, pts, material, strokes=True):
+    def surface(self, pts, material, strokes=True, pigment=None):
         ground = self.name in ('HK_GroundPaved', 'HK_GroundFar', 'HK_Terrain_Castle')
         architecture = self.name.startswith('HK_Machiya') or self.name == 'HK_Kura'
-        pigment = COLORS.get(material) if ground else (self.pigment(material, 0.48) if architecture else None)
+        if pigment is None:
+            pigment = COLORS.get(material) if ground else (self.pigment(material, 0.48) if architecture else None)
         self.polygon(pts, material, pigment,
                      smooth=self.name == 'HK_Terrain_Castle')
         if self.abstract or not strokes or len(pts) < 3:
@@ -133,14 +149,22 @@ class BrushMesh:
             horizontal = abs(normal.z) > 0.7
             # Large/far ground has broad strokes; town and facades have finer ones.
             density = 5 if area < 250 else (0.5 if area < 25000 else 0.018)
-            if self.name == 'HK_GroundPaved':
+            if self.name == 'ART_KyobashiWater':
+                density = 0.045
+            elif self.name == 'ART_KyobashiRoads':
+                density = 0.4
+            elif self.name == 'ART_KyobashiLand':
+                density = 0.045
+            elif self.name == 'HK_GroundPaved':
                 density = 0.28
             elif self.name == 'HK_GroundFar':
                 density = 0.008
             elif self.name == 'HK_Terrain_Castle':
                 density = 0.045
             if material == 'HK_WhitePaint':
-                density = 16
+                density = 2
+            elif material == 'HK_Asphalt':
+                density = 0.65
             if material.startswith('HK_Sign'):
                 density = 2
             count = min(9000, int(area * density + self.rng.random()))
@@ -430,11 +454,11 @@ def sink_tops(pts, depth):
     return out
 
 
-def rebuild(name):
+def rebuild(name, source_name=None, omit_materials=()):
     # Read the source in Blender so its transforms, handedness and primitive groups
     # are respected. Keep safety-relevant silhouettes and original road elevations.
     before = set(bpy.data.objects)
-    bpy.ops.import_scene.gltf(filepath=os.path.join(ROOT, 'data', 'models', name + '.glb'))
+    bpy.ops.import_scene.gltf(filepath=os.path.join(ROOT, 'data', 'models', (source_name or name) + '.glb'))
     imported = set(bpy.data.objects) - before
     b = BrushMesh(name)
     for ob in imported:
@@ -442,12 +466,18 @@ def rebuild(name):
             continue
         for poly in ob.data.polygons:
             material = ob.data.materials[poly.material_index].name.split('.')[0]
+            if material in omit_materials:
+                continue
+            if name == 'HK_Kyobashi' and material == 'HK_Stone':
+                continue  # locally modeled stone newels and patinated finials below
             pts = [ob.matrix_world @ ob.data.vertices[i].co for i in poly.vertices]
             if name in SUNK_TOPS and material == SUNK_TOPS[name][0]:
                 pts = sink_tops(pts, SUNK_TOPS[name][1])
             b.surface(pts, material)
     for ob in imported:
         bpy.data.objects.remove(ob, do_unlink=True)
+    if name == 'HK_Kyobashi':
+        streetscape.bridge_posts(b)
     return b
 
 
@@ -519,6 +549,11 @@ def main():
             manifest = json.load(f)
     names = {file[:-4] for file in os.listdir(os.path.join(ROOT, 'data', 'models')) if file.endswith('.glb')}
     names.update(abstract_props.SIGNAL_MODELS, abstract_props.SIGN_MODELS, abstract_props.STREET_MODELS)
+    names.update(streetscape.MODELS)
+    names.update(moat_art.MODELS)
+    names.update(road_network.MODELS)
+    names.update(hikone_castle.MODELS)
+    names.update(castle_approach.MODELS)
     if args.only and set(args.only) - names:
         parser.error('Unknown models: ' + ', '.join(sorted(set(args.only) - names)))
     for name in sorted(names):
@@ -526,6 +561,18 @@ def main():
             continue
         if args.lod_only:
             b = None
+        elif name in hikone_castle.MODELS:
+            b = hikone_castle.build(name, BrushMesh)
+        elif name in castle_approach.MODELS:
+            b = castle_approach.build(name, BrushMesh)
+        elif name in road_network.MODELS:
+            b = road_network.build(name, BrushMesh)
+        elif name == 'ART_MoatRoadSurface':
+            b = rebuild(name, 'HK_RoadSurf_Straight', ('HK_WhitePaint',))
+        elif name in moat_art.MODELS:
+            b = moat_art.build(name, BrushMesh)
+        elif name in streetscape.MODELS:
+            b = streetscape.build(name, BrushMesh)
         elif name in houses:
             b = house(name, *houses[name])
         elif name.startswith('HK_Tree_'):
@@ -537,7 +584,12 @@ def main():
         # A regular rebuild always refreshes both levels, so regenerated art cannot
         # leave missing or stale distant geometry behind.
         for distant in ([True] if args.lod_only else [False, True]):
-            ob = existing_lod(name) if args.lod_only else b.finish(lod=distant)
+            detail = streetscape.build(name, BrushMesh, lod=True) if distant and name in streetscape.MODELS and not args.lod_only else b
+            if distant and name in hikone_castle.MODELS and not args.lod_only:
+                detail = hikone_castle.build(name, BrushMesh, lod=True)
+            if distant and name in castle_approach.MODELS and not args.lod_only:
+                detail = castle_approach.build(name, BrushMesh, lod=True)
+            ob = existing_lod(name) if args.lod_only else detail.finish(lod=distant)
             bpy.ops.object.select_all(action='DESELECT')
             ob.select_set(True)
             bpy.context.view_layer.objects.active = ob
@@ -551,15 +603,22 @@ def main():
             else:
                 manifest['models'][name] = {'triangles': sum(len(p.vertices) - 2 for p in ob.data.polygons),
                                           'strokes': b.strokes, 'bytes': os.path.getsize(path),
-                                          'remodeled': name in houses or name.startswith('HK_Tree_') or name in abstract_props.MODEL_NAMES}
+                                          'remodeled': name in houses or name.startswith('HK_Tree_') or name in abstract_props.MODEL_NAMES or name in streetscape.MODELS or name in moat_art.MODELS or name in hikone_castle.MODELS}
                 if b.abstract:
-                    manifest['models'][name]['design'] = 'abstract-closed-solids-v2'
+                    manifest['models'][name]['design'] = ('street-view-details-v1'
+                        if name in streetscape.MODELS and name not in ('ART_KeiBox', 'HK_ChainFence')
+                        else 'abstract-closed-solids-v2')
+                if name in hikone_castle.MODELS:
+                    manifest['models'][name]['design'] = 'hikone-landmark-v1'
+                if name in castle_approach.MODELS:
+                    manifest['models'][name].update(remodeled=True, design='hikone-approach-v1')
             print('IMPRESSIONIST', name, manifest['models'][name], flush=True)
             bpy.data.objects.remove(ob, do_unlink=True)
         # Imported source materials and their textures must not contaminate the
         # next mesh's neutral vertex-colour material with an old Base Color map.
         for mat in list(bpy.data.materials):
             bpy.data.materials.remove(mat)
+    road_network.finish_exports()
     with open(os.path.join(OUT, 'manifest.json'), 'w') as f:
         json.dump(manifest, f, indent=2)
     if args.save_library:

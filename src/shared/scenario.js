@@ -1,12 +1,11 @@
 // Scenario model shared by the web scenario editor (../hikone-traffic-sim/editor, which gets a copy
 // through its tools/sync.mjs), the browser port, its local server and the tests.
-// Mirrors Assets/_Project/Scripts/Scenario/CustomScenario.cs: same fields, defaults, order and
-// validation messages. Keep both sides in step (see CustomScenario.Validate).
+// Retains the Unity-compatible fields and serialization order; browser map bounds are local.
 
 export const FORMAT = 'vrlearn-scenario';
 export const VERSION = 1;
 export const HIKONE_MAP = 'hikone-kyobashi';
-export const HIKONE_BOUNDS = { xMin: -160, zMin: -80, xMax: 160, zMax: 140 };
+export const HIKONE_BOUNDS = { xMin: -220, zMin: -155, xMax: 200, zMax: 165 };
 export const PLAYER_MODES = ['walking', 'bicycle'];
 export const SETTINGS = ['crossing', 'midblock', 'bicycle'];
 export const START_BEGIN = 'begin';
@@ -86,7 +85,7 @@ function inside(x, z) {
   return x >= HIKONE_BOUNDS.xMin && x <= HIKONE_BOUNDS.xMax && z >= HIKONE_BOUNDS.zMin && z <= HIKONE_BOUNDS.zMax;
 }
 
-/** The same checks as CustomScenario.Validate (Unity refuses files with any of these errors). */
+/** Structural checks; browser map bounds are owned locally. */
 export function validateStructure(s) {
   const errors = [];
   const add = (message, target) => errors.push({ level: 'error', message, target });

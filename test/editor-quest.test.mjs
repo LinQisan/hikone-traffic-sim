@@ -20,7 +20,7 @@ test('sync pushes valid scenarios, skips broken ones and removes stale files', {
   await fs.mkdir(remote, { recursive: true });
   await fs.writeFile(path.join(remote, 'zz-old-on-quest.json'), '{}');
 
-  const template = JSON.parse(await fs.readFile(path.join(SCENARIOS, 'templates', 'builtin-01.json'), 'utf8'));
+  const template = JSON.parse(await fs.readFile(new URL('../data/editor/templates/builtin-01.json', import.meta.url), 'utf8'));
   const good = path.join(SCENARIOS, 'zz-quest-good.json');
   const bad = path.join(SCENARIOS, 'zz-quest-bad.json');
   await fs.writeFile(good, JSON.stringify({ ...template, id: 'zz-quest-good' }));

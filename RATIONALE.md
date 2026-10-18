@@ -14,11 +14,11 @@ People without a Quest try VRLearn's Hikone scene and its 10 accident events in 
 
 ## Relation to Unity
 
-This is an independent practice tool that originally imported Unity's geometry and scenario format; it need not match VRLearn. Built-in routes, timing, editor templates and lane presets belong to this project and come from `events/`. `node tools/sync.mjs --events-only` rebuilds them without a Unity checkout. A full sync still imports upstream assets and the compatible scenario model, so review it separately from browser event edits. The existing format supports the optional Unity/Quest bridge; web-only scheduling is not reproduced by Unity. Signals never switch; there is no sound, rain or night, and built-ins 06–08 use browser behaviours. **Kerbs are 15 cm** in the imported map (carriageway 0.01, pavement 0.16, town 0.15); keep geometry and rendering consistent. Unity has adopted some of this port's pigments and models, while the browser's raised stroke geometry stays local. The browser hides the crosswalk sign and bridge guide post in `src/web-layout.js`.
+This is an independent practice tool that originally imported Unity's geometry and scenario format; it need not match VRLearn. Built-in routes, timing, editor templates and lane presets belong to this project and come from `events/`. `node tools/sync.mjs --events-only` rebuilds them without a Unity checkout. The browser's roads now follow an approximate Google overhead reconstruction authored in `tools/road_network.py`; `src/road-layout.js` replaces the obsolete imported tile grid and moves its surroundings. Meshes, ground triangles and editor imagery come from the same road polygons. A full sync still imports upstream assets and the compatible scenario model: rebuild the local road plan afterwards, and review the changes separately from browser event edits. The existing format supports the optional Unity/Quest bridge; web-only scheduling is not reproduced by Unity. Signals never switch; there is no sound, rain or night, and built-ins 06–08 use browser behaviours. **Kerbs are 15 cm** (carriageway 0.01, pavement 0.16, town 0.15); keep geometry and rendering consistent. Unity has adopted some of this port's pigments and models, while the browser's raised stroke geometry stays local.
 
 ## Look
 
-A soft, warm Renoir-like painting in which outlines and positions stay clear enough to judge a car's distance. The painting is **in the geometry** (vertex pigments, brush meshes made in Blender), not a screen filter: it costs nothing per frame, looks the same on phones and never shimmers. Props keep only the outlines needed to read them. The Kyobashi crossing follows street photographs (signals, plates, 40 km/h on Route 25; no crosswalk signs at the signalised corners) — web-only choices. In the replay a bear stands in for the participant: posture and fall read clearly without a distressing human figure.
+A soft, warm Renoir-like painting in which outlines and positions stay clear enough to judge a car's distance. The painting is **in the geometry** (vertex pigments, brush meshes made in Blender), not a screen filter: it costs nothing per frame, looks the same on phones and never shimmers. Street View guides approximate shapes and construction details; colour keeps the impressionist warm/cool palette instead of matching the photograph. Detail is concentrated around the crossing and its nearby facades. The Kyobashi crossing follows street photographs (signals, plates, 40 km/h on Route 25; no crosswalk signs at the signalised corners) — web-only choices. In the replay a bear stands in for the participant: posture and fall read clearly without a distressing human figure.
 
 ## Events
 
@@ -41,6 +41,16 @@ A soft, warm Renoir-like painting in which outlines and positions stay clear eno
 ## Replay and results
 
 Unity's window (8 s before to 1.6 s after contact). Bird's-eye for the situation; the accident car's driver seat to ask "could the driver see me?". The fall depends on where and how fast the car hit — educational, not reconstruction. The replay waits on its last frame and restarts cleanly.
+
+The overview plans against the recorded approach, car and posed landing before playback. CPU-only
+copies of the town's low-detail silhouettes retain roofs, trees and signal poles independently of
+render culling; parked vehicles and recorded traffic also obstruct the view. The planner prefers
+one clear three-quarter angle for the complete clip, raises or moves it when necessary, and checks
+the translation between camera positions as well as the subject sight lines. It anticipates turns,
+smooths focus and distance, and validates that smoothing again. If no continuous clear connection
+exists, an angle change is preferred away from contact. Buildings stay visible. Portrait resizing
+replans the framing and reserves the area covered by replay controls; reduced motion prefers a stationary wide shot. Normal playback only
+interpolates the precomputed track, without scene raycasts or new camera vectors each frame.
 
 ## Performance
 

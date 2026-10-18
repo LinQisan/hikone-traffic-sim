@@ -28,7 +28,7 @@ const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
 const layout = webLayout(read('layout.json')), map = read('map.json');   // as the browser shows it
 const ground = new Ground(read('road_tiles.json'));
-const NOT_SOLID = /^HK_(Road|Ground|Water|Terrain)/;
+const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain)|ART_Kyobashi(Roads|Land|Water))/;
 
 const { xMin, zMin, xMax, zMax } = map.world;
 const width = Math.ceil((xMax - xMin) / CELL), height = Math.ceil((zMax - zMin) / CELL);

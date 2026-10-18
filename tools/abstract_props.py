@@ -225,12 +225,11 @@ def signals(b, name):
         square_lamp(b, -0.175, 'ART_SignalGreen', True, 0.112)
 
 
-def speed_sign(b, digits):
+def speed_sign(b, digits, y=2.45, pole_top=2.9):
     """A Japanese speed-limit sign as closed solids, sized like VRLearn's HK_Sign_Speed30 (pole
     2.9 m, disc 0.6 m across at 2.45 m, facing +Z): red ring, white face, blue seven-segment
     digits. `digits` is a two-character string read from the front."""
-    y = 2.45
-    cylinder(b, (0, 0, 0), (0, 2.9, 0), 0.035, 'HK_MetalLight', segments=10)
+    cylinder(b, (0, 0, 0), (0, pole_top, 0), 0.035, 'HK_MetalLight', segments=10)
     cylinder(b, (0, y, 0.03), (0, y, 0.05), 0.305, 'HK_MetalLight', segments=32)
     cylinder(b, (0, y, 0.05), (0, y, 0.06), 0.3, 'HK_SignRed', segments=32)
     cylinder(b, (0, y, 0.06), (0, y, 0.066), 0.23, 'HK_WhitePaint', segments=32)
@@ -255,7 +254,7 @@ def interpolate(profile, z):
     return profile[0][1] if z < profile[0][0] else profile[-1][1]
 
 
-def car_body(b, width, profile, radius, wheelbase, cabin, transform=identity, center_z=0):
+def car_body(b, width, profile, radius, wheelbase, cabin, transform=identity, center_z=0, panel_gap=0):
     hw = width / 2
     # The shell follows the wheel arches, with a fully closed underside above tyres.
     zs = {z for z, _ in profile}
@@ -301,6 +300,7 @@ def car_body(b, width, profile, radius, wheelbase, cabin, transform=identity, ce
         for start, end in ((rear, divider - 0.045), (divider + 0.045, front)):
             breaks = sorted({start, end, *[z for z, _ in profile if start < z < end]})
             for a, c in zip(breaks, breaks[1:]):
+                a, c = a + panel_gap, c - panel_gap
                 panel(b, [glass_point(side, a, 0.14), glass_point(side, c, 0.14),
                           glass_point(side, c, 0.83), glass_point(side, a, 0.83)],
                       'ART_Glass', inside, transform)
@@ -316,6 +316,7 @@ def car_body(b, width, profile, radius, wheelbase, cabin, transform=identity, ce
         start, end = sorted((low, high))
         breaks = sorted({start, end, *[z for z, _ in profile if start < z < end]})
         for a, c in zip(breaks, breaks[1:]):
+            a, c = a + panel_gap, c - panel_gap
             _, _, h0, w0 = section(a)
             _, _, h1, w1 = section(c)
             panel(b, [(-w0 * 0.81, h0 + 0.002, a + center_z), (w0 * 0.81, h0 + 0.002, a + center_z),

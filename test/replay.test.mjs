@@ -11,6 +11,26 @@ registerHooks({ resolve(specifier, context, next) {
 const THREE = await import('three');
 const { createReplayAnimal } = await import('../src/replay-animal.js');
 const { Replay } = await import('../src/replay.js');
+const { GroundContact } = await import('../src/ground-contact.js');
+
+test('ground contact matches precise posed vertices under nested rotations and nonuniform scales', () => {
+  const root = new THREE.Group(), pivot = new THREE.Group();
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12));
+  const box = new THREE.Mesh(new THREE.BoxGeometry(0.2, 3, 0.3));
+  root.add(pivot); pivot.add(sphere, box);
+  sphere.position.set(1, 2, -0.3); box.position.set(-0.2, 0.5, 0.4);
+  const contact = new GroundContact(pivot);
+  for (let i = 0; i < 120; i++) {
+    root.position.set(i / 100, 0.41, -0.7);
+    root.rotation.set(i / 31, i / 41, -i / 53); root.scale.set(1.3, 0.7, 2);
+    pivot.rotation.set(-i / 23, i / 19, i / 29);
+    sphere.rotation.set(i / 17, -i / 13, 0);
+    root.updateWorldMatrix(true, true);
+    const expected = new THREE.Box3().setFromObject(pivot, true).min.y;
+    assert.ok(Math.abs(contact.minimumY() - expected) < 1e-12, `exact ground contact at pose ${i}`);
+  }
+  sphere.geometry.dispose(); sphere.material.dispose(); box.geometry.dispose(); box.material.dispose();
+});
 
 test('the bear is lightweight, texture-free and scales to participant height', () => {
   for (const height of [90, 170, 210]) {
@@ -73,6 +93,11 @@ test('leaving/restarting replay disposes its animal and overlays exactly once', 
   assert.equal(disposedGeometry, geometries.size);
   assert.equal(disposedMaterial, materials.size);
   assert.equal(scene.children.length, 0);
+  assert.equal(replay.frames, null, 'leaving releases the recording and posed hierarchy');
+  assert.equal(replay.figure, null);
+  assert.equal(replay.headTrack, null);
+  assert.equal(replay.grounding, null);
+  assert.equal(replay.driverCamera.parent, null, 'the persistent driver camera must not retain the disposed root');
   replay.start(recording, 1, null, 90);
   assert.ok(replay.animal && replay.playing, 'a new replay has a fresh animal');
   replay.stop();

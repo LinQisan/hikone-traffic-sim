@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-18",
+  "view": "moat-overhead",
+  "url": "?view=moat-overhead&quality=high&benchmark=1",
+  "baseline": "Working tree with the street-detail and moat vegetation work, before the overhead road reconstruction",
+  "conditions": "Same Chrome tab, view, fixed quality and 3072 × 1584 backing buffer. Final sample taken after generation and tests completed; benchmark mode disables dynamic resolution.",
+  "before": {
+    "geometryBytes": 36023525,
+    "placements": 1262,
+    "meshes": 530,
+    "frames": 455,
+    "fps": 56.85652163051245,
+    "medianMs": 16.900000005960464,
+    "p95Ms": 26.700000017881393,
+    "updateMs": 0.11274725355944791,
+    "calls": 114,
+    "triangles": 375159,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "after": {
+    "geometryBytes": 23161791,
+    "placements": 908,
+    "meshes": 212,
+    "frames": 451,
+    "fps": 56.36654501833124,
+    "medianMs": 11,
+    "p95Ms": 38.5,
+    "updateMs": 0.4953436809870726,
+    "calls": 80,
+    "triangles": 306765,
+    "width": 3072,
+    "height": 1584,
+    "multiDraw": true
+  },
+  "note": "The road network, longer bridge, surrounding placements and ground changed. Fewer draws and smaller geometry buffers do not establish an overall smoothness improvement: median and tail timing moved in different directions. Real phones and headsets were not measured."
+}

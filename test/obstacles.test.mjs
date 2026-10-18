@@ -33,7 +33,7 @@ test('the collision grid survives its run-length encoding', () => {
 });
 
 test('houses, storehouses and walls of the town are solid at body height', () => {
-  const layout = read('layout.json');
+  const layout = webLayout(read('layout.json'));
   // the grid covers the map rectangle (the play area inside the invisible walls)
   const { xMin, xMax, zMin, zMax } = read('map.json').world;
   const inside = ([x, , z]) => x > xMin + 5 && x < xMax - 5 && z > zMin + 5 && z < zMax - 5;
@@ -62,6 +62,16 @@ test('authored street furniture is included in the same collision grid the brows
   const furniture = webLayout(read('layout.json')).items.filter(i => i.g === 'WebStreet');
   assert.ok(furniture.some(i => i.a === 'ART_UtilityPole') && furniture.some(i => i.a === 'ART_PathLamp'));
   for (const item of furniture) assert.ok(town.blocked(item.p[0], item.p[2], BODY_RADIUS), `${item.a}: solid at its rendered position`);
+});
+
+test('stone railings and raised banks leave both bridge margins open', () => {
+  for (const x of [26.4, 37.6]) for (let z = 41; z <= 72; z += 0.25)
+    assert.ok(!town.blocked(x, z, BODY_RADIUS), `bridge walking margin at ${x}, ${z}`);
+});
+
+test('parking frontage hedges leave both driveways open across the pavement', () => {
+  for (const entry of [-97, -28]) for (const dx of [-1, 0, 1]) for (let z = 10; z <= 22; z += 0.25)
+    assert.ok(!town.blocked(entry + dx, z, BODY_RADIUS), `parking driveway at ${entry + dx}, ${z}`);
 });
 
 test('a parked vehicle is an oriented box the body stays out of', () => {
