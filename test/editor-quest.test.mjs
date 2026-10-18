@@ -6,6 +6,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import './editor-project.mjs';
 import { handle, SCENARIOS, packageId, available } from '../server/editor-api.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));

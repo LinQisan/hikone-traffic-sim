@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import './editor-project.mjs';
 import { handle, SCENARIOS, available } from '../server/editor-api.mjs';
 
 const skip = !available && 'the VRLearn project is not next to this one (VRLEARN_ROOT)';
