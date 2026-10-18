@@ -1,18 +1,19 @@
 // Browser-owned layout, checked from both the junction and Castle Road in October 2024
 // Street View. Positions fit the imported map's pavement; the old cube anchors do not.
 // Reviewed again against 18 October 2026 photographs from all four corners. Far-side heads hang
-// over the lane they control (Japanese practice); the bridge poles stand on the moat-bank corners
-// outside the bridge newels, and the town poles at the kerb-return apexes. Pedestrian heads line
-// up with the Route 25 crossings at x 19.7 and 44.3 (tools/road_network.py WALK_CROSSINGS).
+// over the lane they control (Japanese practice) on arms of about 4–5.5 m, as photographed. Poles
+// stand about 3 m behind the kerb: the local bridge begins ~4 m further from Route 25 than the
+// real one, so a pole beside the bridge newel would need an 8 m arm. Town poles stand at the
+// kerb-return apexes.
 const INSTALLATIONS = [
   // Over the bridge's northbound lane for traffic arriving from Castle Road; name board faces west.
-  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [22.4, 35.6], height: 5.8,
-    vehicle: [30.2, 4.7, 35.6], facing: [0, -1], phase: 'below',
+  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [24.2, 33.0], height: 5.8,
+    vehicle: [29.6, 4.7, 33.0], facing: [0, -1], phase: 'below',
     nameHeight: 4.15, nameFacing: [-1, 0],
     walks: [{ crossing: 'west', facing: [0, -1], side: [-1, 0] }] },
   // A long truss over the eastbound lane; name board faces Castle Road (south).
-  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [43.2, 35.6], height: 6.0,
-    vehicle: [43.2, 4.7, 28.6], facing: [-1, 0], phase: 'below',
+  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [41.2, 32.8], height: 6.0,
+    vehicle: [41.2, 4.7, 28.6], facing: [-1, 0], phase: 'below',
     nameHeight: 5.6, nameFacing: [0, -1],
     walks: [{ crossing: 'east', facing: [0, -1], side: [1, 0] }] },
   // The mast reaches over the westbound lane; a second head at its end faces southbound traffic.
