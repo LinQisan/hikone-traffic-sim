@@ -123,9 +123,19 @@ function buildPosts(rigs) {
         z: head.z + right[1] * side - facing[1] * 0.05 });
       tube(metal, H(-0.64, armY), H(0.64, armY), 0.028);
       tube(metal, A(l, r.style === 'truss' ? armY - 0.95 * (1 - l / reach) : armY), H(0, armY), 0.03);
-      const phaseY = head.y + (r.phase === 'below' ? -0.62 : 0.79);
-      plate(plates.phase, { x: head.x + facing[0] * 0.06, y: phaseY, z: head.z + facing[1] * 0.06 }, facing, 1.5, 0.46);
-      for (const side of [-0.57, 0.57]) tube(metal, H(side, armY), H(side, phaseY), 0.017);
+      if (r.phase) {
+        const phaseY = head.y + (r.phase === 'below' ? -0.62 : 0.79);
+        plate(plates.phase, { x: head.x + facing[0] * 0.06, y: phaseY, z: head.z + facing[1] * 0.06 }, facing, 1.5, 0.46);
+        for (const side of [-0.57, 0.57]) tube(metal, H(side, armY), H(side, phaseY), 0.017);
+      }
+      // A second head at the arm's end turns to another approach on its own crossbar.
+      for (const e of r.extraHeads ?? []) {
+        const right2 = [-e.facing[1], e.facing[0]];
+        const E = (side, y) => ({ x: e.head.x + right2[0] * side - e.facing[0] * 0.05, y,
+          z: e.head.z + right2[1] * side - e.facing[1] * 0.05 });
+        tube(metal, E(-0.64, armY), E(0.64, armY), 0.028);
+        tube(metal, H(0, armY), E(0, armY), 0.03);
+      }
     }
     if (r.lampFacing) {
       const [lx, lz] = r.lampFacing;

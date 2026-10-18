@@ -532,6 +532,8 @@ if (propCamera) {
   env.root.visible = signals.root.visible = false;
   window.vrlearn.debugView(...propCamera);
 } else if (reviewViews[review.get('view')]) window.vrlearn.debugView(...reviewViews[review.get('view')]);
+// Ad hoc comparison with a photograph: ?cam=x,y,z,tx,ty,tz[,fov] in map metres.
+else if (review.get('cam')) window.vrlearn.debugView(...review.get('cam').split(',').map(Number));
 if (review.get('finish') === 'off') setPainted(false);
 if (review.get('view') === 'ride') {
   selected = scenarioIndex.find(e => e.id === 'builtin-07');

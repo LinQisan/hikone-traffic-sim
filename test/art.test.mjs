@@ -214,17 +214,21 @@ test('front windscreens are outside the vehicle hull and visible from the front'
   }
 });
 
-test('real-size vehicle heads face the four approaches and hang over the carriageway', () => {
+test('real-size vehicle heads cover the four approaches from over the carriageway', () => {
   const rigs = signalRigs(), heads = signalPlacements().filter(h => h.asset === 'ART_Signal_Car');
   const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
-  assert.equal(heads.length, 4);
-  assert.equal(new Set(rigs.filter(r => r.head).map(r => r.facing.join(','))).size, 4, 'one vehicle head per approach');
-  for (const head of heads) {
-    const rig = rigs.find(r => r.id === head.group);
-    const y = ground.roadHeightAt(rig.head.x, rig.head.z);
-    assert.ok(y != null && y < 0.05, `${rig.id}: vehicle head hangs above the road, including its raised paint`);
-    assert.deepEqual(head.matrix.slice(12, 15), [-rig.head.x, rig.head.y, rig.head.z]);
-    assert.deepEqual([head.matrix[8], -head.matrix[10]], rig.facing, 'lenses face the approaching driver');
+  const specs = rigs.flatMap(r => [...(r.head ? [{ rig: r, head: r.head, facing: r.facing, name: 'TrafficLight_Car' }] : []),
+    ...r.extraHeads.map((e, i) => ({ rig: r, ...e, name: `TrafficLight_Car_${i + 2}` }))]);
+  assert.equal(heads.length, 5, 'four poles carry five heads (town-west turns a second head south-bound)');
+  const overRoad = s => { const y = ground.roadHeightAt(s.head.x, s.head.z); return y != null && y < 0.05; };
+  assert.equal(new Set(specs.filter(overRoad).map(s => s.facing.join(','))).size, 4,
+    'every approach has a head hanging over the carriageway');
+  for (const spec of specs) {
+    const { rig } = spec, head = heads.find(h => h.group === rig.id && h.name === spec.name);
+    assert.ok(overRoad(spec) || Math.hypot(spec.head.x - rig.pole.x, spec.head.z - rig.pole.z) < 1,
+      `${rig.id}: a head hangs over the road unless it is a near-side bracket head`);
+    assert.deepEqual(head.matrix.slice(12, 15), [-spec.head.x, spec.head.y, spec.head.z]);
+    assert.deepEqual([head.matrix[8], -head.matrix[10]], spec.facing, 'lenses face the approaching driver');
     for (const offset of [0, 4, 8]) assert.equal(Math.hypot(...head.matrix.slice(offset, offset + 3)), 1,
       'a real-size housing is not scaled twice');
   }
@@ -269,13 +273,13 @@ test('five installations retain six pedestrian heads; only town-west has two', (
   assert.equal(markers.length, rigs.length, 'the editor shows the actual installations');
   for (const r of rigs) assert.ok(markers.some(m => Math.hypot(m.x - r.pole.x, m.z - r.pole.z) < 0.01),
     `${r.id}: the editor marker matches its rendered pole`);
-  assert.equal(heads.length, 10, 'four vehicle heads and six pedestrian heads');
+  assert.equal(heads.length, 11, 'five vehicle heads and six pedestrian heads');
   assert.equal(rigs.filter(r => r.head).length, 4);
   const standalone = rigs.filter(r => !r.head);
   assert.equal(standalone.length, 1, 'the east crossing has a separate walk-only pole');
   assert.equal(standalone[0].id, 'town-east-walk');
-  assert.ok(standalone[0].pole.z > rigs.find(r => r.id === 'town-east').pole.z + 4,
-    'the independent crossing pole stays north of the Castle Road vehicle pole');
+  assert.ok(standalone[0].pole.x > rigs.find(r => r.id === 'town-east').pole.x + 3,
+    'the independent crossing pole stands at the east crossing, apart from the corner pole');
   assert.deepEqual(rigs.filter(r => r.pedestrians.length === 2).map(r => r.id), ['town-west']);
   const crossings = new Map();
   for (const r of rigs) {
