@@ -4,6 +4,7 @@
 // otherwise through store.js (this browser's localStorage).
 import * as S from '../src/shared/scenario.js';
 import * as store from './store.js';
+import { toMapPixel, fromMapPixel, coordinateGrid, coordinateText, containsPoint, imagePlacement } from './map-coordinates.js';
 
 const $ = id => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
@@ -23,6 +24,7 @@ const state = {
   tool: 'select',
   drawing: null,         // index of the vehicle whose route is being drawn
   cursor: null,          // world position of the pointer
+  reference: null,       // read-only map annotation, independent of the scenario and undo history
   view: { scale: 1, tx: 0, ty: 0 },
   undo: [], redo: [], lastEdit: { key: null, at: 0 },
   time: 0, playing: false, lastFrame: 0,
@@ -78,8 +80,8 @@ function setPath(obj, path, value) {
 // ------------------------------------------------------------------ coordinates
 const world = () => state.map.world;
 const ppm = () => state.map.pixelsPerMeter;
-const toPx = (x, z) => [(x - world().xMin) * ppm(), (world().zMax - z) * ppm()];
-const fromPx = (px, py) => ({ x: world().xMin + px / ppm(), z: world().zMax - py / ppm() });
+const toPx = (x, z) => toMapPixel(state.map, x, z);
+const fromPx = (px, py) => fromMapPixel(state.map, px, py);
 function screenToWorld(event) {
   const rect = $('map').getBoundingClientRect();
   const { scale, tx, ty } = state.view;
@@ -129,8 +131,16 @@ function buildMapLayers() {
   const svg = $('map');
   svg.innerHTML = '';
   const viewport = el('g', { id: 'viewport' }, svg);
-  el('image', { href: state.map.imageUrl ?? '/api/map/image', x: 0, y: 0,
+  const revision = state.map.imageRevision ?? '';
+  const imageUrl = new URL(state.map.imageUrl ?? '../api/map/image', location.href);
+  imageUrl.searchParams.set('v', revision);
+  el('image', { href: imageUrl.href, x: 0, y: 0, preserveAspectRatio: 'none',
     width: state.map.imageWidth, height: state.map.imageHeight, id: 'mapImage' }, viewport);
+  if (state.map.detail) {
+    const detail = state.map.detail, url = new URL('../data/' + detail.file, import.meta.url);
+    url.searchParams.set('v', revision);
+    el('image', { ...imagePlacement(state.map, detail), href: url.href, preserveAspectRatio: 'none', id: 'mapDetail' }, viewport);
+  }
 
   const surfaces = el('g', { id: 'layerSurfacesG' }, viewport);
   for (const surface of state.map.surfaces) {
@@ -153,14 +163,26 @@ function buildMapLayers() {
       .appendChild(document.createElementNS(SVG, 'title')).textContent = lane.id + ' — ' + lane.name;
   }
   const walls = el('g', { id: 'layerWallsG' }, viewport);
+  let water = '';
   for (const wall of state.map.walls) {
     const pts = [];
     for (let i = 0; i < wall.polygon.length; i += 2) pts.push(toPx(wall.polygon[i], wall.polygon[i + 1]).join(','));
-    el('polygon', { points: pts.join(' '), class: 'wall', 'vector-effect': 'non-scaling-stroke', 'stroke-width': 2 }, walls);
+    let area = 0;
+    for (let i = 0; i < wall.polygon.length; i += 2) {
+      const next = (i + 2) % wall.polygon.length;
+      area += wall.polygon[i] * wall.polygon[next + 1] - wall.polygon[next] * wall.polygon[i + 1];
+    }
+    if (area < 0) pts.reverse(); // Same winding makes overlapping fragments a filled union.
+    if (pts.length) water += 'M' + pts.join('L') + 'Z';
   }
+  // One filled union keeps the forbidden-water hint without exposing collision triangulation.
+  el('path', { d: water, class: 'wall', 'fill-rule': 'nonzero' }, walls);
+  el('g', { id: 'placeLabels', 'aria-hidden': 'true' }, viewport);
   el('g', { id: 'layerSignalsG' }, viewport);
   el('g', { id: 'overlay' }, viewport);
   el('g', { id: 'cars' }, viewport);
+  el('g', { id: 'referencePoint', 'aria-hidden': 'true' }, viewport);
+  el('g', { id: 'coordinateGrid', class: 'coordinate-grid', 'aria-hidden': 'true' }, svg);
   applyLayers();
 }
 
@@ -169,6 +191,80 @@ function applyLayers() {
   $('layerLanesG').style.display = $('layerLanes').checked ? '' : 'none';
   $('layerWallsG').style.display = $('layerWalls').checked ? '' : 'none';
   $('layerSignalsG').style.display = $('layerSignals').checked ? '' : 'none';
+  renderCoordinateGrid();
+}
+
+function renderCoordinateGrid() {
+  const g = $('coordinateGrid');
+  if (!g || !state.map) return;
+  g.replaceChildren();
+  if (!$('layerGrid').checked) return;
+  const { width, height } = $('map').getBoundingClientRect();
+  const grid = coordinateGrid(state.map, state.view, width, height);
+  let lines = '', axes = '';
+  for (const [axis, ticks] of [['x', grid.x], ['z', grid.z]]) for (const tick of ticks) {
+    const line = axis === 'x' ? `M${tick.pixel},24V${height}` : `M44,${tick.pixel}H${width}`;
+    if (tick.value === 0) axes += line;
+    else lines += line;
+  }
+  el('path', { d: lines, class: 'coordinate-lines' }, g);
+  el('path', { d: axes, class: 'coordinate-axes' }, g);
+  el('rect', { x: 0, y: 0, width, height: 24, class: 'coordinate-ruler' }, g);
+  el('rect', { x: 0, y: 24, width: 44, height: Math.max(0, height - 24), class: 'coordinate-ruler' }, g);
+  for (const tick of grid.x) if (tick.pixel > 60 && tick.pixel < width - 36)
+    el('text', { x: tick.pixel, y: 16, 'text-anchor': 'middle' }, g).textContent = tick.value;
+  for (const tick of grid.z) if (tick.pixel > 44 && tick.pixel < height - 16)
+    el('text', { x: 37, y: tick.pixel + 4, 'text-anchor': 'end' }, g).textContent = tick.value;
+  el('text', { x: width - 8, y: 16, 'text-anchor': 'end' }, g).textContent = 'X →';
+  el('text', { x: 7, y: 16 }, g).textContent = 'Z ↑';
+  $('map').dataset.gridStep = grid.step;
+}
+
+function renderReference() {
+  const g = $('referencePoint');
+  g.replaceChildren();
+  if (!state.reference) return;
+  const [x, y] = toPx(state.reference.x, state.reference.z);
+  el('circle', { cx: x, cy: y, r: k(8), class: 'reference-pin', 'stroke-width': k(2) }, g);
+  el('path', { d: `M${x - k(15)},${y}H${x + k(15)}M${x},${y - k(15)}V${y + k(15)}`,
+    class: 'reference-cross', 'stroke-width': k(1.5) }, g);
+  const screenX = x * state.view.scale + state.view.tx;
+  const left = screenX > $('map').getBoundingClientRect().width - 210;
+  el('text', { x: x + k(left ? -16 : 16), y: y - k(15), 'text-anchor': left ? 'end' : 'start',
+    'font-size': k(12), class: 'label reference-label' }, g)
+    .textContent = coordinateText(state.reference).replace(' (m)', '');
+}
+
+function referencePoint(point, centre = false) {
+  if (!containsPoint(state.map, point)) {
+    toast('地図の範囲内の X・Z 座標を指定してください。', true);
+    return;
+  }
+  state.reference = { x: +point.x.toFixed(2), z: +point.z.toFixed(2) };
+  $('coordinateX').value = fmt(state.reference.x, 2);
+  $('coordinateZ').value = fmt(state.reference.z, 2);
+  $('coordinateValue').value = coordinateText(state.reference);
+  $('btnCopyCoordinates').disabled = false;
+  if (centre) {
+    const rect = $('map').getBoundingClientRect(), [x, y] = toPx(point.x, point.z);
+    state.view.scale = Math.max(state.view.scale, 12 / ppm());
+    state.view.tx = rect.width / 2 - x * state.view.scale;
+    state.view.ty = rect.height / 2 - y * state.view.scale;
+    applyView();
+  } else renderReference();
+  toast('地点を指定しました：' + coordinateText(state.reference));
+}
+
+async function copyCoordinates() {
+  if (!state.reference) return;
+  try {
+    await navigator.clipboard.writeText(coordinateText(state.reference));
+    toast('座標をコピーしました。');
+  } catch {
+    $('coordinateValue').focus();
+    $('coordinateValue').select();
+    toast('座標を選択しました。Ctrl+C / ⌘C でコピーしてください。');
+  }
 }
 
 function renderSignals() {
@@ -181,12 +277,25 @@ function renderSignals() {
   }
 }
 
+function renderPlaces() {
+  const g = $('placeLabels');
+  g.replaceChildren();
+  if (state.view.scale * ppm() > 2) return;
+  for (const place of state.map.places ?? []) {
+    const [x, y] = toPx(place.x, place.z);
+    el('text', { x, y: y - k(13), 'text-anchor': 'middle', 'font-size': k(13), class: 'label' }, g).textContent = place.name;
+  }
+}
+
 function applyView() {
   const { scale, tx, ty } = state.view;
   $('viewport').setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);
   renderSignals();
   renderOverlay();
   renderCars();
+  renderCoordinateGrid();
+  renderReference();
+  renderPlaces();
 }
 
 function fitTo(points, padding = 40) {
@@ -194,8 +303,8 @@ function fitTo(points, padding = 40) {
   const px = points.map(p => toPx(p.x, p.z));
   const xs = px.map(p => p[0]), ys = px.map(p => p[1]);
   const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const w = Math.max(maxX - minX, 150), h = Math.max(maxY - minY, 150);
-  const scale = Math.min((rect.width - padding * 2) / w, (rect.height - padding * 2) / h, 4);
+  const w = Math.max(maxX - minX, 25 * ppm()), h = Math.max(maxY - minY, 25 * ppm());
+  const scale = Math.min((rect.width - padding * 2) / w, (rect.height - padding * 2) / h, 24 / ppm());
   state.view = { scale, tx: rect.width / 2 - scale * (minX + maxX) / 2, ty: rect.height / 2 - scale * (minY + maxY) / 2 };
   applyView();
 }
@@ -204,6 +313,10 @@ function fitScenario() {
   const s = state.scenario;
   const pts = [s.spawn, s.goal, ...(S.hasTrigger(s) ? [s.trigger] : []), ...s.vehicles.flatMap(v => v.route)];
   fitTo(pts.length > 2 ? pts : [{ x: world().xMin, z: world().zMin }, { x: world().xMax, z: world().zMax }]);
+}
+
+function fitMap() {
+  fitTo([{ x: world().xMin, z: world().zMin }, { x: world().xMax, z: world().zMax }], 52);
 }
 
 // ------------------------------------------------------------------ overlay (scenario objects)
@@ -335,14 +448,15 @@ function onPointerDown(event) {
   const p = screenToWorld(event);
   const target = event.target.closest('[data-drag]');
 
-  if (state.tool === 'draw' && !(target && target.dataset.drag.startsWith('point:'))) {
-    addDrawPoint(snapped(p, event));
-    return;
-  }
-  if (!target) {
-    drag = { type: 'pan', sx: event.clientX, sy: event.clientY, view: { ...state.view } };
+  if (state.tool === 'coordinates' || (!target && state.tool !== 'draw')) {
+    drag = { type: 'pan', sx: event.clientX, sy: event.clientY, view: { ...state.view },
+      reference: state.tool === 'coordinates', point: p, moved: false };
     svg.classList.add('panning');
     svg.setPointerCapture(event.pointerId);
+    return;
+  }
+  if (state.tool === 'draw' && !(target && target.dataset.drag.startsWith('point:'))) {
+    addDrawPoint(snapped(p, event));
     return;
   }
   const type = target.dataset.drag;
@@ -367,9 +481,12 @@ function onPointerMove(event) {
     return;
   }
   if (drag.type === 'pan') {
+    if (Math.hypot(event.clientX - drag.sx, event.clientY - drag.sy) > 4) drag.moved = true;
     state.view.tx = drag.view.tx + event.clientX - drag.sx;
     state.view.ty = drag.view.ty + event.clientY - drag.sy;
     $('viewport').setAttribute('transform', `translate(${state.view.tx},${state.view.ty}) scale(${state.view.scale})`);
+    renderCoordinateGrid();
+    renderPlaces();
     return;
   }
   if (!drag.moved) {
@@ -406,9 +523,10 @@ function onPointerMove(event) {
   onScenarioChanged({ inspector: 'values' });
 }
 
-function onPointerUp() {
+function onPointerUp(event) {
   if (drag?.type === 'pan') $('map').classList.remove('panning');
-  if (drag?.moved) onScenarioChanged();
+  if (drag?.reference && !drag.moved && event.type !== 'pointercancel') referencePoint(drag.point);
+  if (drag?.moved && drag.type !== 'pan') onScenarioChanged();
   drag = null;
 }
 
@@ -422,13 +540,14 @@ function onWheel(event) {
 function zoomAt(factor, mx = null, my = null) {
   const rect = $('map').getBoundingClientRect();
   mx ??= rect.width / 2; my ??= rect.height / 2;
-  const scale = Math.min(12, Math.max(0.15, state.view.scale * factor));
+  const scale = Math.min(72 / ppm(), Math.max(0.03, state.view.scale * factor));
   const f = scale / state.view.scale;
   state.view = { scale, tx: mx - (mx - state.view.tx) * f, ty: my - (my - state.view.ty) * f };
   applyView();
 }
 
 function onDoubleClick(event) {
+  if (state.tool === 'coordinates') return;
   if (state.drawing != null) { finishDrawing(true); return; }
   const target = event.target.closest('[data-drag]');
   if (!target || !target.dataset.drag.startsWith('route:')) return;
@@ -450,6 +569,7 @@ function onDoubleClick(event) {
 
 function onContextMenu(event) {
   event.preventDefault();
+  if (state.tool === 'coordinates') return;
   if (state.drawing != null) { finishDrawing(); return; }
   const target = event.target.closest('[data-drag]');
   if (target?.dataset.drag.startsWith('point:')) {
@@ -552,11 +672,15 @@ function deleteVehicle(i) {
 }
 
 function setTool(tool) {
+  if (tool !== 'draw' && state.drawing != null) finishDrawing();
   state.tool = tool;
   $('toolSelect').classList.toggle('active', tool === 'select');
   $('toolDraw').classList.toggle('active', tool === 'draw');
+  $('toolCoordinates').classList.toggle('active', tool === 'coordinates');
+  for (const [id, mode] of [['toolSelect', 'select'], ['toolDraw', 'draw'], ['toolCoordinates', 'coordinates']])
+    $(id).setAttribute('aria-pressed', tool === mode);
   $('map').classList.toggle('drawing', tool === 'draw');
-  if (tool === 'select' && state.drawing != null) finishDrawing();
+  $('map').classList.toggle('locating', tool === 'coordinates');
 }
 
 /** Central change hook. inspector: 'values' (sync inputs), 'full' (rebuild), 'none'. */
@@ -1183,15 +1307,24 @@ function onKey(event) {
   if (typing) return;
   if (mod && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? redo() : undo(); return; }
   if (mod && event.key.toLowerCase() === 'y') { event.preventDefault(); redo(); return; }
+  if (event.key === 'Enter' && state.tool === 'coordinates' && document.activeElement === $('map') && state.map) {
+    event.preventDefault();
+    const rect = $('map').getBoundingClientRect();
+    referencePoint(fromPx((rect.width / 2 - state.view.tx) / state.view.scale,
+      (rect.height / 2 - state.view.ty) / state.view.scale));
+    return;
+  }
   if (event.key === 'Enter' || event.key === 'Escape') {
     if (state.drawing != null) finishDrawing();
-    else if (event.key === 'Escape') select(null);
+    else if (event.key === 'Escape') { select(null); setTool('select'); }
     return;
   }
   if (event.key === ' ') { event.preventDefault(); togglePlay(); return; }
   if (event.key === 'v' || event.key === 'V') setTool('select');
   if (event.key === 'c' || event.key === 'C') setTool('draw');
+  if (event.key === 'p' || event.key === 'P') { setTool('coordinates'); $('map').focus(); }
   if (event.key === 'f' || event.key === 'F') fitScenario();
+  if (event.key === 'g' || event.key === 'G') fitMap();
   if (event.key === 'Delete' || event.key === 'Backspace') {
     const sel = state.selection;
     if (sel?.kind === 'vehicle') event.preventDefault();
@@ -1210,13 +1343,20 @@ function wire() {
   svg.addEventListener('dblclick', onDoubleClick);
   svg.addEventListener('contextmenu', onContextMenu);
   document.addEventListener('keydown', onKey);
-  for (const id of ['layerSurfaces', 'layerLanes', 'layerWalls', 'layerSignals']) $(id).addEventListener('change', applyLayers);
+  for (const id of ['layerSurfaces', 'layerLanes', 'layerWalls', 'layerSignals', 'layerGrid']) $(id).addEventListener('change', applyLayers);
   $('toolSelect').onclick = () => setTool('select');
+  $('toolCoordinates').onclick = () => { setTool('coordinates'); $('map').focus(); };
+  $('coordinateForm').onsubmit = event => {
+    event.preventDefault();
+    if (state.map) referencePoint({ x: +$('coordinateX').value, z: +$('coordinateZ').value }, true);
+  };
+  $('btnCopyCoordinates').onclick = copyCoordinates;
   $('toolDraw').onclick = () => {
     if (state.selection?.kind === 'vehicle') startDrawing(state.selection.index);
     else setTool('draw');
   };
   $('btnFit').onclick = fitScenario;
+  $('btnMapFit').onclick = fitMap;
   $('btnZoomIn').onclick = () => zoomAt(1.4);
   $('btnZoomOut').onclick = () => zoomAt(1 / 1.4);
   // the layers menu closes when clicking elsewhere
@@ -1274,6 +1414,11 @@ async function main() {
     return;
   }
   buildMapLayers();
+  for (const axis of ['X', 'Z']) {
+    $('coordinate' + axis).min = world()[axis.toLowerCase() + 'Min'];
+    $('coordinate' + axis).max = world()[axis.toLowerCase() + 'Max'];
+  }
+  setTool('select');
   await refreshList();
   $('loading').hidden = true;
   // ?open=templates/builtin-01.json&select=vehicle:2&time=12&layers=surfaces — a shareable view
@@ -1295,6 +1440,9 @@ async function main() {
     if (box) { box.checked = true; applyLayers(); }
   }
   if (params.has('time')) { state.time = +params.get('time'); renderCars(); }
+  if (params.has('overview')) fitMap();
+  if (params.get('x')?.trim() && params.get('z')?.trim())
+    referencePoint({ x: Number(params.get('x')), z: Number(params.get('z')) }, true);
 }
 
 // test hook (the page's state for automated checks)

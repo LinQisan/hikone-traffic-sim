@@ -37,9 +37,14 @@ const PLAY_REQUEST = path.join(SCENARIOS, '.play-request.json');
 const run = promisify(execFile);
 
 let mapCache = null;
+let mapCacheStamp = null;
 async function loadMap() {
-  if (!mapCache) mapCache = { ...JSON.parse(await fs.readFile(path.join(MAP_DIR, 'map.json'), 'utf8')),
-    lanes: JSON.parse(await fs.readFile(path.join(DATA, 'editor', 'lanes.json'), 'utf8')) };
+  const file = path.join(MAP_DIR, 'map.json'), stamp = (await fs.stat(file)).mtimeMs;
+  if (!mapCache || stamp !== mapCacheStamp) {
+    mapCache = { ...JSON.parse(await fs.readFile(file, 'utf8')),
+      lanes: JSON.parse(await fs.readFile(path.join(DATA, 'editor', 'lanes.json'), 'utf8')) };
+    mapCacheStamp = stamp;
+  }
   return mapCache;
 }
 

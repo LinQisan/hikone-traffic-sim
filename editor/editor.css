@@ -131,8 +131,9 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 #map { width: 100%; height: 100%; display: block; cursor: grab; outline: none; user-select: none; touch-action: none; }
 #map.panning { cursor: grabbing; }
 #map.drawing { cursor: crosshair; }
-.tools { position: absolute; top: 12px; left: 12px; }
-.view-tools { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; align-items: flex-start; }
+#map.locating { cursor: crosshair; }
+.tools { position: absolute; top: 34px; left: 52px; }
+.view-tools { position: absolute; top: 34px; right: 12px; display: flex; gap: 6px; align-items: flex-start; }
 .segmented { display: flex; background: rgba(11, 18, 32, .9); border: 1px solid var(--edge); border-radius: 12px; padding: 3px; gap: 3px; box-shadow: 0 4px 16px rgba(0, 0, 0, .35); }
 .segmented .tool { border: 0; background: transparent; box-shadow: none; font-weight: 600; }
 .segmented .tool kbd { background: transparent; }
@@ -172,6 +173,27 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
   border-radius: 8px; font-size: 12px; font-variant-numeric: tabular-nums;
 }
 .coords:empty { display: none; }
+.coordinate-grid, #referencePoint { pointer-events: none; }
+.coordinate-lines { fill: none; stroke: #102136; stroke-opacity: .24; stroke-width: 1; }
+.coordinate-axes { fill: none; stroke: #0b5172; stroke-opacity: .85; stroke-width: 2; }
+.coordinate-ruler { fill: #111a2e; fill-opacity: .95; }
+.coordinate-grid text { fill: #f1f5f9; font: 11px ui-monospace, monospace; }
+.reference-pin { fill: #fde68a; stroke: #111a2e; }
+.reference-cross { fill: none; stroke: #111a2e; }
+.label.reference-label { fill: #fde68a; }
+.coordinate-panel { flex-shrink: 0; }
+.coordinate-panel .note { font-size: 12px; line-height: 1.5; color: var(--sub); margin: 0 0 10px; }
+.coordinate-form, .coordinate-copy { display: flex; gap: 7px; align-items: center; }
+.coordinate-form { margin-bottom: 8px; }
+.coordinate-form label { display: flex; align-items: center; gap: 5px; flex: 1; min-width: 0; }
+.coordinate-form input { width: 100%; min-width: 0; }
+.coordinate-form input, .coordinate-copy input {
+  min-height: 44px; padding: 6px; background: var(--field); border: 1px solid var(--edge); border-radius: 8px;
+  font: 12px ui-monospace, monospace;
+}
+.coordinate-copy input { flex: 1; width: 0; }
+.coordinate-panel .small, #toolCoordinates { min-height: 44px; }
+.coordinate-copy .small { padding: 0 8px; }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--text); background: var(--bg); font-size: 15px; }
 
 /* map layers (SVG) */
@@ -180,7 +202,7 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 .surface-ramp { fill: rgba(245, 158, 11, .38); }
 .surface-ground { fill: none; }
 .lane { fill: none; stroke: rgba(241, 245, 249, .6); stroke-dasharray: 6 5; }
-.wall { fill: rgba(217, 70, 239, .32); stroke: #e879f9; }
+.wall { fill: rgba(217, 70, 239, .22); stroke: none; pointer-events: none; }
 .signal { fill: var(--gold); stroke: #0f172a; }
 .walkline { stroke: var(--spawn); stroke-dasharray: 8 6; fill: none; opacity: .85; }
 .area { cursor: move; }
@@ -193,9 +215,9 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 .handle { fill: #fff; stroke: #0f172a; cursor: move; }
 .handle.rotate { fill: var(--gold); }
 .handle.point.selected { fill: var(--gold); }
-.label { font-size: 12px; font-weight: 700; paint-order: stroke; stroke: rgba(11, 18, 32, .8); stroke-width: 3px; fill: #fff; pointer-events: none; }
+.label { font-weight: 700; paint-order: stroke; stroke: rgba(11, 18, 32, .8); stroke-width: 3px; vector-effect: non-scaling-stroke; fill: #fff; pointer-events: none; }
 .conflict { fill: none; stroke: var(--coral); }
-.conflict-label { font-size: 11px; font-weight: 700; paint-order: stroke; stroke: #0b1220; stroke-width: 3px; fill: #ffb4ab; pointer-events: none; }
+.conflict-label { font-weight: 700; paint-order: stroke; stroke: #0b1220; stroke-width: 3px; vector-effect: non-scaling-stroke; fill: #ffb4ab; pointer-events: none; }
 .car { stroke: #0b1220; }
 .preview { fill: none; stroke: #fff; stroke-dasharray: 5 4; pointer-events: none; }
 
@@ -297,17 +319,23 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 .dialog-buttons { display: flex; justify-content: flex-end; gap: 8px; }
 
 /* ------------------------------------------------------------------ narrow screens: everything stacks and the page scrolls */
+@media (max-width: 1400px) { .view-tools { top: 88px; } }
 @media (max-width: 960px) {
   html, body { overflow: auto; height: auto; }
   .bar { height: auto; flex-wrap: wrap; padding: 10px 12px; gap: 10px; }
   .file { order: 3; flex-basis: 100%; }
-  .actions { flex-wrap: wrap; gap: 8px; }
+  .actions { flex-wrap: wrap; gap: 8px; max-width: 100%; }
   .layout { display: flex; flex-direction: column; height: auto; }
   .stage { order: 1; height: 62vh; min-height: 360px; }
   .panel.right { order: 2; overflow: visible; border-left: 0; border-top: 1px solid var(--edge); }
   .panel.left { order: 3; overflow: visible; border-right: 0; border-top: 1px solid var(--edge); }
   .inspector, .checks { overflow: visible; max-height: none; }
   .legend { max-width: calc(100% - 24px); bottom: 46px; }
+  .segmented .tool { padding: 0 8px; min-height: 44px; }
+  .segmented .tool .i { display: none; }
+  .segmented .tool kbd { display: none; }
+  .view-tools .tool { min-height: 44px; }
+  .layers-menu .check { min-height: 44px; }
   .timeline { flex-wrap: wrap; position: sticky; bottom: 0; z-index: 4; }
   .playback { flex-basis: 100%; }
   .timeline .info { display: none; }
@@ -315,3 +343,9 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) { .logo, .actions button, .tool { transition: none; } }
 @media (forced-colors: active) { .actions button, .tool, .tabs button, .play, .vehicle-select, .vehicle-delete, .wide { border: 1px solid ButtonText; } }
+@media (forced-colors: active) {
+  .coordinate-lines, .coordinate-axes, .reference-cross, .reference-pin { stroke: CanvasText; }
+  .coordinate-ruler { fill: Canvas; }
+  .coordinate-grid text, .reference-label { fill: CanvasText; }
+  .reference-pin { fill: Highlight; }
+}

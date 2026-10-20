@@ -57,6 +57,9 @@ test('refuses unsafe paths, template ids and mismatched ids', { skip }, async ()
 
 test('the local editor opens the same built-in events as the browser-only editor', { skip }, async () => withServer(async base => {
   const map = await (await fetch(base + '/api/map')).json();
+  const source = JSON.parse(await fs.readFile(new URL('../data/map.json', import.meta.url)));
+  assert.deepEqual(map.world, source.world, 'the API serves the regenerated overview registration');
+  assert.deepEqual(map.detail, source.detail, 'the sharp practice image retains the same registration in both backends');
   const lanes = JSON.parse(await fs.readFile(new URL('../data/editor/lanes.json', import.meta.url)));
   assert.deepEqual(map.lanes, lanes, 'the server must use the browser lane presets and snapping guides');
   const templates = (await (await fetch(base + '/api/scenarios')).json()).filter(e => e.template);
