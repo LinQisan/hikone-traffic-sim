@@ -116,6 +116,7 @@
         <label>体重 / Weight <span><input id="weight" type="number" min="15" max="150" step="1" value="60" inputmode="numeric"> kg</span></label>
       </div>
       <p class="sel body-note">身長は目の高さとリプレイの小熊の背丈、体重は小熊の体つきに反映されます。</p>
+      <p class="sel body-note">事故場面には信号無視などの危険な車も出ます。青信号でも左右と車の停止を確かめましょう。</p>
       <label class="file">カスタム場面（JSON）を開く <input id="file" type="file" accept=".json,application/json"></label>
       <a class="editor-link" href="editor/">✎ シナリオエディタで場面を作る / Scenario editor</a>
       <p class="sel" aria-live="polite">選択中：<b id="selected"></b></p>
@@ -127,6 +128,7 @@
 </section>
 
 <div id="hud" class="hud" role="region" aria-label="体験中 / Playing" hidden><b id="hudname"></b><span id="hudhelp">クリックで視点操作 ・ WASD で移動 ・ R でやり直し</span>
+  <span id="hudsignal" role="status" aria-live="polite" aria-atomic="true"></span>
   <span class="hudbuttons"><button id="hudretry" type="button" class="touch-only">やり直し / Restart</button>
   <button id="hudmenu" type="button">メニュー / Menu (M)</button></span></div>
 

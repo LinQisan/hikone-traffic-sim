@@ -81,7 +81,7 @@ export async function propReview(view, scene, materials) {
       : ['signals-walk', 'signals-walk-back'].includes(view) ? 'town-east-walk' : 'bridge-east';
     const rig = signalRigs().find(r => r.id === id), { x, z } = rig.pole;
     const centre = p => p && ({ ...p, x: p.x - x, z: p.z - z });
-    await buildSignals(root, materials, [{ ...rig, pole: { x: 0, z: 0 }, head: centre(rig.head),
+    root.userData.signals = await buildSignals(root, materials, [{ ...rig, pole: { x: 0, z: 0 }, head: centre(rig.head),
       extraHeads: rig.extraHeads.map(e => ({ ...e, head: centre(e.head) })),
       pedestrians: rig.pedestrians.map(w => ({ ...w, head: centre(w.head) })) }]);
   } else {

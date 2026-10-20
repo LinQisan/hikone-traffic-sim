@@ -3,11 +3,11 @@
 //
 // Mirrors the Unity side as far as the scenario file describes it: each vehicle appears at route[0]
 // (after delaySeconds from the start, or from entering the trigger), accelerates at 8 m/s² to its
-// cruise speed (scenario.js distanceAt, the same model as the web editor's timing), drives the route
+// cruise speed (scenario.js distanceAt, the web editor's free-road timing), drives the route
 // and disappears at its end. Repeating vehicles appear again every repeatMin..repeatMax seconds and
 // stop when the trigger fires if stopOnTrigger. Everything freezes at contact.
-// Not modelled (as in the file format): the code-only behaviours of built-in 06-08, signals, car
-// following.
+// Ordinary traffic obeys the local junction cycle and queues behind other cars.
+// Authored accident vehicles retain their hazardous launch/motion, including signal violations.
 //
 // Web event timing (optional vehicle fields; the Unity app ignores them):
 //   launch: "meet"      the car leaves (or appears) when a participant going on towards the goal at
@@ -27,6 +27,7 @@
 //   holdMaxSeconds      a holding car goes anyway this long after it appeared (someone who waits for
 //                       it at the kerb then sees it turn in front of them)
 import { START_TRIGGER, isRepeating } from './shared/scenario.js';
+import { SignalCycle, junctionStops } from './signal-cycle.js';
 
 const NORMAL_PACE = 2.4;      // m/s: walking and riding in the app (player.js MOVE_SPEED)
 
@@ -193,11 +194,13 @@ export class Traffic {
     this.time = 0;
     this.triggerTime = null;
     this.frozen = false;
+    this.signalCycle = new SignalCycle();
     this.plans = scenario.vehicles
       .map((v, index) => ({ v, index, next: v.start === START_TRIGGER ? null : v.delaySeconds, done: false }))
       .filter(p => p.v.route && p.v.route.length >= 2);
     for (const p of this.plans) {
       p.path = smoothRoute(p.v.route);                       // what the cars actually drive
+      p.signalStops = junctionStops(p.path);
       if (p.v.launch === 'meet') p.meet = meetPoint(p.path, scenario.spawn, scenario.goal);
     }
     this.participant = null;
@@ -248,6 +251,7 @@ export class Traffic {
       return;
     }
     this.time += dt;
+    this.signalCycle.at(this.time);
     if (participant) this.participant = participant;
     for (const p of this.plans) {
       if (p.meet) { this.stepMeet(p); continue; }
@@ -330,6 +334,7 @@ export class Traffic {
       size: BODY_SIZE[body] ?? BODY_SIZE.sedan, born: at, speed: v.speedKmh / 3.6, path: plan.path, wheelbase,
       x: start.x, z: start.z, yaw: v.overrideYaw && !meet ? v.yaw : start.yaw, steer: start.steer,
       currentSpeed: meet ? meet.speed0 : 0, launched: meet ? meet.launched : true, alive: true, distance: 0,
+      signalStops: plan.signalStops, nextSignal: 0, signalCommitted: false, yellowChecked: false,
       // where this route crosses the participant's path (lets an accident launch adopt the car)
       crossing: plan.crossing ??= meetPoint(plan.path, this.scenario.spawn, this.scenario.goal),
     };
@@ -346,6 +351,31 @@ export class Traffic {
    */
   move(car, dt) {
     let target = car.launched ? car.speed : 0;
+    let stopAt = Infinity;
+    // Accident cars are intentional hazards; changing their launch would erase the lesson.
+    if (!car.accident) {
+      let stop = car.signalStops[car.nextSignal];
+      const front = car.size[2] / 2 + 0.45;
+      while (stop && car.distance > stop.distance - car.size[2] / 2 + 0.05) {
+        car.nextSignal++; car.signalCommitted = false; car.yellowChecked = false;
+        stop = car.signalStops[car.nextSignal];
+      }
+      // A queue can stop a car that initially needed to clear on yellow. It must then wait for green.
+      if (stop && car.signalCommitted && car.currentSpeed < 0.05) car.signalCommitted = false;
+      if (stop && !car.signalCommitted) {
+        const colour = this.signalCycle.state[stop.axis], remaining = stop.distance - front - car.distance;
+        // On yellow, clear the junction if stopping would need harder braking than the car can do.
+        if (colour !== 'yellow') car.yellowChecked = false;
+        if (colour === 'yellow' && !car.yellowChecked) {
+          car.yellowChecked = true;
+          car.signalCommitted = remaining < car.currentSpeed ** 2 / 16 + car.currentSpeed * dt;
+        }
+        if (colour !== 'green' && !car.signalCommitted) {
+          stopAt = Math.max(car.distance, stop.distance - front);
+          target = Math.min(target, Math.sqrt(16 * Math.max(0, remaining)));
+        }
+      }
+    }
     const a = car.yaw * Math.PI / 180, fx = Math.sin(a), fz = Math.cos(a);
     for (const other of this.cars) {
       if (other === car || !other.alive) continue;
@@ -359,6 +389,7 @@ export class Traffic {
     const change = target - car.currentSpeed, before = car.currentSpeed;
     car.currentSpeed = Math.max(0, car.currentSpeed + Math.max(-8 * dt, Math.min(8 * dt, change)));
     car.distance += (before + car.currentSpeed) / 2 * dt;
+    if (car.distance >= stopAt) { car.distance = stopAt; car.currentSpeed = 0; }
     if (car.distance > car.path.at(-1).s) { car.alive = false; return; }
     if (car.distance > 0.01) carPose(car.path, car.distance, car.wheelbase, car);
     if (car.swerve) {

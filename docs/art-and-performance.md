@@ -528,3 +528,31 @@ The owner confirms that the raised-name `bridge-east` installation also carries 
 Validation passes **60 focused art, obstacle, performance and prop-inspection tests**, zero failures or skips. The new regression rejects the former missing reverse head and checks opposing directions, frame alignment and clearance against actual exported housing depth. The collision grid rebuilds byte-identically at **338,379 blocked cells**. Chrome checks both street approaches, both standalone assembly faces, the top-name detail and both walk-notice details without console/page errors. Each standalone car-model part has two instances, confirming both complete housings are rendered.
 
 The [same-page Chrome A/B](performance/signal-east-pair-20261021.json) retains east/west viewpoint draws at **78/65**, with ten textures, and adds **2,592 submitted triangles** and **26,256 resident buffer bytes** through the existing instanced/static batches. Median frame intervals change **20.1/20.7 → 20.6/20.9 ms** and p95 **21.5/21.9 → 21.8/22.4 ms**. These short desktop samples establish neither a speed improvement nor a stutter guarantee. Buffer counts are not total VRAM; no loading-time or retained-heap conclusion is drawn. No physical phone or VR headset was tested. This runtime assembly change needs no GLB or editor bitmap rebuild; the map marker remains at the same pole.
+
+
+### Working pedestrian-exclusive signal cycle (2026-10-21)
+
+The [Hikone transport master plan, printed p. 52](https://www.city.hikone.lg.jp/material/files/group/106/koutuumasu1.pdf) identifies Kyobashi as a pedestrian/vehicle-separated junction. The owner confirms that all pedestrian heads open and close together. Combined with the four marked crossings, the simulator implements the pedestrian-exclusive mode defined in the [National Police Agency's 31 January 2025 guidance, section 3(2)](https://www.npa.go.jp/laws/notification/koutuu/kisei/kisei20250131.pdf): every vehicle direction is red while pedestrians cross, without adding diagonal crossings. Published sources reviewed do not provide this junction's controller timing sheet or exact phase order. The existing photographed 7:30–18:00 plate describes the separation period; the app represents a daytime practice scene and has no night mode.
+
+`src/signal-cycle.js` owns a deterministic 87-second practice cycle. **Its phase order and durations are simulation settings, not measured Kyobashi timings.**
+
+| Phase | Seconds | East/west vehicles | North/south vehicles | All eight pedestrian heads |
+| --- | ---: | --- | --- | --- |
+| East/west movement | 28 | Green | Red | Red |
+| East/west stopping | 3 | Yellow | Red | Red |
+| Vehicle clearance | 3 | Red | Red | Red |
+| North/south movement | 20 | Red | Green | Red |
+| North/south stopping | 3 | Red | Yellow | Red |
+| Vehicle clearance | 3 | Red | Red | Red |
+| Pedestrian movement | 18 | Red | Red | Green |
+| Pedestrian clearance | 6 | Red | Red | Green flashing at 1 Hz |
+| Final clearance | 3 | Red | Red | Red |
+
+All six car heads, including the two back-to-back pairs, follow their viewing axis. Optical faces and both pedestrian figures dim when inactive, including their emissive light. Instance attributes update only when a displayed state changes; the existing geometry, draw batches and static sun-shadow silhouettes remain. Shared vehicle/replay materials and GLBs are untouched. The HUD supplies a textual common pedestrian state, announces only semantic changes (not every blink), and remains visible at touch widths and in forced colours. Reduced-motion mode retains the meaningful 1 Hz signal flash.
+
+Ordinary traffic brakes at the four actual authored stop bars, with front-bumper clearance and the existing lane queueing. On yellow, a car makes one braking decision; one too close to stop clears the junction. A car already inside also clears. Explicit accident cars retain their authored hazardous motion, including possible signal violations, so the ten events still teach their intended lessons. The title and README explain that exception and remind participants to check even on green. `Traffic` and the display use the same cycle and run-relative time. Restart resets the run clock; replay samples its recorded time, including slow motion and rewind. Title/inspection views animate on their own preview clock, and result views hold the final state.
+
+
+Validation passes **204 full regression tests**, zero failures or skips, including all ten event checks. Signal-specific regressions cover phase conflicts and exact boundaries, all eight synchronized pedestrian optics/figures, both reverse vehicle heads, stable-state upload reuse, shared-material isolation, every stop-bar approach and body size, yellow braking, queued clearance cancellation and the accident exception. Final Chrome playthroughs check walking event 01 and cycling event 08 through contact, replay, rewind, results and menu, with displayed states matching replay time. Live traffic waits in both Route 25 lanes during the common walk phase. Eighteen standalone phase/view captures load without console/page errors. A 390 × 844 touch-emulated, reduced-motion, forced-colour check keeps status visible and both retry/menu buttons at least 44 px, and exits through the menu; the older narrow-screen rule now hides only the keyboard hint.
+
+The [same-page A/B and raw verification](performance/signal-cycle-20261021.json) retains junction/corner draws at **87/99**, submitted triangles at **1,009,436/802,251**, and textures at ten. Scene buffer accounting rises **70,845,886 → 70,846,086 bytes** (+200); shader programs rise 22 → 24. Median frame intervals change **28.1/22.4 → 28.0/22.5 ms**, with p95 **29.3/23.9 → 29.4/23.9 ms**. These short desktop samples establish workload parity, not an FPS improvement or stutter bound. Buffer accounting is not total VRAM or retained heap. No physical phone or VR headset was tested. No geometry, map registration or collider changes require regenerated data outputs.

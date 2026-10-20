@@ -6,14 +6,38 @@ import { model, material } from './world.js';
 import { painted } from './style.js';
 import { toThree } from './coords.js';
 import { signalPlacements, signalRigs, signalNamePlate, signalWalkPlate, GUIDE_SIGNS, LANTERNS, BUS_STOPS, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
+import { SignalCycle } from './signal-cycle.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
+
+// Instance brightness also gates emissive light. Keep vehicle lights and shared GLBs untouched.
+function lensMaterial(source, colour, glyph = false) {
+  const mat = painted(source.clone()), compile = mat.onBeforeCompile;
+  const rgb = glyph ? [0.84, 0.9, 0.85]
+    : { red: [0.94, 0.19, 0.16], yellow: [1, 0.77, 0.13], green: [0.17, 0.76, 0.46] }[colour];
+  mat.emissive.setRGB(...rgb, THREE.SRGBColorSpace); mat.emissiveIntensity = 0.7;
+  mat.onBeforeCompile = shader => {
+    compile(shader);
+    shader.vertexShader = shader.vertexShader.replace('#include <common>',
+      '#include <common>\nattribute float signalLit;\nvarying float vSignalLit;'
+        + (glyph ? '\nattribute float signalGreenLit;' : ''))
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvSignalLit = '
+        + (glyph ? 'position.y > 0.0 ? signalLit : signalGreenLit;' : 'signalLit;'));
+    shader.fragmentShader = shader.fragmentShader.replace('#include <common>',
+      '#include <common>\nvarying float vSignalLit;')
+      .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.rgb = mix(vec3(0.006, 0.009, 0.012), diffuseColor.rgb, vSignalLit);')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance *= vSignalLit;');
+  };
+  mat.customProgramCacheKey = () => 'hk-signal-lens-v1-' + glyph;
+  return mat;
+}
 
 /** Instanced solid heads; merged static poles, brackets, lamps and plates. */
 export async function buildSignals(scene, materials, rigs = signalRigs()) {
   const root = new THREE.Group();
   root.name = 'AbstractTrafficSignals';
   const placements = signalPlacements(rigs);
+  const cycle = new SignalCycle(), lenses = [];
   const byAsset = new Map();
   for (const placement of placements) {
     if (!byAsset.has(placement.asset)) byAsset.set(placement.asset, []);
@@ -22,7 +46,25 @@ export async function buildSignals(scene, materials, rigs = signalRigs()) {
   for (const [asset, items] of byAsset) {
     const parts = await model(asset);
     for (const part of parts) {
-      const mesh = new THREE.InstancedMesh(part.geometry, material(materials, part.material), items.length);
+      const lamp = /^ART_Signal(Red|Yellow|Green)$/.exec(part.material.name);
+      const glyph = asset === 'ART_Signal_Pedestrian' && part.material.name === 'ART_SignalGlyph';
+      const colour = glyph ? 'red' : lamp?.[1].toLowerCase(), source = material(materials, part.material);
+      const geometry = lamp || glyph ? part.geometry.clone() : part.geometry;
+      const mesh = new THREE.InstancedMesh(geometry, lamp || glyph ? lensMaterial(source, colour, glyph) : source, items.length);
+      if (lamp || glyph) {
+        const brightness = new THREE.InstancedBufferAttribute(new Float32Array(items.length).fill(-1), 1);
+        brightness.setUsage(THREE.DynamicDrawUsage);
+        geometry.setAttribute('signalLit', brightness);
+        lenses.push({ brightness, colour, axes: items.map(item => asset === 'ART_Signal_Pedestrian' ? 'walk'
+          : Math.abs(item.matrix[8]) > 0.5 ? 'eastWest' : 'northSouth') });
+        if (glyph) {
+          // Both figures share one exported mesh: the upper standing figure follows red,
+          // the lower walking figure follows green, including its dark flash half-cycle.
+          const green = new THREE.InstancedBufferAttribute(new Float32Array(items.length).fill(-1), 1);
+          green.setUsage(THREE.DynamicDrawUsage); geometry.setAttribute('signalGreenLit', green);
+          lenses.push({ brightness: green, colour: 'green', axes: items.map(() => 'walk') });
+        }
+      }
       items.forEach((item, index) => {
         mesh.setMatrixAt(index, new THREE.Matrix4().fromArray(item.matrix).multiply(part.matrix));
       });
@@ -35,7 +77,22 @@ export async function buildSignals(scene, materials, rigs = signalRigs()) {
   }
   for (const mesh of buildPosts(rigs)) root.add(mesh);
   scene.add(root);
-  return { root, placements, rigs, heads: placements.length,
+  const update = seconds => {
+    const state = cycle.at(seconds);
+    for (const lens of lenses) {
+      let changed = false;
+      for (let i = 0; i < lens.axes.length; i++) {
+        const axis = lens.axes[i];
+        const on = axis === 'walk' ? lens.colour === 'red' ? state.walk === 'red' : state.walkOn
+          : state[axis] === lens.colour;
+        if (lens.brightness.array[i] !== Number(on)) { lens.brightness.array[i] = Number(on); changed = true; }
+      }
+      if (changed) lens.brightness.needsUpdate = true;
+    }
+    return state;
+  };
+  update(0);
+  return { root, placements, rigs, heads: placements.length, cycle, update,
     /** Footprints of the poles for obstacles.js (Unity x, z, yaw, [width, length]). */
     poles: [...rigs.map(r => ({ x: r.pole.x, z: r.pole.z, kind: r.kind })),
       ...GUIDE_SIGNS.map(s => ({ x: s.pole[0], z: s.pole[1], kind: 'guide' })),

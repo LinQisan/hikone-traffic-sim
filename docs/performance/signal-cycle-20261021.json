@@ -1,0 +1,1687 @@
+{
+  "date": "2026-10-21",
+  "purpose": "Functional pedestrian-exclusive Kyobashi signal cycle, synchronized heads, ordinary traffic stops, replay clock and accessible status.",
+  "references": [
+    {
+      "url": "https://www.city.hikone.lg.jp/material/files/group/106/koutuumasu1.pdf",
+      "supports": "Printed p. 52 identifies Kyobashi as a pedestrian/vehicle-separated junction; no controller timing sheet."
+    },
+    {
+      "url": "https://www.npa.go.jp/laws/notification/koutuu/kisei/kisei20250131.pdf",
+      "supports": "31 January 2025 guidance, section 3(2), defines simultaneous pedestrian-exclusive indications without diagonal crossing."
+    },
+    {
+      "source": "Owner confirmation in this conversation",
+      "supports": "Every pedestrian head opens and closes at the same time."
+    }
+  ],
+  "assumptions": "Pedestrian-exclusive mode is inferred from the documented separation, owner-confirmed all-head synchronization and four marked crossings. The 87-second phase order and all durations are practice settings, not measured Kyobashi controller timings. The photographed separation-period plate is retained; the simulator remains a daytime scene.",
+  "method": "Same headless Chrome page with saved pre-change app/traffic/signals/prop-review modules versus final rendering modules, benchmark=1, fixed cameras, 2-second warmup and 8-second samples. Baseline has static always-coloured optical faces. Visual phase captures temporarily fix the inspection clock in the QA page only; production runs freely. Follow-up final traffic tests cover revoking a yellow clearance when a queue stops a car before entry.",
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": true,
+  "sources": {
+    "app.js": {
+      "before": "a262fe60357730202f642119675f49fd5d0ecf3f5e2f2659e5fe9f9cb246488c",
+      "after": "5cfb33e8a471c5bcbfcafc8f1f8b76f015ec1735c54f172f30d3b5e75985277e"
+    },
+    "traffic.js": {
+      "before": "71cc4acb69b14aa9be85c602efa85f42773b9841ae8cdc7651dcbb779e3943a6",
+      "after": "7dfedee70d61c9f2d8d31384d048a489f8ba57c01f64b87ddaf9e1cccf54c596"
+    },
+    "signals.js": {
+      "before": "13ba901ac52d934c42a88b0b09eb8cc9d8c2a6d1e27914b54deb1e699f247c23",
+      "after": "bdc6ca649cf4d0668946fa5fa4ad7f67f4a16990df956a81e5546a6cb71ceb7b"
+    },
+    "prop-review.js": {
+      "before": "33d28632546e380f534ffb929d8ac2faefb3135088bd98e80262f7adad21ba82",
+      "after": "8664a766e094a442c45ed7df82db93880ca76d64ef53629c978747726ff08b36"
+    },
+    "signal-cycle.js": {
+      "before": null,
+      "after": "07d0741c0a1da7a84f30447d4723bf7e0a227fc5e15bd58f758587605d06c9d8"
+    }
+  },
+  "cameras": {
+    "junction": [
+      54,
+      7,
+      16,
+      34,
+      3.5,
+      31,
+      62
+    ],
+    "corner": [
+      52.8,
+      2.5,
+      23,
+      37,
+      4,
+      20,
+      65
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "junction",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70845886,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 285,
+        "fps": 35.592521823849,
+        "medianMs": 28.099999994039536,
+        "p95Ms": 29.30000001192093,
+        "updateMs": 0.08070175412454103,
+        "calls": 87,
+        "triangles": 1009436,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 185,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2778.7000000029802,
+        "resourceTransferBytes": 75265497,
+        "resourceBodyBytes": 75221997,
+        "heapBytes": 209351322,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "before",
+      "view": "corner",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70845886,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 356,
+        "fps": 44.44388958934378,
+        "medianMs": 22.400000005960464,
+        "p95Ms": 23.900000005960464,
+        "updateMs": 0.07078651669487525,
+        "calls": 99,
+        "triangles": 802251,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 197,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2778.7000000029802,
+        "resourceTransferBytes": 75265497,
+        "resourceBodyBytes": 75221997,
+        "heapBytes": 130401348,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "after",
+      "view": "junction",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70846086,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 285,
+        "fps": 35.7353328401573,
+        "medianMs": 28,
+        "p95Ms": 29.400000005960464,
+        "updateMs": 0.09543859691996323,
+        "calls": 87,
+        "triangles": 1009436,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 185,
+        "textures": 10,
+        "programs": 24,
+        "readyMs": 2705.4000000059605,
+        "resourceTransferBytes": 75274769,
+        "resourceBodyBytes": 75230969,
+        "heapBytes": 126869346,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "after",
+      "view": "corner",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70846086,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 357,
+        "fps": 44.56372487829235,
+        "medianMs": 22.5,
+        "p95Ms": 23.899999991059303,
+        "updateMs": 0.07871148432670187,
+        "calls": 99,
+        "triangles": 802251,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 197,
+        "textures": 10,
+        "programs": 24,
+        "readyMs": 2705.4000000059605,
+        "resourceTransferBytes": 75274769,
+        "resourceBodyBytes": 75230969,
+        "heapBytes": 127992686,
+        "multiDraw": true
+      }
+    }
+  ],
+  "previews": [
+    {
+      "view": "signals",
+      "name": "cars",
+      "time": 0,
+      "check": {
+        "state": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 28
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-cars.png"
+    },
+    {
+      "view": "signals",
+      "name": "yellow",
+      "time": 28.2,
+      "check": {
+        "state": {
+          "id": "east-west-yellow",
+          "eastWest": "yellow",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 2.8000000000000007
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-yellow.png"
+    },
+    {
+      "view": "signals",
+      "name": "all-red",
+      "time": 31.2,
+      "check": {
+        "state": {
+          "id": "clear-east-west",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 2.8000000000000007
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-all-red.png"
+    },
+    {
+      "view": "signals",
+      "name": "cross-street",
+      "time": 34.2,
+      "check": {
+        "state": {
+          "id": "north-south",
+          "eastWest": "red",
+          "northSouth": "green",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 19.799999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-cross-street.png"
+    },
+    {
+      "view": "signals",
+      "name": "walk",
+      "time": 60.2,
+      "check": {
+        "state": {
+          "id": "walk",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "green",
+          "walkOn": true,
+          "remaining": 17.799999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              0,
+              0
+            ],
+            "green": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-walk.png"
+    },
+    {
+      "view": "signals",
+      "name": "flash-off",
+      "time": 78.7,
+      "check": {
+        "state": {
+          "id": "walk-flash",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "flash",
+          "walkOn": false,
+          "remaining": 5.299999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              0,
+              0
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-flash-off.png"
+    },
+    {
+      "view": "signals-back",
+      "name": "cars",
+      "time": 0,
+      "check": {
+        "state": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 28
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-back-cars.png"
+    },
+    {
+      "view": "signals-back",
+      "name": "yellow",
+      "time": 28.2,
+      "check": {
+        "state": {
+          "id": "east-west-yellow",
+          "eastWest": "yellow",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 2.8000000000000007
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-back-yellow.png"
+    },
+    {
+      "view": "signals-back",
+      "name": "all-red",
+      "time": 31.2,
+      "check": {
+        "state": {
+          "id": "clear-east-west",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 2.8000000000000007
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-back-all-red.png"
+    },
+    {
+      "view": "signals-back",
+      "name": "cross-street",
+      "time": 34.2,
+      "check": {
+        "state": {
+          "id": "north-south",
+          "eastWest": "red",
+          "northSouth": "green",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 19.799999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1,
+              1
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-back-cross-street.png"
+    },
+    {
+      "view": "signals-back",
+      "name": "walk",
+      "time": 60.2,
+      "check": {
+        "state": {
+          "id": "walk",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "green",
+          "walkOn": true,
+          "remaining": 17.799999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              0,
+              0
+            ],
+            "green": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-back-walk.png"
+    },
+    {
+      "view": "signals-back",
+      "name": "flash-off",
+      "time": 78.7,
+      "check": {
+        "state": {
+          "id": "walk-flash",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "flash",
+          "walkOn": false,
+          "remaining": 5.299999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1,
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              0,
+              0
+            ],
+            "green": [
+              0,
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0,
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-back-flash-off.png"
+    },
+    {
+      "view": "signals-town",
+      "name": "cars",
+      "time": 0,
+      "check": {
+        "state": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 28
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1
+            ],
+            "green": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-town-cars.png"
+    },
+    {
+      "view": "signals-town",
+      "name": "yellow",
+      "time": 28.2,
+      "check": {
+        "state": {
+          "id": "east-west-yellow",
+          "eastWest": "yellow",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 2.8000000000000007
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1
+            ],
+            "green": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-town-yellow.png"
+    },
+    {
+      "view": "signals-town",
+      "name": "all-red",
+      "time": 31.2,
+      "check": {
+        "state": {
+          "id": "clear-east-west",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 2.8000000000000007
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1
+            ],
+            "green": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-town-all-red.png"
+    },
+    {
+      "view": "signals-town",
+      "name": "cross-street",
+      "time": 34.2,
+      "check": {
+        "state": {
+          "id": "north-south",
+          "eastWest": "red",
+          "northSouth": "green",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 19.799999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              1
+            ],
+            "green": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-town-cross-street.png"
+    },
+    {
+      "view": "signals-town",
+      "name": "walk",
+      "time": 60.2,
+      "check": {
+        "state": {
+          "id": "walk",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "green",
+          "walkOn": true,
+          "remaining": 17.799999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              0
+            ],
+            "green": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              1
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-town-walk.png"
+    },
+    {
+      "view": "signals-town",
+      "name": "flash-off",
+      "time": 78.7,
+      "check": {
+        "state": {
+          "id": "walk-flash",
+          "eastWest": "red",
+          "northSouth": "red",
+          "walk": "flash",
+          "walkOn": false,
+          "remaining": 5.299999999999997
+        },
+        "optics": [
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "lit": [
+              1
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalRed",
+            "lit": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGlyph",
+            "lit": [
+              0
+            ],
+            "green": [
+              0
+            ]
+          },
+          {
+            "name": "ART_Signal_Pedestrian/ART_SignalGreen",
+            "lit": [
+              0
+            ]
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/signals-town-flash-off.png"
+    }
+  ],
+  "playthroughs": [
+    {
+      "id": "common-walk-queue",
+      "time": 65.11666666666426,
+      "light": {
+        "id": "walk",
+        "eastWest": "red",
+        "northSouth": "red",
+        "walk": "green",
+        "walkOn": true,
+        "remaining": 12.883333333335742
+      },
+      "trafficLight": {
+        "id": "walk",
+        "eastWest": "red",
+        "northSouth": "red",
+        "walk": "green",
+        "walkOn": true,
+        "remaining": 12.883333333335742
+      },
+      "waiting": [
+        {
+          "id": 5,
+          "x": 50.34999991763047,
+          "z": 23.33627797204813,
+          "speed": 0
+        },
+        {
+          "id": 6,
+          "x": 14.252500635354735,
+          "z": 27.92634807741181,
+          "speed": 0
+        },
+        {
+          "id": 7,
+          "x": 8.255002409761573,
+          "z": 27.92173461723828,
+          "speed": 7.638334409421077e-13
+        },
+        {
+          "id": 8,
+          "x": 56.94999971994419,
+          "z": 23.334662587481127,
+          "speed": 7.411355479942156e-13
+        },
+        {
+          "id": 9,
+          "x": 2.2575041841612347,
+          "z": 27.91712115706474,
+          "speed": 9.037708852904162e-12
+        },
+        {
+          "id": 10,
+          "x": 62.94749954030458,
+          "z": 23.333194667944678,
+          "speed": 1.0194314528335882e-12
+        },
+        {
+          "id": 11,
+          "x": 68.34249937879736,
+          "z": 23.331874213438752,
+          "speed": 1.0030050863936897e-10
+        },
+        {
+          "id": 12,
+          "x": -3.1374942220309805,
+          "z": 27.912971158290745,
+          "speed": 2.708187748131271e-09
+        },
+        {
+          "id": 13,
+          "x": 74.34000726701024,
+          "z": 23.333259275851816,
+          "speed": 6.5132669628079985e-09
+        },
+        {
+          "id": 14,
+          "x": -8.532493037028175,
+          "z": 27.908821159202287,
+          "speed": 4.74760503996505e-07
+        },
+        {
+          "id": 15,
+          "x": 80.32121867386174,
+          "z": 23.81122716643864,
+          "speed": 5.299931140869932e-07
+        },
+        {
+          "id": 16,
+          "x": -14.530017890677229,
+          "z": 27.90420767854563,
+          "speed": 3.074752542254878e-05
+        },
+        {
+          "id": 17,
+          "x": 86.31610137716598,
+          "z": 24.05690438920947,
+          "speed": 0.0001160769917153538
+        },
+        {
+          "id": 18,
+          "x": -21.1344505424972,
+          "z": 27.89912734573654,
+          "speed": 0.005120693106161293
+        }
+      ],
+      "label": "歩行者信号：全方向 青"
+    },
+    {
+      "id": "builtin-01",
+      "state": "replay",
+      "mode": "walking",
+      "impact": 3.766666666666658,
+      "replay": {
+        "time": 5.366666666666653,
+        "actual": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 22.633333333333347
+        },
+        "expected": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 22.633333333333347
+        }
+      },
+      "restarted": {
+        "time": 0.2818333333333333,
+        "phase": "east-west"
+      },
+      "exit": "results then title"
+    },
+    {
+      "id": "builtin-08",
+      "state": "replay",
+      "mode": "bicycle",
+      "impact": 11.950000000000173,
+      "replay": {
+        "time": 13.516666666666918,
+        "actual": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 14.483333333333082
+        },
+        "expected": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 14.483333333333082
+        }
+      },
+      "restarted": {
+        "time": 4.083333333333324,
+        "phase": "east-west"
+      },
+      "exit": "results then title"
+    },
+    {
+      "id": "narrow-forced-colours",
+      "display": "block",
+      "role": "status",
+      "live": "polite",
+      "text": "歩行者信号：全方向 赤",
+      "width": 257.90625
+    }
+  ],
+  "errors": [],
+  "finalBehaviorChecks": [
+    {
+      "id": "common-walk-queue",
+      "time": 65.11666666666426,
+      "light": {
+        "id": "walk",
+        "eastWest": "red",
+        "northSouth": "red",
+        "walk": "green",
+        "walkOn": true,
+        "remaining": 12.883333333335742
+      },
+      "trafficLight": {
+        "id": "walk",
+        "eastWest": "red",
+        "northSouth": "red",
+        "walk": "green",
+        "walkOn": true,
+        "remaining": 12.883333333335742
+      },
+      "waiting": [
+        {
+          "id": 6,
+          "x": 13.650000813609111,
+          "z": 27.92588461601047,
+          "speed": 0
+        },
+        {
+          "id": 7,
+          "x": 50.34999991763047,
+          "z": 23.33627797204813,
+          "speed": 0
+        },
+        {
+          "id": 8,
+          "x": 7.05000276627031,
+          "z": 27.920807694435595,
+          "speed": 7.608728462097739e-13
+        },
+        {
+          "id": 9,
+          "x": 56.347499737990624,
+          "z": 23.334810052511678,
+          "speed": 7.510041971019948e-13
+        },
+        {
+          "id": 10,
+          "x": 0.45000471892973337,
+          "z": 27.915730772860716,
+          "speed": 2.813551860627841e-12
+        },
+        {
+          "id": 11,
+          "x": 62.344999558354175,
+          "z": 23.333342132975226,
+          "speed": 4.674779082354992e-12
+        },
+        {
+          "id": 12,
+          "x": -6.149993328924467,
+          "z": 27.910653851285446,
+          "speed": 5.958798886417248e-10
+        },
+        {
+          "id": 13,
+          "x": 68.3424993794452,
+          "z": 23.331874213438596,
+          "speed": 8.447020860558041e-10
+        },
+        {
+          "id": 14,
+          "x": -12.749991436624526,
+          "z": 27.905576929664136,
+          "speed": 6.970050709437854e-08
+        },
+        {
+          "id": 15,
+          "x": 73.73749933069567,
+          "z": 23.33055375890507,
+          "speed": 1.3030291956539486e-07
+        },
+        {
+          "id": 16,
+          "x": -18.747499831700353,
+          "z": 27.900963461667924,
+          "speed": 1.1742829861087026e-05
+        },
+        {
+          "id": 17,
+          "x": 79.72588740267032,
+          "z": 23.746057426631516,
+          "speed": 1.0420609693658397e-05
+        },
+        {
+          "id": 18,
+          "x": -24.746223543632155,
+          "z": 27.89634905881259,
+          "speed": 0.0014150818584843547
+        },
+        {
+          "id": 19,
+          "x": 85.72071912658171,
+          "z": 24.049054744274137,
+          "speed": 0.0009297752122616743
+        }
+      ],
+      "label": "歩行者信号：全方向 青"
+    },
+    {
+      "id": "builtin-01",
+      "state": "replay",
+      "mode": "walking",
+      "impact": 3.766666666666658,
+      "replay": {
+        "time": 5.366666666666653,
+        "actual": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 22.633333333333347
+        },
+        "expected": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 22.633333333333347
+        }
+      },
+      "restarted": {
+        "time": 0.2795333333363136,
+        "phase": "east-west"
+      },
+      "exit": "results then title"
+    },
+    {
+      "id": "builtin-08",
+      "state": "replay",
+      "mode": "bicycle",
+      "impact": 11.950000000000173,
+      "replay": {
+        "time": 13.516666666666918,
+        "actual": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 14.483333333333082
+        },
+        "expected": {
+          "id": "east-west",
+          "eastWest": "green",
+          "northSouth": "red",
+          "walk": "red",
+          "walkOn": false,
+          "remaining": 14.483333333333082
+        }
+      },
+      "restarted": {
+        "time": 4.083333333333324,
+        "phase": "east-west"
+      },
+      "exit": "results then title"
+    },
+    {
+      "id": "narrow-forced-colours",
+      "display": "block",
+      "role": "status",
+      "live": "polite",
+      "text": "歩行者信号：全方向 赤",
+      "width": 257.90625
+    }
+  ],
+  "touchCheck": {
+    "state": {
+      "touch": true,
+      "status": {
+        "text": "歩行者信号：全方向 赤",
+        "display": "block"
+      },
+      "buttons": [
+        {
+          "id": "hudretry",
+          "width": 140.203125,
+          "height": 44,
+          "right": 166.203125,
+          "bottom": 115,
+          "display": "block"
+        },
+        {
+          "id": "hudmenu",
+          "width": 154.953125,
+          "height": 44,
+          "right": 329.15625,
+          "bottom": 115,
+          "display": "block"
+        }
+      ]
+    },
+    "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-cycle/touch-forced-colours.png",
+    "exit": "menu button returns to title",
+    "errors": []
+  },
+  "verification": {
+    "command": "npm test",
+    "tests": 204,
+    "passed": 204,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": "Whole cycle conflicts/boundaries/repetition, all eight walk optics and figures, six car heads, no stable-state buffer uploads, actual GLB/material isolation, four approach stop bars for all three car bodies, yellow dilemma/queue commitment, queuing, explicit accident behavior, full ten-event checker and existing regression suite.",
+    "browser": "18 standalone phase/view captures, live pedestrian-green traffic queues, walking builtin-01 and cycling builtin-08 through contact/replay/restart/results/menu, exact replay-time signal sampling, narrow status and 44px touch menu/retry controls under reduced motion/forced colours. No page or console errors.",
+    "diffCheck": "passed",
+    "geometry": "No model/placement/collider geometry changed. Existing scene draw and triangle counts match, so no generated GLB/map/collision output is rebuilt."
+  },
+  "limits": "Exact local phase order, durations, traffic-responsive offsets and night operation are unverified. Accident vehicles can intentionally violate signals, documented in the UI/README. Short desktop samples show workload parity, not an FPS improvement or stutter bound. Scene buffer counts are not total VRAM or retained heap. Touch is browser emulation; no physical phone or VR headset tested. No commit or deployment."
+}

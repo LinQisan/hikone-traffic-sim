@@ -216,6 +216,7 @@ async function start(again = false) {
     traffic: new Traffic(scenario, { seed: (Date.now() & 0xffffff) + 1, builtInMix: !!entry.template }),
     recorder: new Recorder(), cars: new Map(), carFrame: 0, participant: {}, parked: new THREE.Group(), impact: null,
   };
+  signals.update(0);
   // parked cars and trucks of a built-in scenario (Unity's ScenarioHost objects); they are solid
   const footprints = [];
   for (const p of (builtIn >= 0 ? sceneData.scenarios.find(x => x.id === builtIn)?.parked : null) ?? []) {
@@ -418,6 +419,7 @@ const probe = new PerformanceProbe($('fps'), renderer, new URLSearchParams(locat
     placements: env.objects, meshes: env.root.children.length }));
 const lightPosition = new THREE.Vector3();
 let debugCamera = null;
+let previewSignals = null, previewSignalTime = 0;
 let fpsTime = 0, fpsFrames = 0;
 function tick(dt) {
   if (state === 'playing') {
@@ -456,6 +458,13 @@ function tick(dt) {
   } else if (state !== 'results') {
     player.update(dt);
   }
+  // Replay uses its recorded simulation time, so slow motion and rewind keep the same signals.
+  const signalTime = state === 'replay' ? replay.time : run ? run.time : (previewSignalTime += dt);
+  const signalState = signals.update(signalTime);
+  previewSignals?.update(signalTime);
+  const label = signalState.walk === 'green' ? '歩行者信号：全方向 青' : signalState.walk === 'flash'
+    ? '歩行者信号：全方向 青点滅（渡り始めない）' : '歩行者信号：全方向 赤';
+  if (state === 'playing' && $('hudsignal').textContent !== label) $('hudsignal').textContent = label;
 }
 
 renderer.setAnimationLoop(() => {
@@ -569,6 +578,7 @@ const reviewViews = {
 };
 const propCamera = await propReview(review.get('view'), scene, materials);
 if (propCamera) {
+  previewSignals = scene.getObjectByName('PropReview').userData.signals ?? null;
   env.root.visible = signals.root.visible = false;
   window.vrlearn.debugView(...propCamera);
 } else if (reviewViews[review.get('view')]) {
