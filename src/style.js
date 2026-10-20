@@ -3,6 +3,7 @@
 // There is no screen-space oil-paint pass; desktop and mobile render the same models.
 import * as THREE from 'three';
 import { brushTexture } from './paint-texture.js';
+import { ambientMotion } from './ambient-motion.js';
 
 export const LIGHT = {
   sunColor: [1, 0.94, 0.81], sunIntensity: 2.5,
@@ -51,8 +52,8 @@ const PIGMENTS = {
   HK_Bark: [[0.65, 0.48, 0.32], [0.44, 0.44, 0.54]],
   HK_Stone: [[0.89, 0.81, 0.63], [0.55, 0.66, 0.83]],
   HK_StoneDark: [[0.80, 0.72, 0.59], [0.50, 0.60, 0.78]],
-  HK_Leaf: [[0.75, 0.79, 0.35], [0.34, 0.59, 0.58]],
-  HK_LeafDark: [[0.57, 0.69, 0.37], [0.32, 0.51, 0.58]],
+  HK_Leaf: [[0.78, 0.78, 0.46], [0.35, 0.53, 0.48]],
+  HK_LeafDark: [[0.69, 0.73, 0.44], [0.32, 0.49, 0.46]],
   HK_Sakura: [[1.0, 0.85, 0.76], [0.83, 0.55, 0.72]],
   HK_Grass: [[0.79, 0.78, 0.43], [0.39, 0.57, 0.57]],
   HK_Water: [[0.86, 0.84, 0.63], [0.42, 0.61, 0.83]],
@@ -62,39 +63,75 @@ const PIGMENTS = {
   ART_Tile: [[0.76, 0.64, 0.53], [0.47, 0.59, 0.78]],
   ART_TileRidge: [[0.65, 0.58, 0.50], [0.43, 0.52, 0.70]],
   ART_StoneLight: [[0.89, 0.81, 0.63], [0.55, 0.66, 0.83]],
+  HK_MetalLight: [[0.80, 0.74, 0.64], [0.52, 0.56, 0.65]],
+  ART_SignalPole: [[0.72, 0.61, 0.47], [0.48, 0.49, 0.59]],
+  ART_SignalHousing: [[0.75, 0.69, 0.58], [0.49, 0.55, 0.63]],
+  ART_SignalHood: [[0.68, 0.63, 0.53], [0.43, 0.49, 0.58]],
+  ART_SignalHousingDark: [[0.42, 0.39, 0.36], [0.31, 0.34, 0.43]],
+  ART_SignalHoodDark: [[0.39, 0.37, 0.34], [0.28, 0.31, 0.40]],
   ART_PathGreen: [[0.69, 0.75, 0.48], [0.40, 0.65, 0.70]],
 };
 
-/** The pigments a material name paints with: warm/cool dab colours and how strongly dabs show. */
+const LEAVES = new Set(['HK_Leaf', 'HK_LeafDark']);
+const STREET_METAL = new Set(['HK_MetalLight', 'ART_SignalPole', 'ART_SignalHousing',
+  'ART_SignalHood', 'ART_SignalHousingDark', 'ART_SignalHoodDark']);
+
+/** Warm/cool pigments, brush strength and surface family (0 ordinary, 1 leaves, 2 street metal). */
 export function pigmentOf(name) {
   const pigments = PIGMENTS[name];
+  const surface = LEAVES.has(name) ? 1 : STREET_METAL.has(name) ? 2 : 0;
+  const dab = surface === 1 ? 0.43 : surface === 2 ? 0.60
+    : (name.startsWith('ART_') && !pigments) || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12;
   return {
+    surface,
     warm: pigments?.[0] ?? [0.76, 0.64, 0.49], cool: pigments?.[1] ?? [0.45, 0.55, 0.72],
     // Street-view architecture keeps the town's impressionist palette. Other abstract props
     // use deliberate colour planes, including the unambiguous signal colours.
-    dab: (name.startsWith('ART_') && !pigments) || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12,
+    dab,
   };
 }
 
 const DAB_FRAGMENT = `
+        // A leaf is already a small baked pigment stroke. Skip two-dimensional
+        // overpainting across thousands of overlapping blades.
+        if (hkSurface < 0.5 || hkSurface > 1.5) {
         vec3 hkAn = abs(normalize(vHkNormal));
         vec2 hkP = hkAn.y > max(hkAn.x, hkAn.z) ? vHkWorld.xz : (hkAn.x > hkAn.z ? vHkWorld.zy : vHkWorld.xy);
+        float hkRipple = 0.0, hkGlint = 0.0;
+        if (hkWater > 0.5) {
+          float a = dot(vHkWorld.xz, vec2(0.95, 0.26)) * 2.6 - hkTime * 1.2;
+          float b = dot(vHkWorld.xz, vec2(-0.38, 0.92)) * 4.1 + hkTime * 0.85;
+          hkRipple = sin(a) * 0.65 + sin(b) * 0.35;
+          hkGlint = pow(max(0.0, sin(a) * cos(b)), 6.0);
+          hkP += vec2(0.12, 0.035) * hkTime + vec2(sin(b), sin(a)) * 0.075;
+        }
+        if (hkSurface > 1.5) hkP = vec2(vHkWorld.x + vHkWorld.z * 0.61, vHkWorld.y);
         vec2 hkQ = mat2(0.86, -0.51, 0.51, 0.86) * hkP;
         float hkScale = hkAn.y > 0.7 ? 2.3 : 3.7;
-        vec2 hkDab = texture2D(hkBrush, hkQ * vec2(hkScale, hkScale * 1.35) / 32.0).rg;
+        vec2 hkBrushScale = hkSurface > 1.5 ? vec2(22.0, 2.4)
+          : vec2(hkScale, hkScale * 1.35);
+        vec4 hkStroke = texture2D(hkBrush, hkQ * hkBrushScale / 32.0);
+        vec2 hkDab = hkStroke.rg;
         vec3 hkPigment = mix(hkCool, hkWarm, hkDab.y);
         hkPigment = mix(hkPigment, vec3(0.71, 0.43, 0.39), smoothstep(0.84, 1.0, hkDab.y) * 0.20);
-        float hkAmount = hkDab.x * hkDabStrength * hkStrength;
-        diffuseColor.rgb = mix(diffuseColor.rgb, hkPigment, hkAmount);`;
+        float hkMask = hkDab.x;
+        float hkAmount = hkMask * hkDabStrength * hkStrength;
+        diffuseColor.rgb = mix(diffuseColor.rgb, hkPigment, hkAmount);
+        // Shallow ripples change reflected colour, not the authoritative water/shore height.
+        diffuseColor.rgb *= 1.0 + hkRipple * 0.065;
+        diffuseColor.rgb += vec3(0.10, 0.13, 0.14) * hkGlint;
+        }`;
 
 /**
  * Fine bristles and coloured light on top of the model's baked pigment strokes. Coordinates are
- * anchored in the scene; walking never resizes/slides the paint. `pigments` declares where the
+ * anchored in the scene; only water advects its paint. Walking never resizes/slides the paint.
+ * `fragmentDeclarations` declares where the
  * GLSL names hkWarm, hkCool and hkDabStrength come from (uniforms, or the per-vertex palette).
  */
 function injectPaint(shader, { vertexDeclarations = '', vertexBody = '', fragmentDeclarations, dabs = true, emissive = '' }) {
   shader.uniforms.hkStrength = paint.strength;
   shader.uniforms.hkBrush = { value: brushTexture() };
+  shader.uniforms.hkTime = ambientMotion.time;
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>
       varying vec3 vHkWorld;
@@ -118,18 +155,22 @@ function injectPaint(shader, { vertexDeclarations = '', vertexBody = '', fragmen
     .replace('#include <common>', `#include <common>
       uniform float hkStrength;
       uniform sampler2D hkBrush;
+      uniform float hkTime;
       varying vec3 vHkWorld;
       varying vec3 vHkNormal;
       ${fragmentDeclarations}`)
     .replace('#include <color_fragment>', '#include <color_fragment>' + (dabs ? DAB_FRAGMENT : ''))
     .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + emissive)
     .replace('#include <opaque_fragment>', `#include <opaque_fragment>
+      float fibre = 0.0, detail = 0.0;
+      if (hkSurface < 0.5 || hkSurface > 1.5) {
       vec3 n = normalize(vHkNormal), an = abs(n);
       vec2 p = an.y > max(an.x, an.z) ? vHkWorld.xz : (an.x > an.z ? vHkWorld.zy : vHkWorld.xy);
       vec2 q = mat2(0.91, -0.41, 0.41, 0.91) * p;
-      float fibre = texture2D(hkBrush, q * vec2(34.0, 170.0) / 32.0).b - 0.5;
+      fibre = texture2D(hkBrush, q * vec2(34.0, 170.0) / 32.0).b - 0.5;
       // Avoid high-frequency shimmer on distant surfaces and in stereo views.
-      float detail = 1.0 - smoothstep(0.008, 0.045, max(length(dFdx(p)), length(dFdy(p))));
+      detail = 1.0 - smoothstep(0.008, 0.045, max(length(dFdx(p)), length(dFdy(p))));
+      }
       vec3 c = gl_FragColor.rgb;
       float lightValue = dot(c, vec3(0.2126, 0.7152, 0.0722));
       vec3 shadow = c * vec3(0.88, 0.94, 1.10) + vec3(0.022, 0.021, 0.042);
@@ -146,15 +187,17 @@ export function painted(material) {
     shader.uniforms.hkWarm = { value: col(pigment.warm) };
     shader.uniforms.hkCool = { value: col(pigment.cool) };
     shader.uniforms.hkDabStrength = { value: pigment.dab };
-    injectPaint(shader, { dabs, fragmentDeclarations: 'uniform vec3 hkWarm;\nuniform vec3 hkCool;\nuniform float hkDabStrength;' });
+    shader.uniforms.hkSurface = { value: pigment.surface };
+    injectPaint(shader, { dabs, fragmentDeclarations: 'uniform vec3 hkWarm;\nuniform vec3 hkCool;\nuniform float hkDabStrength;\nuniform float hkSurface;\n'
+      + '#define hkWater ' + (material.name === 'HK_Water' ? '1.0' : '0.0') });
   };
-  material.customProgramCacheKey = () => 'hk-cached-pigment-v4-' + dabs;
+  material.customProgramCacheKey = () => 'hk-cached-pigment-v7-' + dabs + '-' + (material.name === 'HK_Water');
   return material;
 }
 
 /**
  * Every pigment of the city in one material: each vertex carries its pigment's row (hkPigment) in
- * a small palette texture (warm, cool, dab strength, emissive). Merging all colours into one
+ * a small palette texture (warm, cool, dab strength, water flag, emissive, surface family). Merging all colours into one
  * material lets an asset draw in one call instead of one call per colour.
  */
 export class PigmentPalette {
@@ -174,8 +217,9 @@ export class PigmentPalette {
     const pigment = pigmentOf(material.name), linear = c => new THREE.Color().setRGB(...c, THREE.SRGBColorSpace);
     const emissive = material.emissive ? material.emissive.clone().multiplyScalar(material.emissiveIntensity ?? 1) : new THREE.Color(0, 0, 0);
     // Strength shares warm.a, saving one vertex texture lookup without quantizing any pigment.
-    const texels = [[...linear(pigment.warm).toArray(), pigment.dab], [...linear(pigment.cool).toArray(), 1],
-      [...emissive.toArray(), 1]];
+    const texels = [[...linear(pigment.warm).toArray(), pigment.dab],
+      [...linear(pigment.cool).toArray(), material.name === 'HK_Water' ? 1 : 0],
+      [...emissive.toArray(), pigment.surface]];
     texels.forEach((t, i) => this.data.set(t, (index * 3 + i) * 4));
     this.texture.needsUpdate = true;
     this.rows.set(material.name, index);
@@ -201,19 +245,29 @@ export class PigmentPalette {
           varying vec3 vHkWarm;
           varying vec3 vHkCool;
           varying float vHkDab;
-          varying vec3 vHkEmissive;`,
+          varying float vHkWater;
+          varying vec3 vHkEmissive;
+          varying float vHkSurface;`,
         vertexBody: `int hkRow = int(hkPigment + 0.5);
           vec4 hkWarmDab = texelFetch(hkPalette, ivec2(0, hkRow), 0);
           vHkWarm = hkWarmDab.rgb;
-          vHkCool = texelFetch(hkPalette, ivec2(1, hkRow), 0).rgb;
+          vec4 hkCoolWater = texelFetch(hkPalette, ivec2(1, hkRow), 0);
+          vHkCool = hkCoolWater.rgb;
+          vHkWater = hkCoolWater.a;
           vHkDab = hkWarmDab.a;
-          vHkEmissive = texelFetch(hkPalette, ivec2(2, hkRow), 0).rgb;`,
+          vec4 hkEmissionSurface = texelFetch(hkPalette, ivec2(2, hkRow), 0);
+          vHkEmissive = hkEmissionSurface.rgb;
+          vHkSurface = hkEmissionSurface.a;`,
         fragmentDeclarations: `varying vec3 vHkWarm;
           varying vec3 vHkCool;
           varying float vHkDab;
+          varying float vHkWater;
           varying vec3 vHkEmissive;
+          varying float vHkSurface;
+          #define hkSurface vHkSurface
           #define hkWarm vHkWarm
           #define hkCool vHkCool
+          #define hkWater vHkWater
           #define hkDabStrength vHkDab`,
         emissive: 'totalEmissiveRadiance += vHkEmissive;',
       });
@@ -222,7 +276,7 @@ export class PigmentPalette {
       if (fogScale !== 1) shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>',
         `#include <fog_vertex>\n#ifdef USE_FOG\nvFogDepth *= ${fogScale.toFixed(3)};\n#endif`);
     };
-    material.customProgramCacheKey = () => 'hk-palette-v2-' + fogScale;
+    material.customProgramCacheKey = () => 'hk-palette-v5-' + fogScale;
     this.materials.set(key, material);
     return material;
   }

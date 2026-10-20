@@ -11,12 +11,12 @@ registerHooks({ resolve(specifier, context, next) {
 } });
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-const { registerModel } = await import('../src/world.js');
+const { registerModel, material: resolveMaterial } = await import('../src/world.js');
 const { instance } = await import('../src/vehicles.js');
 const { environmentInstances, LOD_FAR, LOD_NEAR } = await import('../src/environment-instances.js');
 const { PigmentPalette, pigmentOf } = await import('../src/style.js');
 const { placement } = await import('../src/coords.js');
-const { buildLight } = await import('../src/world.js');
+const { buildLight, ENVIRONMENT_CELLS } = await import('../src/world.js');
 const { packPigments, geometryBytes } = await import('../src/geometry-budget.js');
 const { webLayout } = await import('../src/web-layout.js');
 const { PerformanceProbe } = await import('../src/performance.js');
@@ -79,6 +79,30 @@ test('view changes preserve ordered instance buffers until visibility or LOD act
   }
 });
 
+test('dense assets can use a shorter detail range with hysteresis and the nearest eye', () => {
+  const geometry = new THREE.BoxGeometry(), material = new THREE.MeshLambertMaterial({ name: 'Box' });
+  const parts = [{ geometry, material, matrix: new THREE.Matrix4() }];
+  const definition = { items: [{ p: [0, 0, -20], r: 0, s: [1, 1, 1] }], high: parts, low: parts };
+  const env = environmentInstances([{ ...definition, asset: 'Leaves', lodFar: 18 },
+    { ...definition, asset: 'Building' }], new PigmentPalette(), () => false);
+  const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 200), leaves = env.assets[0], building = env.assets[1];
+  env.updateLOD(camera);
+  assert.equal(leaves.low.count, 1, 'leaves use the light mesh beyond their own range');
+  assert.equal(building.high.count, 1, 'ordinary geometry retains its existing detail range');
+  camera.position.z = -4; env.updateLOD(camera);
+  assert.equal(leaves.high.count, 1, 'approaching restores the nearby leaves');
+  camera.position.z = -2; env.updateLOD(camera);
+  assert.equal(leaves.high.count, 1, 'moving out inside the hysteresis band keeps detail');
+  camera.position.z = 0; env.updateLOD(camera);
+  camera.position.z = -2; env.updateLOD(camera);
+  assert.equal(leaves.low.count, 1, 'moving back inside the same band keeps the light mesh');
+  const otherEye = camera.clone(); otherEye.position.z = -5;
+  env.updateLOD(camera, otherEye);
+  assert.equal(leaves.high.count, 1, 'a nearby second eye keeps the full crown');
+  for (const mesh of env.root.children) mesh.dispose?.();
+  geometry.dispose(); material.dispose();
+});
+
 test('culling refreshes for camera roll, second-eye projection and shadow projection changes', () => {
   const geometry = new THREE.BoxGeometry(), material = new THREE.MeshLambertMaterial({ name: 'Box' });
   const parts = [{ geometry, material, matrix: new THREE.Matrix4() }];
@@ -99,6 +123,121 @@ test('culling refreshes for camera roll, second-eye projection and shadow projec
   assert.equal(environment.assets[0].shadowMesh.count, 0, 'the resized shadow volume excludes the old caster');
 });
 
+test('transparent panes survive city merging and follow frame LOD without becoming opaque shadow casters', () => {
+  const frame = { geometry: new THREE.BoxGeometry(), material: new THREE.MeshLambertMaterial({ name: 'Frame' }), matrix: new THREE.Matrix4() };
+  const glass = new THREE.MeshStandardMaterial({ name: 'ClearPane', transparent: true, opacity: 0.12, side: THREE.DoubleSide });
+  const pane = { geometry: new THREE.PlaneGeometry(), material: glass, matrix: new THREE.Matrix4() };
+  const parts = [frame, pane];
+  const environment = environmentInstances([{ asset: 'Case', high: parts, low: parts,
+    items: [{ p: [0, 0, -10], r: 0, s: [1, 1, 1] }] }], new PigmentPalette(), () => true);
+  const a = environment.assets[0], high = a.transparent[0][0], low = a.transparent[1][0];
+  assert.equal(a.high.geometry.index.count, frame.geometry.index.count, 'opaque merge excludes glazing');
+  assert.equal(a.shadowMesh.geometry.index.count, frame.geometry.index.count, 'glass does not become a solid shadow');
+  assert.equal(high.material, glass, 'glass retains alpha and its original surface');
+  assert.equal(resolveMaterial(new Map([['ClearPane', frame.material]]), glass), glass, 'standalone preview also retains the glass');
+  assert.equal(glass.depthWrite, false, 'glass does not hide panes and objects behind it');
+  assert.equal(glass.forceSinglePass, true, 'a thin double-sided pane needs one draw');
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 200);
+  environment.updateLOD(camera);
+  assert.ok(high.visible && !low.visible);
+  assert.equal(high.count, a.high.count);
+  assert.equal(high.instanceMatrix, a.high.instanceMatrix, 'placement upload is shared with the frame');
+  camera.position.z = 80;
+  environment.updateLOD(camera);
+  assert.ok(low.visible && !high.visible, 'far glazing follows frame LOD');
+  assert.equal(low.instanceMatrix, a.low.instanceMatrix);
+  camera.rotation.y = Math.PI;
+  environment.updateLOD(camera);
+  assert.ok(!low.visible && !high.visible, 'culled glazing cannot remain floating in view');
+  environment.casters(true);
+  assert.ok(!high.castShadow && !low.castShadow);
+  camera.rotation.y = 0; camera.position.z = 0;
+  environment.updateLOD(camera);
+  assert.ok(high.visible && !low.visible, 'returning restores the near glass');
+});
+
+test('a broad background composite keeps detail local to either eye and independent shadow casters', () => {
+  const geometry = new THREE.BoxGeometry(4, 4, 4), material = new THREE.MeshLambertMaterial({ name: 'ART_Concrete' });
+  const parts = Array.from({ length: 10 }, (_, i) => ({ geometry, material, matrix: new THREE.Matrix4().makeTranslation(10 + i * 200, 2, -10) }));
+  const palette = new PigmentPalette(), environment = environmentInstances([{
+    asset: 'Campus', high: parts, low: parts, items: [{ p: [0, 0, 0], r: 0, s: [1, 1, 1] }],
+    background: true, batched: true, cellSize: 64,
+  }], palette, () => true);
+  const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 900);
+  environment.updateLOD(camera);
+  const cells = environment.cells.slice().sort((a, b) => a.bounds.min.x - b.bounds.min.x);
+  assert.equal(cells.length, 10);
+  assert.deepEqual(cells.map(c => c.low), cells.map((c, i) => i !== 0), 'being beside one building does not promote the whole campus');
+  for (const c of cells) {
+    assert.equal(c.highMesh.material, palette.material(THREE.FrontSide, false, 0.55), 'near cells retain landmark atmosphere');
+    assert.equal(c.lowMesh.material, palette.material(THREE.FrontSide, true, 0.55), 'far cells retain atmosphere and seam depth bias');
+    assert.equal(c.highMesh.castShadow, false);
+    assert.equal(c.lowMesh.castShadow, true);
+  }
+  for (const key of ['highMesh', 'lowMesh'])
+    assert.equal(cells.reduce((n, c) => n + c[key].geometry.index.count, 0), parts.length * geometry.index.count, 'partitioning retains every triangle at each level');
+  const second = camera.clone(); second.position.x = 410;
+  environment.updateLOD(camera, second);
+  assert.deepEqual(cells.map(c => c.low), cells.map((c, i) => i !== 0 && i !== 2), 'the other eye also selects nearby detail');
+  environment.casters(true);
+  assert.ok(cells.every(c => c.lowMesh.visible), 'offscreen cells remain available for the light frustum');
+  cells[0].lowMesh.onBeforeShadow();
+  assert.equal(cells[0].lowMesh.geometry.drawRange.count, Infinity);
+  cells[0].lowMesh.onBeforeRender();
+  assert.equal(cells[0].lowMesh.geometry.drawRange.count, 0, 'the near cell is not drawn twice in the view pass');
+  environment.casters(false);
+  assert.deepEqual(cells.map(c => c.lowMesh.visible), cells.map((c, i) => i !== 0 && i !== 2));
+  const region = environment.regions[0];
+  for (const c of cells) for (const attribute of Object.keys(c.lowMesh.geometry.attributes))
+    assert.equal(c.lowMesh.geometry.attributes[attribute], region.farMesh.geometry.attributes[attribute], 'the distant proxy shares low vertex buffers');
+  for (const eye of [camera, second]) {
+    eye.position.set(900, 2, 2000); eye.lookAt(900, 2, -10);
+    eye.fov = 90; eye.far = 3000; eye.updateProjectionMatrix();
+  }
+  environment.updateLOD(camera, second);
+  environment.casters(false);
+  assert.equal(region.farMesh.visible, true, 'the whole distant silhouette takes one draw');
+  assert.ok(cells.every(c => !c.highMesh.visible && !c.lowMesh.visible), 'local cells do not duplicate the distant view');
+  environment.casters(true);
+  assert.ok(cells.every(c => c.lowMesh.visible), 'distant-proxy selection leaves local shadow casters available');
+  for (const c of cells) {
+    c.lowMesh.onBeforeShadow();
+    assert.equal(c.lowMesh.geometry.drawRange.count, Infinity);
+    c.lowMesh.onBeforeRender();
+    assert.equal(c.lowMesh.geometry.drawRange.count, 0, 'the distant proxy is not duplicated on shadow frames');
+  }
+  camera.position.set(0, 0, 0); camera.rotation.set(0, 0, 0);
+  camera.fov = 70; camera.updateProjectionMatrix();
+  environment.updateLOD(camera);
+  environment.casters(false);
+  assert.equal(region.farMesh.visible, false, 'returning restores local detail');
+  assert.equal(cells[0].highMesh.visible, true);
+  for (const mesh of environment.root.children) mesh.geometry.dispose();
+  geometry.dispose(); material.dispose();
+  for (const material of palette.materials.values()) material.dispose();
+  palette.texture.dispose();
+});
+
+test('cell culling rejects a broad flat cell behind the camera and respects root transforms', () => {
+  const geometry = new THREE.BoxGeometry(200, 1, 2), material = new THREE.MeshLambertMaterial({ name: 'ART_Concrete' });
+  const parts = [{ geometry, material, matrix: new THREE.Matrix4().makeTranslation(0, 0, 10) }];
+  const palette = new PigmentPalette(), environment = environmentInstances([{
+    asset: 'Paving', high: parts, low: parts, items: [{ p: [0, 0, 0], r: 0, s: [1, 1, 1] }], cellSize: 512,
+  }], palette, () => false);
+  const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 900);
+  camera.updateMatrixWorld(); environment.root.updateMatrixWorld(true);
+  const frustum = new THREE.Frustum().setFromProjectionMatrix(camera.projectionMatrix);
+  const mesh = environment.cells[0].highMesh;
+  assert.equal(frustum.intersectsObject(mesh), true, 'the default sphere reaches behind the camera');
+  assert.equal(mesh.intersectsFrustum(frustum), false, 'the actual cell box stays behind the near plane');
+  environment.root.position.z = -30; environment.root.updateMatrixWorld(true);
+  assert.equal(mesh.intersectsFrustum(frustum), true, 'bounds follow the world transform');
+  for (const mesh of environment.root.children) mesh.geometry.dispose();
+  geometry.dispose(); material.dispose();
+  for (const material of palette.materials.values()) material.dispose();
+  palette.texture.dispose();
+});
+
 test('the instanced city keeps every placement and triangle, draws in few calls and switches detail', async () => {
   const layout = webLayout(JSON.parse(await fs.readFile(new URL('../data/layout.json', import.meta.url))));
   const loader = new GLTFLoader();
@@ -112,14 +251,17 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
       return parts;
     };
     const items = layout.items.filter(i => i.a === asset);
-    return { asset, items, high: await parts(''), low: await parts('.lod'), background: items.every(i => i.g === 'WebLandmark'),
-      batched: asset === 'ART_CastleApproach' };
+    return { asset, items, high: await parts(''), low: await parts('.lod'),
+      background: items.every(i => i.g === 'WebLandmark') || ['ART_ShigaCampus', 'ART_WestMoat', 'ART_CastleApproach'].includes(asset),
+      cellSize: ENVIRONMENT_CELLS[asset], batched: asset === 'ART_CastleApproach' };
   }));
   const palette = new PigmentPalette();
   const noShadow = asset => /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/.test(asset);
   const environment = environmentInstances(definitions, palette, asset => !noShadow(asset));
   const shared = new Set(environment.root.children.map(m => m.material));
-  assert.ok(shared.size <= 4 && [...shared].every(m => m.name === 'HikonePigments'), 'shared pigment shader with ground depth biases and a distant-atmosphere variant');
+  const opaque = [...shared].filter(m => !m.transparent), glass = [...shared].filter(m => m.transparent);
+  assert.ok(opaque.length <= 4 && opaque.every(m => m.name === 'HikonePigments'), 'shared pigment shader with ground depth biases and a distant-atmosphere variant');
+  assert.deepEqual([...new Set(glass.map(m => m.name))], ['ART_DisplayGlass'], 'both LODs keep the separate display glass');
 
   // every layout item is drawn exactly once, at its simulator placement
   const expected = new THREE.Matrix4();
@@ -157,6 +299,13 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
     if (mesh && mesh.geometry.attributes.position.count <= 65535)
       assert.ok(mesh.geometry.index.array instanceof Uint16Array, 'a small cell uses compact indices even when its source needs 32 bits');
   }
+  for (const name of Object.keys(ENVIRONMENT_CELLS)) {
+    const definition = definitions.find(d => d.asset === name), cells = environment.cells.filter(c => c.asset === name);
+    assert.ok(cells.length > 1, `${name}: the real composite uses local LOD`);
+    for (const [detail, key] of [['high', 'highMesh'], ['low', 'lowMesh']])
+      assert.equal(cells.reduce((n, c) => n + (c[key]?.geometry.index.count ?? 0), 0),
+        definition[detail].reduce((n, part) => n + part.geometry.index.count, 0), `${name}: ${detail} loses no triangles`);
+  }
 
   // a street view: few draws, objects behind the viewer culled, shadow casters behind kept
   const camera = new THREE.PerspectiveCamera(62, 16 / 9, 0.08, 500);
@@ -169,13 +318,15 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   const shadowCamera = sun.shadow.camera, shadowFrustum = new THREE.Frustum().setFromProjectionMatrix(
     new THREE.Matrix4().multiplyMatrices(shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse));
   assert.equal(environment.updateLOD(camera, null, shadowCamera), true);
-  for (const name of ['ART_HikoneKeep', 'HK_Terrain_Hikone'])
-    assert.ok(environment.assets.find(a => a.asset === name).placements[0].low,
-      `${name}: the distant landmark uses its light silhouette from the practice street`);
+  assert.ok(environment.assets.find(a => a.asset === 'ART_HikoneKeep').placements[0].low,
+    'the distant keep uses its light silhouette from the practice street');
+  assert.ok(environment.cells.filter(c => c.asset === 'HK_Terrain_Hikone').every(c => c.low),
+    'the distant hill cells use their light silhouettes from the practice street');
   environment.root.updateMatrixWorld(true);
   const viewFrustum = new THREE.Frustum().setFromProjectionMatrix(
     new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-  const visible = environment.root.children.filter(m => m.visible && !m.userData.shadowOnly && (!m.frustumCulled || viewFrustum.intersectsObject(m))).length;
+  const visible = environment.root.children.filter(m => m.visible && !(m.isInstancedMesh && m.userData.shadowOnly)
+    && (!m.frustumCulled || m.intersectsFrustum(viewFrustum))).length;
   assert.ok(visible < 180, `draw budget: ${visible}`);
   const drawn = a => [a.high, a.low].flatMap(m => Array.from({ length: m.count }, (_, i) => m.instanceMatrix.array[i * 16 + 12]));
   const tree = environment.assets.find(a => a.asset === 'ART_CastleGrove');
@@ -237,15 +388,15 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
   for (const mesh of environment.root.children) mesh.geometry.dispose();
 });
 
-test('compact pigment rows retain linear colours, dab strength and HDR emissive light', () => {
+test('compact pigment rows retain linear colours, brush family, water identity and HDR emissive light', () => {
   const palette = new PigmentPalette();
-  for (const name of ['HK_Asphalt', 'HK_Sakura', 'ART_LampGlow']) {
+  for (const name of ['HK_Asphalt', 'HK_Sakura', 'HK_Water', 'HK_Leaf', 'ART_SignalPole', 'ART_SignalRed', 'ART_LampGlow']) {
     const material = new THREE.MeshLambertMaterial({ name, emissive: 0xffa840, emissiveIntensity: 2 });
     const row = palette.row(material), pigment = pigmentOf(name), base = row * 12;
     const linear = value => new THREE.Color().setRGB(...value, THREE.SRGBColorSpace).toArray();
     const actual = Array.from(palette.data.slice(base, base + 12));
-    const expected = [...linear(pigment.warm), pigment.dab, ...linear(pigment.cool), 1,
-      ...material.emissive.clone().multiplyScalar(2).toArray(), 1];
+    const expected = [...linear(pigment.warm), pigment.dab, ...linear(pigment.cool), name === 'HK_Water' ? 1 : 0,
+      ...material.emissive.clone().multiplyScalar(2).toArray(), pigment.surface];
     expected.forEach((v, i) => assert.ok(Math.abs(v - actual[i]) < 1e-7, `${name}: palette component ${i}`));
     assert.equal(palette.row(material), row, 'reused source material keeps its row');
   }
@@ -286,6 +437,10 @@ test('the shadow map holds only still things: redrawn on re-centring and changes
   shadow.needsUpdate = false; // A render has consumed the invalidation.
   for (let i = 0; i < 100; i++) light.follow(position);
   assert.equal(shadow.needsUpdate, false, 'standing still (cars passing or not) reuses the shadow map');
+  const skyRotation = scene.backgroundRotation.y;
+  for (let i = 0; i < 60; i++) light.animate(1 / 60);
+  assert.ok(scene.backgroundRotation.y > skyRotation, 'clouds drift using the baked cube texture');
+  assert.equal(shadow.needsUpdate, false, 'water/cloud animation does not redraw sun shadows');
   light.follow(new THREE.Vector3(1, 0, 0));
   assert.equal(shadow.needsUpdate, false, 'small steps keep the cached map (no re-centring every step)');
   light.follow(new THREE.Vector3(5, 0, 0));

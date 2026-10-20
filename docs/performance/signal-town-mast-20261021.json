@@ -1,0 +1,188 @@
+{
+  "date": "2026-10-21",
+  "purpose": "Coordinate-picked town-east mast correction at x=38.70, z=19.29.",
+  "method": "Same headless Chrome page at benchmark=1; baseline source routes and final runtime source, fixed camera, 2-second warmup and 8-second samples. No model or renderer changes.",
+  "baseline": "Short pedestrian-only town-east post; separate Kyobashi name-board lamp already corrected.",
+  "after": "6.2 m square mast, west-reaching 4.5 m arm to a north-facing vehicle head at 5.35 m, upper phase plate, existing south-crossing walk head.",
+  "sources": {
+    "signal-layout.js": {
+      "before": "5a2dadc84d4a25b447f0554110dd3628330ff36c6bc1175aadfbeafb3ce9af79",
+      "after": "21420a3109d86ab955b4dc520c243dbceaa2469adc6cf3be30482e7793f607c5"
+    },
+    "signals.js": {
+      "before": "40ff970b33cb1e615ab9f50cf9c95f6c690f5e978fce0ab6ede927bb19d6a2f2",
+      "after": "d6a31cbbc8e77b60e18f58cf5ba749ca27c908ebca647b9e5fce2ef484d108e3"
+    },
+    "prop-review.js": {
+      "before": "82c9a5927b614222bd79cb6c626a0b43c0895dd2c7b24a924ef805b162913c71",
+      "after": "f43be5356c991b6303bb120c8ae1a56263364b99257d02cc07d86d0bea2d66a9"
+    }
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": true,
+  "cameras": {
+    "photo": [
+      40.5,
+      1.65,
+      28.5,
+      34.3,
+      3.3,
+      10,
+      64
+    ],
+    "junction": [
+      56,
+      7,
+      44,
+      32,
+      3,
+      20,
+      58
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 60.003750234389656,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 16.799999997019768,
+        "updateMs": 0.06895833304151892,
+        "calls": 62,
+        "triangles": 684398,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 187,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 6244.5,
+        "resourceTransferBytes": 75263310,
+        "resourceBodyBytes": 75219810,
+        "heapBytes": 191242139,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "before",
+      "view": "junction",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99925000930782,
+        "medianMs": 16.600000008940697,
+        "p95Ms": 17.5,
+        "updateMs": 0.06020833309739828,
+        "calls": 88,
+        "triangles": 676630,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 191,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 6244.5,
+        "resourceTransferBytes": 75263310,
+        "resourceBodyBytes": 75219810,
+        "heapBytes": 184053217,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "after",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70621006,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.009481747591174,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.06424116400571969,
+        "calls": 62,
+        "triangles": 687196,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 187,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 3226,
+        "resourceTransferBytes": 75263437,
+        "resourceBodyBytes": 75219937,
+        "heapBytes": 127682102,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "after",
+      "view": "junction",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70621006,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 60.002250084355815,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.05229166646798452,
+        "calls": 88,
+        "triangles": 679428,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 191,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 3226,
+        "resourceTransferBytes": 75263437,
+        "resourceBodyBytes": 75219937,
+        "heapBytes": 128726720,
+        "multiDraw": true
+      }
+    }
+  ],
+  "errors": [],
+  "finalViews": [
+    {
+      "view": "signals-town"
+    },
+    {
+      "view": "signals-town-back"
+    },
+    {
+      "view": "photo-direction",
+      "camera": [
+        34,
+        1.65,
+        29,
+        34,
+        3.7,
+        10,
+        64
+      ]
+    }
+  ],
+  "finalErrors": [],
+  "validation": {
+    "focusedTests": 56,
+    "failures": 0,
+    "skipped": 0,
+    "regressionFailsAgainstBaseline": true,
+    "collisionByteIdentical": true,
+    "blockedCells": 338379
+  },
+  "limits": "Refresh-capped samples do not establish an uncapped speed change. No physical phone or VR headset tested."
+}

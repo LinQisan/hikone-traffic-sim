@@ -1,0 +1,322 @@
+{
+  "date": "2026-10-18",
+  "viewport": [
+    1280,
+    720
+  ],
+  "baseline": "working tree before species-based vegetation and terrain changes",
+  "results": [
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.00600060014943,
+        "medianMs": 16.600000023841858,
+        "p95Ms": 17.5,
+        "updateMs": 0.06062500060846408,
+        "calls": 93,
+        "triangles": 428350,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 2784.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 72385883,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.00525045954932,
+        "medianMs": 16.600000023841858,
+        "p95Ms": 17.5,
+        "updateMs": 0.04208333361893892,
+        "calls": 66,
+        "triangles": 227203,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 2784.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 76285283,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "compound",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 481,
+        "fps": 59.998253689260245,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.400000005960464,
+        "updateMs": 0.036382537188004556,
+        "calls": 10,
+        "triangles": 117321,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 2784.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 65000104,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "bank",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 479,
+        "fps": 59.87724539656854,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17,
+        "updateMs": 0.03820459348672616,
+        "calls": 25,
+        "triangles": 109802,
+        "width": 1280,
+        "height": 720,
+        "geometries": 122,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 2784.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 64912967,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 59.99925000919607,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 16.899999976158142,
+        "updateMs": 0.049999999503294625,
+        "calls": 93,
+        "triangles": 506349,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 1568.4000000059605,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 82179665,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.00525045954932,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.400000005960464,
+        "updateMs": 0.045833334264655905,
+        "calls": 66,
+        "triangles": 319352,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 1568.4000000059605,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 85379847,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "compound",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.0045003374806,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.399999976158142,
+        "updateMs": 0.04145833284904559,
+        "calls": 10,
+        "triangles": 274288,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 1568.4000000059605,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 77749890,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "bank",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.00600059992587,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.5,
+        "updateMs": 0.04416666633139054,
+        "calls": 25,
+        "triangles": 216995,
+        "width": 1280,
+        "height": 720,
+        "geometries": 122,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 1568.4000000059605,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 78750038,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    }
+  ],
+  "errors": [],
+  "change": "Species-informed branching vegetation, continuous wooded slopes, explicit Roka dry cut",
+  "measurement": "Same headless Chrome page, fixed 1280x720, high quality, dynamic resolution off; source/data request interception serves the pre-change working tree for before samples. Two-second warmup and eight-second samples. No concurrent tests or screenshots during timing.",
+  "validation": {
+    "command": "npm test",
+    "tests": 149,
+    "passed": 149,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 12255.082074,
+    "pythonCompile": true,
+    "diffCheck": true,
+    "collision": {
+      "objects": 433,
+      "cellMeters": 0.2,
+      "width": 2100,
+      "height": 1600,
+      "blockedCells": 161194,
+      "changes": {
+        "added": 1848,
+        "removed": 2138,
+        "min": [
+          -172.3,
+          -138.9
+        ],
+        "max": [
+          173.10000000000002,
+          133.3
+        ]
+      }
+    },
+    "browser": {
+      "checks": [
+        {
+          "id": "builtin-01",
+          "distance": 1.484160000014279,
+          "look": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "distance": 0.47641540401778354,
+          "look": true,
+          "menu": true
+        },
+        {
+          "editor": true
+        }
+      ],
+      "errors": []
+    },
+    "inspectionViews": [
+      "street",
+      "bank",
+      "compound",
+      "panorama",
+      "tenbin",
+      "west",
+      "museum",
+      "shore",
+      "underpass",
+      "ridge",
+      "entry"
+    ],
+    "inspectionErrors": [],
+    "hardwareNotTested": [
+      "real phone",
+      "VR headset"
+    ]
+  },
+  "geometry": {
+    "placedHighTriangles": 1982697,
+    "placedLowTriangles": 562176,
+    "placedLodRatio": 0.2835410554411491,
+    "hillHighTriangles": 180119,
+    "hillLowTriangles": 87961,
+    "buffersBefore": 26921948,
+    "buffersAfter": 39973740
+  },
+  "limits": "A frame-capped desktop sample does not establish a speed improvement or phone performance. Visible triangles, download and geometry storage increased. Tree species, positions and terrain remain approximate visual reconstruction."
+}

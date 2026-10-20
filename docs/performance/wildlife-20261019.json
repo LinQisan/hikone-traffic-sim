@@ -1,0 +1,596 @@
+{
+  "date": "2026-10-19",
+  "change": "Eight flying crows, twelve swimming mallards and four swans, with staggered expanding wakes. Four instanced meshes; flat transparent wakes use one pass.",
+  "baseline": "Saved already-dirty app.js at beginning of this task. All other source and generated models are identical in both stages; no Git HEAD reset.",
+  "buffers": {
+    "geometryBytesAdded": 368948,
+    "instanceMatrixBytesAdded": 4608,
+    "approximateGeometryIncreasePercent": 0.49421843013809214
+  },
+  "validation": {
+    "command": "node --test test/wildlife.test.mjs test/ambient-motion.test.mjs test/art.test.mjs test/obstacles.test.mjs test/performance.test.mjs",
+    "tests": 50,
+    "pass": 50,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 2839.702953,
+    "collisionRegenerated": true,
+    "collisionByteIdentical": true,
+    "blockedCells": 340050,
+    "browser": {
+      "animation": true,
+      "liveReducedMotionFreeze": true,
+      "pixelIdenticalWhenFrozen": true,
+      "resumeWithoutJump": true,
+      "flows": [
+        {
+          "id": "builtin-01",
+          "start": {
+            "x": 40,
+            "z": 14,
+            "yaw": 13.435523362319215,
+            "state": "playing"
+          },
+          "moved": {
+            "x": 40.173419076985645,
+            "z": 14.814298457163545,
+            "yaw": 12.02252336238627,
+            "state": "playing"
+          },
+          "exit": "title"
+        },
+        {
+          "id": "builtin-07",
+          "start": {
+            "x": -68.54,
+            "z": 22.77,
+            "yaw": 270.99461847364057,
+            "state": "playing"
+          },
+          "moved": {
+            "x": -68.69455660944178,
+            "z": 22.772683274469486,
+            "yaw": 270.99461847364057,
+            "state": "playing"
+          },
+          "exit": "title"
+        }
+      ],
+      "errors": []
+    }
+  },
+  "rendering": {
+    "date": "2026-10-19",
+    "viewport": [
+      1280,
+      720
+    ],
+    "motion": "no-preference; actual animation active",
+    "method": "Same page; saved beginning-of-task app.js before, current app.js after; context disposed between stages; three-second initial settle; two-second warmup and eight-second sample per view; cache disabled.",
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "water": [
+        -36,
+        1,
+        49,
+        -39,
+        -1.1,
+        52,
+        43
+      ],
+      "sky": [
+        -29,
+        15,
+        37,
+        -18,
+        25,
+        60,
+        65
+      ],
+      "campus": [
+        -656,
+        1.3,
+        286,
+        -667,
+        -0.5,
+        301,
+        55
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.001500037495354,
+          "medianMs": 16.600000001490116,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.07624999997206032,
+          "calls": 102,
+          "triangles": 1038683,
+          "width": 1280,
+          "height": 720,
+          "geometries": 193,
+          "textures": 9,
+          "programs": 18,
+          "readyMs": 3502.7000000011176,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 163268532,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "water",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.000750009372325,
+          "medianMs": 16.59999999962747,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.06395833330849807,
+          "calls": 9,
+          "triangles": 106477,
+          "width": 1280,
+          "height": 720,
+          "geometries": 196,
+          "textures": 9,
+          "programs": 19,
+          "readyMs": 3502.7000000011176,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 146775093,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "sky",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.99550033747748,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.600000001490116,
+          "updateMs": 0.056458333336437745,
+          "calls": 33,
+          "triangles": 650092,
+          "width": 1280,
+          "height": 720,
+          "geometries": 198,
+          "textures": 9,
+          "programs": 19,
+          "readyMs": 3502.7000000011176,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 134254348,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.003000150010294,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.0674999999658515,
+          "calls": 35,
+          "triangles": 130397,
+          "width": 1280,
+          "height": 720,
+          "geometries": 208,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 3502.7000000011176,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 134447984,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.002250084383746,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.13791666666123395,
+          "calls": 106,
+          "triangles": 1070955,
+          "width": 1280,
+          "height": 720,
+          "geometries": 197,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 2346.5,
+          "resourceTransferBytes": 83026247,
+          "resourceBodyBytes": 82982747,
+          "heapBytes": 145229328,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "water",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.003000150010294,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.600000001490116,
+          "updateMs": 0.11999999999146288,
+          "calls": 13,
+          "triangles": 138749,
+          "width": 1280,
+          "height": 720,
+          "geometries": 200,
+          "textures": 9,
+          "programs": 21,
+          "readyMs": 2346.5,
+          "resourceTransferBytes": 83026247,
+          "resourceBodyBytes": 82982747,
+          "heapBytes": 154876881,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "sky",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 481,
+          "fps": 60.00199590838502,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.59999999962747,
+          "updateMs": 0.10852390858819108,
+          "calls": 37,
+          "triangles": 682364,
+          "width": 1280,
+          "height": 720,
+          "geometries": 202,
+          "textures": 9,
+          "programs": 21,
+          "readyMs": 2346.5,
+          "resourceTransferBytes": 83026247,
+          "resourceBodyBytes": 82982747,
+          "heapBytes": 135926787,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 481,
+          "fps": 60.00424146405638,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.09812889810798693,
+          "calls": 39,
+          "triangles": 162669,
+          "width": 1280,
+          "height": 720,
+          "geometries": 212,
+          "textures": 9,
+          "programs": 22,
+          "readyMs": 2346.5,
+          "resourceTransferBytes": 83026247,
+          "resourceBodyBytes": 82982747,
+          "heapBytes": 135573097,
+          "multiDraw": true
+        }
+      }
+    ],
+    "errors": []
+  },
+  "initialDoublePassDiagnostic": {
+    "date": "2026-10-19",
+    "viewport": [
+      1280,
+      720
+    ],
+    "motion": "no-preference; actual animation active",
+    "method": "Same page; saved beginning-of-task app.js before, current app.js after; context disposed between stages; three-second initial settle; two-second warmup and eight-second sample per view; cache disabled.",
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "water": [
+        -36,
+        1,
+        49,
+        -39,
+        -1.1,
+        52,
+        43
+      ],
+      "sky": [
+        -29,
+        15,
+        37,
+        -18,
+        25,
+        60,
+        65
+      ],
+      "campus": [
+        -656,
+        1.3,
+        286,
+        -667,
+        -0.5,
+        301,
+        55
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.001500037495354,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.08062500005277494,
+          "calls": 102,
+          "triangles": 1038683,
+          "width": 1280,
+          "height": 720,
+          "geometries": 193,
+          "textures": 9,
+          "programs": 18,
+          "readyMs": 2781.9000000003725,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 247994327,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "water",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.003000150010294,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.054583333285215,
+          "calls": 9,
+          "triangles": 106477,
+          "width": 1280,
+          "height": 720,
+          "geometries": 196,
+          "textures": 9,
+          "programs": 19,
+          "readyMs": 2781.9000000003725,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 135956238,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "sky",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 481,
+          "fps": 60.00424146405638,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.5,
+          "updateMs": 0.053430353370717804,
+          "calls": 33,
+          "triangles": 650092,
+          "width": 1280,
+          "height": 720,
+          "geometries": 198,
+          "textures": 9,
+          "programs": 19,
+          "readyMs": 2781.9000000003725,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 134359008,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.998500037490686,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.59999999962747,
+          "updateMs": 0.059375000015522046,
+          "calls": 35,
+          "triangles": 130397,
+          "width": 1280,
+          "height": 720,
+          "geometries": 208,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 2781.9000000003725,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 134614394,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.99999999999999,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.16458333340706305,
+          "calls": 107,
+          "triangles": 1078635,
+          "width": 1280,
+          "height": 720,
+          "geometries": 197,
+          "textures": 9,
+          "programs": 21,
+          "readyMs": 2784.5,
+          "resourceTransferBytes": 83026224,
+          "resourceBodyBytes": 82982724,
+          "heapBytes": 224994263,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "water",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.003000150010294,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.13729166669072584,
+          "calls": 14,
+          "triangles": 146429,
+          "width": 1280,
+          "height": 720,
+          "geometries": 200,
+          "textures": 9,
+          "programs": 22,
+          "readyMs": 2784.5,
+          "resourceTransferBytes": 83026224,
+          "resourceBodyBytes": 82982724,
+          "heapBytes": 205086129,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "sky",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.01050183782442,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.699999999254942,
+          "updateMs": 0.1277083333853322,
+          "calls": 38,
+          "triangles": 690044,
+          "width": 1280,
+          "height": 720,
+          "geometries": 202,
+          "textures": 9,
+          "programs": 22,
+          "readyMs": 2784.5,
+          "resourceTransferBytes": 83026224,
+          "resourceBodyBytes": 82982724,
+          "heapBytes": 135296124,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 75021769,
+          "sceneBufferBytes": 76993293,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.997750084366245,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.600000001490116,
+          "updateMs": 0.1410416666457119,
+          "calls": 40,
+          "triangles": 170349,
+          "width": 1280,
+          "height": 720,
+          "geometries": 212,
+          "textures": 9,
+          "programs": 23,
+          "readyMs": 2784.5,
+          "resourceTransferBytes": 83026224,
+          "resourceBodyBytes": 82982724,
+          "heapBytes": 135520634,
+          "multiDraw": true
+        }
+      }
+    ],
+    "errors": []
+  },
+  "limits": "Frame-capped desktop samples establish no speed improvement or phone/VR result. GPU/peak VRAM and loading/retained-heap costs were not measured. Cache-disabled fixture routing and startup order prevent a loading-time comparison. Current host CPU speed and scheduler limits are both 100; no recorded thermal/performance warning. The initial diagnostic rendered the flat transparent ring twice, adding five calls; the final uses four.",
+  "realPhoneOrVRTested": false
+}

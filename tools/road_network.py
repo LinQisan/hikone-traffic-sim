@@ -7,11 +7,14 @@ ground triangles and the editor plan are generated from these same polygons.
 import json
 import math
 import os
+import sys
 import struct
 import subprocess
 import zlib
 import random
 from collections import defaultdict
+if __name__ == '__main__':
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from castle_approach import data as approach_data, hill_height, hill_surface
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -99,7 +102,16 @@ def masonry(b, a, c, low, high, seed, inset=(0.0, 0.0)):
 
 
 def walk_height(x, z):
-    # Flush coloured shoulders on the bridge; short end transitions meet town pavements.
+    # The photographed footways are level with the road behind a separate raised kerb.
+    # Preserve the castle approach's authored terrain and blend the north bridge landing.
+    if z <= 74:
+        return 0.01
+    if 25 <= x <= 39 and z < 75.4:
+        return 0.01 + 0.15 * (z - 74) / 1.4
+    return hill_height(x, z) + 0.01
+
+
+def curb_height(x, z):
     if 25 <= x <= 39 and 39.6 <= z <= 74:
         return 0.01 + 0.15 * max(0, 1 - (z - 39.6) / 1.4, 1 - (74 - z) / 1.4)
     return hill_height(x, z) + 0.01
@@ -287,7 +299,7 @@ def edge_uses(polys):
     return edges
 
 
-def curb_bands(roads, width=0.12):
+def curb_bands(roads, width=0.24):
     """Mitered bands outside the actual union contour, including intersection fillets."""
     remaining = {uses[0][1]: uses[0][2] for uses in edge_uses(roads).values() if len(uses) == 1}
     bands = []
@@ -311,7 +323,9 @@ def curb_bands(roads, width=0.12):
             before, after = math.dist(a, p), math.dist(p, c)
             n1 = ((p[1] - a[1]) / before, -(p[0] - a[0]) / before)
             n2 = ((c[1] - p[1]) / after, -(c[0] - p[0]) / after)
-            k = width / (1 + n1[0] * n2[0] + n1[1] * n2[1])
+            # Keep the established narrow cap on the terrain-following castle approach.
+            local_width = width if p[1] < 74 else 0.12
+            k = local_width / (1 + n1[0] * n2[0] + n1[1] * n2[1])
             outer.append((p[0] + (n1[0] + n2[0]) * k, p[1] + (n1[1] + n2[1]) * k))
         for i, a in enumerate(simple):
             j = (i + 1) % len(simple)
@@ -335,11 +349,11 @@ def height_pieces(poly):
         triangles = [ccw([(x, z) for x, y, z in t]) for t, cap in hill_surface()[1]]
         nearby = [t for t in triangles if overlap(bounds(poly), bounds(t))]
         return [cut for t in nearby if (cut := intersection(poly, t))] + difference([poly], nearby)
-    if not overlap(bounds(poly), (25, 39.6, 39, 74)):
+    if not overlap(bounds(poly), (25, 39.6, 39, 75.4)):
         return [poly]
     pieces = [poly]
     for a, b in [((25, 0), (25, 1)), ((39, 0), (39, 1)),
-                 *[((0, z), (1, z)) for z in (39.6, 41, 72.6, 74)]]:
+                 *[((0, z), (1, z)) for z in (39.6, 41, 72.6, 74, 75.4)]]:
         pieces = [p for q in pieces for p in (clip(q, a, b, True), clip(q, a, b, False)) if p]
     return pieces
 
@@ -441,10 +455,15 @@ def surfaces():
     roads, walks = polygons()
     noded = node_polygons(roads + walks)
     roads, walks = [p for p in noded[:len(roads)] if p], [p for p in noded[len(roads):] if p]
-    bands = [(p, bounds(p)) for p in curb_bands(roads)]
+    # Crossing openings keep the kerb out of the pedestrian line, including both returns.
+    openings = [ccw([(x - 1.5, 18), (x + 1.5, 18), (x + 1.5, 34), (x - 1.5, 34)])
+                for x in WALK_CROSSINGS]
+    openings += [ccw([(24, z - 0.2), (40, z - 0.2), (40, z + 2.8), (24, z + 2.8)])
+                 for z in (16.4, 33.1)]
+    bands = [(p, bounds(p)) for p in difference(curb_bands(roads), openings)]
     pavement, curbs = [], []
     for p in walks:
-        if max(walk_height(*v) for v in p) <= 0.01 + 1e-7:
+        if max(curb_height(*v) for v in p) <= 0.01 + 1e-7:
             pavement.append(p)  # Flush bridge margins have no raised curb to model.
             continue
         nearby = [q for q, box in bands if overlap(bounds(p), box)]
@@ -455,7 +474,7 @@ def surfaces():
                 curbs.extend(height_pieces(cut))
     entries = [('road', p, 0.01, 'HK_Asphalt') for p in roads]
     entries += [('walk', p, walk_height, 'HK_Sidewalk') for p in pavement]
-    entries += [('curb', p, walk_height, 'HK_Curb') for p in curbs]
+    entries += [('curb', p, curb_height, 'HK_Curb') for p in curbs]
     entries += [('town', p, 0.15, 'HK_Sidewalk') for p in town_land()]
     entries += [('bank', p, north_bank_height, 'HK_Grass') for p in north_land()]
     for patch in approach_data()['patches']:
@@ -488,7 +507,7 @@ def surface_steps():
             return
         if da + db < 0:
             a, b, ha, hb, la, lb, first, second = b, a, lb, la, hb, ha, second, first
-        material = 'HK_Curb' if second == 'road' and first in ('walk', 'curb') else 'HK_Sidewalk'
+        material = 'HK_Curb' if first == 'curb' or second == 'curb' else 'HK_Sidewalk'
         destination = 'roads'
         if first == 'bank':
             destination, material = 'banks', 'HK_Stone'
@@ -634,11 +653,28 @@ def town_land():
 
 
 def land_mesh(b):
+    from university import land_cutters, cut
+    from shop_corner import APRON_FINISHES
     for kind, p, height, material in surfaces():
         if kind in ('town', 'bank'):
             p = approach_part(p, False)
             if p:
-                face(b, p, height, material)
+                for q in cut([p], land_cutters()):
+                    remaining = [q]
+                    if kind == 'town':
+                        # Replace existing plot faces, retaining their authoritative elevation.
+                        for finish, polygon in APRON_FINISHES:
+                            rest = []
+                            for piece in remaining:
+                                inside = intersection(piece, polygon) if overlap(bounds(piece), bounds(polygon)) else []
+                                if inside:
+                                    face(b, inside, height, finish, False)
+                                    rest.extend(difference([piece], [polygon]))
+                                else:
+                                    rest.append(piece)
+                            remaining = rest
+                    for piece in remaining:
+                        face(b, piece, height, material)
 
 
 def north_land():
@@ -647,7 +683,7 @@ def north_land():
     patches = [t for patch in approach_data()['patches']
                for t in triangulate(ccw([tuple(p) for p in patch['footprint']]))]
     # The hill supplies its own surface: do not retain a second unseen ground sheet below it.
-    hill = triangulate(ccw([(x, z) for x, y, z in hill_surface()[0][-1]]))
+    hill = triangulate(ccw(approach_data()['innerBank'] + approach_data()['northBank']))
     for x in range(-380, 220, 8):
         for lo, hi in zip((4, 12, 20, 32, 50, 75, 110, 130, 180, 240, 300),
                           (12, 20, 32, 50, 75, 110, 130, 180, 240, 300, 370)):
@@ -798,10 +834,12 @@ def approach_side(points, far):
 def distant_approach_mesh(b):
     # No raised brush geometry outside the practice rectangle. The small composite retains
     # vertex pigments and the same exact surface silhouettes, with one draw per selected LOD.
+    from university import land_cutters, cut
     for kind, p, height, material in surfaces():
         p = approach_part(p, True)
         if p:
-            face(b, p, height, material, False)
+            for q in cut([p], land_cutters()):
+                face(b, q, height, material, False)
     for destination, points, material in surface_steps():
         points = approach_side(points, True)
         if points:
@@ -836,12 +874,15 @@ def export_plan(markings=()):
     roads = [p for kind, p, height, material in surfaces() if kind == 'road']
     walks = [p for kind, p, height, material in surfaces() if kind in ('walk', 'curb')]
     groups = {'Kyobashi carriageway': [t for p in roads for t in triangles(p, 0.01)],
-              'Kyobashi pavement': [t for p in walks for t in triangles(p, walk_height)],
+              'Kyobashi pavement': [t for kind, p, height, material in surfaces()
+                                   if kind in ('walk', 'curb') for t in triangles(p, height)],
               # Flat distant bank is the ordinary 0.15 m fallback, outside the editor/play
               # rectangle. Keep its render mesh but do not index thousands of unused ground
               # triangles at startup. The rising path keeps its own exact walk triangles.
               'Kyobashi raised bank': [t for kind, p, height, material in surfaces() if kind == 'bank'
                                       if (q := approach_part(p, False)) for t in triangles(q, height)]}
+    from castle_paths import ground_triangles, segments, quad
+    groups.update({'Hikone castle path ' + name: triangles for name, triangles in ground_triangles().items()})
     with open(os.path.join(ROOT, 'data', 'road_tiles.json'), 'w') as f:
         json.dump(groups, f, separators=(',', ':'))
     path = os.path.join(ROOT, 'data', 'map.json')
@@ -855,13 +896,19 @@ def export_plan(markings=()):
         polygon = [(x, moat_edge(x)) for x in xs] + [(x, north_shore(x)) for x in reversed(xs)]
         water_walls.append(dict(name='Moat water ' + label, polygon=[round(v, 5) for p in polygon for v in p]))
     # The bridge deck is free ground; its pedestrian corridor is removed from the water walls.
-    for i, p in enumerate(difference(triangulate(inner_moat()), strip(approach_data()['path'], -2.4, 2.4))):
+    bridge_cuts = strip(approach_data()['path'], -2.4, 2.4)
+    bridge_cuts += [ccw([(x, z) for x, y, z in quad(segment)]) for segment in segments()
+                    if segment['route']['id'] == 'omote-bridge'
+                    or (segment['route']['id'] == 'otemon-ascent' and segment['index'] == 0)]
+    for i, p in enumerate(difference(triangulate(inner_moat()), bridge_cuts)):
         water_walls.append(dict(name='Inner moat ' + str(i), polygon=[round(v, 5) for point in p for v in point]))
     meta.update(world=WORLD, imageWidth=(WORLD['xMax'] - WORLD['xMin']) * ppm,
                 imageHeight=(WORLD['zMax'] - WORLD['zMin']) * ppm, pixelsPerMeter=ppm,
                 exportedFrom='tools/road_network.py; Google Maps overhead visual reconstruction',
-                surfaces=[dict(kind=k, triangles=[v for t in ts for i, v in enumerate(t) if i % 3 != 1])
-                          for k, ts in zip(('carriageway', 'sidewalk', 'ground'), groups.values())],
+                surfaces=[dict(kind=('carriageway' if name == 'Kyobashi carriageway' else
+                                     'ground' if name == 'Kyobashi raised bank' else 'sidewalk'),
+                               triangles=[v for t in ts for i, v in enumerate(t) if i % 3 != 1])
+                          for name, ts in groups.items()],
                 walls=water_walls, lanes=[], signals=signals)
     with open(path, 'w') as f:
         json.dump(meta, f, separators=(',', ':'))
@@ -878,80 +925,41 @@ def finish_exports():
         export_image(*_pending_image)
 
 
+def refresh_image():
+    """Refresh the complete model-derived editor images and their registration."""
+    export_image(None, None, None, None)
+
+
+def export_castle_paths():
+    """A castle-only rebuild refreshes its own ground without re-importing road geometry."""
+    from castle_paths import ground_triangles
+    path = os.path.join(ROOT, 'data', 'road_tiles.json')
+    with open(path) as f:
+        existing = json.load(f)
+    groups = {k: v for k, v in existing.items() if not k.startswith('Hikone castle path ')}
+    castle = ground_triangles()
+    groups.update({'Hikone castle path ' + k: v for k, v in castle.items()})
+    with open(path, 'w') as f:
+        json.dump(groups, f, separators=(',', ':'))
+    path = os.path.join(ROOT, 'data', 'map.json')
+    with open(path) as f:
+        meta = json.load(f)
+    # Rebuild from named ground groups. Campus groups can follow castle groups;
+    # positional slicing silently dropped the campus after a castle-only rebuild.
+    meta['surfaces'] = [dict(kind=('carriageway' if k in ('Kyobashi carriageway','Shiga University streets')
+                                  else 'ground' if k.endswith('grounds') or k=='Kyobashi raised bank'
+                                  else 'sidewalk'),
+                             triangles=[v for t in ts for i,v in enumerate(t) if i%3!=1])
+                        for k,ts in groups.items()]
+    with open(path, 'w') as f:
+        json.dump(meta, f, separators=(',', ':'))
+
+
 def export_image(meta, roads, walks, markings):
-    """A dependency-free plan image; editor overlays supply editable route lines."""
-    w, h, ppm = meta['imageWidth'], meta['imageHeight'], meta['pixelsPerMeter']
-    rows = [bytearray(bytes((168, 177, 127)) * w) for _ in range(h)]
-    def raster(poly, color):
-        p = [((x - WORLD['xMin']) * ppm, (WORLD['zMax'] - z) * ppm) for x, z in poly]
-        for j in range(max(0, math.ceil(min(v[1] for v in p))), min(h, math.ceil(max(v[1] for v in p)))):
-            cuts = []
-            y = j + 0.5
-            for a, c in zip(p, p[1:] + p[:1]):
-                if min(a[1], c[1]) <= y < max(a[1], c[1]):
-                    cuts.append(a[0] + (c[0] - a[0]) * (y - a[1]) / (c[1] - a[1]))
-            cuts.sort()
-            for lo, hi in zip(cuts[::2], cuts[1::2]):
-                lo, hi = max(0, math.ceil(lo - 0.5)), min(w, math.ceil(hi - 0.5))
-                rows[j][lo * 3:hi * 3] = bytes(color) * max(0, hi - lo)
-    raster([(-220, -155), (200, -155), (200, moat_edge(200)),
-            *[(x, moat_edge(x)) for x in range(200, -221, -2)]], (222, 204, 164))
-    raster([*[(x, moat_edge(x)) for x in range(-220, 201, 2)],
-            *[(x, north_shore(x)) for x in range(200, -221, -2)]], (108, 153, 164))
-    raster(inner_moat(), (108, 153, 164))
-    for patch in approach_data()['patches']:
-        raster(patch['footprint'], (194, 174, 133))
-    for x in range(-220, 200, 4):
-        if 24 <= x < 40:
-            continue
-        raster([(x, north_shore(x)), (x + 4, north_shore(x + 4)),
-                (x + 4, north_shore(x + 4) + 4), (x, north_shore(x) + 4)], (158, 160, 142))
-    for p in walks:
-        raster(p, (237, 219, 179))
-    for p in roads:
-        raster(p, (132, 142, 156))
-    for p, material in markings:
-        raster(p, (250, 242, 209) if material == 'HK_WhitePaint' else (133, 171, 143))
-    # Use the browser's actual placement transformation for the plan's roof footprints.
-    script = "import fs from 'node:fs';import {webLayout} from './src/web-layout.js';console.log(JSON.stringify(webLayout(JSON.parse(fs.readFileSync('data/layout.json'))).items));"
-    items = json.loads(subprocess.check_output(['node', '--input-type=module', '-e', script], cwd=ROOT))
-    roof_bounds = {}
-    for item in items:
-        name = item['a']
-        x, y, z = item['p']
-        angle = math.radians(item['r'])
-        if item['g'] in ('Buildings', 'WebFrontage'):
-            if name not in roof_bounds:
-                # GLB stores mirrored X and ordinary Z. Read the exported silhouette, including
-                # eaves, rather than guessing every new building is a 7.2 by 9 metre house.
-                with open(os.path.join(ROOT, 'data', 'models', 'impressionist', name + '.glb'), 'rb') as f:
-                    header = f.read(20)
-                    model = json.loads(f.read(struct.unpack_from('<I', header, 12)[0]))
-                positions = [model['accessors'][p['attributes']['POSITION']]
-                             for mesh in model['meshes'] for p in mesh['primitives']]
-                roof_bounds[name] = (-max(p['max'][0] for p in positions),
-                                     -min(p['min'][0] for p in positions),
-                                     min(p['min'][2] for p in positions), max(p['max'][2] for p in positions))
-            left, right, back, front = roof_bounds[name]
-            pts = [(x + u * math.cos(angle) + v * math.sin(angle),
-                    z - u * math.sin(angle) + v * math.cos(angle))
-                   for u, v in [(u * item['s'][0], v * item['s'][2])
-                                for u, v in [(left, front), (right, front), (right, back), (left, back)]]]
-            raster(pts, (100, 111, 139))
-        elif item['g'] in ('Forest', 'WebBank', 'WebGrove', 'WebTownTrees') and ('Tree' in name or 'Grove' in name):
-            r = (6.3 if item['g'] == 'WebGrove' else 3) * item['s'][0]
-            raster([(x + r * math.cos(i * math.tau / 9), z + r * math.sin(i * math.tau / 9)) for i in range(9)], (117, 145, 103))
-        elif item['g'] == 'WebParking':
-            raster([(x - 4, z - 0.6), (x + 4, z - 0.6), (x + 4, z + 0.6), (x - 4, z + 0.6)], (117, 145, 103))
-    for building in approach_data()['buildings']:
-        raster(building['footprint'], (100, 111, 139))
-    def chunk(kind, data):
-        return struct.pack('!I', len(data)) + kind + data + struct.pack('!I', zlib.crc32(kind + data))
-    raw = b''.join(b'\0' + row for row in rows)
-    png = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('!2I5B', w, h, 8, 2, 0, 0, 0))
-    png += chunk(b'IDAT', zlib.compress(raw)) + chunk(b'IEND', b'')
-    with open(os.path.join(ROOT, 'data', 'map.png'), 'wb') as f:
-        f.write(png)
+    """Render in a clean Blender process, preserving the caller's export/library scene."""
+    import bpy
+    subprocess.run([bpy.app.binary_path, '-b', '--factory-startup', '--python',
+                    os.path.join(ROOT, 'tools', 'build_editor_map.py')], cwd=ROOT, check=True)
 
 
 def build(name, mesh_class):
@@ -980,3 +988,11 @@ def build(name, mesh_class):
             face(b, [(x, moat_edge(x)), (x2, moat_edge(x2)),
                      (x2, north_shore(x2)), (x, north_shore(x))], -1.35, 'HK_Water')
     return b
+
+
+if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Refresh the editor plan from current road and model sources.')
+    parser.add_argument('--image-only', action='store_true', required=True)
+    parser.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else None)
+    refresh_image()

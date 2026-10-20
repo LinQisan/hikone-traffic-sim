@@ -8,7 +8,7 @@ import random
 from abstract_props import face, cylinder
 from streetscape import outward_face
 
-MODELS = ('ART_HikoneKeep', 'HK_Terrain_Hikone')
+MODELS = ('ART_HikoneKeep', 'HK_Terrain_Hikone', 'ART_HikoneCompound')
 
 
 def box(b, center, size, material, transform=lambda p: p):
@@ -252,28 +252,63 @@ def hill(b):
     from castle_approach import data, hill_surface, hill_height
     site = data()['castle']
     for triangle, cap in hill_surface()[1]:
-        outward_face(b, [(x - site['x'], y, z - site['z']) for x, y, z in triangle],
-                     'ART_StoneLight' if cap else 'HK_Leaf', (0, -1, 0))
-    # A wooded skyline is supported by the hill, with an open crest under the keep and its wing.
-    # These canopy masses are a simplified reference silhouette, not surveyed individual trees.
+        points = [(x - site['x'], y, z - site['z']) for x, y, z in triangle]
+        # Terraces make the hill concave. Orient each height-field triangle upward;
+        # a single point under the summit can flip the sides of a lower courtyard.
+        below = tuple(sum(p[k] for p in points) / 3 - (1 if k == 1 else 0) for k in range(3))
+        # Slope vegetation is not a tree-leaf shell. Broad, quiet soil/ground-cover
+        # pigments and shared smooth normals remove the old giant green facets.
+        outward_face(b, points, 'ART_StoneLight' if cap else 'HK_Grass', below)
+        if not cap:
+            b.smooth[-1] = True
+            mx, my, mz = (sum(p[k] for p in triangle) / 3 for k in range(3))
+            shade = 0.5 + 0.25 * math.sin(mx / 19 + mz / 27) + 0.25 * math.sin(mz / 13 - mx / 35)
+            b.pigments[-1] = (0.38 + 0.10 * shade, 0.46 + 0.10 * shade, 0.30 + 0.07 * shade)
+    # A jittered woodland replaces radial rows of 30 m canopy balls. Each tree is supported
+    # by the shared hill surface; primary boughs remain visible between smaller leaf sprays.
+    from vegetation import tree
+    from castle_paths import segments, distance
     rng = random.Random(1606)
-    feet = hill_surface()[0][-1]
-    for row, radius in enumerate((0.40, 0.60, 0.80, 0.96)):
-        count = 15 + row * 4
-        for i in range(count):
-            a = (i + row * 0.27 + rng.uniform(-0.22, 0.22)) * math.tau / count
-            r = min(0.99, radius + rng.uniform(-0.035, 0.035))
-            foot = min(feet, key=lambda p: abs((math.atan2(p[2] - site['z'], p[0] - site['x']) - a + math.pi) % math.tau - math.pi))
-            x, z = (foot[0] - site['x']) * r, (foot[2] - site['z']) * r
-            y = hill_height(x + site['x'], z + site['z'])
-            size, height = rng.uniform(17, 22), rng.uniform(6.5, 8)
-            # Keep the observed entry path readable; crowns can overhang but not bury it.
-            if any(math.hypot(x + site['x'] - px, z + site['z'] - pz) < size + 3 for px, pz in data()['path']):
+    bank = data()['innerBank'] + data()['northBank']
+    def inside(x, z, polygon):
+        return sum((a[1] > z) != (c[1] > z) and
+                   x < a[0] + (c[0] - a[0]) * (z - a[1]) / (c[1] - a[1])
+                   for a, c in zip(polygon, polygon[1:] + polygon[:1])) % 2
+    i = 0
+    spacing = 22
+    for row in range(math.ceil((max(z for x, z in bank) - min(z for x, z in bank)) / spacing)):
+        for col in range(math.ceil((max(x for x, z in bank) - min(x for x, z in bank)) / spacing)):
+            x = min(x for x, z in bank) + col * spacing + rng.uniform(2, spacing - 2)
+            z = min(z for x, z in bank) + row * spacing + rng.uniform(2, spacing - 2)
+            size, height = rng.uniform(6.2, 8.4), rng.uniform(11.5, 17.0)
+            if not inside(x, z, bank) or any(inside(x, z, t['footprint']) for t in data()['terraces']):
                 continue
-            # Overlapping lobes read as the continuous wooded slope seen from the road. Horizontal
-            # coverage is independent of tree height, avoiding tall invented trees or regular rows.
-            b.crown((x, y + height * 0.7, z), (size, height, size * 0.93),
-                    'HK_Leaf' if i % 3 else 'HK_LeafDark', seed=1606 + row * 31 + i)
+            from castle_approach import point_segment_distance
+            if min(point_segment_distance(x, z, a, c) for a, c in zip(bank, bank[1:] + bank[:1])) < size + 2:
+                continue
+            y = hill_height(x, z)
+            # Trunks stay outside the path; high boughs can shade a lower path. A
+            # grade-separated bridge still clears every crown at its own deck height.
+            blocked = False
+            for segment in segments():
+                d, path_y = distance(segment, x, z)
+                half = segment['route']['width'] / 2
+                if d < half + 1.2 or (d < size * 1.8 + half + 1 and y + height * 0.42 < path_y + 1.9 < y + height * 1.2):
+                    blocked = True
+                    break
+            if blocked:
+                continue
+            def near_building(item):
+                a = item['yaw'] * math.pi / 180
+                dx, dz = x - item['x'], z - item['z']
+                u, v = dx * math.cos(a) - dz * math.sin(a), dx * math.sin(a) + dz * math.cos(a)
+                return math.hypot(max(0, abs(u) - item['size'][0] / 2 - 5),
+                                  max(0, abs(v) - item['size'][1] / 2 - 5)) < size * 1.8
+            if any(near_building(item) for item in data()['compound']):
+                continue
+            tree(b, 'shii' if i % 3 == 0 else 'tabu', base=(x - site['x'], y, z - site['z']),
+                 height=height, spread=size, seed=1606 + i * 37, lean=(rng.uniform(-1, 1), rng.uniform(-1, 1)), fine=False)
+            i += 1
 
 
 def build(name, mesh_class, lod=False):
@@ -281,5 +316,8 @@ def build(name, mesh_class, lod=False):
     b.abstract = True
     b.distant = lod
     if name == 'ART_HikoneKeep': keep(b)
+    elif name == 'ART_HikoneCompound':
+        from castle_compound import compound
+        compound(b)
     else: hill(b)
     return b

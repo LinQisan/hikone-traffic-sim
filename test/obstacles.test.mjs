@@ -35,12 +35,23 @@ test('the collision grid survives its run-length encoding', () => {
 test('houses, storehouses and walls of the town are solid at body height', () => {
   const layout = webLayout(read('layout.json'));
   // the grid covers the map rectangle (the play area inside the invisible walls)
-  const { xMin, xMax, zMin, zMax } = read('map.json').world;
+  const { xMin, xMax, zMin, zMax } = S.HIKONE_BOUNDS;
   const inside = ([x, , z]) => x > xMin + 5 && x < xMax - 5 && z > zMin + 5 && z < zMax - 5;
   const solid = layout.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a) && inside(i.p));
   assert.ok(solid.length > 40, `${solid.length} buildings`);
   // a building's origin is on its street front: it is solid within a step of it
   for (const item of solid) assert.ok(town.blocked(item.p[0], item.p[2], 1), `${item.a} at ${item.p[0]}, ${item.p[2]}`);
+});
+
+test('the photographed shop and boarded neighbor stay solid behind their low thresholds', () => {
+  const items = webLayout(read('layout.json')).items;
+  for (const asset of ['ART_CornerShop', 'ART_WhiteStorehouse']) {
+    const item = items.find(i => i.a === asset);
+    assert.ok(item);
+    for (const [x, z] of [[0, -2], [-2, -4], [2, -7], [0, -8]])
+      assert.ok(town.blocked(item.p[0] + x, item.p[2] + z, 0.05), `${asset}: its enclosed body remains solid`);
+    assert.ok(!town.blocked(item.p[0], item.p[2] + 1.2, BODY_RADIUS), `${asset}: the apron is outside the solid body`);
+  }
 });
 
 test('every scenario starts on free ground and its straight way to the goal is not built over', () => {

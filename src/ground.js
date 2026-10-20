@@ -1,5 +1,5 @@
 // Ground height in Unity coordinates from tools/road_network.py's road polygons:
-// carriageway 0.01, pavement 0.16, town 0.15, flush bridge margins and raised bank terrain.
+// carriageway/town footways 0.01, kerb caps 0.16, town plots 0.15; castle paths follow terrain.
 // Pure logic (node:test); terrain heights come from the authored geometry, not renderer offsets.
 const CELL = 4;
 const TOWN_Z = 39.6;
@@ -53,8 +53,7 @@ export class Ground {
 
   static fallback(x, z) {
     // The bridge also has a fallback for partially loaded/custom ground data.
-    if (z > TOWN_Z && z < 74 && x > 25 && x < 39) return Math.abs(x - 32) < 4 ? 0.01
-      : 0.01 + 0.15 * Math.max(0, 1 - (z - TOWN_Z) / 1.4, 1 - (74 - z) / 1.4);
+    if (z > TOWN_Z && z < 74 && x > 25 && x < 39) return 0.01;
     return 0.15;
   }
 }

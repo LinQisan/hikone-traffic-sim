@@ -1,0 +1,2166 @@
+{
+  "date": "2026-10-19",
+  "purpose": "Reduce render workload while moving through the expanded university and moat scene; investigate the apparent 60 FPS limit.",
+  "baseline": {
+    "description": "The already-dirty working tree saved at task start, not Git HEAD. Only runtime source files change in this task.",
+    "sourceFixture": "/tmp/hikone-performance-70n0vL/before",
+    "hashes": {
+      "environment-instances.js": {
+        "baseline": "4e913fe4ee655e8c9c897083c5f630743c30a489db32b3757ef89dd3a0c339f8",
+        "final": "ba5baece98e73bcc1e75b3cbeb3eeb5f20277f70e501a9cbcdfe1459f2dba423"
+      },
+      "world.js": {
+        "baseline": "7b84b31e97f10f6b66d0d70c0e8c9c484da51e4ddbb6304c73ede5c958144bf0",
+        "final": "54ddea978e1dc0d3279e5cee87a63b8348c747bc3187376da94b67d84ec6745b"
+      },
+      "app.js": {
+        "baseline": "924c8ea90383cdc97a34018a788a60b21cdd705d019489e1ad119caa857faaea",
+        "final": "cd69de732a94a593476501a9ca77e1962fbac9a3cc15d982897be2a890bfce4d"
+      },
+      "player.js": {
+        "baseline": "320619b1d16e18441065ae93bdfcc86b9d3b2b4da31acad9a3a4269e1d6b81b5",
+        "final": "320619b1d16e18441065ae93bdfcc86b9d3b2b4da31acad9a3a4269e1d6b81b5"
+      }
+    }
+  },
+  "implementation": {
+    "cellMetres": {
+      "hill": 128,
+      "campus": 96,
+      "westMoat": 128,
+      "castleCompound": 128
+    },
+    "grouping": "Whole low silhouette when the region is distant and more than eight low cells intersect either eye; otherwise local cells. Shared low attributes, separate indices and exact local bounds.",
+    "culling": "Transformed cell AABBs for view and shadow frustums.",
+    "shadow": "Independent static low cell casters; no whole-proxy casting or duplicate near/proxy view draws.",
+    "projection": "debugView now updates its projection for each requested FOV. The baseline receives the identical diagnostic correction in browser routing.",
+    "unchanged": [
+      "authored model geometry",
+      "body collision",
+      "navigation heights",
+      "player controller",
+      "traffic timing",
+      "moving shadow policy",
+      "render callback frequency"
+    ]
+  },
+  "methodology": [
+    "Same Chrome page, 1280 x 720, device scale 1, reduced motion, benchmark=1 disables adaptive resolution.",
+    "The delivered 96/128 m campus/moat grid uses a four-view comparison, before then after. The prior 64/96 m candidate has a six-view after/before pair and a two-view before/after repeat, retained separately.",
+    "Each view settles 2.5 seconds, then the ordinary probe excludes two seconds of warmup and samples for eight seconds.",
+    "CPU render/GPU query summaries include warmup and sampling; they are not the identical interval to the delivered-frame probe.",
+    "GPU queries are asynchronous EXT_disjoint_timer_query_webgl2; no finish/wait is used. Disjoint query results are discarded.",
+    "The prior WebGL renderer/context is disposed before navigating between revisions. No test/build process runs during measurement.",
+    "FOV and projection entries verify identical requested cameras in the final comparison and reversed repeat."
+  ],
+  "limits": [
+    "Host performance varies sharply: CPU speed limit was 55 near setup and later 22, with scheduler limit 40. No recorded thermal warning is not evidence of unthrottled GPU clocks.",
+    "Earlier six-view timings mix throttled and refresh-limited periods. Do not attribute their large FPS changes solely to source code. Even the earlier reversed repeat has worse after-change p95 frame cadence despite lower GPU medians; the delivered grid uses larger cells to reduce CPU submissions.",
+    "A different application was active on the host. Its processes were observed and left untouched; exclusive CPU/GPU ownership is not established.",
+    "Frame cadence remains browser/display controlled. No application-level 60 FPS limiter exists. No 120/144 Hz display was tested.",
+    "Resident geometry counts deduplicate shared attributes and indices; these are not total VRAM or peak memory.",
+    "Loading time, transfer counts, texture allocation order and retained-heap changes are not established by source routing and warm sequential viewpoints.",
+    "No real phone, VR headset or battery measurement."
+  ],
+  "verification": {
+    "fullRegression": {
+      "tests": 170,
+      "pass": 170,
+      "fail": 0,
+      "skipped": 0
+    },
+    "browser": {
+      "flows": [
+        {
+          "id": "builtin-01",
+          "start": {
+            "state": "playing",
+            "mode": "walking",
+            "x": 40,
+            "z": 14,
+            "yaw": 13.435523362319215
+          },
+          "turned": -13.789476637680785,
+          "moved": {
+            "x": 39.77180837302401,
+            "z": 14.929767041241922
+          },
+          "replayEnded": true,
+          "state": "results"
+        },
+        {
+          "id": "builtin-07",
+          "start": {
+            "state": "playing",
+            "mode": "bicycle",
+            "x": -68.54,
+            "z": 22.77,
+            "yaw": -89.00538152635941
+          },
+          "turned": 246.74861847369073,
+          "moved": {
+            "x": -68.74853102588852,
+            "z": 22.77362033031056
+          },
+          "replayEnded": true,
+          "state": "results"
+        }
+      ],
+      "navigation": [
+        {
+          "mode": "walking",
+          "route": "main",
+          "frames": 4153,
+          "distance": 166.11999999996203,
+          "end": [
+            -694.8924502698285,
+            211.10524085963615
+          ],
+          "ground": 0.01,
+          "controllerAverageMs": 0.04288466168890911,
+          "controllerP95Ms": 0.10000000055879354
+        },
+        {
+          "mode": "walking",
+          "route": "west",
+          "frames": 2715,
+          "distance": 108.59999999993587,
+          "end": [
+            -687.3568123501708,
+            173.2893374936064
+          ],
+          "ground": 0.009999999999999998,
+          "controllerAverageMs": 0.04272559852601744,
+          "controllerP95Ms": 0.10000000055879354
+        },
+        {
+          "mode": "bicycle",
+          "route": "main",
+          "frames": 4181,
+          "distance": 166.10791666665386,
+          "end": [
+            -694.8993837287884,
+            211.10406118841044
+          ],
+          "ground": 0.01,
+          "controllerAverageMs": 0.05364745276378897,
+          "controllerP95Ms": 0.10000000055879354
+        },
+        {
+          "mode": "bicycle",
+          "route": "west",
+          "frames": 2743,
+          "distance": 108.58791666667615,
+          "end": [
+            -687.3574131802465,
+            173.2894575929012
+          ],
+          "ground": 0.01,
+          "controllerAverageMs": 0.05515858548993161,
+          "controllerP95Ms": 0.10000000055879354
+        }
+      ],
+      "errors": []
+    },
+    "controllerTimings": "Synthetic fixed-step route traversals overlap the final regression run; controller timing fields are diagnostic only, not an isolated CPU benchmark.",
+    "artifacts": "/Users/xinyu/.codex/visualizations/2026/10/19/01a15455-0d15-7612-80bb-4566a7428375/campus-performance"
+  },
+  "summary": {
+    "geometryBytes": [
+      76551571,
+      74652821
+    ],
+    "pairs": [
+      {
+        "view": "street",
+        "triangles": [
+          1014211,
+          1003920
+        ],
+        "triangleReductionPercent": 1.014680377160182,
+        "calls": [
+          96,
+          103
+        ]
+      },
+      {
+        "view": "campus",
+        "triangles": [
+          522883,
+          87899
+        ],
+        "triangleReductionPercent": 83.18954718359556,
+        "calls": [
+          4,
+          43
+        ]
+      },
+      {
+        "view": "westGate",
+        "triangles": [
+          565533,
+          284951
+        ],
+        "triangleReductionPercent": 49.613727227235195,
+        "calls": [
+          6,
+          63
+        ]
+      },
+      {
+        "view": "school",
+        "triangles": [
+          1188046,
+          396874
+        ],
+        "triangleReductionPercent": 66.59439112626953,
+        "calls": [
+          6,
+          52
+        ]
+      }
+    ]
+  },
+  "benchmark": {
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "gate": [
+        -590.3,
+        2.1,
+        182,
+        -647,
+        5,
+        188,
+        68
+      ],
+      "campus": [
+        -700,
+        2,
+        210,
+        -735,
+        6,
+        275,
+        70
+      ],
+      "westGate": [
+        -778,
+        2.1,
+        154,
+        -778,
+        3,
+        178,
+        68
+      ],
+      "school": [
+        -528.224,
+        1.7,
+        262.826,
+        -528.996,
+        3,
+        291.662,
+        78
+      ],
+      "panorama": [
+        -720,
+        300,
+        120,
+        -490,
+        0,
+        370,
+        58
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 479,
+          "fps": 60.00025052296809,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 18.5,
+          "updateMs": 0.08204592901645598,
+          "calls": 96,
+          "triangles": 1014211,
+          "width": 1280,
+          "height": 720,
+          "geometries": 114,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 5206.800000000745,
+          "resourceTransferBytes": 83009728,
+          "resourceBodyBytes": 82966828,
+          "heapBytes": 148152915,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 600,
+          "medianMs": 1.5,
+          "p95Ms": 1.7999999998137355
+        },
+        "gpu": {
+          "samples": 599,
+          "medianMs": 5.373439,
+          "p95Ms": 6.450199
+        },
+        "fov": 62,
+        "projection": 1.664279482350518,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 478,
+          "fps": 59.859992736648024,
+          "medianMs": 16.700000000186265,
+          "p95Ms": 18.399999999441206,
+          "updateMs": 0.11778242677200788,
+          "calls": 4,
+          "triangles": 522883,
+          "width": 1280,
+          "height": 720,
+          "geometries": 114,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 5206.800000000745,
+          "resourceTransferBytes": 83009728,
+          "resourceBodyBytes": 82966828,
+          "heapBytes": 134096736,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 599,
+          "medianMs": 0.6000000005587935,
+          "p95Ms": 0.8999999994412065
+        },
+        "gpu": {
+          "samples": 599,
+          "medianMs": 3.925959,
+          "p95Ms": 3.93824
+        },
+        "fov": 70,
+        "projection": 1.4281480067421146,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "westGate",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 60.03602161297338,
+          "medianMs": 16.799999999813735,
+          "p95Ms": 24,
+          "updateMs": 0.07812500000582076,
+          "calls": 6,
+          "triangles": 565533,
+          "width": 1280,
+          "height": 720,
+          "geometries": 114,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 5206.800000000745,
+          "resourceTransferBytes": 83009728,
+          "resourceBodyBytes": 82966828,
+          "heapBytes": 134317968,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 601,
+          "medianMs": 0.7000000001862645,
+          "p95Ms": 1
+        },
+        "gpu": {
+          "samples": 601,
+          "medianMs": 3.875119,
+          "p95Ms": 4.921159
+        },
+        "fov": 68,
+        "projection": 1.4825609685127399,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "school",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 108,
+          "fps": 13.4148159189152,
+          "medianMs": 68.5,
+          "p95Ms": 83.70000000018626,
+          "updateMs": 0.08981481476479934,
+          "calls": 6,
+          "triangles": 1188046,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 5206.800000000745,
+          "resourceTransferBytes": 83009728,
+          "resourceBodyBytes": 82966828,
+          "heapBytes": 134755088,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 225,
+          "medianMs": 0.7000000001862645,
+          "p95Ms": 1
+        },
+        "gpu": {
+          "samples": 221,
+          "medianMs": 7.930689,
+          "p95Ms": 69.943619
+        },
+        "fov": 78,
+        "projection": 1.2348971565350515,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.99475045933342,
+          "medianMs": 16.700000000186265,
+          "p95Ms": 18.800000000745058,
+          "updateMs": 0.1491666666426075,
+          "calls": 103,
+          "triangles": 1003920,
+          "width": 1280,
+          "height": 720,
+          "geometries": 195,
+          "textures": 9,
+          "programs": 18,
+          "readyMs": 25545.39999999944,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 205889301,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 602,
+          "medianMs": 2.6000000005587935,
+          "p95Ms": 4.7000000001862645
+        },
+        "gpu": {
+          "samples": 601,
+          "medianMs": 8.35628,
+          "p95Ms": 8.66594
+        },
+        "fov": 62,
+        "projection": 1.664279482350518,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 445,
+          "fps": 55.49527978350476,
+          "medianMs": 16.799999999813735,
+          "p95Ms": 26.90000000037253,
+          "updateMs": 0.2734831460469057,
+          "calls": 43,
+          "triangles": 87899,
+          "width": 1280,
+          "height": 720,
+          "geometries": 201,
+          "textures": 9,
+          "programs": 18,
+          "readyMs": 25545.39999999944,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 133824480,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 567,
+          "medianMs": 1.6000000005587935,
+          "p95Ms": 11.5
+        },
+        "gpu": {
+          "samples": 565,
+          "medianMs": 2.975999,
+          "p95Ms": 4.28196
+        },
+        "fov": 70,
+        "projection": 1.4281480067421146,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "westGate",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 369,
+          "fps": 45.855028519593034,
+          "medianMs": 18.59999999962747,
+          "p95Ms": 49.30000000074506,
+          "updateMs": 0.5021680217049511,
+          "calls": 63,
+          "triangles": 284951,
+          "width": 1280,
+          "height": 720,
+          "geometries": 211,
+          "textures": 9,
+          "programs": 18,
+          "readyMs": 25545.39999999944,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 134843000,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 453,
+          "medianMs": 3.199999999254942,
+          "p95Ms": 19.200000000186265
+        },
+        "gpu": {
+          "samples": 453,
+          "medianMs": 2.925399,
+          "p95Ms": 4.35868
+        },
+        "fov": 68,
+        "projection": 1.4825609685127399,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "school",
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 414,
+          "fps": 51.70927894283373,
+          "medianMs": 16.899999999441206,
+          "p95Ms": 22.299999999813735,
+          "updateMs": 0.24661835747352545,
+          "calls": 52,
+          "triangles": 396874,
+          "width": 1280,
+          "height": 720,
+          "geometries": 220,
+          "textures": 9,
+          "programs": 19,
+          "readyMs": 25545.39999999944,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 135208894,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 493,
+          "medianMs": 2.400000000372529,
+          "p95Ms": 15.800000000745058
+        },
+        "gpu": {
+          "samples": 493,
+          "medianMs": 4.41184,
+          "p95Ms": 6.064109
+        },
+        "fov": 78,
+        "projection": 1.2348971565350515,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      }
+    ],
+    "errors": []
+  },
+  "movingBenchmark": {
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "gate": [
+        -590.3,
+        2.1,
+        182,
+        -647,
+        5,
+        188,
+        68
+      ],
+      "campus": [
+        -700,
+        2,
+        210,
+        -735,
+        6,
+        275,
+        70
+      ],
+      "westGate": [
+        -778,
+        2.1,
+        154,
+        -778,
+        3,
+        178,
+        68
+      ],
+      "school": [
+        -528.224,
+        1.7,
+        262.826,
+        -528.996,
+        3,
+        291.662,
+        78
+      ],
+      "panorama": [
+        -720,
+        300,
+        120,
+        -490,
+        0,
+        370,
+        58
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "moving",
+        "start": [
+          -611.1536355287917,
+          177.48350738016427
+        ],
+        "end": [
+          -641.1243870455168,
+          175.96277096027532
+        ],
+        "distance": 30.011519999999656,
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.99550033747748,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.5,
+          "updateMs": 0.1902083333057817,
+          "calls": 3.0229166666666667,
+          "triangles": 246464.49375,
+          "width": 1280,
+          "height": 720,
+          "geometries": 6,
+          "textures": 5,
+          "programs": 4,
+          "readyMs": 11979.800000000745,
+          "resourceTransferBytes": 83009728,
+          "resourceBodyBytes": 82966828,
+          "heapBytes": 146449232,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 600,
+          "medianMs": 0.5,
+          "p95Ms": 0.6999999992549419
+        },
+        "gpu": {
+          "samples": 599,
+          "medianMs": 2.705959,
+          "p95Ms": 3.02992
+        },
+        "fov": 70,
+        "projection": 1.4281480067421146,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "moving",
+        "start": [
+          -611.1536355287917,
+          177.48350738016427
+        ],
+        "end": [
+          -641.1706197274553,
+          175.959957672747
+        ],
+        "distance": 30.057839999999207,
+        "probe": {
+          "geometryBytes": 74652821,
+          "sceneBufferBytes": 76619737,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 60.003000150010294,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.5,
+          "updateMs": 0.2950000000263875,
+          "calls": 34.29375,
+          "triangles": 107319.47291666667,
+          "width": 1280,
+          "height": 720,
+          "geometries": 54,
+          "textures": 5,
+          "programs": 8,
+          "readyMs": 10135.100000000559,
+          "resourceTransferBytes": 83013412,
+          "resourceBodyBytes": 82970512,
+          "heapBytes": 195218234,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 601,
+          "medianMs": 1.2000000001862645,
+          "p95Ms": 1.8999999994412065
+        },
+        "gpu": {
+          "samples": 600,
+          "medianMs": 1.97152,
+          "p95Ms": 2.322999
+        },
+        "fov": 70,
+        "projection": 1.4281480067421146,
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      }
+    ],
+    "errors": []
+  },
+  "earlierFineGrid": {
+    "cellMetres": {
+      "hill": 128,
+      "campus": 64,
+      "westMoat": 96,
+      "castleCompound": 128
+    },
+    "afterBefore": {
+      "views": {
+        "street": [
+          55,
+          2.15,
+          23,
+          0,
+          2.8,
+          27,
+          62
+        ],
+        "gate": [
+          -590.3,
+          2.1,
+          182,
+          -647,
+          5,
+          188,
+          68
+        ],
+        "campus": [
+          -700,
+          2,
+          210,
+          -735,
+          6,
+          275,
+          70
+        ],
+        "westGate": [
+          -778,
+          2.1,
+          154,
+          -778,
+          3,
+          178,
+          68
+        ],
+        "school": [
+          -528.224,
+          1.7,
+          262.826,
+          -528.996,
+          3,
+          291.662,
+          78
+        ],
+        "panorama": [
+          -720,
+          300,
+          120,
+          -490,
+          0,
+          370,
+          58
+        ]
+      },
+      "results": [
+        {
+          "stage": "after",
+          "view": "street",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 479,
+            "fps": 59.994238549112175,
+            "medianMs": 16.699999999254942,
+            "p95Ms": 17.799999999813735,
+            "updateMs": 0.08016701458344754,
+            "calls": 103,
+            "triangles": 1003920,
+            "width": 1280,
+            "height": 720,
+            "geometries": 234,
+            "textures": 9,
+            "programs": 18,
+            "readyMs": 3440.899999999441,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 136028641,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 600,
+            "medianMs": 1.2999999998137355,
+            "p95Ms": 1.6000000005587935
+          },
+          "gpu": {
+            "samples": 599,
+            "medianMs": 5.348879,
+            "p95Ms": 5.538359
+          },
+          "fov": 62,
+          "projection": 1.664279482350518,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "gate",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 481,
+            "fps": 59.992267109019906,
+            "medianMs": 16.700000000186265,
+            "p95Ms": 18.300000000745058,
+            "updateMs": 0.07130977131325651,
+            "calls": 57,
+            "triangles": 118079,
+            "width": 1280,
+            "height": 720,
+            "geometries": 234,
+            "textures": 9,
+            "programs": 20,
+            "readyMs": 3440.899999999441,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 143368159,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 601,
+            "medianMs": 0.8999999994412065,
+            "p95Ms": 1.199999999254942
+          },
+          "gpu": {
+            "samples": 601,
+            "medianMs": 2.03884,
+            "p95Ms": 2.059
+          },
+          "fov": 68,
+          "projection": 1.4825609685127399,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "campus",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 480,
+            "fps": 59.997000149996694,
+            "medianMs": 16.700000000186265,
+            "p95Ms": 18.59999999962747,
+            "updateMs": 0.06645833335157174,
+            "calls": 73,
+            "triangles": 106531,
+            "width": 1280,
+            "height": 720,
+            "geometries": 245,
+            "textures": 9,
+            "programs": 20,
+            "readyMs": 3440.899999999441,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 134712013,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 601,
+            "medianMs": 0.900000000372529,
+            "p95Ms": 1.2000000001862645
+          },
+          "gpu": {
+            "samples": 601,
+            "medianMs": 2.659799,
+            "p95Ms": 2.73704
+          },
+          "fov": 70,
+          "projection": 1.4281480067421146,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "westGate",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 480,
+            "fps": 59.98350453625113,
+            "medianMs": 16.699999999254942,
+            "p95Ms": 18.59999999962747,
+            "updateMs": 0.06437500001629815,
+            "calls": 93,
+            "triangles": 262263,
+            "width": 1280,
+            "height": 720,
+            "geometries": 256,
+            "textures": 9,
+            "programs": 20,
+            "readyMs": 3440.899999999441,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 135911093,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 601,
+            "medianMs": 1.2000000001862645,
+            "p95Ms": 1.400000000372529
+          },
+          "gpu": {
+            "samples": 601,
+            "medianMs": 2.53436,
+            "p95Ms": 4.187839
+          },
+          "fov": 68,
+          "projection": 1.4825609685127399,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "school",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 481,
+            "fps": 59.99900209560063,
+            "medianMs": 16.600000000558794,
+            "p95Ms": 18.5,
+            "updateMs": 0.0646569646329555,
+            "calls": 62,
+            "triangles": 389757,
+            "width": 1280,
+            "height": 720,
+            "geometries": 266,
+            "textures": 9,
+            "programs": 20,
+            "readyMs": 3440.899999999441,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 136871827,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 601,
+            "medianMs": 1.099999999627471,
+            "p95Ms": 1.2999999998137355
+          },
+          "gpu": {
+            "samples": 601,
+            "medianMs": 3.185399,
+            "p95Ms": 3.313679
+          },
+          "fov": 78,
+          "projection": 1.2348971565350515,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "panorama",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 480,
+            "fps": 60.0075009376172,
+            "medianMs": 16.699999999254942,
+            "p95Ms": 18.5,
+            "updateMs": 0.10562500002173086,
+            "calls": 32,
+            "triangles": 726101,
+            "width": 1280,
+            "height": 720,
+            "geometries": 276,
+            "textures": 9,
+            "programs": 20,
+            "readyMs": 3440.899999999441,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 137023131,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 600,
+            "medianMs": 1.099999999627471,
+            "p95Ms": 1.2999999998137355
+          },
+          "gpu": {
+            "samples": 600,
+            "medianMs": 3.7548,
+            "p95Ms": 4.838019
+          },
+          "fov": 58,
+          "projection": 1.8040477552714236,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "street",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 477,
+            "fps": 59.622018899052264,
+            "medianMs": 16.700000000186265,
+            "p95Ms": 25,
+            "updateMs": 0.21530398326209382,
+            "calls": 96,
+            "triangles": 1014211,
+            "width": 1280,
+            "height": 720,
+            "geometries": 114,
+            "textures": 9,
+            "programs": 15,
+            "readyMs": 7639.9000000003725,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 145948283,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 599,
+            "medianMs": 2.400000000372529,
+            "p95Ms": 10.5
+          },
+          "gpu": {
+            "samples": 597,
+            "medianMs": 5.385679,
+            "p95Ms": 6.57476
+          },
+          "fov": 62,
+          "projection": 1.664279482350518,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "gate",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 288,
+            "fps": 36.013054732342155,
+            "medianMs": 18,
+            "p95Ms": 50.700000000186265,
+            "updateMs": 0.2534722222642611,
+            "calls": 3,
+            "triangles": 245096,
+            "width": 1280,
+            "height": 720,
+            "geometries": 114,
+            "textures": 9,
+            "programs": 16,
+            "readyMs": 7639.9000000003725,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 134603240,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 409,
+            "medianMs": 0.7999999998137355,
+            "p95Ms": 11.199999999254942
+          },
+          "gpu": {
+            "samples": 406,
+            "medianMs": 3.91648,
+            "p95Ms": 39.823669
+          },
+          "fov": 68,
+          "projection": 1.4825609685127399,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "campus",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 121,
+            "fps": 15.086905563451932,
+            "medianMs": 66.79999999981374,
+            "p95Ms": 67.90000000037253,
+            "updateMs": 0.13801652895794672,
+            "calls": 4,
+            "triangles": 522883,
+            "width": 1280,
+            "height": 720,
+            "geometries": 114,
+            "textures": 9,
+            "programs": 16,
+            "readyMs": 7639.9000000003725,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 135218368,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 152,
+            "medianMs": 0.7999999998137355,
+            "p95Ms": 1.2000000001862645
+          },
+          "gpu": {
+            "samples": 152,
+            "medianMs": 61.171479,
+            "p95Ms": 61.70423
+          },
+          "fov": 70,
+          "projection": 1.4281480067421146,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "westGate",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 170,
+            "fps": 21.151381682903953,
+            "medianMs": 49.799999999813735,
+            "p95Ms": 51.40000000037253,
+            "updateMs": 0.1870588235611863,
+            "calls": 6,
+            "triangles": 565533,
+            "width": 1280,
+            "height": 720,
+            "geometries": 114,
+            "textures": 9,
+            "programs": 16,
+            "readyMs": 7639.9000000003725,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 135353308,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 213,
+            "medianMs": 0.7999999998137355,
+            "p95Ms": 1.300000000745058
+          },
+          "gpu": {
+            "samples": 213,
+            "medianMs": 41.452209,
+            "p95Ms": 42.095609
+          },
+          "fov": 68,
+          "projection": 1.4825609685127399,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "school",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 108,
+            "fps": 13.38356300188423,
+            "medianMs": 69.40000000037253,
+            "p95Ms": 83.79999999981374,
+            "updateMs": 0.09999999992928847,
+            "calls": 6,
+            "triangles": 1188046,
+            "width": 1280,
+            "height": 720,
+            "geometries": 115,
+            "textures": 9,
+            "programs": 16,
+            "readyMs": 7639.9000000003725,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 135210344,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 135,
+            "medianMs": 0.7999999998137355,
+            "p95Ms": 1.1000000005587935
+          },
+          "gpu": {
+            "samples": 135,
+            "medianMs": 69.561229,
+            "p95Ms": 70.02306
+          },
+          "fov": 78,
+          "projection": 1.2348971565350515,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "panorama",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 108,
+            "fps": 13.554897334202574,
+            "medianMs": 73.3999999994412,
+            "p95Ms": 83.8999999994412,
+            "updateMs": 0.42407407405510267,
+            "calls": 38,
+            "triangles": 762188,
+            "width": 1280,
+            "height": 720,
+            "geometries": 122,
+            "textures": 9,
+            "programs": 16,
+            "readyMs": 7639.9000000003725,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 135245816,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 136,
+            "medianMs": 1.2000000001862645,
+            "p95Ms": 11.200000000186265
+          },
+          "gpu": {
+            "samples": 136,
+            "medianMs": 70.7139,
+            "p95Ms": 71.299509
+          },
+          "fov": 58,
+          "projection": 1.8040477552714236,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        }
+      ],
+      "errors": []
+    },
+    "reversedRepeat": {
+      "views": {
+        "street": [
+          55,
+          2.15,
+          23,
+          0,
+          2.8,
+          27,
+          62
+        ],
+        "gate": [
+          -590.3,
+          2.1,
+          182,
+          -647,
+          5,
+          188,
+          68
+        ],
+        "campus": [
+          -700,
+          2,
+          210,
+          -735,
+          6,
+          275,
+          70
+        ],
+        "westGate": [
+          -778,
+          2.1,
+          154,
+          -778,
+          3,
+          178,
+          68
+        ],
+        "school": [
+          -528.224,
+          1.7,
+          262.826,
+          -528.996,
+          3,
+          291.662,
+          78
+        ],
+        "panorama": [
+          -720,
+          300,
+          120,
+          -490,
+          0,
+          370,
+          58
+        ]
+      },
+      "results": [
+        {
+          "stage": "before",
+          "view": "campus",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 480,
+            "fps": 59.99700014998971,
+            "medianMs": 16.699999999254942,
+            "p95Ms": 18.399999999441206,
+            "updateMs": 0.08583333336670572,
+            "calls": 4,
+            "triangles": 522883,
+            "width": 1280,
+            "height": 720,
+            "geometries": 7,
+            "textures": 5,
+            "programs": 4,
+            "readyMs": 5942.100000000559,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 283331584,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 600,
+            "medianMs": 0.5,
+            "p95Ms": 0.6000000005587935
+          },
+          "gpu": {
+            "samples": 599,
+            "medianMs": 3.926879,
+            "p95Ms": 3.939639
+          },
+          "fov": 70,
+          "projection": 1.4281480067421146,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "before",
+          "view": "westGate",
+          "probe": {
+            "geometryBytes": 76551571,
+            "sceneBufferBytes": 78519191,
+            "placements": 440,
+            "meshes": 218,
+            "frames": 479,
+            "fps": 59.995741429624324,
+            "medianMs": 16.700000000186265,
+            "p95Ms": 18.200000000186265,
+            "updateMs": 0.0951983298219756,
+            "calls": 6,
+            "triangles": 565533,
+            "width": 1280,
+            "height": 720,
+            "geometries": 8,
+            "textures": 5,
+            "programs": 4,
+            "readyMs": 5942.100000000559,
+            "resourceTransferBytes": 83009728,
+            "resourceBodyBytes": 82966828,
+            "heapBytes": 133517674,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 600,
+            "medianMs": 0.599999999627471,
+            "p95Ms": 0.7000000001862645
+          },
+          "gpu": {
+            "samples": 600,
+            "medianMs": 3.5316,
+            "p95Ms": 3.862279
+          },
+          "fov": 68,
+          "projection": 1.4825609685127399,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "campus",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 479,
+            "fps": 59.95218844261847,
+            "medianMs": 16.700000000186265,
+            "p95Ms": 19.600000000558794,
+            "updateMs": 0.12901878914754986,
+            "calls": 73,
+            "triangles": 106531,
+            "width": 1280,
+            "height": 720,
+            "geometries": 112,
+            "textures": 5,
+            "programs": 6,
+            "readyMs": 10457.700000000186,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 146519761,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 602,
+            "medianMs": 1.7999999998137355,
+            "p95Ms": 2.7000000001862645
+          },
+          "gpu": {
+            "samples": 601,
+            "medianMs": 2.657439,
+            "p95Ms": 3.996919
+          },
+          "fov": 70,
+          "projection": 1.4281480067421146,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        },
+        {
+          "stage": "after",
+          "view": "westGate",
+          "probe": {
+            "geometryBytes": 74640696,
+            "sceneBufferBytes": 76607612,
+            "placements": 440,
+            "meshes": 483,
+            "frames": 467,
+            "fps": 58.456107849638656,
+            "medianMs": 17.199999999254942,
+            "p95Ms": 25.40000000037253,
+            "updateMs": 0.3629550321119373,
+            "calls": 93,
+            "triangles": 262263,
+            "width": 1280,
+            "height": 720,
+            "geometries": 131,
+            "textures": 5,
+            "programs": 6,
+            "readyMs": 10457.700000000186,
+            "resourceTransferBytes": 83013411,
+            "resourceBodyBytes": 82970511,
+            "heapBytes": 135516858,
+            "multiDraw": true
+          },
+          "cpuRender": {
+            "samples": 591,
+            "medianMs": 2.599999999627471,
+            "p95Ms": 12.700000000186265
+          },
+          "gpu": {
+            "samples": 590,
+            "medianMs": 2.568359,
+            "p95Ms": 4.198679
+          },
+          "fov": 68,
+          "projection": 1.4825609685127399,
+          "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+          "timer": true,
+          "focused": true,
+          "hidden": false
+        }
+      ],
+      "errors": []
+    }
+  },
+  "rejectedPrototype": {
+    "explanation": "Fine cells without distant grouping raised street draws to 217; this version was rejected. Prototype camera changes retained the first 68-degree projection because debugView did not refresh it. These samples are historical diagnostics, not final-camera A/B evidence.",
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "gate": [
+        -590.3,
+        2.1,
+        182,
+        -647,
+        5,
+        188,
+        68
+      ],
+      "campus": [
+        -700,
+        2,
+        210,
+        -735,
+        6,
+        275,
+        70
+      ],
+      "westGate": [
+        -778,
+        2.1,
+        154,
+        -778,
+        3,
+        178,
+        68
+      ],
+      "school": [
+        -528.224,
+        1.7,
+        262.826,
+        -528.996,
+        3,
+        291.662,
+        78
+      ],
+      "panorama": [
+        -720,
+        300,
+        120,
+        -490,
+        0,
+        370,
+        58
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.99925000937768,
+          "medianMs": 16.700000000186265,
+          "p95Ms": 17.40000000037253,
+          "updateMs": 0.08833333332828867,
+          "calls": 97,
+          "triangles": 1032057,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 4158.5999999996275,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 222782136,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 605,
+          "medianMs": 1.599999999627471,
+          "p95Ms": 2.400000000372529
+        },
+        "gpu": {
+          "samples": 604,
+          "medianMs": 5.38964,
+          "p95Ms": 6.58584
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "gate",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.99850003750465,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 17.59999999962747,
+          "updateMs": 0.1012500000166862,
+          "calls": 3,
+          "triangles": 245096,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 4158.5999999996275,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 208906192,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 601,
+          "medianMs": 0.599999999627471,
+          "p95Ms": 0.7000000001862645
+        },
+        "gpu": {
+          "samples": 601,
+          "medianMs": 2.618919,
+          "p95Ms": 2.629359
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 402,
+          "fps": 50.20168088214976,
+          "medianMs": 17.200000000186265,
+          "p95Ms": 43.89999999944121,
+          "updateMs": 0.14328358210020917,
+          "calls": 4,
+          "triangles": 522883,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 4158.5999999996275,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 135103970,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 522,
+          "medianMs": 0.7000000001862645,
+          "p95Ms": 1.8999999994412065
+        },
+        "gpu": {
+          "samples": 518,
+          "medianMs": 5.307479,
+          "p95Ms": 6.62971
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "westGate",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 169,
+          "fps": 21.21170283533747,
+          "medianMs": 49.700000000186265,
+          "p95Ms": 51.5,
+          "updateMs": 0.09349112422067739,
+          "calls": 6,
+          "triangles": 565533,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 4158.5999999996275,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 134722862,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 213,
+          "medianMs": 0.7999999998137355,
+          "p95Ms": 1.199999999254942
+        },
+        "gpu": {
+          "samples": 213,
+          "medianMs": 41.37366,
+          "p95Ms": 41.954979
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "school",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 112,
+          "fps": 13.940057751668798,
+          "medianMs": 68.3999999994412,
+          "p95Ms": 82,
+          "updateMs": 0.09642857141859297,
+          "calls": 6,
+          "triangles": 1188046,
+          "width": 1280,
+          "height": 720,
+          "geometries": 116,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 4158.5999999996275,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 134616902,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 140,
+          "medianMs": 0.7000000001862645,
+          "p95Ms": 1
+        },
+        "gpu": {
+          "samples": 140,
+          "medianMs": 68.257029,
+          "p95Ms": 68.66075
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "before",
+        "view": "panorama",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 107,
+          "fps": 13.29192546583851,
+          "medianMs": 81.29999999981374,
+          "p95Ms": 84.5,
+          "updateMs": 0.11214953271028037,
+          "calls": 106,
+          "triangles": 1056720,
+          "width": 1280,
+          "height": 720,
+          "geometries": 138,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 4158.5999999996275,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 135340689,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 134,
+          "medianMs": 2.2999999998137355,
+          "p95Ms": 2.8999999994412065
+        },
+        "gpu": {
+          "samples": 134,
+          "medianMs": 72.240369,
+          "p95Ms": 72.67681
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 67225241,
+          "sceneBufferBytes": 69192157,
+          "placements": 440,
+          "meshes": 479,
+          "frames": 479,
+          "fps": 59.99799589158054,
+          "medianMs": 16.699999999254942,
+          "p95Ms": 18.799999999813735,
+          "updateMs": 0.1336116909899113,
+          "calls": 217,
+          "triangles": 981202,
+          "width": 1280,
+          "height": 720,
+          "geometries": 248,
+          "textures": 9,
+          "programs": 18,
+          "readyMs": 22433.39999999944,
+          "resourceTransferBytes": 83010157,
+          "resourceBodyBytes": 82967257,
+          "heapBytes": 223624118,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 597,
+          "medianMs": 3.6000000005587935,
+          "p95Ms": 7.599999999627471
+        },
+        "gpu": {
+          "samples": 595,
+          "medianMs": 7.79719,
+          "p95Ms": 8.48586
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "gate",
+        "probe": {
+          "geometryBytes": 67225241,
+          "sceneBufferBytes": 69192157,
+          "placements": 440,
+          "meshes": 479,
+          "frames": 480,
+          "fps": 59.99775008437323,
+          "medianMs": 16.600000000558794,
+          "p95Ms": 25.100000000558794,
+          "updateMs": 0.12020833332984088,
+          "calls": 56,
+          "triangles": 87604,
+          "width": 1280,
+          "height": 720,
+          "geometries": 248,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 22433.39999999944,
+          "resourceTransferBytes": 83010157,
+          "resourceBodyBytes": 82967257,
+          "heapBytes": 126493040,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 600,
+          "medianMs": 1.400000000372529,
+          "p95Ms": 9.599999999627471
+        },
+        "gpu": {
+          "samples": 601,
+          "medianMs": 3.042919,
+          "p95Ms": 3.629
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 67225241,
+          "sceneBufferBytes": 69192157,
+          "placements": 440,
+          "meshes": 479,
+          "frames": 478,
+          "fps": 59.691055083109596,
+          "medianMs": 17.600000000558794,
+          "p95Ms": 24.899999999441206,
+          "updateMs": 0.13974895398035084,
+          "calls": 77,
+          "triangles": 111386,
+          "width": 1280,
+          "height": 720,
+          "geometries": 258,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 22433.39999999944,
+          "resourceTransferBytes": 83010157,
+          "resourceBodyBytes": 82967257,
+          "heapBytes": 128189947,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 604,
+          "medianMs": 1.7000000001862645,
+          "p95Ms": 12.5
+        },
+        "gpu": {
+          "samples": 603,
+          "medianMs": 4.008519,
+          "p95Ms": 4.217999
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "westGate",
+        "probe": {
+          "geometryBytes": 67225241,
+          "sceneBufferBytes": 69192157,
+          "placements": 440,
+          "meshes": 479,
+          "frames": 303,
+          "fps": 37.559965786963595,
+          "medianMs": 17.600000000558794,
+          "p95Ms": 48.89999999944121,
+          "updateMs": 0.18844884486789062,
+          "calls": 96,
+          "triangles": 258339,
+          "width": 1280,
+          "height": 720,
+          "geometries": 262,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 22433.39999999944,
+          "resourceTransferBytes": 83010157,
+          "resourceBodyBytes": 82967257,
+          "heapBytes": 128894983,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 433,
+          "medianMs": 2.2999999998137355,
+          "p95Ms": 13.299999999813735
+        },
+        "gpu": {
+          "samples": 430,
+          "medianMs": 4.052639,
+          "p95Ms": 35.369599
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "school",
+        "probe": {
+          "geometryBytes": 67225241,
+          "sceneBufferBytes": 69192157,
+          "placements": 440,
+          "meshes": 479,
+          "frames": 144,
+          "fps": 17.959590920429033,
+          "medianMs": 51.799999999813735,
+          "p95Ms": 65.90000000037253,
+          "updateMs": 0.49374999998447794,
+          "calls": 77,
+          "triangles": 355349,
+          "width": 1280,
+          "height": 720,
+          "geometries": 269,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 22433.39999999944,
+          "resourceTransferBytes": 83010157,
+          "resourceBodyBytes": 82967257,
+          "heapBytes": 129370625,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 180,
+          "medianMs": 2.099999999627471,
+          "p95Ms": 12.5
+        },
+        "gpu": {
+          "samples": 179,
+          "medianMs": 51.275079,
+          "p95Ms": 51.661049
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      },
+      {
+        "stage": "after",
+        "view": "panorama",
+        "probe": {
+          "geometryBytes": 67225241,
+          "sceneBufferBytes": 69192157,
+          "placements": 440,
+          "meshes": 479,
+          "frames": 109,
+          "fps": 13.65333066112119,
+          "medianMs": 69.40000000037253,
+          "p95Ms": 82.70000000018626,
+          "updateMs": 0.6348623852971771,
+          "calls": 231,
+          "triangles": 1019265,
+          "width": 1280,
+          "height": 720,
+          "geometries": 299,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 22433.39999999944,
+          "resourceTransferBytes": 83010157,
+          "resourceBodyBytes": 82967257,
+          "heapBytes": 130065600,
+          "multiDraw": true
+        },
+        "cpuRender": {
+          "samples": 137,
+          "medianMs": 4.2999999998137355,
+          "p95Ms": 15.399999999441206
+        },
+        "gpu": {
+          "samples": 138,
+          "medianMs": 68.459209,
+          "p95Ms": 68.88915
+        },
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "timer": true,
+        "focused": true,
+        "hidden": false
+      }
+    ],
+    "errors": []
+  }
+}

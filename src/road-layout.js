@@ -1,6 +1,7 @@
 // Local placements accompanying tools/road_network.py's overhead road reconstruction.
 // The practice junction remains (32,26); the rest of the imported tile grid is replaced.
 import { CASTLE_ITEMS } from './castle-layout.js';
+import { UNIVERSITY_ITEMS } from './university-layout.js';
 import { NORTH_APPROACH, INNER_MOAT_ROAD, distanceToPath, APPROACH_BUILDINGS, APPROACH_PATCHES } from './castle-approach.js';
 export function moatBend(x) {
   const t = Math.max(0, Math.min(1, (x - 110) / 130));
@@ -28,7 +29,7 @@ export function townTaper(x) {
 }
 export const townPathEdge = x => 16 + TOWN_INSET * townTaper(x);
 // Half widths (with eaves) of the Route 25 frontage. A building moves only as far as its
-// least-tapered end allows, so no wall or eave stands on the raised footway.
+// least-tapered end allows, so no wall or eave stands on the footway.
 const FRONT_HALF = { HK_Machiya_A: 4.1, HK_Machiya_A_Narrow: 3.2, HK_Machiya_B: 3.5, HK_Machiya_C: 4.7,
   HK_Kura: 3.5, ART_CornerShop: 3.4, ART_WhiteStorehouse: 4, ART_EavesStorehouse: 4,
   ART_ThreeStorey: 3.5, ART_WestCorner: 8.1, ART_NorthLonghouse: 18.6 };
@@ -124,6 +125,7 @@ export function roadLayout(layout) {
       const t = Math.max(0, Math.min(1, (x - 110) / 130));
       item.r -= Math.atan(30 * 6 * t * (1 - t) / 130) * 180 / Math.PI;
     }
+    if ((item.g === 'Signs' || item.a === 'HK_StreetLamp') && z <= 74) item.p[1] = 0.01;
     items.push(item);
   }
   for (const [a, x, z, r] of [
@@ -134,7 +136,7 @@ export function roadLayout(layout) {
     ['HK_Sign_ParkingDirection', -79, 32.3, 90],
     // 30 km/h for northbound Castle Road traffic, beside the corner house (18 October 2026 photograph)
     ['HK_Sign_Speed30', 27.5, 1.5, 180],
-  ]) items.push({ a, p: [x, 0.16, z], r, s: [1, 1, 1], g: 'Signs' });
+  ]) items.push({ a, p: [x, 0.01, z], r, s: [1, 1, 1], g: 'Signs' });
   // A broad-leaf belt, interrupted by the north approach and the visible long-house frontage.
   // These represent canopy masses, not an invented inventory of individual surveyed trees.
   for (let row = 0; row < 3; row++) for (let i = 0; i < 27; i++) {
@@ -158,7 +160,7 @@ export function roadLayout(layout) {
   for (const [side, start] of [[-1, -1], [1, 0]]) {
     const zs = [];
     for (let z = start; z > -114; z -= 9.5) if (Math.abs(z + 64) > 8.5) zs.push(z);
-    for (const [i, z] of zs.entries()) items.push({ a: 'ART_TownTree', p: [castleX(z) + side * 5.6, 0.16, z],
+    for (const [i, z] of zs.entries()) items.push({ a: 'ART_TownTree', p: [castleX(z) + side * 5.6, 0.01, z],
       r: side < 0 ? 180 : 0, s: [0.9 + i % 2 * 0.12, 0.94 + i % 3 * 0.05, 1], g: 'WebTownTrees' });
   }
   // Close the frontage gaps beside the junction: both sides are continuous eaves-on houses.
@@ -166,6 +168,7 @@ export function roadLayout(layout) {
     ['HK_Machiya_A_Narrow', 1, -16.3]])
     items.push({ a, p: [castleX(z) + side * 10.4, 0.15, z], r: side < 0 ? 90 : 270, s: [1, 1, 1], g: 'WebFrontage' });
   items.push(...CASTLE_ITEMS);
+  items.push(...UNIVERSITY_ITEMS);
   // Continue the town frontage along the gently bending bank, instead of across the road.
   const facades = ['HK_Machiya_A', 'HK_Kura', 'HK_Machiya_A_Narrow', 'HK_Machiya_B'];
   for (let i = 0; i < 13; i++) {
@@ -178,9 +181,14 @@ export function roadLayout(layout) {
   }
   for (const a of ['ART_KyobashiRoads', 'ART_KyobashiLand', 'ART_KyobashiBanks', 'ART_KyobashiWater', 'ART_KyobashiBridge'])
     items.push(worldAsset(a));
-  const overheadWires = (layout.overheadWires ?? []).map(w => ({ ...w,
-    a: [w.a[0], w.a[1], w.a[2] + moatBend(w.a[0])],
-    b: [w.b[0], w.b[1], w.b[2] + moatBend(w.b[0])],
-  }));
+  // Rotate crossarm offsets with their pole as well as translating the road bend.
+  const bendWire = at => {
+    const pole = layout.items.find(i => /UtilityPole$/.test(i.a) && Math.abs(i.p[0] - at[0]) < 0.001);
+    const t = Math.max(0, Math.min(1, (at[0] - 110) / 130));
+    const angle = -Math.atan(30 * 6 * t * (1 - t) / 130), offset = pole ? at[2] - pole.p[2] : 0;
+    return [at[0] + offset * Math.sin(angle), at[1],
+      at[2] + moatBend(at[0]) + offset * (Math.cos(angle) - 1)];
+  };
+  const overheadWires = (layout.overheadWires ?? []).map(w => ({ ...w, a: bendWire(w.a), b: bendWire(w.b) }));
   return { ...layout, items, overheadWires, roadPlan: 'google-overhead-v1' };
 }

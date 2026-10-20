@@ -1,0 +1,273 @@
+{
+  "date": "2026-10-18",
+  "viewport": [
+    1280,
+    720
+  ],
+  "baseline": "working tree before water and sky animation",
+  "results": [
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.010501837866336,
+        "medianMs": 16.599999994039536,
+        "p95Ms": 17.80000001192093,
+        "updateMs": 0.0677083338300387,
+        "calls": 93,
+        "triangles": 506349,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 2915.2999999821186,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 85723999,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 479,
+        "fps": 59.99799589162254,
+        "medianMs": 16.599999994039536,
+        "p95Ms": 17.799999982118607,
+        "updateMs": 0.050730689582346875,
+        "calls": 66,
+        "triangles": 319352,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 2915.2999999821186,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 89811832,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "bank",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 481,
+        "fps": 60.00349292668933,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.5,
+        "updateMs": 0.054885654712169434,
+        "calls": 25,
+        "triangles": 216995,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 2915.2999999821186,
+        "resourceTransferBytes": 46840648,
+        "resourceBodyBytes": 46800148,
+        "heapBytes": 79516640,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.0045003374806,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.07562500033527612,
+        "calls": 93,
+        "triangles": 506349,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 1303.699999988079,
+        "resourceTransferBytes": 46843202,
+        "resourceBodyBytes": 46802402,
+        "heapBytes": 152119296,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 481,
+        "fps": 60.00573859449873,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.69999998807907,
+        "updateMs": 0.05155925195578974,
+        "calls": 66,
+        "triangles": 319352,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 1303.699999988079,
+        "resourceTransferBytes": 46843202,
+        "resourceBodyBytes": 46802402,
+        "heapBytes": 85471942,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "bank",
+      "probe": {
+        "geometryBytes": 39973740,
+        "sceneBufferBytes": 41519968,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.00975158472195,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.400000005960464,
+        "updateMs": 0.04604166653007269,
+        "calls": 25,
+        "triangles": 216995,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 1303.699999988079,
+        "resourceTransferBytes": 46843202,
+        "resourceBodyBytes": 46802402,
+        "heapBytes": 78311203,
+        "multiDraw": true
+      },
+      "geometryBytes": 39973740,
+      "meshes": 209
+    }
+  ],
+  "errors": [],
+  "change": "Animated water paint/ripples/glints and drifting baked cloud sky, with independent decorative clock and live reduced-motion freeze/resume",
+  "measurement": "Same headless Chrome page, fixed 1280x720, high quality and dynamic resolution off. Before uses request interception against the pre-animation working-tree snapshot. Two-second warmup plus eight-second samples; no concurrent tests, video recording or screenshots during measurement.",
+  "validation": {
+    "command": "npm test",
+    "tests": 150,
+    "passed": 150,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 139383.252912,
+    "functional": {
+      "checks": [
+        {
+          "id": "builtin-01",
+          "distance": 1.474799999999974,
+          "look": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "distance": 0.4624999999999889,
+          "look": true,
+          "menu": true
+        },
+        {
+          "editor": true
+        }
+      ],
+      "errors": []
+    },
+    "motion": {
+      "live": {
+        "t0": 0.806,
+        "t1": 1.822699999988078
+      },
+      "reducedMotion": {
+        "frozen": 1.8557999999821175,
+        "resumed": true
+      },
+      "frames": [
+        {
+          "time": 0
+        },
+        {
+          "time": 4
+        },
+        {
+          "time": 8
+        }
+      ],
+      "errors": []
+    },
+    "pixelComparison": {
+      "sky": {
+        "changedPixels": 212114,
+        "pixels": 217600
+      },
+      "water": {
+        "changedPixels": 204542,
+        "pixels": 204800
+      },
+      "wall": {
+        "changedPixels": 0,
+        "pixels": 12000
+      },
+      "reducedMotionIdentical": true
+    },
+    "initialReducedMotion": {
+      "time": 0,
+      "reducedMotion": true,
+      "skyAngle": 0,
+      "errors": []
+    },
+    "preview": {
+      "durationSeconds": 10,
+      "dimensions": [
+        1280,
+        720
+      ],
+      "format": "H.264 MP4",
+      "bytes": 2963426
+    },
+    "hardwareNotTested": [
+      "real phone",
+      "VR headset"
+    ],
+    "diffCheck": true
+  },
+  "limits": "Frame-capped desktop samples do not establish faster rendering or mobile performance. Shader arithmetic and one shared time uniform were added, while model geometry, draw calls, textures and the cached shadow policy remain unchanged."
+}

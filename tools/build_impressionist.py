@@ -23,6 +23,8 @@ import road_network
 import quantize_glb
 import hikone_castle
 import castle_approach
+import vegetation
+import university
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'models', 'impressionist')
@@ -42,6 +44,7 @@ COLORS = {
     'HK_Soil': (0.61, 0.48, 0.36), 'HK_Leaf': (0.45, 0.61, 0.36),
     'HK_LeafDark': (0.28, 0.46, 0.40), 'HK_Sakura': (0.94, 0.68, 0.73),
     'HK_Bark': (0.47, 0.35, 0.29), 'HK_Metal': (0.29, 0.39, 0.46),
+    'ART_TreeBark': (0.54, 0.48, 0.38),
     'HK_MetalLight': (0.66, 0.70, 0.77), 'HK_Glass': (0.32, 0.47, 0.59),
     'HK_Shoji': (0.94, 0.89, 0.71), 'HK_TruckCab': (0.84, 0.87, 0.85),
     'HK_Rubber': (0.26, 0.27, 0.35), 'HK_KeiPaint': (0.90, 0.91, 0.87),
@@ -58,6 +61,11 @@ COLORS = {
     'ART_SignalRed': (0.94, 0.19, 0.16), 'ART_SignalYellow': (1.0, 0.77, 0.13),
     'ART_SignalGreen': (0.17, 0.76, 0.46), 'ART_SignalGlyph': (1.0, 0.96, 0.80),
     'ART_Glass': (0.35, 0.52, 0.66), 'ART_GlassLight': (0.65, 0.76, 0.81),
+    'ART_DisplayGlass': (0.82, 0.91, 0.94),
+    'ART_DisplayTimber': (0.23, 0.24, 0.21), 'ART_DisplayMetal': (0.64, 0.67, 0.65),
+    'ART_DisplayRoof': (0.55, 0.61, 0.59), 'ART_DisplayInk': (0.95, 0.96, 0.93),
+    'ART_ShopPlaster': (0.91, 0.87, 0.73), 'ART_ShopWoodWear': (0.40, 0.37, 0.29),
+    'ART_ShopStone': (0.65, 0.65, 0.60), 'ART_ApronAsphalt': (0.34, 0.37, 0.37),
     'ART_Cargo': (0.80, 0.82, 0.82), 'ART_Chassis': (0.17, 0.18, 0.22),
     'ART_Patina': (0.38, 0.50, 0.43), 'ART_Bronze': (0.39, 0.34, 0.24),
     'ART_StoneLight': (0.72, 0.71, 0.65), 'ART_Chain': (0.27, 0.28, 0.27),
@@ -293,6 +301,16 @@ class BrushMesh:
             bsdf = mat.node_tree.nodes.new('ShaderNodeBsdfPrincipled')
             bsdf.inputs['Base Color'].default_value = (1, 1, 1, 1)
             bsdf.inputs['Roughness'].default_value = 0.95
+            if name == 'ART_TreeBark':
+                # This first opaque material also selects the merged tree batch's side.
+                # Bark and leaf blades are outward-facing solids, so cull their backs.
+                mat.use_backface_culling = True
+            if name == 'ART_DisplayGlass':
+                # Thin alpha-blended panes, without a screen-space transmission pass.
+                bsdf.inputs['Alpha'].default_value = 0.12
+                bsdf.inputs['Roughness'].default_value = 0.12
+                mat.surface_render_method = 'BLENDED'
+                mat.use_backface_culling = False
             if name in EMISSION:
                 emission, strength = EMISSION[name]
                 bsdf.inputs['Emission Color'].default_value = (*[linear(c) for c in emission], 1)
@@ -308,9 +326,9 @@ class BrushMesh:
             slot, pigment, smooth = self.slots[i], self.pigments[i], self.smooth[i]
             poly.material_index = slot
             poly.use_smooth = smooth
-            rgba = (*[linear(c) for c in pigment], 1)
-            for i in poly.loop_indices:
-                colors.data[i].color = rgba
+            tones = pigment if isinstance(pigment[0], (tuple, list)) else [pigment] * len(poly.loop_indices)
+            for loop, tone in zip(poly.loop_indices, tones):
+                colors.data[loop].color = (*[linear(c) for c in tone], 1)
         bm = bmesh.new()
         bm.from_mesh(mesh)
         bmesh.ops.remove_doubles(bm, verts=list(bm.verts), dist=0.00001)
@@ -403,34 +421,16 @@ def house(name, width, depth, height, variant):
     return b
 
 
-def tree(name):
+def tree(name, lod=False):
     b = BrushMesh(name)
-    rng = b.rng
+    b.distant = lod
     h = {'HK_Tree_Zelkova': 8.5, 'HK_Tree_Sakura': 6, 'HK_Tree_RoundLow': 8,
          'HK_Tree_Cedar': 11, 'HK_Tree_Pine': 7.4}.get(name, 7)
-    sakura, cedar, pine = 'Sakura' in name, 'Cedar' in name, 'Pine' in name
-    material = 'HK_Sakura' if sakura else 'HK_Leaf'
-    b.branch((0, 0, 0), (0.13, h * 0.38, 0.08), 0.22)
-    if cedar:
-        # Broken, overlapping sprays replace three opaque seven-sided cones.
-        for level in range(6):
-            y = h * (0.34 + level * 0.105)
-            r = 2.15 * (1 - level / 6.9)
-            for i in range(3):
-                a = i * math.tau / 3 + level * 0.61
-                b.crown((math.cos(a) * r * 0.40, y, math.sin(a) * r * 0.40),
-                        (r * 0.62, 0.83, r * 0.62), 'HK_LeafDark', level * 30 + i)
-    else:
-        lobes = 9 if name == 'HK_Tree_RoundLow' else (13 if not pine else 10)
-        for i in range(lobes):
-            a = i * 2.39996
-            y = h * rng.uniform(0.54, 0.84)
-            r = rng.uniform(0.5, 1.65) * (0.75 if sakura else 1)
-            x, z = math.cos(a) * r, math.sin(a) * r
-            b.branch((0.13, h * 0.32, 0.08), (x, y - 0.3, z), 0.09)
-            size = rng.uniform(0.72, 1.28) * (1.0 if sakura else 1.15)
-            b.crown((x, y, z), (size, size * (0.40 if pine else 0.82), size * 0.92),
-                    'HK_LeafDark' if pine else material, i + 103)
+    species = next((kind for token, kind in [('Zelkova', 'zelkova'), ('Sakura', 'cherry'),
+                    ('Cedar', 'cedar'), ('Pine', 'pine')] if token in name), 'tabu')
+    b.abstract = True
+    vegetation.tree(b, species, height=h, spread=2.0 if species == 'cedar' else 3.5 if species == 'pine' else 2.7,
+                    seed=sum(map(ord, name)), lean=(0.9, 0.25) if species == 'pine' else (0.15, 0.08))
     return b
 
 
@@ -472,6 +472,9 @@ def rebuild(name, source_name=None, omit_materials=()):
             if name == 'HK_Kyobashi' and material == 'HK_Stone':
                 continue  # locally modeled stone newels and patinated finials below
             pts = [ob.matrix_world @ ob.data.vertices[i].co for i in poly.vertices]
+            if name == 'HK_GroundFar':
+                university.crop_far_ground(b, pts, material)
+                continue
             if name in SUNK_TOPS and material == SUNK_TOPS[name][0]:
                 pts = sink_tops(pts, SUNK_TOPS[name][1])
             b.surface(pts, material)
@@ -555,6 +558,7 @@ def main():
     names.update(road_network.MODELS)
     names.update(hikone_castle.MODELS)
     names.update(castle_approach.MODELS)
+    names.update(university.MODELS)
     if args.only and set(args.only) - names:
         parser.error('Unknown models: ' + ', '.join(sorted(set(args.only) - names)))
     for name in sorted(names):
@@ -562,6 +566,8 @@ def main():
             continue
         if args.lod_only:
             b = None
+        elif name in university.MODELS:
+            b = university.build(name, BrushMesh)
         elif name in hikone_castle.MODELS:
             b = hikone_castle.build(name, BrushMesh)
         elif name in castle_approach.MODELS:
@@ -590,6 +596,12 @@ def main():
                 detail = hikone_castle.build(name, BrushMesh, lod=True)
             if distant and name in castle_approach.MODELS and not args.lod_only:
                 detail = castle_approach.build(name, BrushMesh, lod=True)
+            if distant and name in university.MODELS and not args.lod_only:
+                detail = university.build(name, BrushMesh, lod=True)
+            if distant and name.startswith('HK_Tree_') and not args.lod_only:
+                detail = tree(name, lod=True)
+            if distant and name in moat_art.MODELS and not args.lod_only:
+                detail = moat_art.build(name, BrushMesh, lod=True)
             ob = existing_lod(name) if args.lod_only else detail.finish(lod=distant)
             bpy.ops.object.select_all(action='DESELECT')
             ob.select_set(True)
@@ -614,6 +626,8 @@ def main():
                     manifest['models'][name]['design'] = 'hikone-landmark-v1'
                 if name in castle_approach.MODELS:
                     manifest['models'][name].update(remodeled=True, design='hikone-approach-v1')
+                if name in university.MODELS:
+                    manifest['models'][name].update(remodeled=True, design='shiga-connected-campus-v1')
             print('IMPRESSIONIST', name, manifest['models'][name], flush=True)
             bpy.data.objects.remove(ob, do_unlink=True)
         # Imported source materials and their textures must not contaminate the
@@ -621,6 +635,10 @@ def main():
         for mat in list(bpy.data.materials):
             bpy.data.materials.remove(mat)
     road_network.finish_exports()
+    if not args.lod_only and (not args.only or any(name in args.only for name in (*university.MODELS, 'ART_KyobashiRoads', 'ART_HikoneCompound', 'HK_Terrain_Hikone'))):
+        university.export_plan()
+    if args.only and not args.lod_only and 'ART_KyobashiRoads' not in args.only and any(name in args.only for name in ('ART_HikoneCompound', 'HK_Terrain_Hikone')):
+        road_network.export_castle_paths()
     with open(os.path.join(OUT, 'manifest.json'), 'w') as f:
         json.dump(manifest, f, indent=2)
     if args.save_library:

@@ -1,0 +1,269 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": true,
+  "cameras": {
+    "photo": [
+      52.8,
+      1.65,
+      21.8,
+      22,
+      10,
+      25.3,
+      64
+    ],
+    "street": [
+      55,
+      2.15,
+      23,
+      0,
+      2.8,
+      27,
+      62
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70599166,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 60.00150003752329,
+        "medianMs": 16.600000008940697,
+        "p95Ms": 17.700000002980232,
+        "updateMs": 0.08000000047807893,
+        "calls": 102,
+        "triangles": 1047200,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4139.300000011921,
+        "resourceTransferBytes": 75263763,
+        "resourceBodyBytes": 75220263,
+        "heapBytes": 224634665,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/before-photo.png"
+    },
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70599166,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 479,
+        "fps": 59.996492898141085,
+        "medianMs": 16.600000008940697,
+        "p95Ms": 17.299999997019768,
+        "updateMs": 0.06346555340389617,
+        "calls": 98,
+        "triangles": 1034813,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4139.300000011921,
+        "resourceTransferBytes": 75263763,
+        "resourceBodyBytes": 75220263,
+        "heapBytes": 148402568,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/before-street.png"
+    },
+    {
+      "stage": "after",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99925000941959,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.0787500001800557,
+        "calls": 102,
+        "triangles": 1044568,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4047.2000000029802,
+        "resourceTransferBytes": 75263310,
+        "resourceBodyBytes": 75219810,
+        "heapBytes": 208333368,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/after-photo.png"
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 479,
+        "fps": 60.002505323813104,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.5,
+        "updateMs": 0.0561586641444045,
+        "calls": 98,
+        "triangles": 1032181,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4047.2000000029802,
+        "resourceTransferBytes": 75263310,
+        "resourceBodyBytes": 75219810,
+        "heapBytes": 148467471,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/after-street.png"
+    }
+  ],
+  "previews": [
+    {
+      "view": "signals-walk",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/after-signals-walk.png",
+      "geometry": {
+        "names": [
+          [
+            -0.17000000178813934,
+            6.039999961853027,
+            0.24500000476837158
+          ],
+          [
+            -0.17000000178813934,
+            5.460000038146973,
+            0.24500000476837158
+          ],
+          [
+            -0.17000000178813934,
+            6.039999961853027,
+            1.3949999809265137
+          ],
+          [
+            -0.17000000178813934,
+            5.460000038146973,
+            0.24500000476837158
+          ],
+          [
+            -0.17000000178813934,
+            5.460000038146973,
+            1.3949999809265137
+          ],
+          [
+            -0.17000000178813934,
+            6.039999961853027,
+            1.3949999809265137
+          ]
+        ]
+      }
+    },
+    {
+      "view": "signals-walk-back",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/after-signals-walk-back.png",
+      "geometry": {
+        "names": [
+          [
+            -0.17000000178813934,
+            6.039999961853027,
+            0.24500000476837158
+          ],
+          [
+            -0.17000000178813934,
+            5.460000038146973,
+            0.24500000476837158
+          ],
+          [
+            -0.17000000178813934,
+            6.039999961853027,
+            1.3949999809265137
+          ],
+          [
+            -0.17000000178813934,
+            5.460000038146973,
+            0.24500000476837158
+          ],
+          [
+            -0.17000000178813934,
+            5.460000038146973,
+            1.3949999809265137
+          ],
+          [
+            -0.17000000178813934,
+            6.039999961853027,
+            1.3949999809265137
+          ]
+        ]
+      }
+    },
+    {
+      "view": "signals-double",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-coordinate/after-signals-double.png",
+      "geometry": {
+        "names": []
+      }
+    }
+  ],
+  "errors": [],
+  "context": {
+    "date": "2026-10-21",
+    "referenceCoordinate": {
+      "x": 45.03,
+      "z": 20.45
+    },
+    "referenceImage": "codex-clipboard-bdfc2ab8-1090-4d75-b66c-1c7878830b35.png",
+    "comparison": "One headless installed-Chrome page, fixed cameras, benchmark=1, with saved pre-correction signal sources routed before and final local sources after. All generated GLBs are shared.",
+    "limitations": "Refresh-capped desktop windows establish no speed gain, worst-case FPS or phone/VR performance."
+  },
+  "sources": {
+    "signal-layout.js": {
+      "beforeSha256": "b6accf8c51695a30f76e818f73d3ee5a40101c0513179de4c8e3f96f614890ba",
+      "afterSha256": "5a2dadc84d4a25b447f0554110dd3628330ff36c6bc1175aadfbeafb3ce9af79"
+    },
+    "signals.js": {
+      "beforeSha256": "a7a0c8d85339db1e54e2c432656f886a814feb32f3b3ce0d041b2040d5bea93b",
+      "afterSha256": "40ff970b33cb1e615ab9f50cf9c95f6c690f5e978fce0ab6ede927bb19d6a2f2"
+    },
+    "prop-review.js": {
+      "beforeSha256": "4c6aa5679500e8ba105d014a6df1640dd9fe47a7e114de2af8cd79fb24ffcd4a",
+      "afterSha256": "82c9a5927b614222bd79cb6c626a0b43c0895dd2c7b24a924ef805b162913c71"
+    }
+  },
+  "validation": {
+    "focusedTests": 55,
+    "failed": 0,
+    "skipped": 0,
+    "commands": [
+      "node --test test/art.test.mjs test/obstacles.test.mjs test/performance.test.mjs test/prop-review.test.mjs",
+      "node --test --test-name-pattern=coordinate-picked test/art.test.mjs"
+    ],
+    "collision": {
+      "command": "node tools/build_collision.mjs",
+      "byteIdentical": true,
+      "blockedCells": 338379,
+      "sha256": "6ccc0517e122f24cc56d4089e5e66ac05b1e66c844d45e3cfe113141d3d5383d"
+    },
+    "renderedNameFace": "Centred at recentered Unity (0.17,5.75,0.82) on the selected shop-side shaft; absent from the opposite town-west arm.",
+    "realPhoneOrVR": false
+  }
+}

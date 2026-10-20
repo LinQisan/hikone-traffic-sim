@@ -1,0 +1,373 @@
+{
+  "date": "2026-10-20",
+  "purpose": "Correct the corner shop, boarded neighbor and asphalt/stone apron around the display case from the same owner-supplied close-up.",
+  "reference": {
+    "file": "/tmp/codex-remote-attachments/01a15455-0d15-7612-80bb-4566a7428375/60B112D5-65F7-4DFA-A28B-89EA99902996/1-照片-1.jpg",
+    "sha256": "823f951fe8d2f618d47ef2f24bc350d31710a517b5d3ef018c02abb8b73c8517",
+    "limits": "Perspective-photo estimates fitted to the existing approximate building registration; not surveyed dimensions or interiors."
+  },
+  "baseline": {
+    "description": "The preceding photo-corrected case and already-dirty scene, not Git HEAD.",
+    "fixture": "/tmp/hikone-shop-context/before",
+    "substitutedAssets": [
+      "ART_CornerShop",
+      "ART_KyobashiLand",
+      "ART_PavingDetails",
+      "ART_WhiteStorehouse"
+    ],
+    "routedAssets": [
+      "ART_CornerShop",
+      "ART_WhiteStorehouse",
+      "ART_KyobashiLand",
+      "ART_KyobashiRoads",
+      "ART_PavingDetails"
+    ]
+  },
+  "implementation": {
+    "source": [
+      "tools/shop_corner.py",
+      "tools/streetscape.py",
+      "tools/road_network.py",
+      "tools/build_impressionist.py",
+      "tools/build_collision.mjs",
+      "src/app.js"
+    ],
+    "architecture": [
+      "Corner shop: shallow timber-framed glazed display/entry bays, pale window band, ceramic silhouettes, cream upper panels, screened upper windows and a lower tiled lean-to canopy with its Castle Road return.",
+      "Boarded neighbor: dark closed boarding on the front and exposed return, low stone footing, wrapping tiled canopy and pale upper wall."
+    ],
+    "apron": "Existing town-plot faces are partitioned into asphalt and stone at 0.15 m. Joints and the drain are clipped against exported walking surfaces and inset onto the plot side at boundaries.",
+    "collision": "Project only the authored closed main-body materials of the two low-threshold buildings to keep their interiors solid; do not fill roofs or aprons.",
+    "glass": "Reuse the existing ART_DisplayGlass material and separate alpha draw, with depth writes disabled, one thin-pane pass and no glass sun-shadow caster.",
+    "newRuntimeDependencies": 0,
+    "newImageTextures": 0,
+    "newPostProcessing": 0,
+    "newReflectionCaptures": 0,
+    "review": "?view=display-surroundings",
+    "editorImageCommand": "blender -b --factory-startup --python tools/road_network.py -- --image-only"
+  },
+  "models": {
+    "ART_CornerShop": {
+      "before": {
+        "triangles": 16664,
+        "strokes": 0,
+        "bytes": 726396,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 5624,
+          "bytes": 253088
+        }
+      },
+      "after": {
+        "triangles": 9762,
+        "strokes": 0,
+        "bytes": 436084,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 2778,
+          "bytes": 136052
+        }
+      },
+      "sha256": {
+        "before": "7ee5ab14a37af7a77f4313981156070e722b04604194a3c9aa262def90d9d45b",
+        "after": "9167cab5f49bc0136d31c9323daa46f55f3c28a0d3ff3a155b4c4d78e4215b0c"
+      }
+    },
+    "ART_KyobashiLand": {
+      "before": {
+        "triangles": 39201,
+        "strokes": 5661,
+        "bytes": 1569912,
+        "remodeled": false,
+        "lod": {
+          "triangles": 7356,
+          "bytes": 317316
+        }
+      },
+      "after": {
+        "triangles": 39119,
+        "strokes": 5643,
+        "bytes": 1568644,
+        "remodeled": false,
+        "lod": {
+          "triangles": 7376,
+          "bytes": 320056
+        }
+      },
+      "sha256": {
+        "before": "55b2479b90c2a57eadc2ccc2094253f789d539734b6b37defcd486418c37a648",
+        "after": "8cdcbb419e20d6818f2303c076ad548e6d21544263336860956d64b75d2b73ab"
+      }
+    },
+    "ART_PavingDetails": {
+      "before": {
+        "triangles": 8116,
+        "strokes": 0,
+        "bytes": 364892,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 8116,
+          "bytes": 364896
+        }
+      },
+      "after": {
+        "triangles": 8205,
+        "strokes": 0,
+        "bytes": 369964,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 8157,
+          "bytes": 366816
+        }
+      },
+      "sha256": {
+        "before": "bedff7b8ff4ef6d78c45757d27c19c4f62660f66db8fd9a389e7b06af6529ef5",
+        "after": "11e90ec920852f832366ec49ffc3c4c682c3c04b5ce3bd1de8a90ffdf3be9b69"
+      }
+    },
+    "ART_WhiteStorehouse": {
+      "before": {
+        "triangles": 6018,
+        "strokes": 0,
+        "bytes": 263684,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 1818,
+          "bytes": 85980
+        }
+      },
+      "after": {
+        "triangles": 5004,
+        "strokes": 0,
+        "bytes": 225272,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 1032,
+          "bytes": 56600
+        }
+      },
+      "sha256": {
+        "before": "bf9850964760dfe30730e714153e6a5b6c01d0c43e1163c1164d7928046da461",
+        "after": "eac645efaeade3534c17d452fd68dcbfb6ece2c1f64e5ffa249bc9df8db4ebee"
+      }
+    }
+  },
+  "generated": {
+    "changedManifestEntries": [
+      "ART_CornerShop",
+      "ART_KyobashiLand",
+      "ART_PavingDetails",
+      "ART_WhiteStorehouse"
+    ],
+    "roadModelRegenerated": "Both regenerated ART_KyobashiRoads GLBs are byte-identical to the baseline.",
+    "walkingSurfaceDataByteIdentical": true,
+    "mapMetadataByteIdentical": true,
+    "mapImageRefreshed": true,
+    "mapImageSha256": "4f7ef02af729436fac01f7471473aafb5a42341794a442011e735c08b721689c"
+  },
+  "collision": {
+    "added": 7,
+    "removed": 9,
+    "bounds": [
+      44.799999999999955,
+      15.200000000000017,
+      55,
+      18.200000000000017
+    ],
+    "blockedCells": 340024,
+    "objects": 436,
+    "regenerated": true
+  },
+  "verification": {
+    "tests": 62,
+    "pass": 62,
+    "fail": 0,
+    "skipped": 0,
+    "groups": [
+      {
+        "command": "node --test test/art.test.mjs test/performance.test.mjs",
+        "tests": 37,
+        "log": "/tmp/hikone-shop-context/tests-rendering.log"
+      },
+      {
+        "command": "node --test test/obstacles.test.mjs test/events.test.mjs",
+        "tests": 25,
+        "log": "/tmp/hikone-shop-context/tests-safety.log"
+      }
+    ],
+    "routes": {
+      "command": "node tools/check_routes.mjs",
+      "checked": 46,
+      "failed": 0,
+      "log": "/tmp/hikone-shop-context/routes.log"
+    },
+    "regressions": [
+      "Sample both LOD plot surfaces across finish boundaries for continuous 0.15 m ground.",
+      "Ensure revised low-threshold buildings remain solid inside and leave their aprons free."
+    ],
+    "includes": "All ten event-purpose/sight-line checks, spawn/goal clearance, paving heights, LOD and transparent-draw culling/shadow checks.",
+    "syntax": [
+      "src/app.js",
+      "tools/build_collision.mjs",
+      "tools/shop_corner.py",
+      "tools/road_network.py",
+      "tools/streetscape.py"
+    ],
+    "diffCheck": "passed"
+  },
+  "benchmark": {
+    "views": {
+      "frontage": [
+        43.7,
+        1.8,
+        20.7,
+        47.4,
+        2.05,
+        15.3,
+        59
+      ],
+      "corner": [
+        31.5,
+        2.1,
+        24.8,
+        47.2,
+        1.3,
+        16.1,
+        46
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "frontage",
+        "probe": {
+          "geometryBytes": 74876235,
+          "sceneBufferBytes": 76847759,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 480,
+          "fps": 60.01275270997323,
+          "medianMs": 16.600000001490116,
+          "p95Ms": 25.700000002980232,
+          "updateMs": 0.1452083333550642,
+          "calls": 49,
+          "triangles": 640797,
+          "width": 1280,
+          "height": 720,
+          "geometries": 77,
+          "textures": 8,
+          "programs": 16,
+          "readyMs": 13677.39999999851,
+          "resourceTransferBytes": 83013046,
+          "resourceBodyBytes": 82969546,
+          "heapBytes": 150523956,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-shop-context/before-frontage.png"
+      },
+      {
+        "stage": "before",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74876235,
+          "sceneBufferBytes": 76847759,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 481,
+          "fps": 60.08744534665834,
+          "medianMs": 17.80000000447035,
+          "p95Ms": 22.399999998509884,
+          "updateMs": 0.13742203754905355,
+          "calls": 72,
+          "triangles": 549655,
+          "width": 1280,
+          "height": 720,
+          "geometries": 93,
+          "textures": 10,
+          "programs": 18,
+          "readyMs": 13677.39999999851,
+          "resourceTransferBytes": 83013046,
+          "resourceBodyBytes": 82969546,
+          "heapBytes": 135124286,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-shop-context/before-corner.png"
+      },
+      {
+        "stage": "after",
+        "view": "frontage",
+        "probe": {
+          "geometryBytes": 74408697,
+          "sceneBufferBytes": 76380221,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 477,
+          "fps": 59.55353575708041,
+          "medianMs": 17.19999999552965,
+          "p95Ms": 25.100000001490116,
+          "updateMs": 0.149895178150206,
+          "calls": 50,
+          "triangles": 632906,
+          "width": 1280,
+          "height": 720,
+          "geometries": 78,
+          "textures": 8,
+          "programs": 16,
+          "readyMs": 19610.79999999702,
+          "resourceTransferBytes": 82546370,
+          "resourceBodyBytes": 82502870,
+          "heapBytes": 134487501,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-shop-context/after-frontage.png"
+      },
+      {
+        "stage": "after",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74408697,
+          "sceneBufferBytes": 76380221,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 479,
+          "fps": 59.99348713707337,
+          "medianMs": 17.5,
+          "p95Ms": 24.899999998509884,
+          "updateMs": 0.17056367420328933,
+          "calls": 73,
+          "triangles": 541764,
+          "width": 1280,
+          "height": 720,
+          "geometries": 94,
+          "textures": 10,
+          "programs": 18,
+          "readyMs": 19610.79999999702,
+          "resourceTransferBytes": 82546370,
+          "resourceBodyBytes": 82502870,
+          "heapBytes": 134796642,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-shop-context/after-corner.png"
+      }
+    ],
+    "previews": [],
+    "errors": [],
+    "methodology": [
+      "One headless Chrome page, 1280x720, device scale 1, reduced motion, benchmark=1 with adaptive resolution disabled.",
+      "Route the four changed preceding GLB pairs plus the byte-identical road pair for the before stage. The remaining source and scene are identical.",
+      "Each view settles for two seconds, then resets the standard two-second warmup/eight-second sampling window. Dispose the renderer/context before stage navigation.",
+      "No builds or tests overlap sampling."
+    ],
+    "limits": [
+      "Capped, variable desktop timings do not establish a speed gain, startup improvement or mobile guarantee.",
+      "Geometry buffers are not total VRAM. Routed/warm views do not establish retained-heap or transfer improvements.",
+      "No real phone or VR headset was tested."
+    ]
+  }
+}

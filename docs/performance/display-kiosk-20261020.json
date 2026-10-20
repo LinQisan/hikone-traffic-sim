@@ -1,0 +1,286 @@
+{
+  "date": "2026-10-20",
+  "purpose": "Correct the practice-junction display case against dated Street View and the satellite frontage layout.",
+  "baseline": {
+    "description": "Saved task-start working tree, including earlier uncommitted campus/wildlife/rendering changes; not Git HEAD.",
+    "fixture": "/tmp/hikone-display-2tHOTg/before",
+    "modelHashes": {
+      "before": "2d61403a1d3ae788ab397f673d479d6619fe9bc574fa8c4bebac24432d22a1f5",
+      "after": "57bd02c23ad0a09680b266926ab74ab4ced080e7f6a3413cc5c8855218b7e9ab"
+    }
+  },
+  "sources": [
+    {
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=gZkWacuuqtEbZG-yk9E1cA&heading=150&pitch=-1&fov=25",
+      "capture": "November 2022",
+      "evidence": "Unobstructed tall glazing, low corrugated base, feet, pale lattice, shallow metal gable and cream/green campaign-panel outline."
+    },
+    {
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=2ktrhAY4ZkkBfA6R_NUjeQ&heading=160&pitch=-1&fov=25",
+      "capture": "October 2024",
+      "evidence": "Same cabinet beside the corner shop, partially obscured by a vehicle."
+    },
+    {
+      "url": "https://www.google.com/maps/@?api=1&map_action=map&center=35.27208,136.25254&zoom=21&basemap=satellite",
+      "evidence": "Junction, shop frontage and apron relationship; not a survey of the cabinet."
+    }
+  ],
+  "implementation": {
+    "asset": "ART_DisplayKiosk",
+    "source": "tools/streetscape.py",
+    "bodyMetres": [
+      1.42,
+      0.96
+    ],
+    "overallHeightMetres": 2.2865,
+    "glazingHeightMetres": 1.56,
+    "ribbedBaseHeightMetres": 0.29,
+    "localPlacement": {
+      "before": [
+        47.2,
+        0.15,
+        17
+      ],
+      "after": [
+        47.2,
+        0.15,
+        16.1
+      ],
+      "yaw": 0
+    },
+    "glass": "Opaque painted reflection planes, narrow glints and visible side lattice; existing pigment pipeline, no transparent draw or new texture.",
+    "motif": "Simplified observed cream/green oval and castle silhouette; unreadable/date-specific lettering omitted.",
+    "lod": "Same silhouette bounds; reduce corrugation/lattice bars and fine glazing glints."
+  },
+  "models": {
+    "before": {
+      "triangles": 1870,
+      "strokes": 0,
+      "bytes": 88080,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 1870,
+        "bytes": 88084
+      }
+    },
+    "after": {
+      "triangles": 1352,
+      "strokes": 0,
+      "bytes": 71004,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 990,
+        "bytes": 54352
+      }
+    },
+    "changedManifestEntries": [
+      "ART_DisplayKiosk"
+    ]
+  },
+  "collision": {
+    "added": 19,
+    "removed": 54,
+    "bounds": [
+      46.200000000000045,
+      15.600000000000023,
+      47.799999999999955,
+      17.600000000000023
+    ],
+    "totalBlocked": 340015,
+    "objects": 436,
+    "grid": [
+      6300,
+      5125
+    ],
+    "cellMetres": 0.2,
+    "regenerated": true
+  },
+  "verification": {
+    "command": "node --test test/art.test.mjs test/obstacles.test.mjs test/performance.test.mjs test/prop-review.test.mjs test/events.test.mjs",
+    "tests": 59,
+    "pass": 59,
+    "fail": 0,
+    "skipped": 0,
+    "includes": "All ten accident-event purpose/sight-line checks; clear spawns/goals; LOD geometry and async uncached prop inspection.",
+    "previews": {
+      "views": [
+        {
+          "view": "display-kiosk",
+          "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/display-kiosk.png"
+        },
+        {
+          "view": "display-kiosk-back",
+          "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/display-kiosk-back.png"
+        }
+      ],
+      "errors": []
+    },
+    "cornerScreenshots": [
+      {
+        "stage": "before",
+        "path": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/before-corner.png"
+      },
+      {
+        "stage": "after",
+        "path": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/after-corner.png"
+      }
+    ],
+    "diffCheck": "passed"
+  },
+  "benchmark": {
+    "views": {
+      "corner": [
+        31.5,
+        2.1,
+        24.8,
+        47.2,
+        1.3,
+        16.1,
+        46
+      ],
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74895991,
+          "sceneBufferBytes": 76867515,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 481,
+          "fps": 59.995260249732304,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 17.69999999552965,
+          "updateMs": 0.07754677741666345,
+          "calls": 71,
+          "triangles": 548577,
+          "width": 1280,
+          "height": 720,
+          "geometries": 90,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 3152.3000000044703,
+          "resourceTransferBytes": 83033528,
+          "resourceBodyBytes": 82990028,
+          "heapBytes": 276241046,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/before-corner.png"
+      },
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74895991,
+          "sceneBufferBytes": 76867515,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 479,
+          "fps": 59.99949896035391,
+          "medianMs": 16.700000002980232,
+          "p95Ms": 18,
+          "updateMs": 0.07578288090253922,
+          "calls": 106,
+          "triangles": 1141563,
+          "width": 1280,
+          "height": 720,
+          "geometries": 205,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 3152.3000000044703,
+          "resourceTransferBytes": 83033528,
+          "resourceBodyBytes": 82990028,
+          "heapBytes": 136627798,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/before-street.png"
+      },
+      {
+        "stage": "after",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74841851,
+          "sceneBufferBytes": 76813375,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.99400059996236,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 18.599999994039536,
+          "updateMs": 0.08666666685603559,
+          "calls": 71,
+          "triangles": 548059,
+          "width": 1280,
+          "height": 720,
+          "geometries": 90,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 4082.89999999851,
+          "resourceTransferBytes": 82982721,
+          "resourceBodyBytes": 82939221,
+          "heapBytes": 134507014,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/after-corner.png"
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74841851,
+          "sceneBufferBytes": 76813375,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 480,
+          "fps": 59.99999999999999,
+          "medianMs": 16.600000001490116,
+          "p95Ms": 18.600000001490116,
+          "updateMs": 0.08979166698021193,
+          "calls": 106,
+          "triangles": 1141045,
+          "width": 1280,
+          "height": 720,
+          "geometries": 205,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 4082.89999999851,
+          "resourceTransferBytes": 82982721,
+          "resourceBodyBytes": 82939221,
+          "heapBytes": 135766601,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-case/after-street.png"
+      }
+    ],
+    "errors": [],
+    "methodology": [
+      "One headless Chrome page at 1280 x 720, device scale 1, reduced motion, benchmark=1 with adaptive resolution disabled.",
+      "Task-start GLBs and web-layout.js are substituted only for the before stage; the remaining already-dirty scene is identical.",
+      "Each camera settles for two seconds, then the standard two-second warmup/eight-second sampling window is reset.",
+      "The old renderer/context is disposed before source-stage navigation; no build/test process overlaps sampling."
+    ],
+    "limits": [
+      "Capped desktop timings do not establish a frame-rate gain. After p95 is slightly higher in both views.",
+      "Geometry bytes deduplicate active shared buffers; they are not total VRAM or peak memory.",
+      "Fixture routing and warm sequential views do not establish loading, transfer or retained-heap improvements."
+    ]
+  },
+  "limits": [
+    "Dimensions and the 0.9 m relative setback are visual estimates fitted to the existing approximate shop frontage.",
+    "Dated Street View does not establish every October 2026 detail; no surveyed drawing was found.",
+    "Opaque painted glazing approximates the observed appearance; it is not physical glass/refraction.",
+    "No real phone or VR headset tested."
+  ]
+}

@@ -21,7 +21,7 @@ export function brushTexture() {
   for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) {
     const px = (x + 0.5) / SIZE * PERIOD, py = (y + 0.5) / SIZE * PERIOD;
     const cx = Math.floor(px - 0.5), cy = Math.floor(py - 0.5);
-    let mask = 0, pigment = 0;
+    let mask = 0, pigment = 0, leafMask = 0;
     const grain = hash(x, y, 90787);
     for (let j = 0; j < 2; j++) for (let i = 0; i < 2; i++) {
       const ix = cx + i, iy = cy + j;
@@ -32,13 +32,16 @@ export function brushTexture() {
         + (grain - 0.5) * 0.20 + Math.abs(qx + qy) * 0.13;
       const t = Math.max(0, Math.min(1, (edge - 0.71) / 0.33));
       const dab = 1 - t * t * (3 - 2 * t);
+      const leafEdge = (qx / (0.47 + cell.seed * 0.12)) ** 2 + (qy / (0.32 + cell.seed * 0.12)) ** 2;
+      const leafT = Math.max(0, Math.min(1, (leafEdge + (grain - 0.5) * 0.10 - 0.18) / 0.82));
+      leafMask = Math.max(leafMask, 1 - leafT * leafT * (3 - 2 * leafT));
       if (dab > mask) { mask = dab; pigment = cell.seed; }
     }
     const offset = (y * SIZE + x) * 4;
     data[offset] = Math.round(mask * 255);
     data[offset + 1] = Math.round(pigment * 255);
     data[offset + 2] = Math.round(grain * 255);
-    data[offset + 3] = 255;
+    data[offset + 3] = Math.round(leafMask * 255);
   }
   texture = new THREE.DataTexture(data, SIZE, SIZE);
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;

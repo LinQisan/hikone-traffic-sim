@@ -1,0 +1,545 @@
+{
+  "date": "2026-10-20",
+  "change": "Autumn concept-sheet broadleaf trees",
+  "baseline": "Working tree at the start of this tree change, including the prior local scene corrections; not Git HEAD.",
+  "method": "Same browser page, baseline then final, benchmark=1, identical cameras and viewport, reduced motion. Only saved tree/composite GLBs are substituted for the baseline. Model generation finished before either measurement.",
+  "limits": "Frame-capped desktop samples do not establish a speed gain or phone/VR performance. Geometry buffers are not total VRAM. Routed, warm resource/heap counters are not loading or retained-heap comparisons.",
+  "assets": {
+    "HK_Tree_Round": {
+      "before": {
+        "triangles": 8200,
+        "strokes": 196,
+        "bytes": 154736,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2136,
+          "bytes": 41696
+        }
+      },
+      "after": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002488,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76528
+        }
+      }
+    },
+    "HK_Tree_RoundLow": {
+      "before": {
+        "triangles": 8188,
+        "strokes": 196,
+        "bytes": 154308,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2136,
+          "bytes": 41704
+        }
+      },
+      "after": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002616,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76556
+        }
+      }
+    },
+    "HK_Tree_Sakura": {
+      "before": {
+        "triangles": 8200,
+        "strokes": 196,
+        "bytes": 154740,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2136,
+          "bytes": 41704
+        }
+      },
+      "after": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002504,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76544
+        }
+      }
+    },
+    "HK_Tree_Zelkova": {
+      "before": {
+        "triangles": 8188,
+        "strokes": 196,
+        "bytes": 154312,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2136,
+          "bytes": 41704
+        }
+      },
+      "after": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002452,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76592
+        }
+      }
+    },
+    "ART_MoatTree_Airy": {
+      "before": {
+        "triangles": 8188,
+        "strokes": 196,
+        "bytes": 154312,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2136,
+          "bytes": 41708
+        }
+      },
+      "after": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002548,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76592
+        }
+      }
+    },
+    "ART_MoatTree_Broad": {
+      "before": {
+        "triangles": 8180,
+        "strokes": 196,
+        "bytes": 154024,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2136,
+          "bytes": 41708
+        }
+      },
+      "after": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002496,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76556
+        }
+      }
+    },
+    "ART_CastleGrove": {
+      "before": {
+        "triangles": 16396,
+        "strokes": 392,
+        "bytes": 306076,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 4272,
+          "bytes": 80160
+        }
+      },
+      "after": {
+        "triangles": 99940,
+        "strokes": 8064,
+        "bytes": 2006492,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 6800,
+          "bytes": 150876
+        }
+      }
+    },
+    "ART_TownTree": {
+      "before": {
+        "triangles": 9912,
+        "strokes": 238,
+        "bytes": 187336,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 2604,
+          "bytes": 51352
+        }
+      },
+      "after": {
+        "triangles": 51690,
+        "strokes": 4074,
+        "bytes": 1039184,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 3868,
+          "bytes": 88152
+        }
+      }
+    },
+    "HK_Terrain_Hikone": {
+      "before": {
+        "triangles": 900300,
+        "strokes": 0,
+        "bytes": 21692572,
+        "remodeled": true,
+        "design": "hikone-landmark-v1",
+        "lod": {
+          "triangles": 277787,
+          "bytes": 6866484
+        }
+      },
+      "after": {
+        "triangles": 430792,
+        "strokes": 44016,
+        "bytes": 14214004,
+        "remodeled": true,
+        "design": "hikone-landmark-v1",
+        "lod": {
+          "triangles": 254728,
+          "bytes": 9068888
+        }
+      }
+    },
+    "ART_ShigaCampus": {
+      "before": {
+        "triangles": 133738,
+        "strokes": 0,
+        "bytes": 7019528,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 50857,
+          "bytes": 2804800
+        }
+      },
+      "after": {
+        "triangles": 83562,
+        "strokes": 4704,
+        "bytes": 4759696,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 48393,
+          "bytes": 2599164
+        }
+      }
+    },
+    "ART_WestMoat": {
+      "before": {
+        "triangles": 111346,
+        "strokes": 0,
+        "bytes": 6481732,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 78054,
+          "bytes": 4896964
+        }
+      },
+      "after": {
+        "triangles": 97898,
+        "strokes": 5124,
+        "bytes": 5736616,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 73126,
+          "bytes": 4466216
+        }
+      }
+    }
+  },
+  "highSetBytes": {
+    "before": 80394000,
+    "after": 77551420
+  },
+  "collision": {
+    "beforeBlocked": 340024,
+    "afterBlocked": 338379,
+    "added": 3151,
+    "removed": 4796,
+    "width": 6300,
+    "height": 5125,
+    "cell": 0.2
+  },
+  "validation": {
+    "command": "npm test",
+    "tests": 187,
+    "passed": 187,
+    "failed": 0,
+    "skipped": 0,
+    "browserErrors": [],
+    "phoneTested": false,
+    "headsetTested": false,
+    "browserFlows": {
+      "checks": [
+        {
+          "id": "builtin-01",
+          "keyboardLook": true,
+          "movement": true,
+          "replayEnd": true,
+          "results": true,
+          "menuExit": true
+        },
+        {
+          "id": "builtin-07",
+          "keyboardLook": true,
+          "movement": true,
+          "replayEnd": true,
+          "results": true,
+          "menuExit": true
+        }
+      ],
+      "errors": []
+    },
+    "contactMethod": "Explicit inspection contact after keyboard movement; actual event purpose/contact timing is covered by the full regression."
+  },
+  "viewport": {
+    "width": 1280,
+    "height": 960
+  },
+  "reducedMotion": true,
+  "views": {
+    "street": [
+      55,
+      2.15,
+      23,
+      0,
+      2.8,
+      27,
+      62
+    ],
+    "avenue": [
+      32,
+      2.1,
+      7,
+      32,
+      4,
+      -42,
+      60
+    ],
+    "bank": [
+      20,
+      2.1,
+      42,
+      0,
+      5,
+      78,
+      56
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 74407641,
+        "sceneBufferBytes": 76344461,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.009481747591174,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.07920997867093513,
+        "calls": 99,
+        "triangles": 1050526,
+        "width": 1280,
+        "height": 960,
+        "geometries": 176,
+        "textures": 10,
+        "programs": 18,
+        "readyMs": 3990.7999999970198,
+        "resourceTransferBytes": 82546342,
+        "resourceBodyBytes": 82502842,
+        "heapBytes": 229156807,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/before-street.png"
+    },
+    {
+      "stage": "before",
+      "view": "avenue",
+      "probe": {
+        "geometryBytes": 74407641,
+        "sceneBufferBytes": 76344461,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99550033751938,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.07916666685293118,
+        "calls": 35,
+        "triangles": 694067,
+        "width": 1280,
+        "height": 960,
+        "geometries": 186,
+        "textures": 10,
+        "programs": 20,
+        "readyMs": 3990.7999999970198,
+        "resourceTransferBytes": 82546342,
+        "resourceBodyBytes": 82502842,
+        "heapBytes": 145232817,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/before-avenue.png"
+    },
+    {
+      "stage": "before",
+      "view": "bank",
+      "probe": {
+        "geometryBytes": 74407641,
+        "sceneBufferBytes": 76344461,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99250093738283,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.06958333368723592,
+        "calls": 39,
+        "triangles": 773975,
+        "width": 1280,
+        "height": 960,
+        "geometries": 207,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 3990.7999999970198,
+        "resourceTransferBytes": 82546342,
+        "resourceBodyBytes": 82502842,
+        "heapBytes": 133221134,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/before-bank.png"
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.00648718771485,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.5,
+        "updateMs": 0.08419958348705467,
+        "calls": 99,
+        "triangles": 1292007,
+        "width": 1280,
+        "height": 960,
+        "geometries": 176,
+        "textures": 10,
+        "programs": 18,
+        "readyMs": 2216.5999999940395,
+        "resourceTransferBytes": 78937650,
+        "resourceBodyBytes": 78894150,
+        "heapBytes": 220848161,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-street.png"
+    },
+    {
+      "stage": "after",
+      "view": "avenue",
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.0019959083432,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.400000005960464,
+        "updateMs": 0.07006236944897506,
+        "calls": 35,
+        "triangles": 1221947,
+        "width": 1280,
+        "height": 960,
+        "geometries": 186,
+        "textures": 10,
+        "programs": 20,
+        "readyMs": 2216.5999999940395,
+        "resourceTransferBytes": 78937650,
+        "resourceBodyBytes": 78894150,
+        "heapBytes": 143125210,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-avenue.png"
+    },
+    {
+      "stage": "after",
+      "view": "bank",
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 60.00675075950515,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.05895833373069763,
+        "calls": 39,
+        "triangles": 1031913,
+        "width": 1280,
+        "height": 960,
+        "geometries": 207,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2216.5999999940395,
+        "resourceTransferBytes": 78937650,
+        "resourceBodyBytes": 78894150,
+        "heapBytes": 133706871,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-bank.png"
+    }
+  ],
+  "previews": [
+    {
+      "view": "tree",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-tree.png"
+    },
+    {
+      "view": "tree-broad",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-tree-broad.png"
+    },
+    {
+      "view": "tree-airy",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-tree-airy.png"
+    },
+    {
+      "view": "tree-detail",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-tree-detail.png"
+    },
+    {
+      "view": "tree-raw",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/trees/after-tree-raw.png"
+    }
+  ],
+  "errors": []
+}

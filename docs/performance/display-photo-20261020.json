@@ -1,0 +1,298 @@
+{
+  "date": "2026-10-20",
+  "purpose": "Correct the display case using the owner-supplied close-up, replacing the lattice interpretation with uninterrupted glass and reproducing the photographed cabinet and campaign graphic.",
+  "reference": {
+    "file": "/tmp/codex-remote-attachments/01a15455-0d15-7612-80bb-4566a7428375/60B112D5-65F7-4DFA-A28B-89EA99902996/1-照片-1.jpg",
+    "sha256": "823f951fe8d2f618d47ef2f24bc350d31710a517b5d3ef018c02abb8b73c8517",
+    "priority": "The close-up supersedes the preceding Street View interpretation for cabinet detail.",
+    "observed": [
+      "Large clear glazing without a wooden lattice",
+      "Full-height dark weathered wood posts and low sheet-metal roof",
+      "Ribbed silver base and irregular stone foot pads",
+      "Orange/white oval, dark castle, green leaf and cyan river",
+      "Hikone Castle Town / 2024年 / 彦根城を世界遺産に。"
+    ],
+    "limits": "Body dimensions and finish colours are estimated from a perspective photo, not a measured survey."
+  },
+  "baseline": {
+    "description": "The preceding transparent cabinet in the already-dirty working tree, not Git HEAD.",
+    "fixture": "/tmp/hikone-photo-case/before",
+    "modelSha256": {
+      "before": "cc9bb7d8e503ef873284ceeb8bd2706b421d9edd683e9d2f9d4d3fb5d903728d",
+      "after": "cb1f82f22d64db4b1c9f3628a6a3dccfdb6da7e5deafa635c3f900a049927586"
+    }
+  },
+  "implementation": {
+    "asset": "ART_DisplayKiosk",
+    "source": "tools/display_case.py",
+    "dispatch": "tools/streetscape.py",
+    "bodyMetres": [
+      1.42,
+      1.04
+    ],
+    "heightAboveOriginMetres": 2.2445,
+    "glassBottomTopMetres": [
+      0.53,
+      1.985
+    ],
+    "glassOpacity": 0.12,
+    "glass": "Four thin double-sided panes; existing separate transparent draw, no depth writes or opaque glass shadow.",
+    "lettering": "Baked flat outline triangles in tools/reference/display-case-lettering.json. Optional Blender authoring script uses Arial Narrow Bold and Hiragino Kaku Gothic W6; ordinary model rebuilds and the browser need no installed font.",
+    "sourceTriangleCounts": {
+      "town": 400,
+      "year": 204,
+      "campaign": 865
+    },
+    "lod": "Keep logo/year and silhouette; omit fine English/Japanese lines, reduce weathering and metal ribs.",
+    "placement": "Existing local (47.2, 0.15, 16.1), yaw 0. No render-only height offset.",
+    "newImageAssets": 0,
+    "newRuntimeDependencies": 0,
+    "newPostProcessing": 0,
+    "newReflectionCaptures": 0,
+    "cameraPreview": "Standalone front camera changes to the right-hand side visible in the photo."
+  },
+  "models": {
+    "before": {
+      "triangles": 1306,
+      "strokes": 0,
+      "bytes": 67700,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 944,
+        "bytes": 51048
+      }
+    },
+    "after": {
+      "triangles": 2948,
+      "strokes": 0,
+      "bytes": 108816,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 951,
+        "bytes": 44952
+      }
+    },
+    "changedManifestEntries": [
+      "ART_DisplayKiosk"
+    ]
+  },
+  "collision": {
+    "added": 11,
+    "removed": 0,
+    "bounds": [
+      46.40000000000009,
+      15.400000000000006,
+      47.799999999999955,
+      16.600000000000023
+    ],
+    "regenerated": true,
+    "blockedCells": 340026,
+    "objects": 436
+  },
+  "verification": {
+    "tests": 60,
+    "pass": 60,
+    "fail": 0,
+    "skipped": 0,
+    "groups": [
+      {
+        "command": "node --test test/art.test.mjs test/performance.test.mjs",
+        "tests": 36,
+        "log": "/tmp/hikone-photo-case/tests-rendering.log"
+      },
+      {
+        "command": "node --test test/obstacles.test.mjs test/events.test.mjs",
+        "tests": 24,
+        "log": "/tmp/hikone-photo-case/tests-safety.log"
+      }
+    ],
+    "includes": "All ten event-purpose/sight-line checks. Expanded glass regression checks six heights from both the front and the side, rejecting opaque backing and the former lattice. Spawn/goal and LOD checks pass.",
+    "syntax": [
+      "tools/display_case.py",
+      "tools/build_display_lettering.py",
+      "tools/streetscape.py",
+      "src/prop-review.js"
+    ],
+    "diffCheck": "passed"
+  },
+  "benchmark": {
+    "views": {
+      "corner": [
+        31.5,
+        2.1,
+        24.8,
+        47.2,
+        1.3,
+        16.1,
+        46
+      ],
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74837195,
+          "sceneBufferBytes": 76808719,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 479,
+          "fps": 60.02882386114419,
+          "medianMs": 16.69999999552965,
+          "p95Ms": 26.399999998509884,
+          "updateMs": 0.1244258875015633,
+          "calls": 72,
+          "triangles": 548013,
+          "width": 1280,
+          "height": 720,
+          "geometries": 91,
+          "textures": 10,
+          "programs": 16,
+          "readyMs": 15467.80000000447,
+          "resourceTransferBytes": 82977963,
+          "resourceBodyBytes": 82934463,
+          "heapBytes": 212455505,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-photo/before-corner.png"
+      },
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74837195,
+          "sceneBufferBytes": 76808719,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 479,
+          "fps": 59.726430504132104,
+          "medianMs": 16.900000005960464,
+          "p95Ms": 24.399999998509884,
+          "updateMs": 0.16471816289835534,
+          "calls": 107,
+          "triangles": 1140999,
+          "width": 1280,
+          "height": 720,
+          "geometries": 206,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 15467.80000000447,
+          "resourceTransferBytes": 82977963,
+          "resourceBodyBytes": 82934463,
+          "heapBytes": 134193596,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-photo/before-street.png"
+      },
+      {
+        "stage": "after",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74876235,
+          "sceneBufferBytes": 76847759,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 475,
+          "fps": 59.334948909497136,
+          "medianMs": 16.700000002980232,
+          "p95Ms": 25,
+          "updateMs": 0.17052631582084454,
+          "calls": 72,
+          "triangles": 549655,
+          "width": 1280,
+          "height": 720,
+          "geometries": 91,
+          "textures": 10,
+          "programs": 16,
+          "readyMs": 18379.40000000596,
+          "resourceTransferBytes": 83012983,
+          "resourceBodyBytes": 82969483,
+          "heapBytes": 133911690,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-photo/after-corner.png"
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74876235,
+          "sceneBufferBytes": 76847759,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 481,
+          "fps": 59.981793468139514,
+          "medianMs": 17.200000002980232,
+          "p95Ms": 24.80000000447035,
+          "updateMs": 0.17837837837218246,
+          "calls": 107,
+          "triangles": 1142641,
+          "width": 1280,
+          "height": 720,
+          "geometries": 206,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 18379.40000000596,
+          "resourceTransferBytes": 83012983,
+          "resourceBodyBytes": 82969483,
+          "heapBytes": 135335213,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-photo/after-street.png"
+      }
+    ],
+    "previews": [
+      {
+        "view": "display-kiosk",
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-photo/display-kiosk.png",
+        "surfaces": [
+          {
+            "name": "ART_DisplayGlass",
+            "opacity": 0.11999999731779099,
+            "depthWrite": false,
+            "castShadow": false,
+            "side": 2,
+            "singlePass": true
+          }
+        ]
+      },
+      {
+        "view": "display-kiosk-back",
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-photo/display-kiosk-back.png",
+        "surfaces": [
+          {
+            "name": "ART_DisplayGlass",
+            "opacity": 0.11999999731779099,
+            "depthWrite": false,
+            "castShadow": false,
+            "side": 2,
+            "singlePass": true
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "methodology": [
+      "One headless Chrome page, 1280x720, device scale 1, reduced motion, benchmark=1 with adaptive resolution disabled.",
+      "Only the saved preceding high/low case GLBs are substituted for the before stage; the remaining scene and source are identical.",
+      "Each camera settles for two seconds, then resets the standard two-second warmup and eight-second sample window. Dispose the renderer/context before stage navigation.",
+      "No builds or tests overlap sample windows. Standalone views follow sampling."
+    ],
+    "limits": [
+      "Frame-capped, variable desktop timings establish no speed improvement or phone/VR guarantee.",
+      "Counted geometry buffers are not total VRAM. Routed/warm views do not establish loading-time or retained-heap changes.",
+      "No real phone or VR headset was tested."
+    ]
+  }
+}

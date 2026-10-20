@@ -1,0 +1,235 @@
+{
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": true,
+  "cameras": {
+    "photo": [
+      52.8,
+      1.65,
+      21.8,
+      22,
+      10,
+      25.3,
+      64
+    ],
+    "street": [
+      55,
+      2.15,
+      23,
+      0,
+      2.8,
+      27,
+      62
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 60.00150003752329,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.08187500052154065,
+        "calls": 102,
+        "triangles": 1044568,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4082.4000000059605,
+        "resourceTransferBytes": 75263094,
+        "resourceBodyBytes": 75219594,
+        "heapBytes": 230296361,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/before-photo.png"
+    },
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99775008439419,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.0722916664245228,
+        "calls": 98,
+        "triangles": 1032181,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4082.4000000059605,
+        "resourceTransferBytes": 75263094,
+        "resourceBodyBytes": 75219594,
+        "heapBytes": 148371011,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/before-street.png"
+    },
+    {
+      "stage": "after",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70599166,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99925000941959,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.700000002980232,
+        "updateMs": 0.08499999977648258,
+        "calls": 102,
+        "triangles": 1047200,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4625.399999991059,
+        "resourceTransferBytes": 75263763,
+        "resourceBodyBytes": 75220263,
+        "heapBytes": 214839221,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/after-photo.png"
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70599166,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.004241463986666,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.69999998807907,
+        "updateMs": 0.07920997929052603,
+        "calls": 98,
+        "triangles": 1034813,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 182,
+        "textures": 10,
+        "programs": 19,
+        "readyMs": 4625.399999991059,
+        "resourceTransferBytes": 75263763,
+        "resourceBodyBytes": 75220263,
+        "heapBytes": 148280632,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/after-street.png"
+    }
+  ],
+  "previews": [
+    {
+      "view": "signals-walk",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/after-signals-walk.png",
+      "geometry": {
+        "names": []
+      }
+    },
+    {
+      "view": "signals-walk-back",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/after-signals-walk-back.png",
+      "geometry": {
+        "names": []
+      }
+    },
+    {
+      "view": "signals-double",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-corner/after-signals-double.png",
+      "geometry": {
+        "names": [
+          [
+            -0.17000000178813934,
+            6.929999828338623,
+            3.924999952316284
+          ],
+          [
+            -0.17000000178813934,
+            6.349999904632568,
+            3.924999952316284
+          ],
+          [
+            -0.17000000178813934,
+            6.929999828338623,
+            5.074999809265137
+          ],
+          [
+            -0.17000000178813934,
+            6.349999904632568,
+            3.924999952316284
+          ],
+          [
+            -0.17000000178813934,
+            6.349999904632568,
+            5.074999809265137
+          ],
+          [
+            -0.17000000178813934,
+            6.929999828338623,
+            5.074999809265137
+          ]
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "context": {
+    "date": "2026-10-20",
+    "browser": "Installed Chrome, headless, one Playwright page",
+    "comparison": "Beginning-of-change working files routed into the same page versus final local sources; identical generated assets and fixed cameras. Earlier tree-performance changes remain on both sides.",
+    "limitations": "Capped desktop windows do not establish a speed gain, worst-case FPS or phone/VR performance."
+  },
+  "sources": {
+    "signal-layout.js": {
+      "beforeSha256": "3f3eb159ffecdab97e3855fcee004412b5b617f0e58967c6528fdf15646c295a",
+      "afterSha256": "b6accf8c51695a30f76e818f73d3ee5a40101c0513179de4c8e3f96f614890ba"
+    },
+    "signals.js": {
+      "beforeSha256": "db9625f69f4349906957d3d1a5e9ae99f0869add0b4a0772cf5915abd0a5a26e",
+      "afterSha256": "a7a0c8d85339db1e54e2c432656f886a814feb32f3b3ce0d041b2040d5bea93b"
+    },
+    "prop-review.js": {
+      "beforeSha256": "49885f5500f8cce2c61686e5341b85ae949a4bedb0b249d198ffd7208179f0f2",
+      "afterSha256": "4c6aa5679500e8ba105d014a6df1640dd9fe47a7e114de2af8cd79fb24ffcd4a"
+    }
+  },
+  "validation": {
+    "focusedTests": 55,
+    "failed": 0,
+    "skipped": 0,
+    "commands": [
+      "node --test test/art.test.mjs test/prop-review.test.mjs",
+      "node --test test/obstacles.test.mjs test/performance.test.mjs"
+    ],
+    "collision": {
+      "command": "node tools/build_collision.mjs",
+      "blockedCells": 338379,
+      "byteIdentical": true,
+      "sha256": "6ccc0517e122f24cc56d4089e5e66ac05b1e66c844d45e3cfe113141d3d5383d"
+    },
+    "browserErrors": [],
+    "renderedGeometry": "The town-west name face is centred at recentered Unity (0.17,6.64,4.5), above the arm-end head; neither shop-pole preview contains a name face. Support uprights remain behind both plates.",
+    "realPhoneOrVR": false
+  }
+}

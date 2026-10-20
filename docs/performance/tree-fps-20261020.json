@@ -1,0 +1,1456 @@
+{
+  "date": "2026-10-20",
+  "change": "Reduce tree-side frame drops: leaf geometry, tree LOD, foliage fragment cost, high-density MSAA and bark back-face culling.",
+  "baseline": "Working tree immediately after the first concept-tree delivery, including prior local scene changes; not Git HEAD.",
+  "method": "Same headless Chrome tab and cameras, baseline then final within each power/quality configuration. Saved original app/style/LOD modules and tree GLBs are routed only for baseline. GPU/model generation and tests finish before sampling. The diagnostic low-power request selects Intel UHD 630; production continues requesting high-performance.",
+  "sampling": "benchmark=1 fixes adaptive resolution. Regular quality renders 1600 x 1000; quality=high renders 3072 x 1920. Each probe excludes two warm-up seconds, then samples eight seconds. GPU elapsed queries cover that warmed window, with disjoint results discarded. Actual adaptive-resolution behavior is tested separately without benchmark=1.",
+  "limits": "Desktop GPU clocks and load vary: intermediate diagnostic baselines differ, so report the matched final windows. A capped 60 fps does not measure extra speed headroom; GPU elapsed times and submitted geometry provide additional evidence. Geometry buffer totals are not total VRAM. Routed/warm counters do not establish loading or retained-heap improvements. No phone or headset performance claim.",
+  "assets": {
+    "HK_Tree_Round": {
+      "before": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002488,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76528
+        }
+      },
+      "after": {
+        "triangles": 17674,
+        "strokes": 2016,
+        "bytes": 405728,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2392,
+          "bytes": 60384
+        }
+      }
+    },
+    "HK_Tree_RoundLow": {
+      "before": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002616,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76556
+        }
+      },
+      "after": {
+        "triangles": 17674,
+        "strokes": 2016,
+        "bytes": 405856,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2392,
+          "bytes": 60408
+        }
+      }
+    },
+    "HK_Tree_Sakura": {
+      "before": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002504,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76544
+        }
+      },
+      "after": {
+        "triangles": 17674,
+        "strokes": 2016,
+        "bytes": 405748,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2392,
+          "bytes": 60404
+        }
+      }
+    },
+    "HK_Tree_Zelkova": {
+      "before": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002452,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76592
+        }
+      },
+      "after": {
+        "triangles": 17674,
+        "strokes": 2016,
+        "bytes": 405688,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2392,
+          "bytes": 60440
+        }
+      }
+    },
+    "ART_MoatTree_Airy": {
+      "before": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002548,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76592
+        }
+      },
+      "after": {
+        "triangles": 17674,
+        "strokes": 2016,
+        "bytes": 405788,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2392,
+          "bytes": 60444
+        }
+      }
+    },
+    "ART_MoatTree_Broad": {
+      "before": {
+        "triangles": 49930,
+        "strokes": 4032,
+        "bytes": 1002496,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 3400,
+          "bytes": 76556
+        }
+      },
+      "after": {
+        "triangles": 17674,
+        "strokes": 2016,
+        "bytes": 405736,
+        "remodeled": true,
+        "design": "abstract-closed-solids-v2",
+        "lod": {
+          "triangles": 2392,
+          "bytes": 60408
+        }
+      }
+    },
+    "ART_CastleGrove": {
+      "before": {
+        "triangles": 99940,
+        "strokes": 8064,
+        "bytes": 2006492,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 6800,
+          "bytes": 150876
+        }
+      },
+      "after": {
+        "triangles": 35428,
+        "strokes": 4032,
+        "bytes": 812996,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 4784,
+          "bytes": 118600
+        }
+      }
+    },
+    "ART_TownTree": {
+      "before": {
+        "triangles": 51690,
+        "strokes": 4074,
+        "bytes": 1039184,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 3868,
+          "bytes": 88152
+        }
+      },
+      "after": {
+        "triangles": 19434,
+        "strokes": 2058,
+        "bytes": 442420,
+        "remodeled": true,
+        "design": "street-view-details-v1",
+        "lod": {
+          "triangles": 2860,
+          "bytes": 72004
+        }
+      }
+    }
+  },
+  "highSetBytes": {
+    "before": 77551420,
+    "after": 72180600
+  },
+  "collision": {
+    "blocked": 338379,
+    "byteIdentical": true,
+    "sha256": "6ccc0517e122f24cc56d4089e5e66ac05b1e66c844d45e3cfe113141d3d5383d"
+  },
+  "validation": {
+    "tests": 188,
+    "passed": 188,
+    "failed": 0,
+    "skipped": 0,
+    "command": "npm test",
+    "cullingRegressionFailedBeforeFix": true,
+    "runtimeTreeSidesChecked": 30,
+    "runtimeTreeSides": "FrontSide at both levels",
+    "browserFlows": {
+      "checks": [
+        {
+          "id": "builtin-01",
+          "keyboardLook": true,
+          "movement": true,
+          "replayEnd": true,
+          "results": true,
+          "menuExit": true
+        },
+        {
+          "id": "builtin-07",
+          "keyboardLook": true,
+          "movement": true,
+          "replayEnd": true,
+          "results": true,
+          "menuExit": true
+        }
+      ],
+      "errors": []
+    },
+    "phoneTested": false,
+    "headsetTested": false
+  },
+  "adaptiveResolution": {
+    "results": [
+      {
+        "stage": "before",
+        "frames": 442,
+        "medianMs": 16.69999999999891,
+        "p95Ms": 33.29999999999927,
+        "scale": 0.85,
+        "changes": [
+          {
+            "elapsed": 0,
+            "scale": 1,
+            "width": 1600,
+            "height": 1000
+          },
+          {
+            "elapsed": 483.3000000000002,
+            "scale": 0.85,
+            "width": 1360,
+            "height": 850
+          }
+        ],
+        "width": 1360,
+        "height": 850
+      },
+      {
+        "stage": "after",
+        "frames": 481,
+        "medianMs": 16.69999999999891,
+        "p95Ms": 16.700000000000728,
+        "scale": 1,
+        "changes": [
+          {
+            "elapsed": 0,
+            "scale": 1,
+            "width": 1600,
+            "height": 1000
+          }
+        ],
+        "width": 1600,
+        "height": 1000
+      }
+    ],
+    "errors": []
+  },
+  "pixelIsolation": {
+    "results": [
+      {
+        "variant": "native",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70567630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 132,
+          "fps": 16.577083437992844,
+          "medianMs": 60.19999998807907,
+          "p95Ms": 63.20000000298023,
+          "updateMs": 0.37272727274985024,
+          "calls": 17,
+          "triangles": 396407,
+          "width": 3072,
+          "height": 1920,
+          "geometries": 186,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 2543.7999999970198,
+          "resourceTransferBytes": 75263193,
+          "resourceBodyBytes": 75219693,
+          "heapBytes": 290341771,
+          "multiDraw": true,
+          "antialias": true
+        }
+      },
+      {
+        "variant": "noAA",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70567630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 202,
+          "fps": 25.161306394948433,
+          "medianMs": 39,
+          "p95Ms": 47.70000000298023,
+          "updateMs": 0.35841584183497005,
+          "calls": 17,
+          "triangles": 396407,
+          "width": 3072,
+          "height": 1920,
+          "geometries": 186,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 2799.5,
+          "resourceTransferBytes": 75263182,
+          "resourceBodyBytes": 75219682,
+          "heapBytes": 252772035,
+          "multiDraw": true,
+          "antialias": false
+        }
+      },
+      {
+        "variant": "noAA-no-fibre",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70567630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 241,
+          "fps": 30.187639351632143,
+          "medianMs": 33.099999994039536,
+          "p95Ms": 34.6000000089407,
+          "updateMs": 0.37053941907477084,
+          "calls": 17,
+          "triangles": 396407,
+          "width": 3072,
+          "height": 1920,
+          "geometries": 186,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 4090,
+          "resourceTransferBytes": 75262325,
+          "resourceBodyBytes": 75218825,
+          "heapBytes": 127429677,
+          "multiDraw": true,
+          "antialias": false
+        }
+      },
+      {
+        "variant": "noAA-no-paint",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70567630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 320,
+          "fps": 39.99400089985013,
+          "medianMs": 25,
+          "p95Ms": 26.299999997019768,
+          "updateMs": 0.37875000038184226,
+          "calls": 17,
+          "triangles": 396407,
+          "width": 3072,
+          "height": 1920,
+          "geometries": 186,
+          "textures": 9,
+          "programs": 21,
+          "readyMs": 2712.2000000029802,
+          "resourceTransferBytes": 75262301,
+          "resourceBodyBytes": 75218801,
+          "heapBytes": 205783836,
+          "multiDraw": true,
+          "antialias": false
+        }
+      },
+      {
+        "variant": "noAA-no-shadow",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70567630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 246,
+          "fps": 30.687474271126852,
+          "medianMs": 32.599999994039536,
+          "p95Ms": 33.900000005960464,
+          "updateMs": 0.40243902445081775,
+          "calls": 17,
+          "triangles": 396407,
+          "width": 3072,
+          "height": 1920,
+          "geometries": 186,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 2163.7999999970198,
+          "resourceTransferBytes": 75263182,
+          "resourceBodyBytes": 75219682,
+          "heapBytes": 305970812,
+          "multiDraw": true,
+          "antialias": false
+        }
+      }
+    ],
+    "errors": []
+  },
+  "viewport": {
+    "width": 1536,
+    "height": 960
+  },
+  "deviceScaleFactor": 2,
+  "cameras": {
+    "canopy": [
+      25,
+      1.7,
+      -9,
+      27.08,
+      6.2,
+      -10.5,
+      70
+    ],
+    "avenue": [
+      32,
+      1.7,
+      -10,
+      32,
+      5,
+      -45,
+      70
+    ],
+    "street": [
+      55,
+      2.15,
+      23,
+      0,
+      2.8,
+      27,
+      62
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "power": "low-power",
+      "quality": "auto",
+      "view": "canopy",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": true
+      },
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 367,
+        "fps": 45.86926634170729,
+        "medianMs": 21.799999997019768,
+        "p95Ms": 23.200000002980232,
+        "updateMs": 0.3602179835375388,
+        "calls": 16,
+        "triangles": 752115,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 187,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2521.9000000059605,
+        "resourceTransferBytes": 78940105,
+        "resourceBodyBytes": 78896605,
+        "heapBytes": 221840794,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 367,
+          "medianMs": 20.143666,
+          "p95Ms": 20.631583,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 99940,
+            "lowTriangles": 6800,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 10,
+            "low": 0,
+            "highTriangles": 51690,
+            "lowTriangles": 3868,
+            "highSide": 2,
+            "lowSide": 2
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/before-low-power-auto-canopy.png"
+    },
+    {
+      "stage": "before",
+      "power": "low-power",
+      "quality": "auto",
+      "view": "avenue",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": true
+      },
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 288,
+        "fps": 35.93038487929636,
+        "medianMs": 27.700000002980232,
+        "p95Ms": 29.600000008940697,
+        "updateMs": 0.31840277721898425,
+        "calls": 31,
+        "triangles": 1097586,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 194,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2521.9000000059605,
+        "resourceTransferBytes": 78940105,
+        "resourceBodyBytes": 78896605,
+        "heapBytes": 155337349,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 288,
+          "medianMs": 25.911834,
+          "p95Ms": 26.643665,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 1,
+            "low": 13,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 99940,
+            "lowTriangles": 6800,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 10,
+            "low": 8,
+            "highTriangles": 51690,
+            "lowTriangles": 3868,
+            "highSide": 2,
+            "lowSide": 2
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/before-low-power-auto-avenue.png"
+    },
+    {
+      "stage": "before",
+      "power": "low-power",
+      "quality": "auto",
+      "view": "street",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": true
+      },
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 353,
+        "fps": 44.128861275378036,
+        "medianMs": 22.599999994039536,
+        "p95Ms": 23.799999997019768,
+        "updateMs": 0.2920679880606892,
+        "calls": 106,
+        "triangles": 1479671,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 194,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2521.9000000059605,
+        "resourceTransferBytes": 78940105,
+        "resourceBodyBytes": 78896605,
+        "heapBytes": 133334417,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 353,
+          "medianMs": 20.831166,
+          "p95Ms": 21.472832,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 11,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 3,
+            "low": 2,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 1,
+            "low": 2,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 35,
+            "highTriangles": 99940,
+            "lowTriangles": 6800,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 3,
+            "low": 0,
+            "highTriangles": 51690,
+            "lowTriangles": 3868,
+            "highSide": 2,
+            "lowSide": 2
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/before-low-power-auto-street.png"
+    },
+    {
+      "stage": "after",
+      "power": "low-power",
+      "quality": "auto",
+      "view": "canopy",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": false
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.002744408290454,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.12681912685010635,
+        "calls": 17,
+        "triangles": 396407,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 186,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2170.0999999940395,
+        "resourceTransferBytes": 75263087,
+        "resourceBodyBytes": 75219587,
+        "heapBytes": 187093525,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 481,
+          "medianMs": 10.209583,
+          "p95Ms": 10.957082,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 35428,
+            "lowTriangles": 4784,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 8,
+            "low": 2,
+            "highTriangles": 19434,
+            "lowTriangles": 2860,
+            "highSide": 0,
+            "lowSide": 0
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-low-power-auto-canopy.png"
+    },
+    {
+      "stage": "after",
+      "power": "low-power",
+      "quality": "auto",
+      "view": "avenue",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": false
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 464,
+        "fps": 57.92686733003899,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 23.099999994039536,
+        "updateMs": 0.1340517245297288,
+        "calls": 30,
+        "triangles": 640024,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 192,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2170.0999999940395,
+        "resourceTransferBytes": 75263087,
+        "resourceBodyBytes": 75219587,
+        "heapBytes": 150020767,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 464,
+          "medianMs": 10.328917,
+          "p95Ms": 16.680417,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 14,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 35428,
+            "lowTriangles": 4784,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 6,
+            "low": 12,
+            "highTriangles": 19434,
+            "lowTriangles": 2860,
+            "highSide": 0,
+            "lowSide": 0
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-low-power-auto-avenue.png"
+    },
+    {
+      "stage": "after",
+      "power": "low-power",
+      "quality": "auto",
+      "view": "street",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": false
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 477,
+        "fps": 59.74748233872762,
+        "medianMs": 16.600000008940697,
+        "p95Ms": 17.600000008940697,
+        "updateMs": 0.10775681352340451,
+        "calls": 106,
+        "triangles": 1104487,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 192,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2170.0999999940395,
+        "resourceTransferBytes": 75263087,
+        "resourceBodyBytes": 75219587,
+        "heapBytes": 126294711,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 477,
+          "medianMs": 10.635583,
+          "p95Ms": 16.651249,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 11,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 2,
+            "low": 3,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 3,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 35,
+            "highTriangles": 35428,
+            "lowTriangles": 4784,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 1,
+            "low": 2,
+            "highTriangles": 19434,
+            "lowTriangles": 2860,
+            "highSide": 0,
+            "lowSide": 0
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-low-power-auto-street.png"
+    },
+    {
+      "stage": "before",
+      "power": "low-power",
+      "quality": "high",
+      "view": "canopy",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": true
+      },
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 132,
+        "fps": 16.461110626133493,
+        "medianMs": 60.099999994039536,
+        "p95Ms": 64,
+        "updateMs": 0.3159090908187808,
+        "calls": 16,
+        "triangles": 752115,
+        "width": 3072,
+        "height": 1920,
+        "geometries": 187,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2635,
+        "resourceTransferBytes": 78940105,
+        "resourceBodyBytes": 78896605,
+        "heapBytes": 313056292,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 132,
+          "medianMs": 54.631582,
+          "p95Ms": 57.597083,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 99940,
+            "lowTriangles": 6800,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 10,
+            "low": 0,
+            "highTriangles": 51690,
+            "lowTriangles": 3868,
+            "highSide": 2,
+            "lowSide": 2
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/before-low-power-high-canopy.png"
+    },
+    {
+      "stage": "after",
+      "power": "low-power",
+      "quality": "high",
+      "view": "canopy",
+      "device": {
+        "gpu": "ANGLE (Intel, ANGLE Metal Renderer: Intel(R) UHD Graphics 630, Unspecified Version)",
+        "power": "low-power",
+        "gpuTimer": true,
+        "antialias": false
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 421,
+        "fps": 52.56323819508162,
+        "medianMs": 18.899999991059303,
+        "p95Ms": 20.299999997019768,
+        "updateMs": 0.37387173394550904,
+        "calls": 17,
+        "triangles": 396407,
+        "width": 3072,
+        "height": 1920,
+        "geometries": 186,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 2227.6000000089407,
+        "resourceTransferBytes": 75263087,
+        "resourceBodyBytes": 75219587,
+        "heapBytes": 240666628,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 421,
+          "medianMs": 18.748916,
+          "p95Ms": 19.376665,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 35428,
+            "lowTriangles": 4784,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 8,
+            "low": 2,
+            "highTriangles": 19434,
+            "lowTriangles": 2860,
+            "highSide": 0,
+            "lowSide": 0
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-low-power-high-canopy.png"
+    },
+    {
+      "stage": "before",
+      "power": "high-performance",
+      "quality": "auto",
+      "view": "canopy",
+      "device": {
+        "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "power": "high-performance",
+        "gpuTimer": true,
+        "antialias": true
+      },
+      "probe": {
+        "geometryBytes": 72783650,
+        "sceneBufferBytes": 74720470,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 59.99775008439419,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.1202083334637185,
+        "calls": 16,
+        "triangles": 752115,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 187,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 3966.0999999940395,
+        "resourceTransferBytes": 78940112,
+        "resourceBodyBytes": 78896612,
+        "heapBytes": 247762537,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 480,
+          "medianMs": 8.42044,
+          "p95Ms": 8.46928,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 49930,
+            "lowTriangles": 3400,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 99940,
+            "lowTriangles": 6800,
+            "highSide": 2,
+            "lowSide": 2
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 10,
+            "low": 0,
+            "highTriangles": 51690,
+            "lowTriangles": 3868,
+            "highSide": 2,
+            "lowSide": 2
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/before-high-performance-auto-canopy.png"
+    },
+    {
+      "stage": "after",
+      "power": "high-performance",
+      "quality": "auto",
+      "view": "canopy",
+      "device": {
+        "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "power": "high-performance",
+        "gpuTimer": true,
+        "antialias": false
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70567630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 480,
+        "fps": 60.00300014994044,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.700000002980232,
+        "updateMs": 0.15687500005587934,
+        "calls": 17,
+        "triangles": 396407,
+        "width": 1600,
+        "height": 1000,
+        "geometries": 186,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 4213,
+        "resourceTransferBytes": 75263094,
+        "resourceBodyBytes": 75219594,
+        "heapBytes": 128809519,
+        "multiDraw": true,
+        "gpu": {
+          "samples": 480,
+          "medianMs": 4.243239,
+          "p95Ms": 4.480159,
+          "discarded": 0
+        },
+        "trees": [
+          {
+            "asset": "HK_Tree_Round",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Broad",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_MoatTree_Airy",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 17674,
+            "lowTriangles": 2392,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "HK_Tree_Pine",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 4816,
+            "lowTriangles": 1272,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_CastleGrove",
+            "high": 0,
+            "low": 0,
+            "highTriangles": 35428,
+            "lowTriangles": 4784,
+            "highSide": 0,
+            "lowSide": 0
+          },
+          {
+            "asset": "ART_TownTree",
+            "high": 8,
+            "low": 2,
+            "highTriangles": 19434,
+            "lowTriangles": 2860,
+            "highSide": 0,
+            "lowSide": 0
+          }
+        ]
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-high-performance-auto-canopy.png"
+    }
+  ],
+  "previews": [
+    {
+      "view": "tree-broad",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-tree-broad.png"
+    },
+    {
+      "view": "tree-detail",
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/tree-fps/after-tree-detail.png"
+    }
+  ],
+  "errors": []
+}

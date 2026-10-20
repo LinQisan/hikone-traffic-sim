@@ -1,0 +1,625 @@
+{
+  "date": "2026-10-19",
+  "purpose": "Register the university, Nishi school peninsula, two moat shorelines and connecting streets against north-up aerial and dated public Street View references.",
+  "baseline": "Saved already-dirty working tree from the beginning of this correction, not Git HEAD. Rendering fixtures contain the prior source, models and exported ground/walls.",
+  "references": [
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.2772,136.2487&zoom=18&basemap=satellite",
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.2767019,136.2485277&zoom=20&basemap=satellite",
+    "https://www.google.com/maps/@?api=1&map_action=pano&pano=jfK2aVA5I6pPr6QmspUkIA&heading=300",
+    "https://www.google.com/maps/@?api=1&map_action=pano&pano=oSBsIlmcNwwIajIeCcCoSA&heading=300",
+    "https://www.shiga-u.ac.jp/information/campus-access/campusmap/"
+  ],
+  "models": {
+    "ART_ShigaCampus": {
+      "before": {
+        "triangles": 133738,
+        "strokes": 0,
+        "bytes": 7019528,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 50857,
+          "bytes": 2804800
+        }
+      },
+      "after": {
+        "triangles": 133738,
+        "strokes": 0,
+        "bytes": 7019528,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 50857,
+          "bytes": 2804800
+        }
+      }
+    },
+    "ART_WestMoat": {
+      "before": {
+        "triangles": 115356,
+        "strokes": 0,
+        "bytes": 6602644,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 48896,
+          "bytes": 3094804
+        }
+      },
+      "after": {
+        "triangles": 111346,
+        "strokes": 0,
+        "bytes": 6481732,
+        "remodeled": true,
+        "design": "shiga-connected-campus-v1",
+        "lod": {
+          "triangles": 78054,
+          "bytes": 4896964
+        }
+      }
+    },
+    "ART_CastleApproach": {
+      "before": {
+        "triangles": 13715,
+        "strokes": 0,
+        "bytes": 690784,
+        "remodeled": true,
+        "design": "hikone-approach-v1",
+        "lod": {
+          "triangles": 12081,
+          "bytes": 618208
+        }
+      },
+      "after": {
+        "triangles": 13956,
+        "strokes": 0,
+        "bytes": 702904,
+        "remodeled": true,
+        "design": "hikone-approach-v1",
+        "lod": {
+          "triangles": 12322,
+          "bytes": 631612
+        }
+      }
+    },
+    "ART_HikoneCompound": {
+      "before": {
+        "triangles": 74062,
+        "strokes": 0,
+        "bytes": 3669984,
+        "remodeled": true,
+        "design": "hikone-landmark-v1",
+        "lod": {
+          "triangles": 30328,
+          "bytes": 1455596
+        }
+      },
+      "after": {
+        "triangles": 74062,
+        "strokes": 0,
+        "bytes": 3669984,
+        "remodeled": true,
+        "design": "hikone-landmark-v1",
+        "lod": {
+          "triangles": 30328,
+          "bytes": 1455596
+        }
+      }
+    },
+    "ART_KyobashiRoads": {
+      "before": {
+        "triangles": 78647,
+        "strokes": 10614,
+        "bytes": 3493404,
+        "remodeled": false,
+        "lod": {
+          "triangles": 18944,
+          "bytes": 843116
+        }
+      },
+      "after": {
+        "triangles": 78647,
+        "strokes": 10614,
+        "bytes": 3493404,
+        "remodeled": false,
+        "lod": {
+          "triangles": 18944,
+          "bytes": 843116
+        }
+      }
+    },
+    "ART_KyobashiLand": {
+      "before": {
+        "triangles": 38926,
+        "strokes": 5619,
+        "bytes": 1558404,
+        "remodeled": false,
+        "lod": {
+          "triangles": 7321,
+          "bytes": 315248
+        }
+      },
+      "after": {
+        "triangles": 39201,
+        "strokes": 5661,
+        "bytes": 1569912,
+        "remodeled": false,
+        "lod": {
+          "triangles": 7356,
+          "bytes": 317316
+        }
+      }
+    }
+  },
+  "validation": {
+    "command": "npm test",
+    "tests": 168,
+    "pass": 168,
+    "fail": 0,
+    "skipped": 0,
+    "durationMs": 35904.910096,
+    "collision": {
+      "objects": 436,
+      "width": 6300,
+      "height": 5125,
+      "cellMetres": 0.2,
+      "blockedCells": 340050
+    },
+    "realControllerTraversal": {
+      "navigation": [
+        {
+          "name": "main",
+          "mode": "walking",
+          "frames": 15909,
+          "distance": 636.3600000000012,
+          "end": [
+            -694.9391351992897,
+            211.0973783839531
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "main",
+          "mode": "bicycle",
+          "frames": 15937,
+          "distance": 636.3479166666679,
+          "end": [
+            -694.9360497878477,
+            211.09791312862998
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "west",
+          "mode": "walking",
+          "frames": 23298,
+          "distance": 931.9199999997323,
+          "end": [
+            -687.3935544492534,
+            173.29665059503097
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "west",
+          "mode": "bicycle",
+          "frames": 23328,
+          "distance": 931.987916666399,
+          "end": [
+            -687.3938249238361,
+            173.29670419568583
+          ],
+          "ground": 0.010000000000000002
+        },
+        {
+          "name": "moat",
+          "mode": "walking",
+          "frames": 12849,
+          "distance": 513.9600000001125,
+          "end": [
+            -217.71843795312918,
+            219.29541675003236
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "moat",
+          "mode": "bicycle",
+          "frames": 12877,
+          "distance": 513.9479166667792,
+          "end": [
+            -217.72136212579136,
+            219.29535460752498
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "school",
+          "mode": "walking",
+          "frames": 1746,
+          "distance": 69.83999999999972,
+          "end": [
+            -527.8060061615257,
+            318.23326200685494
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "school",
+          "mode": "bicycle",
+          "frames": 1774,
+          "distance": 69.8279166666664,
+          "end": [
+            -527.8065431612844,
+            318.2212015489635
+          ],
+          "ground": 0.01
+        },
+        {
+          "name": "lot",
+          "mode": "walking",
+          "frames": 613,
+          "distance": 24.519999999999655,
+          "end": [
+            -484.99519076148766,
+            266.2352899453522
+          ],
+          "ground": 0.010000000000000002
+        },
+        {
+          "name": "lot",
+          "mode": "bicycle",
+          "frames": 641,
+          "distance": 24.507916666666322,
+          "end": [
+            -485.0003954701877,
+            266.2250287389315
+          ],
+          "ground": 0.01
+        }
+      ],
+      "errors": []
+    },
+    "ordinaryScenarioFlow": {
+      "results": [
+        {
+          "id": "builtin-01",
+          "start": {
+            "state": "playing",
+            "mode": "walking",
+            "x": 40,
+            "z": 14,
+            "y": 1.5912,
+            "ground": 0.01,
+            "yaw": 13.435523362319215
+          },
+          "turned": -25.585476635535016,
+          "moved": {
+            "x": 39.44376800633599,
+            "z": 15.161701325308952
+          },
+          "state": "results",
+          "replayed": true
+        },
+        {
+          "id": "builtin-07",
+          "start": {
+            "state": "playing",
+            "mode": "bicycle",
+            "x": -68.54,
+            "z": 22.77,
+            "y": 1.562013800095281,
+            "ground": 0.01,
+            "yaw": -89.00538152635941
+          },
+          "turned": 233.49461847364057,
+          "moved": {
+            "x": -68.89595107188636,
+            "z": 22.776179706109136
+          },
+          "state": "results",
+          "replayed": true
+        }
+      ],
+      "errors": []
+    },
+    "visualReview": {
+      "views": [
+        "school-map",
+        "school-neighborhood",
+        "university",
+        "university-gate",
+        "school-moat-lane",
+        "school-open-lot"
+      ],
+      "errors": []
+    }
+  },
+  "rendering": {
+    "date": "2026-10-19",
+    "viewport": [
+      1280,
+      720
+    ],
+    "renderer": "Chrome ANGLE Metal, reduced motion, fixed same page; before resources served from saved working-tree fixture",
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "lane": [
+        -528.224,
+        1.7,
+        262.826,
+        -528.996,
+        3,
+        291.662,
+        78
+      ],
+      "lot": [
+        -496.23,
+        1.7,
+        250.48,
+        -263.89,
+        21,
+        395.92,
+        72
+      ],
+      "overview": [
+        -645,
+        115,
+        160,
+        -495,
+        0,
+        310,
+        68
+      ]
+    },
+    "results": [
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 60.00675075928159,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.600000023841858,
+          "updateMs": 0.0616666658471028,
+          "calls": 95,
+          "triangles": 1048974,
+          "width": 1280,
+          "height": 720,
+          "geometries": 118,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 3371.899999976158,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 140038063,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "lane",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 479,
+          "fps": 60.00175370496997,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.30000001192093,
+          "updateMs": 0.05052192263414068,
+          "calls": 6,
+          "triangles": 1188046,
+          "width": 1280,
+          "height": 720,
+          "geometries": 121,
+          "textures": 9,
+          "programs": 17,
+          "readyMs": 3371.899999976158,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 144071410,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "lot",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 60.00075000955393,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.050416665400067964,
+          "calls": 56,
+          "triangles": 1612285,
+          "width": 1280,
+          "height": 720,
+          "geometries": 137,
+          "textures": 9,
+          "programs": 17,
+          "readyMs": 3371.899999976158,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 135470932,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "overview",
+        "probe": {
+          "geometryBytes": 76551571,
+          "sceneBufferBytes": 78519191,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 481,
+          "fps": 60.00873307965816,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.399999976158142,
+          "updateMs": 0.04303534164745942,
+          "calls": 37,
+          "triangles": 844513,
+          "width": 1280,
+          "height": 720,
+          "geometries": 137,
+          "textures": 9,
+          "programs": 17,
+          "readyMs": 3371.899999976158,
+          "resourceTransferBytes": 83009690,
+          "resourceBodyBytes": 82966790,
+          "heapBytes": 135872869,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74664091,
+          "sceneBufferBytes": 76631711,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.99850003758847,
+          "medianMs": 16.600000023841858,
+          "p95Ms": 17.599999964237213,
+          "updateMs": 0.08833333253860473,
+          "calls": 95,
+          "triangles": 1019414,
+          "width": 1280,
+          "height": 720,
+          "geometries": 118,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 3189.800000011921,
+          "resourceTransferBytes": 81095374,
+          "resourceBodyBytes": 81052474,
+          "heapBytes": 133203483,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "lane",
+        "probe": {
+          "geometryBytes": 74664091,
+          "sceneBufferBytes": 76631711,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 481,
+          "fps": 59.99975052087708,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.80000001192093,
+          "updateMs": 0.08004158128076184,
+          "calls": 6,
+          "triangles": 1191815,
+          "width": 1280,
+          "height": 720,
+          "geometries": 121,
+          "textures": 9,
+          "programs": 17,
+          "readyMs": 3189.800000011921,
+          "resourceTransferBytes": 81095374,
+          "resourceBodyBytes": 81052474,
+          "heapBytes": 137491327,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "lot",
+        "probe": {
+          "geometryBytes": 74664091,
+          "sceneBufferBytes": 76631711,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 60.002250084467576,
+          "medianMs": 16.600000023841858,
+          "p95Ms": 17.600000023841858,
+          "updateMs": 0.08083333435157934,
+          "calls": 56,
+          "triangles": 1616080,
+          "width": 1280,
+          "height": 720,
+          "geometries": 137,
+          "textures": 9,
+          "programs": 17,
+          "readyMs": 3189.800000011921,
+          "resourceTransferBytes": 81095374,
+          "resourceBodyBytes": 81052474,
+          "heapBytes": 133911548,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "overview",
+        "probe": {
+          "geometryBytes": 74664091,
+          "sceneBufferBytes": 76631711,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.93856297304194,
+          "medianMs": 17.099999964237213,
+          "p95Ms": 24.900000035762787,
+          "updateMs": 0.11604166813194752,
+          "calls": 37,
+          "triangles": 848247,
+          "width": 1280,
+          "height": 720,
+          "geometries": 137,
+          "textures": 9,
+          "programs": 17,
+          "readyMs": 3189.800000011921,
+          "resourceTransferBytes": 81095374,
+          "resourceBodyBytes": 81052474,
+          "heapBytes": 133722612,
+          "multiDraw": true
+        }
+      }
+    ],
+    "errors": []
+  },
+  "renderingSummary": {
+    "geometryBytesBefore": 74664091,
+    "geometryBytesAfter": 76551571,
+    "geometryIncreasePercent": 2.527962203410472,
+    "drawsByView": {
+      "street": 95,
+      "lane": 6,
+      "lot": 56,
+      "overview": 37
+    },
+    "placements": 440,
+    "environmentMeshes": 218,
+    "textures": 9,
+    "method": "Same page, fixed cameras and viewport, reduced motion, cache disabled, four-second initial settle, two-second probe warmup and eight-second sample per view. Prior renderer disposed and context lost before swapping stages. After stage precedes before stage.",
+    "hostLimits": {
+      "CPU_Speed_Limit": 100,
+      "CPU_Scheduler_Limit": 100,
+      "availableCPUs": 12,
+      "recordedThermalPerformanceWarnings": false
+    },
+    "limits": "Frame-capped desktop measurements establish no speed improvement. Buffer bytes are not total VRAM. Fixture routing and differing startup order prevent loading-time or retained-heap claims. No real phone or VR headset tested."
+  }
+}

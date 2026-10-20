@@ -1,0 +1,1039 @@
+{
+  "date": "2026-10-21",
+  "purpose": "Add the owner-confirmed back-to-back vehicle head on the northeast bridge-east truss.",
+  "method": "Same headless Chrome page at benchmark=1; saved beginning-of-change signal-layout.js served for baseline, current source for final. Each revision uses fixed viewpoints, two-second warmup and eight-second samples. View front is from east and shows the newly added east-facing lenses; reverse is from west and shows the original west-facing lenses.",
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": true,
+  "before": "One west-facing vehicle head on bridge-east.",
+  "after": "An east-facing head 0.40 m behind the original, at the same height, using the existing arm-end crossbars and two ties. Extended top-name shaft and both pedestrian heads retain their positions and finish.",
+  "sources": {
+    "signal-layout.js": {
+      "before": "44afb84ef9d69a92f592fc2708b273682e0707a6bde72f6c8130fb1543d77c85",
+      "after": "c90a7eb3e510c1c61cb5e9746dc7ed30ffbbf0f0de2a7ae3d4467869a53233a0"
+    },
+    "signals.js": {
+      "before": "13ba901ac52d934c42a88b0b09eb8cc9d8c2a6d1e27914b54deb1e699f247c23",
+      "after": "13ba901ac52d934c42a88b0b09eb8cc9d8c2a6d1e27914b54deb1e699f247c23"
+    },
+    "prop-review.js": {
+      "before": "33d28632546e380f534ffb929d8ac2faefb3135088bd98e80262f7adad21ba82",
+      "after": "33d28632546e380f534ffb929d8ac2faefb3135088bd98e80262f7adad21ba82"
+    }
+  },
+  "cameras": {
+    "front": [
+      49,
+      3.7,
+      24,
+      41.2,
+      5,
+      28.6,
+      48
+    ],
+    "reverse": [
+      33,
+      3.7,
+      34,
+      41.2,
+      5,
+      28.6,
+      48
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "front",
+      "rig": {
+        "id": "bridge-east",
+        "corner": "northeast",
+        "style": "truss",
+        "height": 8.9,
+        "facing": [
+          -1,
+          0
+        ],
+        "phase": "below",
+        "nameHeight": 8.45,
+        "nameFacing": [
+          0,
+          -1
+        ],
+        "nameSize": [
+          1.35,
+          0.8
+        ],
+        "trussTieHeight": 7,
+        "group": "bridge-east",
+        "kind": "car",
+        "pole": {
+          "x": 41.2,
+          "z": 32.8
+        },
+        "head": {
+          "x": 41.2,
+          "y": 5.35,
+          "z": 28.6
+        },
+        "extraHeads": [],
+        "pedestrians": [
+          {
+            "facing": [
+              0,
+              -1
+            ],
+            "side": [
+              1,
+              0
+            ],
+            "crossing": "east",
+            "head": {
+              "x": 41.760000000000005,
+              "y": 2.75,
+              "z": 32.66
+            }
+          },
+          {
+            "facing": [
+              -1,
+              0
+            ],
+            "side": [
+              0,
+              -1
+            ],
+            "crossing": "north",
+            "head": {
+              "x": 41.06,
+              "y": 2.75,
+              "z": 32.239999999999995
+            }
+          }
+        ]
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70819630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 398,
+        "fps": 49.70588602609629,
+        "medianMs": 20.099999994039536,
+        "p95Ms": 21.5,
+        "updateMs": 0.09070351734832303,
+        "calls": 78,
+        "triangles": 918637,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 188,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2994,
+        "resourceTransferBytes": 75265299,
+        "resourceBodyBytes": 75221799,
+        "heapBytes": 212529398,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/before-front.png"
+    },
+    {
+      "stage": "before",
+      "view": "reverse",
+      "rig": {
+        "id": "bridge-east",
+        "corner": "northeast",
+        "style": "truss",
+        "height": 8.9,
+        "facing": [
+          -1,
+          0
+        ],
+        "phase": "below",
+        "nameHeight": 8.45,
+        "nameFacing": [
+          0,
+          -1
+        ],
+        "nameSize": [
+          1.35,
+          0.8
+        ],
+        "trussTieHeight": 7,
+        "group": "bridge-east",
+        "kind": "car",
+        "pole": {
+          "x": 41.2,
+          "z": 32.8
+        },
+        "head": {
+          "x": 41.2,
+          "y": 5.35,
+          "z": 28.6
+        },
+        "extraHeads": [],
+        "pedestrians": [
+          {
+            "facing": [
+              0,
+              -1
+            ],
+            "side": [
+              1,
+              0
+            ],
+            "crossing": "east",
+            "head": {
+              "x": 41.760000000000005,
+              "y": 2.75,
+              "z": 32.66
+            }
+          },
+          {
+            "facing": [
+              -1,
+              0
+            ],
+            "side": [
+              0,
+              -1
+            ],
+            "crossing": "north",
+            "head": {
+              "x": 41.06,
+              "y": 2.75,
+              "z": 32.239999999999995
+            }
+          }
+        ]
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70819630,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 385,
+        "fps": 48.232316905095864,
+        "medianMs": 20.700000002980232,
+        "p95Ms": 21.899999991059303,
+        "updateMs": 0.06701298735358498,
+        "calls": 65,
+        "triangles": 469238,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 198,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2994,
+        "resourceTransferBytes": 75265299,
+        "resourceBodyBytes": 75221799,
+        "heapBytes": 135739432,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/before-reverse.png"
+    },
+    {
+      "stage": "after",
+      "view": "front",
+      "rig": {
+        "id": "bridge-east",
+        "corner": "northeast",
+        "style": "truss",
+        "height": 8.9,
+        "facing": [
+          -1,
+          0
+        ],
+        "phase": "below",
+        "nameHeight": 8.45,
+        "nameFacing": [
+          0,
+          -1
+        ],
+        "nameSize": [
+          1.35,
+          0.8
+        ],
+        "trussTieHeight": 7,
+        "group": "bridge-east",
+        "kind": "car",
+        "pole": {
+          "x": 41.2,
+          "z": 32.8
+        },
+        "head": {
+          "x": 41.2,
+          "y": 5.35,
+          "z": 28.6
+        },
+        "extraHeads": [
+          {
+            "facing": [
+              1,
+              0
+            ],
+            "head": {
+              "x": 41.6,
+              "y": 5.35,
+              "z": 28.6
+            }
+          }
+        ],
+        "pedestrians": [
+          {
+            "facing": [
+              0,
+              -1
+            ],
+            "side": [
+              1,
+              0
+            ],
+            "crossing": "east",
+            "head": {
+              "x": 41.760000000000005,
+              "y": 2.75,
+              "z": 32.66
+            }
+          },
+          {
+            "facing": [
+              -1,
+              0
+            ],
+            "side": [
+              0,
+              -1
+            ],
+            "crossing": "north",
+            "head": {
+              "x": 41.06,
+              "y": 2.75,
+              "z": 32.239999999999995
+            }
+          }
+        ]
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70845886,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 388,
+        "fps": 48.499393757614165,
+        "medianMs": 20.600000008940697,
+        "p95Ms": 21.799999997019768,
+        "updateMs": 0.07551546352579422,
+        "calls": 78,
+        "triangles": 921229,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 188,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2549.199999988079,
+        "resourceTransferBytes": 75265441,
+        "resourceBodyBytes": 75221941,
+        "heapBytes": 193406333,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-front.png"
+    },
+    {
+      "stage": "after",
+      "view": "reverse",
+      "rig": {
+        "id": "bridge-east",
+        "corner": "northeast",
+        "style": "truss",
+        "height": 8.9,
+        "facing": [
+          -1,
+          0
+        ],
+        "phase": "below",
+        "nameHeight": 8.45,
+        "nameFacing": [
+          0,
+          -1
+        ],
+        "nameSize": [
+          1.35,
+          0.8
+        ],
+        "trussTieHeight": 7,
+        "group": "bridge-east",
+        "kind": "car",
+        "pole": {
+          "x": 41.2,
+          "z": 32.8
+        },
+        "head": {
+          "x": 41.2,
+          "y": 5.35,
+          "z": 28.6
+        },
+        "extraHeads": [
+          {
+            "facing": [
+              1,
+              0
+            ],
+            "head": {
+              "x": 41.6,
+              "y": 5.35,
+              "z": 28.6
+            }
+          }
+        ],
+        "pedestrians": [
+          {
+            "facing": [
+              0,
+              -1
+            ],
+            "side": [
+              1,
+              0
+            ],
+            "crossing": "east",
+            "head": {
+              "x": 41.760000000000005,
+              "y": 2.75,
+              "z": 32.66
+            }
+          },
+          {
+            "facing": [
+              -1,
+              0
+            ],
+            "side": [
+              0,
+              -1
+            ],
+            "crossing": "north",
+            "head": {
+              "x": 41.06,
+              "y": 2.75,
+              "z": 32.239999999999995
+            }
+          }
+        ]
+      },
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70845886,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 382,
+        "fps": 47.78583937953465,
+        "medianMs": 20.900000005960464,
+        "p95Ms": 22.399999991059303,
+        "updateMs": 0.06806282710810606,
+        "calls": 65,
+        "triangles": 471830,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 198,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2549.199999988079,
+        "resourceTransferBytes": 75265441,
+        "resourceBodyBytes": 75221941,
+        "heapBytes": 127627785,
+        "multiDraw": true
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-reverse.png"
+    }
+  ],
+  "previews": [
+    {
+      "view": "signals",
+      "check": {
+        "rig": {
+          "id": "bridge-east",
+          "corner": "northeast",
+          "style": "truss",
+          "height": 8.9,
+          "facing": [
+            -1,
+            0
+          ],
+          "phase": "below",
+          "nameHeight": 8.45,
+          "nameFacing": [
+            0,
+            -1
+          ],
+          "nameSize": [
+            1.35,
+            0.8
+          ],
+          "trussTieHeight": 7,
+          "group": "bridge-east",
+          "kind": "car",
+          "pole": {
+            "x": 41.2,
+            "z": 32.8
+          },
+          "head": {
+            "x": 41.2,
+            "y": 5.35,
+            "z": 28.6
+          },
+          "extraHeads": [
+            {
+              "facing": [
+                1,
+                0
+              ],
+              "head": {
+                "x": 41.6,
+                "y": 5.35,
+                "z": 28.6
+              }
+            }
+          ],
+          "pedestrians": [
+            {
+              "facing": [
+                0,
+                -1
+              ],
+              "side": [
+                1,
+                0
+              ],
+              "crossing": "east",
+              "head": {
+                "x": 41.760000000000005,
+                "y": 2.75,
+                "z": 32.66
+              }
+            },
+            {
+              "facing": [
+                -1,
+                0
+              ],
+              "side": [
+                0,
+                -1
+              ],
+              "crossing": "north",
+              "head": {
+                "x": 41.06,
+                "y": 2.75,
+                "z": 32.239999999999995
+              }
+            }
+          ]
+        },
+        "carParts": [
+          {
+            "name": "ART_Signal_Car/ART_SignalHousing",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_Frame",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalHood",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "count": 2
+          }
+        ],
+        "postVertices": 12828,
+        "calls": 23,
+        "triangles": 113958
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-signals.png"
+    },
+    {
+      "view": "signals-back",
+      "check": {
+        "rig": {
+          "id": "bridge-east",
+          "corner": "northeast",
+          "style": "truss",
+          "height": 8.9,
+          "facing": [
+            -1,
+            0
+          ],
+          "phase": "below",
+          "nameHeight": 8.45,
+          "nameFacing": [
+            0,
+            -1
+          ],
+          "nameSize": [
+            1.35,
+            0.8
+          ],
+          "trussTieHeight": 7,
+          "group": "bridge-east",
+          "kind": "car",
+          "pole": {
+            "x": 41.2,
+            "z": 32.8
+          },
+          "head": {
+            "x": 41.2,
+            "y": 5.35,
+            "z": 28.6
+          },
+          "extraHeads": [
+            {
+              "facing": [
+                1,
+                0
+              ],
+              "head": {
+                "x": 41.6,
+                "y": 5.35,
+                "z": 28.6
+              }
+            }
+          ],
+          "pedestrians": [
+            {
+              "facing": [
+                0,
+                -1
+              ],
+              "side": [
+                1,
+                0
+              ],
+              "crossing": "east",
+              "head": {
+                "x": 41.760000000000005,
+                "y": 2.75,
+                "z": 32.66
+              }
+            },
+            {
+              "facing": [
+                -1,
+                0
+              ],
+              "side": [
+                0,
+                -1
+              ],
+              "crossing": "north",
+              "head": {
+                "x": 41.06,
+                "y": 2.75,
+                "z": 32.239999999999995
+              }
+            }
+          ]
+        },
+        "carParts": [
+          {
+            "name": "ART_Signal_Car/ART_SignalHousing",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_Frame",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalHood",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "count": 2
+          }
+        ],
+        "postVertices": 12828,
+        "calls": 23,
+        "triangles": 113958
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-signals-back.png"
+    },
+    {
+      "view": "signals-name",
+      "check": {
+        "rig": {
+          "id": "bridge-east",
+          "corner": "northeast",
+          "style": "truss",
+          "height": 8.9,
+          "facing": [
+            -1,
+            0
+          ],
+          "phase": "below",
+          "nameHeight": 8.45,
+          "nameFacing": [
+            0,
+            -1
+          ],
+          "nameSize": [
+            1.35,
+            0.8
+          ],
+          "trussTieHeight": 7,
+          "group": "bridge-east",
+          "kind": "car",
+          "pole": {
+            "x": 41.2,
+            "z": 32.8
+          },
+          "head": {
+            "x": 41.2,
+            "y": 5.35,
+            "z": 28.6
+          },
+          "extraHeads": [
+            {
+              "facing": [
+                1,
+                0
+              ],
+              "head": {
+                "x": 41.6,
+                "y": 5.35,
+                "z": 28.6
+              }
+            }
+          ],
+          "pedestrians": [
+            {
+              "facing": [
+                0,
+                -1
+              ],
+              "side": [
+                1,
+                0
+              ],
+              "crossing": "east",
+              "head": {
+                "x": 41.760000000000005,
+                "y": 2.75,
+                "z": 32.66
+              }
+            },
+            {
+              "facing": [
+                -1,
+                0
+              ],
+              "side": [
+                0,
+                -1
+              ],
+              "crossing": "north",
+              "head": {
+                "x": 41.06,
+                "y": 2.75,
+                "z": 32.239999999999995
+              }
+            }
+          ]
+        },
+        "carParts": [
+          {
+            "name": "ART_Signal_Car/ART_SignalHousing",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_Frame",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalHood",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "count": 2
+          }
+        ],
+        "postVertices": 12828,
+        "calls": 10,
+        "triangles": 109396
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-signals-name.png"
+    },
+    {
+      "view": "signals-walk-detail",
+      "check": {
+        "rig": {
+          "id": "bridge-east",
+          "corner": "northeast",
+          "style": "truss",
+          "height": 8.9,
+          "facing": [
+            -1,
+            0
+          ],
+          "phase": "below",
+          "nameHeight": 8.45,
+          "nameFacing": [
+            0,
+            -1
+          ],
+          "nameSize": [
+            1.35,
+            0.8
+          ],
+          "trussTieHeight": 7,
+          "group": "bridge-east",
+          "kind": "car",
+          "pole": {
+            "x": 41.2,
+            "z": 32.8
+          },
+          "head": {
+            "x": 41.2,
+            "y": 5.35,
+            "z": 28.6
+          },
+          "extraHeads": [
+            {
+              "facing": [
+                1,
+                0
+              ],
+              "head": {
+                "x": 41.6,
+                "y": 5.35,
+                "z": 28.6
+              }
+            }
+          ],
+          "pedestrians": [
+            {
+              "facing": [
+                0,
+                -1
+              ],
+              "side": [
+                1,
+                0
+              ],
+              "crossing": "east",
+              "head": {
+                "x": 41.760000000000005,
+                "y": 2.75,
+                "z": 32.66
+              }
+            },
+            {
+              "facing": [
+                -1,
+                0
+              ],
+              "side": [
+                0,
+                -1
+              ],
+              "crossing": "north",
+              "head": {
+                "x": 41.06,
+                "y": 2.75,
+                "z": 32.239999999999995
+              }
+            }
+          ]
+        },
+        "carParts": [
+          {
+            "name": "ART_Signal_Car/ART_SignalHousing",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_Frame",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalHood",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "count": 2
+          }
+        ],
+        "postVertices": 12828,
+        "calls": 14,
+        "triangles": 109070
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-signals-walk-detail.png"
+    },
+    {
+      "view": "signals-walk-side",
+      "check": {
+        "rig": {
+          "id": "bridge-east",
+          "corner": "northeast",
+          "style": "truss",
+          "height": 8.9,
+          "facing": [
+            -1,
+            0
+          ],
+          "phase": "below",
+          "nameHeight": 8.45,
+          "nameFacing": [
+            0,
+            -1
+          ],
+          "nameSize": [
+            1.35,
+            0.8
+          ],
+          "trussTieHeight": 7,
+          "group": "bridge-east",
+          "kind": "car",
+          "pole": {
+            "x": 41.2,
+            "z": 32.8
+          },
+          "head": {
+            "x": 41.2,
+            "y": 5.35,
+            "z": 28.6
+          },
+          "extraHeads": [
+            {
+              "facing": [
+                1,
+                0
+              ],
+              "head": {
+                "x": 41.6,
+                "y": 5.35,
+                "z": 28.6
+              }
+            }
+          ],
+          "pedestrians": [
+            {
+              "facing": [
+                0,
+                -1
+              ],
+              "side": [
+                1,
+                0
+              ],
+              "crossing": "east",
+              "head": {
+                "x": 41.760000000000005,
+                "y": 2.75,
+                "z": 32.66
+              }
+            },
+            {
+              "facing": [
+                -1,
+                0
+              ],
+              "side": [
+                0,
+                -1
+              ],
+              "crossing": "north",
+              "head": {
+                "x": 41.06,
+                "y": 2.75,
+                "z": 32.239999999999995
+              }
+            }
+          ]
+        },
+        "carParts": [
+          {
+            "name": "ART_Signal_Car/ART_SignalHousing",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_Frame",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalGreen",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalHood",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalYellow",
+            "count": 2
+          },
+          {
+            "name": "ART_Signal_Car/ART_SignalRed",
+            "count": 2
+          }
+        ],
+        "postVertices": 12828,
+        "calls": 15,
+        "triangles": 109162
+      },
+      "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/01a1593f-1418-7111-9163-c2edec87dbb2/signal-east-pair/after-signals-walk-side.png"
+    }
+  ],
+  "errors": [],
+  "verification": {
+    "command": "node --test test/art.test.mjs test/obstacles.test.mjs test/performance.test.mjs test/prop-review.test.mjs",
+    "tests": 60,
+    "passed": 60,
+    "failed": 0,
+    "skipped": 0,
+    "regression": "The new opposed-head/exported-housing clearance test fails against the baseline missing-head layout and passes on the final layout.",
+    "collision": "Rebuilt by node tools/build_collision.mjs; byte-identical to beginning of this change, 338379 blocked cells.",
+    "geometry": "Both complete car-head asset sets are instanced twice in all five standalone bridge-east inspection views. Actual GLB rear depth is 0.13 m, leaving approximately 0.14 m between housing backs.",
+    "consoleErrors": [],
+    "diffCheck": "passed"
+  },
+  "limits": "Short desktop Chrome samples establish the added geometry and unchanged draw/texture counts; no FPS improvement, stutter guarantee, total VRAM, loading-time or retained-heap conclusion. No physical phone or VR headset tested."
+}

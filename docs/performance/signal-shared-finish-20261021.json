@@ -1,0 +1,218 @@
+{
+  "date": "2026-10-21",
+  "purpose": "Unify all traffic-signal finishes with the two display-kiosk corner installations.",
+  "method": "Matched Chrome overview/corner views before and after the colour-only change; canonical position/normal hashes and pole-pigment samples check the actual merged mesh.",
+  "referenceInstallations": [
+    "town-east",
+    "town-east-walk"
+  ],
+  "source": {
+    "before": "e0ce93f566fc64dfc42321fd1647023c5d5271591cdf869093faf6cd8ba46b7b",
+    "after": "13ba901ac52d934c42a88b0b09eb8cc9d8c2a6d1e27914b54deb1e699f247c23"
+  },
+  "cameras": {
+    "overview": [
+      56,
+      15,
+      48,
+      33,
+      3.5,
+      26,
+      58
+    ],
+    "corner": [
+      52.8,
+      2.5,
+      23,
+      37,
+      4,
+      20,
+      65
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "geometry": {
+        "vertices": 30576,
+        "geometryHash": "33bff616",
+        "shafts": [
+          {
+            "id": "bridge-west",
+            "count": 168,
+            "colorHash": "5f4f9fd1",
+            "meanColor": [
+              0.16309063136577606,
+              0.11703680854822908,
+              0.10394128385399069
+            ]
+          },
+          {
+            "id": "bridge-east",
+            "count": 168,
+            "colorHash": "9d415983",
+            "meanColor": [
+              0.15628579737884657,
+              0.11354039369949273,
+              0.10665820326123919
+            ]
+          },
+          {
+            "id": "town-west",
+            "count": 72,
+            "colorHash": "b65b444",
+            "meanColor": [
+              0.3244501973191897,
+              0.23497909555832544,
+              0.18288518860936165
+            ]
+          },
+          {
+            "id": "town-east",
+            "count": 72,
+            "colorHash": "5a6c81f4",
+            "meanColor": [
+              0.3184448406100273,
+              0.23189346368114153,
+              0.18528290589650473
+            ]
+          },
+          {
+            "id": "town-east-walk",
+            "count": 72,
+            "colorHash": "20536e3d",
+            "meanColor": [
+              0.3347938656806946,
+              0.24029381262759367,
+              0.17875534606476626
+            ]
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "overview",
+          "draw": {
+            "calls": 87,
+            "triangles": 661904,
+            "textures": 10
+          }
+        },
+        {
+          "view": "corner",
+          "draw": {
+            "calls": 97,
+            "triangles": 763777,
+            "textures": 10
+          }
+        }
+      ]
+    },
+    {
+      "stage": "after",
+      "geometry": {
+        "vertices": 30576,
+        "geometryHash": "33bff616",
+        "shafts": [
+          {
+            "id": "bridge-west",
+            "count": 168,
+            "colorHash": "9daa5f17",
+            "meanColor": [
+              0.3242163732647896,
+              0.2348589529948575,
+              0.18297854651297843
+            ]
+          },
+          {
+            "id": "bridge-east",
+            "count": 168,
+            "colorHash": "3643a2b1",
+            "meanColor": [
+              0.3174115387456758,
+              0.23136253974267415,
+              0.18569546512195043
+            ]
+          },
+          {
+            "id": "town-west",
+            "count": 72,
+            "colorHash": "b65b444",
+            "meanColor": [
+              0.3244501973191897,
+              0.23497909555832544,
+              0.18288518860936165
+            ]
+          },
+          {
+            "id": "town-east",
+            "count": 72,
+            "colorHash": "5a6c81f4",
+            "meanColor": [
+              0.3184448406100273,
+              0.23189346368114153,
+              0.18528290589650473
+            ]
+          },
+          {
+            "id": "town-east-walk",
+            "count": 72,
+            "colorHash": "20536e3d",
+            "meanColor": [
+              0.3347938656806946,
+              0.24029381262759367,
+              0.17875534606476626
+            ]
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "overview",
+          "draw": {
+            "calls": 87,
+            "triangles": 661904,
+            "textures": 10
+          }
+        },
+        {
+          "view": "corner",
+          "draw": {
+            "calls": 97,
+            "triangles": 763777,
+            "textures": 10
+          }
+        }
+      ]
+    }
+  ],
+  "previews": [
+    {
+      "view": "signals"
+    },
+    {
+      "view": "signals-back"
+    },
+    {
+      "view": "signals-bridge-west"
+    },
+    {
+      "view": "signals-double"
+    },
+    {
+      "view": "signals-town"
+    },
+    {
+      "view": "signals-walk"
+    }
+  ],
+  "errors": [],
+  "validation": {
+    "allFiveViewsChecked": true,
+    "referencePigmentsUnchanged": true,
+    "allGeometryUnchanged": true,
+    "existingGeometryTests": 59,
+    "consoleErrors": 0
+  },
+  "limits": "Cosmetic palette assignment only; no frame-rate conclusion is drawn. Existing geometry, collision and workload checks remain applicable because their tested inputs are unchanged. No physical phone or VR headset tested."
+}

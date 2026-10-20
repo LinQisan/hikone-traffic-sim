@@ -1,0 +1,312 @@
+{
+  "date": "2026-10-19",
+  "baseline": "Working tree after the Renoir-inspired repaint, before the connected Shiga University extension.",
+  "renderComparison": {
+    "date": "2026-10-19",
+    "viewport": [
+      1280,
+      720
+    ],
+    "renderer": "Chrome ANGLE Metal, reduced motion, fixed same page; before resources served from saved working-tree fixture",
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "west": [
+        -180,
+        14,
+        28,
+        -450,
+        8,
+        80,
+        65
+      ],
+      "campus": [
+        -790,
+        180,
+        125,
+        -690,
+        0,
+        350,
+        65
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 52407110,
+          "sceneBufferBytes": 54374346,
+          "placements": 438,
+          "meshes": 212,
+          "frames": 480,
+          "fps": 60.002250084467576,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.599999994039536,
+          "updateMs": 0.07145833304772774,
+          "calls": 93,
+          "triangles": 897095,
+          "width": 1280,
+          "height": 720,
+          "geometries": 116,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 3138.5999999940395,
+          "resourceTransferBytes": 58611281,
+          "resourceBodyBytes": 58569881,
+          "heapBytes": 100790240,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "west",
+        "probe": {
+          "geometryBytes": 52407110,
+          "sceneBufferBytes": 54374346,
+          "placements": 438,
+          "meshes": 212,
+          "frames": 480,
+          "fps": 60.00075000933041,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.5,
+          "updateMs": 0.0587499996026357,
+          "calls": 16,
+          "triangles": 311214,
+          "width": 1280,
+          "height": 720,
+          "geometries": 122,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 3138.5999999940395,
+          "resourceTransferBytes": 58611281,
+          "resourceBodyBytes": 58569881,
+          "heapBytes": 105195317,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 52407110,
+          "sceneBufferBytes": 54374346,
+          "placements": 438,
+          "meshes": 212,
+          "frames": 480,
+          "fps": 60.00450033770416,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.5,
+          "updateMs": 0.054791667188207306,
+          "calls": 5,
+          "triangles": 303238,
+          "width": 1280,
+          "height": 720,
+          "geometries": 122,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 3138.5999999940395,
+          "resourceTransferBytes": 58611281,
+          "resourceBodyBytes": 58569881,
+          "heapBytes": 95624865,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.988002399564785,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.69999998807907,
+          "updateMs": 0.07687499976406495,
+          "calls": 95,
+          "triangles": 904481,
+          "width": 1280,
+          "height": 720,
+          "geometries": 118,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 1507.7000000178814,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 162813986,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "west",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.99925000941959,
+          "medianMs": 16.80000001192093,
+          "p95Ms": 18.299999982118607,
+          "updateMs": 0.05291666674117247,
+          "calls": 18,
+          "triangles": 321793,
+          "width": 1280,
+          "height": 720,
+          "geometries": 125,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 1507.7000000178814,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 109835312,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 481,
+          "fps": 60.01023043420516,
+          "medianMs": 16.799999982118607,
+          "p95Ms": 18,
+          "updateMs": 0.057796256334023265,
+          "calls": 7,
+          "triangles": 313894,
+          "width": 1280,
+          "height": 720,
+          "geometries": 125,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 1507.7000000178814,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 100813957,
+          "multiDraw": true
+        }
+      }
+    ],
+    "errors": []
+  },
+  "validation": {
+    "fullRegression": {
+      "pass": 156,
+      "fail": 0,
+      "skip": 0
+    },
+    "connectionAndObstacles": {
+      "pass": 15,
+      "fail": 0,
+      "skip": 0
+    },
+    "collisionBlockedCells": 311032,
+    "collisionGrid": [
+      6300,
+      5125
+    ],
+    "collisionCellMetres": 0.2
+  },
+  "gameplayChecks": {
+    "results": [
+      {
+        "id": "builtin-01",
+        "start": {
+          "state": "playing",
+          "mode": "walking",
+          "x": 40,
+          "z": 14,
+          "y": 1.5912,
+          "ground": 0.01,
+          "yaw": 13.435523362319215
+        },
+        "turned": -30.130476638217228,
+        "moved": {
+          "x": 39.359846607340806,
+          "z": 15.102969950803837
+        },
+        "state": "results",
+        "replayed": true
+      },
+      {
+        "id": "builtin-07",
+        "start": {
+          "state": "playing",
+          "mode": "bicycle",
+          "x": -68.54,
+          "z": 22.77,
+          "y": 1.562013800095281,
+          "ground": 0.01,
+          "yaw": -89.00538152635941
+        },
+        "turned": 233.49461847364057,
+        "moved": {
+          "x": -68.8843925469895,
+          "z": 22.775979037274123
+        },
+        "state": "results",
+        "replayed": true
+      }
+    ],
+    "errors": []
+  },
+  "visualChecks": {
+    "errors": []
+  },
+  "limitations": [
+    "No real phone or VR headset was tested.",
+    "Frame-capped desktop timings do not establish a speed improvement.",
+    "The before stage routes saved source/model/ground/wall files through the same page; both stages use the final collision file. This isolates rendering rather than end-to-end loading or retained memory.",
+    "Readiness, resource counters and uncollected heap values do not establish network, loading-time or memory improvements.",
+    "The initial baseline was captured before an interrupted task interval; the reported comparison repeats both stages together after work and tests finished."
+  ],
+  "sources": [
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.27765,136.24650&zoom=18&basemap=satellite",
+    "https://www.shiga-u.ac.jp/information/campus-access/campusmap/",
+    "https://www.shiga-u.ac.jp/access/access-hikone/",
+    "https://online.bunka.go.jp/heritages/detail/193149",
+    "https://www.city.hikone.lg.jp/kakuka/toshi_seisaku/15/4/3/4217.html"
+  ],
+  "physicalTraversal": {
+    "navigation": [
+      {
+        "mode": "walking",
+        "frames": 14823,
+        "distance": 592.9200000000407,
+        "end": [
+          -763.4349110900089,
+          178.32894208207384
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "frames": 14852,
+        "distance": 592.9479166667073,
+        "end": [
+          -763.4580519950673,
+          178.3276661757875
+        ],
+        "ground": 0.01
+      }
+    ],
+    "errors": []
+  },
+  "editorAndReviewChecks": {
+    "errors": []
+  }
+}

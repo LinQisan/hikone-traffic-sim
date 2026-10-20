@@ -88,25 +88,11 @@ def road_paint(b, details_only=False):
 
 
 def bank_tree(b, airy):
-    # Trunks fork above head height; the canopy leans toward the water (local +Z).
-    height = 4.0 if airy else 3.1
-    cylinder(b, (0, 0, 0), (0.16, height, 0.18), 0.20, 'HK_Bark', segments=9, end_radius=0.12)
-    if airy:
-        lobes = [(-1.5, 5.1, 0.4), (1.5, 5.5, 0.8), (-0.6, 6.4, 1.0),
-                 (1.7, 7.0, 1.5), (-1.1, 7.3, 1.9), (0.1, 8.5, 1.4),
-                 (-2.0, 6.2, 2.0), (0.8, 6.3, 2.7)]
-        radius = (1.65, 1.30, 1.60)
-    else:
-        lobes = [(-2.1, 4.8, 0.9), (0.0, 5.4, 1.5), (2.0, 5.3, 0.7),
-                 (-1.2, 6.5, 0.2), (1.3, 6.8, 1.4), (-1.7, 6.0, 2.8),
-                 (1.5, 6.2, 3.0), (0.0, 7.4, 1.8), (-2.5, 5.3, 2.0)]
-        radius = (2.05, 1.15, 1.75)
-    for i, (x, y, z) in enumerate(lobes):
-        cylinder(b, (0.16, height - 0.15, 0.18), (x * 0.8, y - 0.45, z * 0.8),
-                 0.075, 'HK_Bark', segments=7, end_radius=0.025)
-        scale = 0.88 + b.rng.random() * 0.25
-        b.crown((x, y, z), tuple(r * scale for r in radius),
-                'HK_LeafDark' if i % 4 == 0 else 'HK_Leaf', i + 231)
+    from vegetation import tree
+    b.abstract = True
+    # Two leafy-season cherry forms along the moat: upright and old, spreading crowns.
+    tree(b, 'cherry', height=9.0 if airy else 7.6, spread=3.1 if airy else 4.1,
+         lean=(0.12, 1.45), seed=231 if airy else 271)
 
 
 def bank_patch(b):
@@ -116,19 +102,22 @@ def bank_patch(b):
     for i, a in enumerate(outline):
         c = outline[(i + 1) % len(outline)]
         b.face([(0, 0.08, 0), (c[0], 0.01, c[1]), (a[0], 0.01, a[1])], 'HK_Grass')
+    from vegetation import shrubs
+    centers = []
     for i, x in enumerate((-2.5, -1.7, -0.8, 0.2, 1.0, 2.0, 2.6)):
         z = b.rng.uniform(-0.15, 0.65)
         y = b.rng.uniform(0.25, 0.43)
-        b.crown((x, y, z), (0.72, 0.46 + b.rng.random() * 0.15, 0.67),
-                'HK_LeafDark' if i % 3 == 0 else 'HK_Leaf', 510 + i)
+        centers.append((x, y, z, 0.72, 0.46 + b.rng.random() * 0.15, 0.67))
+    shrubs(b, centers, 510)
     for i in range(22):
         x, z = b.rng.uniform(-2.8, 2.8), b.rng.uniform(0.5, 1.0)
         h = b.rng.uniform(0.18, 0.42)
         b.face([(x - 0.035, 0.01, z), (x + 0.035, 0.01, z), (x + 0.08, h, z + 0.18)], 'HK_Grass')
 
 
-def build(name, mesh_class):
+def build(name, mesh_class, lod=False):
     b = mesh_class(name)
+    b.distant = lod
     if name == 'ART_MoatRoadPaint':
         road_paint(b)
     elif name == 'ART_MoatBankPatch':

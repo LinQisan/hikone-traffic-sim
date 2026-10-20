@@ -1,0 +1,440 @@
+{
+  "date": "2026-10-19",
+  "baseline": "Existing uncommitted working tree at the start of this photograph refinement.",
+  "stages": [
+    {
+      "name": "Footways, poles and initial foliage volumes",
+      "date": "2026-10-18",
+      "viewport": [
+        1280,
+        720
+      ],
+      "renderer": "Chrome ANGLE Metal, reduced motion",
+      "results": [
+        {
+          "stage": "before",
+          "view": "street",
+          "probe": {
+            "geometryBytes": 39973740,
+            "sceneBufferBytes": 41519968,
+            "placements": 437,
+            "meshes": 209,
+            "frames": 480,
+            "fps": 60.003750234389656,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.5,
+            "updateMs": 0.08104166742414236,
+            "calls": 93,
+            "triangles": 506349,
+            "width": 1280,
+            "height": 720,
+            "geometries": 115,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 5058,
+            "resourceTransferBytes": 46843259,
+            "resourceBodyBytes": 46802459,
+            "heapBytes": 84807025,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "before",
+          "view": "photo",
+          "probe": {
+            "geometryBytes": 39973740,
+            "sceneBufferBytes": 41519968,
+            "placements": 437,
+            "meshes": 209,
+            "frames": 480,
+            "fps": 59.99925000941959,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.599999994039536,
+            "updateMs": 0.08499999990065893,
+            "calls": 88,
+            "triangles": 450543,
+            "width": 1280,
+            "height": 720,
+            "geometries": 116,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 5058,
+            "resourceTransferBytes": 46843259,
+            "resourceBodyBytes": 46802459,
+            "heapBytes": 92783241,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "before",
+          "view": "bank",
+          "probe": {
+            "geometryBytes": 39973740,
+            "sceneBufferBytes": 41519968,
+            "placements": 437,
+            "meshes": 209,
+            "frames": 481,
+            "fps": 60.00274440817892,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 20.099999994039536,
+            "updateMs": 0.08586278594952859,
+            "calls": 25,
+            "triangles": 243362,
+            "width": 1280,
+            "height": 720,
+            "geometries": 120,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 5058,
+            "resourceTransferBytes": 46843259,
+            "resourceBodyBytes": 46802459,
+            "heapBytes": 79601217,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "after",
+          "view": "street",
+          "probe": {
+            "geometryBytes": 41106903,
+            "sceneBufferBytes": 42653323,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 59.99925000919607,
+            "medianMs": 16.700000017881393,
+            "p95Ms": 17.30000001192093,
+            "updateMs": 0.08770833549400171,
+            "calls": 93,
+            "triangles": 514744,
+            "width": 1280,
+            "height": 720,
+            "geometries": 116,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 4340.0999999940395,
+            "resourceTransferBytes": 48001373,
+            "resourceBodyBytes": 47959973,
+            "heapBytes": 83069427,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "after",
+          "view": "photo",
+          "probe": {
+            "geometryBytes": 41106903,
+            "sceneBufferBytes": 42653323,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 60.001500037411525,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 17.5,
+            "updateMs": 0.061875001154839994,
+            "calls": 88,
+            "triangles": 455968,
+            "width": 1280,
+            "height": 720,
+            "geometries": 117,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 4340.0999999940395,
+            "resourceTransferBytes": 48001373,
+            "resourceBodyBytes": 47959973,
+            "heapBytes": 89136975,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "after",
+          "view": "bank",
+          "probe": {
+            "geometryBytes": 41106903,
+            "sceneBufferBytes": 42653323,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 479,
+            "fps": 60.00025052310109,
+            "medianMs": 16.600000023841858,
+            "p95Ms": 17.5,
+            "updateMs": 0.0611691027568626,
+            "calls": 25,
+            "triangles": 252007,
+            "width": 1280,
+            "height": 720,
+            "geometries": 121,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 4340.0999999940395,
+            "resourceTransferBytes": 48001373,
+            "resourceBodyBytes": 47959973,
+            "heapBytes": 81396796,
+            "multiDraw": true
+          }
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "Final rounded shoulders, pendant foliage and pine spread",
+      "date": "2026-10-19",
+      "viewport": [
+        1280,
+        720
+      ],
+      "baseline": "First photograph refinement; final comparison isolates rounded shoulders, pendant foliage and wider pine. Both use final street code and the same Chrome page.",
+      "renderer": "Chrome ANGLE Metal, reduced motion, HTTP cache disabled",
+      "viewpoints": {
+        "street": [
+          55,
+          2.15,
+          23,
+          0,
+          2.8,
+          27,
+          62
+        ],
+        "photo": [
+          55,
+          1.65,
+          21,
+          15,
+          4,
+          41,
+          65
+        ],
+        "bank": [
+          32,
+          2.1,
+          53,
+          30,
+          4,
+          91,
+          68
+        ]
+      },
+      "results": [
+        {
+          "stage": "before",
+          "view": "street",
+          "probe": {
+            "geometryBytes": 41106903,
+            "sceneBufferBytes": 42653323,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 59.99925000941959,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.69999998807907,
+            "updateMs": 0.06083333343267441,
+            "calls": 93,
+            "triangles": 514744,
+            "width": 1280,
+            "height": 720,
+            "geometries": 116,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 2647.4000000059605,
+            "resourceTransferBytes": 48001405,
+            "resourceBodyBytes": 47960005,
+            "heapBytes": 86876584,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "before",
+          "view": "photo",
+          "probe": {
+            "geometryBytes": 41106903,
+            "sceneBufferBytes": 42653323,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 60.01875586120663,
+            "medianMs": 16.599999994039536,
+            "p95Ms": 18.80000001192093,
+            "updateMs": 0.04812499893208345,
+            "calls": 88,
+            "triangles": 455968,
+            "width": 1280,
+            "height": 720,
+            "geometries": 117,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 2647.4000000059605,
+            "resourceTransferBytes": 48001405,
+            "resourceBodyBytes": 47960005,
+            "heapBytes": 92948355,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "before",
+          "view": "bank",
+          "probe": {
+            "geometryBytes": 41106903,
+            "sceneBufferBytes": 42653323,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 59.99925000919607,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.599999994039536,
+            "updateMs": 0.055208333084980646,
+            "calls": 25,
+            "triangles": 252007,
+            "width": 1280,
+            "height": 720,
+            "geometries": 121,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 2647.4000000059605,
+            "resourceTransferBytes": 48001405,
+            "resourceBodyBytes": 47960005,
+            "heapBytes": 81094557,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "after",
+          "view": "street",
+          "probe": {
+            "geometryBytes": 48312768,
+            "sceneBufferBytes": 49859188,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 60.00225008424405,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.5,
+            "updateMs": 0.0708333333954215,
+            "calls": 93,
+            "triangles": 553494,
+            "width": 1280,
+            "height": 720,
+            "geometries": 116,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 1397.300000011921,
+            "resourceTransferBytes": 55800697,
+            "resourceBodyBytes": 55759297,
+            "heapBytes": 91394688,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "after",
+          "view": "photo",
+          "probe": {
+            "geometryBytes": 48312768,
+            "sceneBufferBytes": 49859188,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 60.01800540144157,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.69999998807907,
+            "updateMs": 0.055000000074505805,
+            "calls": 88,
+            "triangles": 492736,
+            "width": 1280,
+            "height": 720,
+            "geometries": 117,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 1397.300000011921,
+            "resourceTransferBytes": 55800697,
+            "resourceBodyBytes": 55759297,
+            "heapBytes": 96809271,
+            "multiDraw": true
+          }
+        },
+        {
+          "stage": "after",
+          "view": "bank",
+          "probe": {
+            "geometryBytes": 48312768,
+            "sceneBufferBytes": 49859188,
+            "placements": 438,
+            "meshes": 212,
+            "frames": 480,
+            "fps": 60.00300015005221,
+            "medianMs": 16.69999998807907,
+            "p95Ms": 18.400000005960464,
+            "updateMs": 0.04499999930461248,
+            "calls": 25,
+            "triangles": 287741,
+            "width": 1280,
+            "height": 720,
+            "geometries": 121,
+            "textures": 9,
+            "programs": 14,
+            "readyMs": 1397.300000011921,
+            "resourceTransferBytes": 55800697,
+            "resourceBodyBytes": 55759297,
+            "heapBytes": 87907544,
+            "multiDraw": true
+          }
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "validation": {
+    "tests": 153,
+    "passed": 153,
+    "failed": 0,
+    "skipped": 0,
+    "collisionObjects": 434,
+    "blockedCells": 161664
+  },
+  "limitations": [
+    "Frame-capped desktop measurements do not establish a speed improvement or mobile performance.",
+    "The final-stage baseline routes regenerated intermediate GLBs from a local fixture; do not infer loading or network improvements from its resource/readiness fields.",
+    "No real phone or VR headset was tested."
+  ],
+  "browserChecks": {
+    "results": [
+      {
+        "id": "builtin-01",
+        "start": {
+          "state": "playing",
+          "mode": "walking",
+          "x": 40,
+          "z": 14,
+          "y": 1.5912,
+          "ground": 0.01,
+          "yaw": 13.435523362319215
+        },
+        "turned": -30.68847663714434,
+        "moved": {
+          "x": 39.36714123278216,
+          "z": 15.066344119295202
+        },
+        "state": "results",
+        "replayed": true
+      },
+      {
+        "id": "builtin-07",
+        "start": {
+          "state": "playing",
+          "mode": "bicycle",
+          "x": -68.54,
+          "z": 22.77,
+          "y": 1.562013800095281,
+          "ground": 0.01,
+          "yaw": -89.00538152635941
+        },
+        "turned": 233.49461847364057,
+        "moved": {
+          "x": -68.90309925301668,
+          "z": 22.776303806475983
+        },
+        "state": "results",
+        "replayed": true
+      }
+    ],
+    "errors": []
+  }
+}

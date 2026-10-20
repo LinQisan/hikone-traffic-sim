@@ -1,34 +1,45 @@
 // Browser-owned layout, checked from both the junction and Castle Road in October 2024
 // Street View. Positions fit the imported map's pavement; the old cube anchors do not.
-// Reviewed again against 18 October 2026 photographs from all four corners. Far-side heads hang
-// over the lane they control (Japanese practice) on arms of about 4–5.5 m, as photographed. Poles
+// Reviewed against the owner's October 2026 photographs, including the view west from the shop.
+// Far-side heads hang over their lanes; the shop-side Kyobashi lamp carries a name and walk head. Poles
 // stand about 3 m behind the kerb: the local bridge begins ~4 m further from Route 25 than the
 // real one, so a pole beside the bridge newel would need an 8 m arm. Town poles stand at the
 // kerb-return apexes.
 const INSTALLATIONS = [
   // Over the bridge's northbound lane for traffic arriving from Castle Road; name board faces west.
-  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [24.2, 33.0], height: 5.8,
-    vehicle: [29.6, 4.7, 33.0], facing: [0, -1], phase: 'below',
+  { id: 'bridge-west', corner: 'northwest', style: 'truss', pole: [24.2, 33.0], height: 6.8,
+    vehicle: [29.6, 5.35, 33.0], facing: [0, -1], phase: 'below',
     nameHeight: 4.15, nameFacing: [-1, 0],
-    walks: [{ crossing: 'west', facing: [0, -1], side: [-1, 0] }] },
+    walks: [{ crossing: 'west', facing: [0, -1], side: [-1, 0] },
+      { crossing: 'north', facing: [1, 0], side: [0, -1] }] },
   // A long truss over the eastbound lane; name board faces Castle Road (south).
-  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [41.2, 32.8], height: 6.0,
-    vehicle: [41.2, 4.7, 28.6], facing: [-1, 0], phase: 'below',
-    nameHeight: 5.6, nameFacing: [0, -1],
-    walks: [{ crossing: 'east', facing: [0, -1], side: [1, 0] }] },
-  // The mast reaches over the westbound lane; a second head at its end faces southbound traffic.
-  { id: 'town-west', corner: 'southwest', style: 'mast', pole: [25.3, 19.3], height: 6.4,
-    vehicle: [25.3, 4.7, 23.8], facing: [1, 0], phase: 'above', lampFacing: [0, 1],
-    extraHeads: [{ head: [24.4, 4.62, 23.9], facing: [0, 1] }],
+  { id: 'bridge-east', corner: 'northeast', style: 'truss', pole: [41.2, 32.8], height: 8.9,
+    vehicle: [41.2, 5.35, 28.6], facing: [-1, 0], phase: 'below',
+    // The owner confirms an opposing vehicle head on this same arm-end frame.
+    extraHeads: [{ head: [41.6, 5.35, 28.6], facing: [1, 0] }],
+    // The owner clarified that the name belongs above the truss on a taller shaft.
+    // Keep the tension attachment below the name instead of lifting it with the pole cap.
+    nameHeight: 8.45, nameFacing: [0, -1], nameSize: [1.35, 0.8], trussTieHeight: 7.0,
+    walks: [{ crossing: 'east', facing: [0, -1], side: [1, 0] },
+      { crossing: 'north', facing: [-1, 0], side: [0, -1] }] },
+  // The owner's (25.34, 19.31) front/rear pair shows two opposing heads on one arm-end frame.
+  // The phase plate faces westbound traffic; its rear is visible above the reverse-facing head.
+  { id: 'town-west', corner: 'southwest', style: 'mast', pole: [25.3, 19.3], height: 7.1,
+    vehicle: [25.3, 5.35, 23.8], facing: [1, 0], phase: 'above', lampFacing: [0, 1], lampReach: 2.75,
+    armBack: 0.4, lampBack: 0.35, lampDark: true,
+    extraHeads: [{ head: [24.9, 5.35, 23.8], facing: [-1, 0] }],
     walks: [{ crossing: 'west', facing: [0, 1], side: [-1, 0] },
-      { crossing: 'south', facing: [1, 0], side: [0, 1] }] },
-  // Near-side head on a short bracket for westbound traffic, under a lamp aimed at the junction.
+      { crossing: 'south', facing: [1, 0], side: [0, -1] }] },
+  // The owner's (38.70, 19.29) photograph identifies a tall square mast, not a walk-only post.
+  // Its arm reaches west over Castle Road's southbound lane; the name-board lamp is farther east.
   { id: 'town-east', corner: 'southeast', style: 'mast', pole: [38.7, 19.3], height: 6.2,
-    vehicle: [38.7, 4.7, 20.05], facing: [1, 0], phase: null, lampFacing: [-0.71, 0.71],
+    vehicle: [34.2, 5.35, 19.3], facing: [0, 1], phase: 'above',
     walks: [{ crossing: 'south', facing: [-1, 0], side: [0, -1] }] },
-  // The east crossing ends at a separate lamp/name-board pole in front of the machiya.
+  // Coordinate-specific close-up: the Kyobashi plate sits beside the shaft below its lamp.
+  // This installation carries the east-crossing pedestrian head, without a vehicle head or arm.
   { id: 'town-east-walk', corner: 'southeast-walk', style: 'lamp', pole: [44.9, 20.6], height: 6.4,
-    facing: [0, 1], lampFacing: [0, 1], nameHeight: 5.5, nameFacing: [1, 0], nameSize: [1.1, 0.48],
+    facing: [0, 1], lampFacing: [0, 1], lampReach: 1.6, lampBack: 0.3, lampDark: true,
+    nameHeight: 5.75, nameFacing: [1, 0], nameSize: [1.15, 0.58], nameOffset: [0, 0.82],
     walks: [{ crossing: 'east', facing: [0, 1], side: [-1, 0] }] },
 ];
 
@@ -57,9 +68,9 @@ export const POLE = {
   bus: { base: 0.05, top: 0.05 },
 };
 export const ARM_ABOVE_HEAD = 0.47;
-export const ARM_BEYOND_HEAD = 0.85;
+export const ARM_BEYOND_HEAD = 0.4;
 
-/** Five physical installations in Unity metres: four vehicle poles (five heads) and one walk-only lamp. */
+/** Five installations: four vehicle poles (six heads) and an independent name-board lamp. */
 export function signalRigs() {
   return INSTALLATIONS.map(({ pole, vehicle, walks, extraHeads = [], ...config }) => ({
     ...config, group: config.id, kind: vehicle ? 'car' : 'pedestrian',
@@ -68,8 +79,25 @@ export function signalRigs() {
     extraHeads: extraHeads.map(({ head, facing }) => ({ facing, head: { x: head[0], y: head[1], z: head[2] } })),
     pedestrians: walks.map(({ facing, side, crossing }) => ({ facing, side, crossing,
       head: { x: pole[0] + side[0] * 0.56 + facing[0] * 0.14,
-        y: 2.85, z: pole[1] + side[1] * 0.56 + facing[1] * 0.14 } })),
+        y: 2.75, z: pole[1] + side[1] * 0.56 + facing[1] * 0.14 } })),
   }));
+}
+
+/** Name face in map coordinates, shared by the assembly and geometric clearance checks. */
+export function signalNamePlate(rig) {
+  if (rig.nameHeight == null) return null;
+  const facing = rig.nameFacing, offset = rig.nameOffset ?? [0, 0];
+  return { facing, size: rig.nameSize ?? [0.96, 0.72],
+    center: { x: rig.pole.x + facing[0] * 0.17 + offset[0], y: rig.nameHeight,
+      z: rig.pole.z + facing[1] * 0.17 + offset[1] } };
+}
+
+/** Walk notices sit ahead of the hoods, with room between each housing and its shaft. */
+export function signalWalkPlate(rig, walk) {
+  const { facing, side, head } = walk;
+  return { facing, size: [0.18, 0.72],
+    center: { x: rig.pole.x + facing[0] * 0.5 + side[0] * 0.24, y: head.y,
+      z: rig.pole.z + facing[1] * 0.5 + side[1] * 0.24 } };
 }
 
 /** Real-size heads. GLB lenses face local -Z; mirror the Unity placement into three.js. */

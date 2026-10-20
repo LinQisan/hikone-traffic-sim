@@ -1,11 +1,11 @@
-// Five Kyobashi installations: four vehicle poles and the separate east-crossing lamp pole.
-// Only the town-west pole carries pedestrian heads for two different crossings.
+// Five Kyobashi installations: four vehicle poles and an independent name-board lamp.
+// Both bridge corners and town-west carry pedestrian heads for two adjacent crossings.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { model, material } from './world.js';
 import { painted } from './style.js';
 import { toThree } from './coords.js';
-import { signalPlacements, signalRigs, GUIDE_SIGNS, LANTERNS, BUS_STOPS, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
+import { signalPlacements, signalRigs, signalNamePlate, signalWalkPlate, GUIDE_SIGNS, LANTERNS, BUS_STOPS, POLE, ARM_ABOVE_HEAD, ARM_BEYOND_HEAD } from './signal-layout.js';
 
 const UP = new THREE.Vector3(0, 1, 0);
 
@@ -52,7 +52,7 @@ function buildPosts(rigs) {
     const from = toThree(a.x, a.y, a.z), to = toThree(b.x, b.y, b.z);
     const d = new THREE.Vector3().subVectors(to, from), length = d.length();
     if (length < 1e-6) return;
-    const g = new THREE.CylinderGeometry(r1, r0, length, 14, 1);
+    const g = new THREE.CylinderGeometry(r1, r0, length, 14, Math.max(1, Math.ceil(length / 0.65)));
     g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UP, d.normalize()));
     g.translate((from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2);
     list.push(g);
@@ -62,7 +62,7 @@ function buildPosts(rigs) {
     const from = toThree(a.x, a.y, a.z), to = toThree(b.x, b.y, b.z);
     const d = new THREE.Vector3().subVectors(to, from), length = d.length();
     if (length < 1e-6) return;
-    const g = new THREE.BoxGeometry(w, length, h);
+    const g = new THREE.BoxGeometry(w, length, h, 1, Math.max(1, Math.ceil(length / 0.55)), 1);
     g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UP, d.normalize()));
     g.translate((from.x + to.x) / 2, (from.y + to.y) / 2, (from.z + to.z) / 2);
     list.push(g);
@@ -91,13 +91,13 @@ function buildPosts(rigs) {
   };
   for (const r of rigs) {
     const { head, facing, pole } = r, spec = POLE[r.kind];
-    // Bridge-side truss poles are round dark brown; the town-side masts and the lamp pole are
-    // square taupe steel with flat arms (18 October 2026 photographs).
+    // Keep the photographed round/box sections, with the owner's common shop-corner
+    // taupe-metal finish on every traffic-signal installation.
     const square = r.style !== 'truss';
-    const metal = square ? taupe : brown;
+    const metal = taupe;
     const P = (y, out = 0) => ({ x: pole.x + facing[0] * out, y, z: pole.z + facing[1] * out });
-    if (square) beam(metal, P(0.16), P(r.height), spec.base * 1.75);
-    else tube(metal, P(0.16), P(r.height), spec.base, spec.top);
+    if (square) beam(metal, P(0.01), P(r.height), spec.base * 1.75);
+    else tube(metal, P(0.01), P(r.height), spec.base, spec.top);
     tube(metal, P(r.height), P(r.height + 0.06), spec.top + 0.015, 0.02);
     if (head) {
       const dx = head.x - pole.x, dz = head.z - pole.z, l = Math.hypot(dx, dz) || 1;
@@ -106,15 +106,15 @@ function buildPosts(rigs) {
       const A = (s, y) => ({ x: pole.x + ux * s - facing[0] * 0.05, y,
         z: pole.z + uz * s - facing[1] * 0.05 });
       if (r.style === 'truss') {
-        const lower = s => armY - 0.95 * (1 - s / reach);
-        const upper = s => armY - 0.20 + 0.29 * s / reach;
+        const lower = s => armY + 0.25 * (1 - s / reach);
+        const upper = s => armY + 0.10 + 0.72 * (1 - s / reach);
         tube(metal, A(0, lower(0)), A(reach, lower(reach)), 0.06, 0.045);
         tube(metal, A(0, upper(0)), A(reach, upper(reach)), 0.04, 0.03);
         for (const s of [0.35, 0.68]) tube(metal, A(reach * s, lower(reach * s)), A(reach * s, upper(reach * s)), 0.022);
         // Thin tension cable above the paired pipes.
-        tube(metal, P(r.height - 0.1), A(reach, armY + 0.12), 0.008);
+        tube(metal, P(r.trussTieHeight ?? r.height - 0.1), A(reach, armY + 0.12), 0.008);
       } else {
-        beam(metal, A(0, armY), A(reach, armY), 0.13, 0.16);
+        beam(metal, A(-(r.armBack ?? 0), armY), A(reach, armY), 0.13, 0.16);
         beam(metal, A(0, armY - 0.4), A(0.55, armY), 0.07);
       }
       tube(metal, P(armY - 0.22), P(armY + 0.18), spec.base + 0.018);
@@ -122,35 +122,46 @@ function buildPosts(rigs) {
       const right = [-facing[1], facing[0]];
       const H = (side, y) => ({ x: head.x + right[0] * side - facing[0] * 0.05, y,
         z: head.z + right[1] * side - facing[1] * 0.05 });
-      tube(metal, H(-0.64, armY), H(0.64, armY), 0.028);
-      tube(metal, A(l, r.style === 'truss' ? armY - 0.95 * (1 - l / reach) : armY), H(0, armY), 0.03);
+      tube(metal, H(-0.52, armY), H(0.52, armY), 0.028);
+      tube(metal, A(l, r.style === 'truss' ? armY + 0.25 * (1 - l / reach) : armY), H(0, armY), 0.03);
       if (r.phase) {
-        const phaseY = head.y + (r.phase === 'below' ? -0.62 : 0.79);
-        plate(plates.phase, { x: head.x + facing[0] * 0.06, y: phaseY, z: head.z + facing[1] * 0.06 }, facing, 1.5, 0.46);
-        for (const side of [-0.57, 0.57]) tube(metal, H(side, armY), H(side, phaseY), 0.017);
+        const phaseY = head.y + (r.phase === 'below' ? -0.57 : 0.73);
+        plate(plates.phase, { x: head.x + facing[0] * 0.06, y: phaseY, z: head.z + facing[1] * 0.06 }, facing, 1.18, 0.37);
+        for (const side of [-0.44, 0.44]) tube(metal, H(side, armY), H(side, phaseY), 0.017);
       }
-      // A second head at the arm's end turns to another approach on its own crossbar.
+      // Opposing heads share an arm-end frame with two ties between their rear crossbars.
       for (const e of r.extraHeads ?? []) {
+        const extraArmY = e.head.y + ARM_ABOVE_HEAD;
         const right2 = [-e.facing[1], e.facing[0]];
         const E = (side, y) => ({ x: e.head.x + right2[0] * side - e.facing[0] * 0.05, y,
           z: e.head.z + right2[1] * side - e.facing[1] * 0.05 });
-        tube(metal, E(-0.64, armY), E(0.64, armY), 0.028);
-        tube(metal, H(0, armY), E(0, armY), 0.03);
+        tube(metal, E(-0.52, extraArmY), E(0.52, extraArmY), 0.028);
+        if (facing[0] * e.facing[0] + facing[1] * e.facing[1] < -0.99) {
+          for (const side of [-0.44, 0.44]) tube(metal, H(side, armY), E(-side, extraArmY), 0.025);
+        } else tube(metal, H(0, armY), E(0, extraArmY), 0.03);
       }
     }
     if (r.lampFacing) {
       const [lx, lz] = r.lampFacing;
+      const reach = r.lampReach ?? 1.35;
       const L = (s, y) => ({ x: pole.x + lx * s, y, z: pole.z + lz * s });
-      if (square) beam(metal, P(r.height - 0.05), L(1.2, r.height - 0.05), 0.1, 0.12);
+      if (square) {
+        beam(metal, L(-(r.lampBack ?? 0), r.height - 0.05), L(reach - 0.15, r.height - 0.05), 0.1, 0.12);
+        beam(metal, P(r.height - 0.37), L(0.4, r.height - 0.05), 0.065);
+      }
       else tube(metal, P(r.height - 0.25), L(1.15, r.height + 0.12), 0.045);
-      const yaw = Math.atan2(-lx, lz);
-      box(back, L(1.35, r.height + 0.12), [0.42, 0.12, 0.58], yaw);
-      box(glass, L(1.35, r.height + 0.052), [0.34, 0.018, 0.46], yaw);
+      const yaw = Math.atan2(-lx, lz), lampY = square ? r.height - 0.05 : r.height + 0.12;
+      box(r.lampDark ? dark : back, L(reach, lampY), [0.42, 0.12, 0.58], yaw);
+      box(glass, L(reach, lampY - 0.068), [0.34, 0.018, 0.46], yaw);
     }
-    if (r.nameHeight != null) {
-      const f = r.nameFacing, c = { x: pole.x + f[0] * 0.17, y: r.nameHeight, z: pole.z + f[1] * 0.17 };
-      plate(plates.name, c, f, ...(r.nameSize ?? [0.96, 0.72]));
-      for (const dy of [-0.23, 0.23]) tube(metal, P(c.y + dy), { ...c, y: c.y + dy }, 0.018);
+    const namePlate = signalNamePlate(r);
+    if (namePlate) {
+      const { facing: f, center: c, size } = namePlate, offset = r.nameOffset ?? [0, 0];
+      plate(plates.name, c, f, ...size);
+      const length = Math.hypot(...offset), along = length ? offset.map(v => v / length * size[0] * 0.44) : [0, 0];
+      for (const dy of [-size[1] * 0.32, size[1] * 0.32])
+        tube(metal, P(c.y + dy), { x: c.x - along[0] - f[0] * 0.045,
+          y: c.y + dy, z: c.z - along[1] - f[1] * 0.045 }, 0.018);
     }
     // Each explicitly authored pedestrian head uses short upper/lower brackets on its pole.
     for (const walk of r.pedestrians) {
@@ -160,18 +171,22 @@ function buildPosts(rigs) {
         tube(metal, P(y), { x: rear.x, y, z: rear.z }, 0.025);
         tube(metal, { x: rear.x, y, z: rear.z }, { x: rear.x, y: walk.head.y + Math.sign(dy) * 0.31, z: rear.z }, 0.025);
       }
-      plate(plates.walk, { x: pole.x + walk.facing[0] * 0.18 - walk.side[0] * 0.16,
-        y: walk.head.y, z: pole.z + walk.facing[1] * 0.18 - walk.side[1] * 0.16 }, walk.facing, 0.18, 0.72);
+      // Bring the notice ahead of the hood envelope so it remains readable from an angle.
+      const notice = signalWalkPlate(r, walk), c = notice.center;
+      plate(plates.walk, c, notice.facing, ...notice.size);
+      for (const dy of [-notice.size[1] * 0.4, notice.size[1] * 0.4])
+        tube(metal, P(c.y + dy), { x: c.x - notice.facing[0] * 0.045, y: c.y + dy,
+          z: c.z - notice.facing[1] * 0.045 }, 0.012);
     }
     // Clamps and the slim control box read as part of the shared installation.
     for (const y of [2.4, 3.3]) tube(metal, P(y - 0.035), P(y + 0.035), spec.base + 0.025);
-    box(metal, P(3.75, -0.17), [0.22, 0.48, 0.16]);
+    box(metal, P(Math.min(3.75, r.height - 0.3), -0.17), [0.22, 0.48, 0.16]);
   }
   // Brown cantilever: the arm carries the double-sided board over the west lane on two hangers.
   // Both faces and the lantern's disc share one atlas texture (one draw call).
   for (const s of GUIDE_SIGNS) {
     const [px, pz] = s.pole, [bx, by, bz] = s.board, [w, h] = s.size, [fx, fz] = s.facing;
-    tube(brown, { x: px, y: 0.16, z: pz }, { x: px, y: s.height, z: pz }, POLE.guide.base, POLE.guide.top);
+    tube(brown, { x: px, y: 0.01, z: pz }, { x: px, y: s.height, z: pz }, POLE.guide.base, POLE.guide.top);
     const armY = by + h / 2 + 0.25, far = bx + w / 2 - 0.15;
     tube(brown, { x: px, y: armY, z: pz }, { x: far, y: armY, z: pz }, 0.085, 0.06);
     tube(brown, { x: px, y: armY - 0.75, z: pz }, { x: px + 1.1, y: armY, z: pz }, 0.04);
@@ -182,7 +197,7 @@ function buildPosts(rigs) {
   // Dark pole, a square glazed lantern under a cap, and the blue disc on a short bracket.
   for (const l of LANTERNS) {
     const [px, pz] = l.pole, top = l.height, d = l.disc;
-    tube(dark, { x: px, y: 0.16, z: pz }, { x: px, y: top - 0.55, z: pz }, POLE.lantern.base, POLE.lantern.top);
+    tube(dark, { x: px, y: 0.01, z: pz }, { x: px, y: top - 0.55, z: pz }, POLE.lantern.base, POLE.lantern.top);
     box(glass, { x: px, y: top - 0.28, z: pz }, [0.46, 0.5, 0.46]);
     box(dark, { x: px, y: top - 0.55, z: pz }, [0.52, 0.06, 0.52]);
     box(dark, { x: px, y: top - 0.01, z: pz }, [0.56, 0.06, 0.56]);
@@ -234,7 +249,16 @@ function buildPosts(rigs) {
     const color = new THREE.Color().setRGB(...rgb, THREE.SRGBColorSpace);
     for (const g of list) {
       const values = new Float32Array(g.attributes.position.count * 3);
-      for (let i = 0; i < values.length; i += 3) { values[i] = color.r; values[i + 1] = color.g; values[i + 2] = color.b; }
+      const position = g.attributes.position, normal = g.attributes.normal;
+      const warm = new THREE.Color().setRGB(0.77, 0.65, 0.47, THREE.SRGBColorSpace);
+      const cool = new THREE.Color().setRGB(0.48, 0.48, 0.61, THREE.SRGBColorSpace);
+      const stroke = new THREE.Color();
+      for (let i = 0; i < position.count; i++) {
+        const t = 0.5 + Math.sin(position.getY(i) * 2.1 + position.getX(i) * 0.4 + position.getZ(i) * 0.6) * 0.25
+          + (normal.getX(i) - normal.getZ(i)) * 0.12;
+        stroke.copy(cool).lerp(warm, t).lerp(color, 0.76);
+        values.set([stroke.r, stroke.g, stroke.b], i * 3);
+      }
       g.setAttribute('color', new THREE.BufferAttribute(values, 3)); solids.push(g);
     }
   }

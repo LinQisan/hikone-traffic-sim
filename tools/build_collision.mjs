@@ -29,8 +29,14 @@ const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
 const layout = webLayout(read('layout.json')), map = read('map.json');   // as the browser shows it
 const ground = new Ground(read('road_tiles.json'));
 const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain)|ART_Kyobashi(Roads|Land|Water))/;
+// These photo-corrected buildings have low real thresholds. Project their closed main
+// bodies too: a plinth below the body band must not turn a building's interior into free cells.
+const SOLID_BODY = new Map([['ART_CornerShop', 'ART_ShopPlaster'], ['ART_WhiteStorehouse', 'ART_DisplayInk']]);
 
-const { xMin, zMin, xMax, zMax } = map.world;
+// Body coverage follows the practice frame and western extension, independently of image coverage.
+const practice = map.practiceWorld ?? map.world;
+const xMin = Math.min(practice.xMin, -1060), zMin = practice.zMin;
+const xMax = practice.xMax, zMax = Math.max(practice.zMax, 870);
 const width = Math.ceil((xMax - xMin) / CELL), height = Math.ceil((zMax - zMin) / CELL);
 const bits = new Uint8Array(Math.ceil(width * height / 8));
 const mark = (x, z) => {
@@ -48,7 +54,8 @@ async function parts(name) {
     const gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     gltf.scene.updateMatrixWorld(true);
     const list = [];
-    gltf.scene.traverse(o => { if (o.isMesh) list.push({ geometry: o.geometry, matrix: o.matrixWorld.clone() }); });
+    gltf.scene.traverse(o => { if (o.isMesh) list.push({ geometry: o.geometry,
+      material: o.material.name, matrix: o.matrixWorld.clone() }); });
     cache.set(name, list);
   }
   return cache.get(name);
@@ -86,14 +93,25 @@ let objects = 0;
 for (const item of layout.items) {
   if (NOT_SOLID.test(item.a)) continue;
   objects++;
+  const bodyMaterial = SOLID_BODY.get(item.a);
   placement(...item.p, item.r, item.s, m);
-  for (const { geometry, matrix } of await parts(item.a)) {
+  for (const { geometry, material, matrix } of await parts(item.a)) {
     world.multiplyMatrices(m, matrix);
     const pos = geometry.attributes.position, index = geometry.index;
     const count = index ? index.count : pos.count;
     const corner = k => { v.fromBufferAttribute(pos, index ? index.getX(k) : k).applyMatrix4(world);
       return [-v.x, v.y, v.z]; };                                  // three → Unity
-    for (let k = 0; k < count; k += 3) markTriangle(corner(k), corner(k + 1), corner(k + 2));
+    for (let k = 0; k < count; k += 3) {
+      const a = corner(k), b = corner(k + 1), c = corner(k + 2);
+      markTriangle(a, b, c);
+      if (bodyMaterial && material === bodyMaterial) {
+        const area = (b[0] - a[0]) * (c[2] - a[2]) - (b[2] - a[2]) * (c[0] - a[0]);
+        if (Math.abs(area) < 1e-8) continue;
+        const floor = ground.heightAt((a[0] + b[0] + c[0]) / 3, (a[2] + b[2] + c[2]) / 3);
+        const y = floor + (BAND_LOW + BAND_HIGH) / 2;
+        markTriangle([a[0], y, a[2]], [b[0], y, b[2]], [c[0], y, c[2]]);
+      }
+    }
   }
 }
 

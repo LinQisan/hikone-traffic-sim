@@ -45,7 +45,7 @@ test('the exported data is complete', () => {
 test('ground heights match the browser road plan', () => {
   const g = new Ground(data('road_tiles.json'));
   assert.ok(Math.abs(g.heightAt(32, 10) - 0.01) < 1e-3, 'carriageway 0.01');
-  assert.ok(Math.abs(g.heightAt(40, 14) - 0.16) < 1e-3, 'sidewalk 0.16 (15 cm kerbs, as in Unity)');
+  assert.ok(Math.abs(g.heightAt(40, 14) - 0.01) < 1e-3, 'footway is flush with the carriageway');
   assert.ok(Math.abs(g.heightAt(60, 26) - 0.01) < 1e-3, 'Route 25');
   assert.equal(Ground.fallback(32, 45), 0.01, 'bridge deck carriageway');
   for (const x of [26.2, 37.8]) for (const z of [44, 56, 70]) {
@@ -130,12 +130,15 @@ test('analysis: looking toward the car, side checks, verdicts and the placement 
   assert.ok(c.checkedRight && !c.checkedLeft);
 });
 
-test('15 cm kerbs: the reviewed layout stands on the road plan', async () => {
+test('flush footways and separate 15 cm kerbs: placements follow the road plan', async () => {
   const { webLayout } = await import('../src/web-layout.js');
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
   const shown = webLayout(layout);
   const g = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
-  assert.ok(Math.abs(g.heightAt(40, 14) - g.heightAt(32, 10) - 0.15) < 2e-3, 'a 15 cm kerb');
+  assert.ok(Math.abs(g.heightAt(60, 30.6) - g.heightAt(60, 26)) < 1e-6, 'the walking surface is level with the road');
+  assert.ok(Math.abs(g.heightAt(60, 30.10) - g.heightAt(60, 30.6) - 0.15) < 2e-3, 'only the narrow kerb cap is raised');
+  for (const x of [19.7, 44.3]) for (const z of [21.9, 22.1, 29.9, 30.1])
+    assert.ok(Math.abs(g.heightAt(x, z) - 0.01) < 1e-6, 'crossing openings have no raised lip');
   // every house stands on the ground (not floating, not sunk) and keeps VRLearn's height
   for (const h of shown.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a)).slice(0, 40))
     assert.ok(Math.abs(g.heightAt(h.p[0], h.p[2]) - h.p[1]) < 0.03, `${h.a} at ${h.p[0]}, ${h.p[2]}: ground ${g.heightAt(h.p[0], h.p[2]).toFixed(3)}, base ${h.p[1].toFixed(3)}`);

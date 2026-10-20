@@ -7,6 +7,7 @@ import json
 import math
 import os
 from abstract_props import beveled_box as box, cylinder, face, car_body, wheel, speed_sign
+from display_case import display_kiosk
 
 MODELS = ('ART_CornerShop', 'ART_WhiteStorehouse', 'ART_EavesStorehouse', 'ART_ThreeStorey',
           'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_TownTree',
@@ -159,6 +160,9 @@ def window(b, x, y, w, h, z=-0.405, slats=False):
 
 
 def frontage(b, name):
+    if name in ('ART_CornerShop', 'ART_WhiteStorehouse'):
+        from shop_corner import photo_frontage
+        return photo_frontage(b, name)
     corner, modern = name == 'ART_CornerShop', name == 'ART_ThreeStorey'
     eaves = name == 'ART_EavesStorehouse'
     width, depth, height = (5.4, 9, 6.0) if corner else (6, 8, 9.0) if modern else (7.2, 9, 6.1)
@@ -306,9 +310,9 @@ def parking_pavilion(b):
 
 
 def clipped_hedge(b):
+    from vegetation import shrubs
     box(b, (0, 0.09, 0), (8.0, 0.18, 0.85), 'ART_StoneLight', 0.025)
-    for i, x in enumerate((-3.3, -2.0, -0.7, 0.7, 2.0, 3.3)):
-        b.crown((x, 0.56, 0), (0.90, 0.45, 0.58), 'HK_LeafDark' if i % 3 == 0 else 'HK_Leaf', 1200 + i)
+    shrubs(b, [(x, 0.56, 0, 0.90, 0.45, 0.48) for x in (-3.3, -2.0, -0.7, 0.7, 2.0, 3.3)], 1200)
 
 
 def parking_direction(b):
@@ -325,42 +329,39 @@ def parking_direction(b):
 
 
 def planting(b, town=False):
-    # Crowns are modelled as broad masses. The grove has only a few structural trunks;
-    # the formal town tree has one clear trunk above its low, clipped hedge bed.
+    from vegetation import tree, shrubs
     if town:
-        cylinder(b, (0, 0, 0), (0.1, 4.3, 0), 0.20, 'HK_Bark', segments=8, end_radius=0.11)
-        lobes = [(-1.7, 6.3, 0), (1.5, 6.8, 0.3), (-0.4, 8.4, 0.2), (0.5, 7.0, 1.8)]
-        radius = (2.2, 2.3, 2.0)
-        # The bed stays narrow across the pedestrian route and long along the street.
-        for z in (-1.25, 0, 1.25):
-            b.crown((0, 0.36, z), (0.48, 0.38, 0.88), 'HK_LeafDark', 780 + int(z * 4))
+        tree(b, 'zelkova', height=10.1, spread=3.2, seed=900)
+        shrubs(b, [(0, 0.36, z, 0.40, 0.30, 0.80) for z in (-1.25, 0, 1.25)], 780)
     else:
-        lobes = [(-3.6, 6.2, 0.1), (0, 7.7, 1.2), (3.4, 6.8, -0.1),
-                 (-2.7, 7.0, 3.7), (2.1, 7.9, 3.3)]
-        radius = (3.7, 2.0, 3.1)
-        cylinder(b, (0, 0, 0), (0.1, 3.6, 0), 0.28, 'HK_Bark', segments=8, end_radius=0.16)
-        for x, z in ((-2.4, 0), (2.1, 2.4)):
-            cylinder(b, (0.1, 2.9, 0), (x + 0.15, 4.4, z), 0.12, 'HK_Bark', segments=7, end_radius=0.06)
-    for i, (x, y, z) in enumerate(lobes):
-        if town:
-            cylinder(b, (0.1, 3.8, 0), (x * 0.7, y - 0.5, z * 0.7),
-                     0.075, 'HK_Bark', segments=6, end_radius=0.025)
-        b.crown((x, y, z), radius, 'HK_LeafDark' if i % 4 == 0 else 'HK_Leaf', 900 + i)
+        # Buried root ends accommodate the bank's 1:3 fall across this rotated pair;
+        # placement height remains the authoritative bank height at the asset origin.
+        tree(b, 'tabu', base=(-2.4, 0, 0), height=10.6, spread=4.1, seed=910, root_depth=1.5)
+        tree(b, 'shii', base=(2.8, 0, 2.5), height=12.2, spread=4.2, seed=940, root_depth=1.5)
 
 
-_triangles = None
+_ground_cells = None
 
 
-def ground_height(x, z):
-    global _triangles
-    if _triangles is None:
+def ground_height(x, z, footway=False):
+    """Sample the exported partition; flush footways are identified by kind, not height."""
+    global _ground_cells
+    if _ground_cells is None:
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         with open(os.path.join(root, 'data', 'road_tiles.json')) as f:
-            _triangles = [t for tris in json.load(f).values() for t in tris]
+            groups = json.load(f)
+        _ground_cells = {}
+        for name, triangles in groups.items():
+            for triangle in triangles:
+                xs, zs = triangle[0::3], triangle[2::3]
+                for gx in range(math.floor(min(xs) / 4), math.floor(max(xs) / 4) + 1):
+                    for gz in range(math.floor(min(zs) / 4), math.floor(max(zs) / 4) + 1):
+                        _ground_cells.setdefault((gx, gz), []).append((triangle, name == 'Kyobashi pavement'))
     best = None
-    for ax, ay, az, bx, by, bz, cx, cy, cz in _triangles:
-        if x < min(ax, bx, cx) - 1e-6 or x > max(ax, bx, cx) + 1e-6 or z < min(az, bz, cz) - 1e-6 or z > max(az, bz, cz) + 1e-6:
+    for triangle, pavement in _ground_cells.get((math.floor(x / 4), math.floor(z / 4)), []):
+        if footway and not pavement:
             continue
+        ax, ay, az, bx, by, bz, cx, cy, cz = triangle
         d = (bz - cz) * (ax - cx) + (cx - bx) * (az - cz)
         if abs(d) < 1e-12:
             continue
@@ -370,7 +371,7 @@ def ground_height(x, z):
         if min(a, c, e) >= -1e-6:
             h = a * ay + c * by + e * cy
             best = h if best is None else max(h, best)
-    return 0.15 if best is None else best
+    return best if footway or best is not None else 0.15
 
 
 def paving(b):
@@ -388,7 +389,8 @@ def paving(b):
             for i in range(int((hi - lo) / 0.6)):
                 x = lo + i * 0.6 + 0.3
                 z = 34.4 - 3.0 * shore_taper(x) if row == 'moat' else 18.6 + 2.0 * town_taper(x)
-                if ground_height(x, z) < 0.14:
+                if any(ground_height(xx, zz, footway=True) is None
+                       for xx in (x - 0.298, x + 0.298) for zz in (z - 0.15, z + 0.15)):
                     continue
                 rect(x, z, 0.596, 0.30, 'ART_Tactile')
                 for dz in (-0.095, 0, 0.095):
@@ -420,39 +422,8 @@ def paving(b):
         ring(b, (x, h + 0.004, z), 0.29, 0.29, 0.006, 'ART_Chain', vertical=False, segments=32)
         for dx in (-0.15, 0, 0.15):
             rect(x + dx, z, 0.035, 0.42, 'ART_Chain', 0.004)
-
-
-def display_kiosk(b):
-    # 18 October 2026 photograph: a small glazed display case on a ribbed steel base, dark timber
-    # corner posts, a shoji-like back and a shallow metal gable. Its campaign lettering is omitted.
-    w, d = 1.5, 0.9
-    box(b, (0, 0.38, 0), (w, 0.6, d), 'HK_MetalLight', 0.01)
-    for y in [0.14 + i * 0.1 for i in range(6)]:
-        box(b, (0, y, d / 2 + 0.006), (w - 0.06, 0.018, 0.012), 'ART_FrameLight', 0.002)
-        for side in (-1, 1):
-            box(b, (side * (w / 2 + 0.006), y, 0), (0.012, 0.018, d - 0.06), 'ART_FrameLight', 0.002)
-    box(b, (0, 0.72, 0), (w + 0.06, 0.08, d + 0.06), 'HK_WoodDark', 0.01)
-    box(b, (0, 1.17, -d / 2 + 0.05), (w - 0.1, 0.84, 0.03), 'HK_Shoji', 0.005)
-    for x in (-0.25, 0.25):
-        box(b, (x, 1.17, -d / 2 + 0.07), (0.025, 0.84, 0.02), 'HK_WoodLight', 0.003)
-    box(b, (0, 1.17, d / 2 - 0.02), (w - 0.1, 0.84, 0.012), 'ART_GlassLight', 0.002)
-    for side in (-1, 1):
-        box(b, (side * (w / 2 - 0.02), 1.17, 0.03), (0.012, 0.84, d - 0.16), 'ART_GlassLight', 0.002)
-    for sx in (-1, 1):
-        for sz in (-1, 1):
-            box(b, (sx * (w / 2 - 0.04), 0.84, sz * (d / 2 - 0.04)), (0.08, 1.68, 0.08), 'HK_WoodDark', 0.01)
-    box(b, (0, 1.66, 0), (w + 0.04, 0.09, d + 0.04), 'HK_WoodDark', 0.01)
-    # Gable roof with the ridge along the front, overhanging all round.
-    hw, eave, ridge, over = w / 2 + 0.14, 1.72, 1.97, d / 2 + 0.2
-    inside = (0, eave + 0.05, 0)
-    for side in (-1, 1):
-        outward_face(b, [(-hw, eave, side * over), (hw, eave, side * over), (hw, ridge, 0), (-hw, ridge, 0)],
-                     'HK_Metal', inside)
-        outward_face(b, [(-hw, eave - 0.02, side * over), (hw, eave - 0.02, side * over),
-                         (hw, ridge - 0.02, 0), (-hw, ridge - 0.02, 0)], 'HK_WoodDark', (0, ridge + 1, 0))
-    for sx in (-1, 1):
-        outward_face(b, [(sx * (w / 2), eave - 0.04, -over + 0.12), (sx * (w / 2), eave - 0.04, over - 0.12),
-                         (sx * (w / 2), ridge - 0.04, 0)], 'HK_WoodDark', (0, eave, 0))
+    from shop_corner import apron_details
+    apron_details(b)
 
 
 def kei_box(b):

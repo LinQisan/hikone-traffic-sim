@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-18",
+  "viewport": [
+    1280,
+    720
+  ],
+  "baseline": "working tree before castle compound changes",
+  "results": [
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 20966947,
+        "sceneBufferBytes": 22512983,
+        "placements": 436,
+        "meshes": 206,
+        "frames": 480,
+        "fps": 60.01200240043538,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.700000017881393,
+        "updateMs": 0.06958333278695743,
+        "calls": 92,
+        "triangles": 391162,
+        "width": 1280,
+        "height": 720,
+        "geometries": 114,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 2432.4000000059605,
+        "resourceTransferBytes": 27403485,
+        "resourceBodyBytes": 27363885,
+        "heapBytes": 62108259,
+        "multiDraw": true
+      },
+      "geometryBytes": 20966947,
+      "meshes": 206
+    },
+    {
+      "stage": "before",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 20966947,
+        "sceneBufferBytes": 22512983,
+        "placements": 436,
+        "meshes": 206,
+        "frames": 480,
+        "fps": 60.00600060014943,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.04708333387970924,
+        "calls": 65,
+        "triangles": 190015,
+        "width": 1280,
+        "height": 720,
+        "geometries": 117,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 2432.4000000059605,
+        "resourceTransferBytes": 27403485,
+        "resourceBodyBytes": 27363885,
+        "heapBytes": 66922400,
+        "multiDraw": true
+      },
+      "geometryBytes": 20966947,
+      "meshes": 206
+    },
+    {
+      "stage": "before",
+      "view": "compound",
+      "probe": {
+        "geometryBytes": 20966947,
+        "sceneBufferBytes": 22512983,
+        "placements": 436,
+        "meshes": 206,
+        "frames": 480,
+        "fps": 60.00900135011309,
+        "medianMs": 16.599999994039536,
+        "p95Ms": 17.700000017881393,
+        "updateMs": 0.05083333359410366,
+        "calls": 9,
+        "triangles": 34986,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 16,
+        "readyMs": 2432.4000000059605,
+        "resourceTransferBytes": 27403485,
+        "resourceBodyBytes": 27363885,
+        "heapBytes": 54515164,
+        "multiDraw": true
+      },
+      "geometryBytes": 20966947,
+      "meshes": 206
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 25415841,
+        "sceneBufferBytes": 26962069,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 59.99925000919607,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.059999999466041724,
+        "calls": 93,
+        "triangles": 414509,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 1147.2999999821186,
+        "resourceTransferBytes": 31871924,
+        "resourceBodyBytes": 31831424,
+        "heapBytes": 114044745,
+        "multiDraw": true
+      },
+      "geometryBytes": 25415841,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 25415841,
+        "sceneBufferBytes": 26962069,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.001500037411525,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.5,
+        "updateMs": 0.05270833273728689,
+        "calls": 66,
+        "triangles": 213362,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 1147.2999999821186,
+        "resourceTransferBytes": 31871924,
+        "resourceBodyBytes": 31831424,
+        "heapBytes": 117755732,
+        "multiDraw": true
+      },
+      "geometryBytes": 25415841,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "compound",
+      "probe": {
+        "geometryBytes": 25415841,
+        "sceneBufferBytes": 26962069,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 479,
+        "fps": 59.99423854916115,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.69999998807907,
+        "updateMs": 0.04843423865533323,
+        "calls": 10,
+        "triangles": 105078,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 1147.2999999821186,
+        "resourceTransferBytes": 31871924,
+        "resourceBodyBytes": 31831424,
+        "heapBytes": 62305517,
+        "multiDraw": true
+      },
+      "geometryBytes": 25415841,
+      "meshes": 209
+    }
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "validation": {
+    "fullRegression": {
+      "passed": 144,
+      "failed": 0,
+      "skipped": 0
+    },
+    "collision": "Regenerated; byte-for-byte identical to the pre-change grid (161484 blocked cells).",
+    "browser": {
+      "checks": [
+        {
+          "id": "builtin-01",
+          "distance": 1.5146399999856688,
+          "look": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "distance": 0.4680842249819001,
+          "look": true,
+          "menu": true
+        },
+        {
+          "editor": true
+        }
+      ],
+      "errors": []
+    },
+    "visualViews": [
+      "castle-compound",
+      "castle-tenbin",
+      "castle-west-turret",
+      "castle-panorama",
+      "museum",
+      "north shore"
+    ],
+    "resourceObservation": "The initial capture/benchmark logs include one existing /favicon.ico 404. The main page now uses the editor's empty favicon declaration; final walking, cycling and editor checks have no console or page errors.",
+    "hardwareNotTested": [
+      "real phone",
+      "VR headset"
+    ]
+  }
+}

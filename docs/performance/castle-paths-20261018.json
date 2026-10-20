@@ -1,0 +1,368 @@
+{
+  "date": "2026-10-18",
+  "viewport": [
+    1280,
+    720
+  ],
+  "baseline": "working tree before castle circulation changes",
+  "results": [
+    {
+      "stage": "before",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 25415841,
+        "sceneBufferBytes": 26962069,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 59.99850003758847,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.400000005960464,
+        "updateMs": 0.07083333333333333,
+        "calls": 93,
+        "triangles": 414509,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 3687.699999988079,
+        "resourceTransferBytes": 31871618,
+        "resourceBodyBytes": 31831418,
+        "heapBytes": 69931076,
+        "multiDraw": true
+      },
+      "geometryBytes": 25415841,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 25415841,
+        "sceneBufferBytes": 26962069,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 479,
+        "fps": 60.002505323813104,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.5,
+        "updateMs": 0.06054279662373171,
+        "calls": 66,
+        "triangles": 213362,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 3687.699999988079,
+        "resourceTransferBytes": 31871618,
+        "resourceBodyBytes": 31831418,
+        "heapBytes": 75374620,
+        "multiDraw": true
+      },
+      "geometryBytes": 25415841,
+      "meshes": 209
+    },
+    {
+      "stage": "before",
+      "view": "compound",
+      "probe": {
+        "geometryBytes": 25415841,
+        "sceneBufferBytes": 26962069,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 59.99775008450594,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.599999994039536,
+        "updateMs": 0.07729166621963184,
+        "calls": 10,
+        "triangles": 105078,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 3687.699999988079,
+        "resourceTransferBytes": 31871618,
+        "resourceBodyBytes": 31831418,
+        "heapBytes": 62728197,
+        "multiDraw": true
+      },
+      "geometryBytes": 25415841,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "street",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 59.99850003758847,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 20.80000001192093,
+        "updateMs": 0.1472916663934787,
+        "calls": 93,
+        "triangles": 428350,
+        "width": 1280,
+        "height": 720,
+        "geometries": 115,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 4969.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 67657791,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "panorama",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 480,
+        "fps": 60.012752709861424,
+        "medianMs": 17.099999994039536,
+        "p95Ms": 25.19999998807907,
+        "updateMs": 0.09541666600853205,
+        "calls": 66,
+        "triangles": 227203,
+        "width": 1280,
+        "height": 720,
+        "geometries": 118,
+        "textures": 9,
+        "programs": 14,
+        "readyMs": 4969.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 74522158,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    },
+    {
+      "stage": "after",
+      "view": "compound",
+      "probe": {
+        "geometryBytes": 26921948,
+        "sceneBufferBytes": 28468176,
+        "placements": 437,
+        "meshes": 209,
+        "frames": 445,
+        "fps": 55.43927841742554,
+        "medianMs": 16.900000005960464,
+        "p95Ms": 32,
+        "updateMs": 0.15932584364762467,
+        "calls": 10,
+        "triangles": 117321,
+        "width": 1280,
+        "height": 720,
+        "geometries": 120,
+        "textures": 9,
+        "programs": 15,
+        "readyMs": 4969.5,
+        "resourceTransferBytes": 33653541,
+        "resourceBodyBytes": 33613041,
+        "heapBytes": 65641037,
+        "multiDraw": true
+      },
+      "geometryBytes": 26921948,
+      "meshes": 209
+    }
+  ],
+  "captureNote": "All six probe reports completed. The final after-compound screenshot timed out after metric collection; reports were recovered verbatim from stdout. Successful independent review captures are retained separately.",
+  "reverseOrderRepeat": {
+    "date": "2026-10-18",
+    "viewport": [
+      1280,
+      720
+    ],
+    "baseline": "working tree before castle circulation changes",
+    "results": [
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 26921948,
+          "sceneBufferBytes": 28468176,
+          "placements": 437,
+          "meshes": 209,
+          "frames": 480,
+          "fps": 60.003750234389656,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.099999994039536,
+          "updateMs": 0.0758333324144284,
+          "calls": 93,
+          "triangles": 428350,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 14,
+          "readyMs": 3118.100000023842,
+          "resourceTransferBytes": 33653541,
+          "resourceBodyBytes": 33613041,
+          "heapBytes": 72779691,
+          "multiDraw": true
+        },
+        "geometryBytes": 26921948,
+        "meshes": 209
+      },
+      {
+        "stage": "after",
+        "view": "compound",
+        "probe": {
+          "geometryBytes": 26921948,
+          "sceneBufferBytes": 28468176,
+          "placements": 437,
+          "meshes": 209,
+          "frames": 480,
+          "fps": 60.0075009376172,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.04479166592160861,
+          "calls": 10,
+          "triangles": 117321,
+          "width": 1280,
+          "height": 720,
+          "geometries": 117,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 3118.100000023842,
+          "resourceTransferBytes": 33653541,
+          "resourceBodyBytes": 33613041,
+          "heapBytes": 75857893,
+          "multiDraw": true
+        },
+        "geometryBytes": 26921948,
+        "meshes": 209
+      },
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 25415841,
+          "sceneBufferBytes": 26962069,
+          "placements": 437,
+          "meshes": 209,
+          "frames": 480,
+          "fps": 60.00900135033668,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.599999994039536,
+          "updateMs": 0.06041666660457849,
+          "calls": 93,
+          "triangles": 414509,
+          "width": 1280,
+          "height": 720,
+          "geometries": 115,
+          "textures": 9,
+          "programs": 14,
+          "readyMs": 1499.800000011921,
+          "resourceTransferBytes": 31871618,
+          "resourceBodyBytes": 31831418,
+          "heapBytes": 151194737,
+          "multiDraw": true
+        },
+        "geometryBytes": 25415841,
+        "meshes": 209
+      },
+      {
+        "stage": "before",
+        "view": "compound",
+        "probe": {
+          "geometryBytes": 25415841,
+          "sceneBufferBytes": 26962069,
+          "placements": 437,
+          "meshes": 209,
+          "frames": 481,
+          "fps": 59.999750520654025,
+          "medianMs": 16.600000023841858,
+          "p95Ms": 17.600000023841858,
+          "updateMs": 0.05197505278052015,
+          "calls": 10,
+          "triangles": 105078,
+          "width": 1280,
+          "height": 720,
+          "geometries": 117,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 1499.800000011921,
+          "resourceTransferBytes": 31871618,
+          "resourceBodyBytes": 31831418,
+          "heapBytes": 62720715,
+          "multiDraw": true
+        },
+        "geometryBytes": 25415841,
+        "meshes": 209
+      }
+    ],
+    "errors": []
+  },
+  "validation": {
+    "fullRegression": {
+      "passed": 147,
+      "failed": 0,
+      "skipped": 0
+    },
+    "targetedGeometry": {
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0
+    },
+    "collision": "Regenerated; byte-for-byte identical to the pre-circulation grid (161484 blocked cells).",
+    "browser": {
+      "checks": [
+        {
+          "id": "builtin-01",
+          "distance": 1.4805600000142791,
+          "look": true,
+          "menu": true
+        },
+        {
+          "id": "builtin-07",
+          "distance": 0.4817968999906712,
+          "look": true,
+          "menu": true
+        },
+        {
+          "editor": true
+        }
+      ],
+      "errors": []
+    },
+    "views": [
+      "castle-paths",
+      "castle-tenbin",
+      "castle-west-turret",
+      "castle-panorama",
+      "museum",
+      "north shore",
+      "castle-underpass",
+      "ridge",
+      "Otemon entry"
+    ],
+    "routes": 15,
+    "checks": [
+      "connected graph from both entrance slopes to the gates, Honmaru, Nishinomaru, Kuromon and lower buildings",
+      "per-route Float32 ground versus both rendered LODs",
+      "body width and head clearance through gates and under Roka",
+      "no unbridged water crossings or raised paving across the carriageway",
+      "both editor backends, road seams, events and performance in full regression"
+    ],
+    "hardwareNotTested": [
+      "real phone",
+      "VR headset"
+    ]
+  }
+}

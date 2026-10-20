@@ -1,0 +1,386 @@
+{
+  "date": "2026-10-19",
+  "scope": "Shiga Hikone campus gate, enclosure, local streets, middle/inner moats, western castle foot and terrain clearance",
+  "references": [
+    "https://www.google.com/maps/@?api=1&map_action=pano&pano=oSBsIlmcNwwIajIeCcCoSA&heading=300",
+    "https://www.google.com/maps/@?api=1&map_action=map&center=35.2777,136.2490&zoom=17&basemap=satellite",
+    "https://www.shiga-u.ac.jp/information/campus-access/campusmap/",
+    "https://www.shiga-u.ac.jp/wp/wp-content/uploads/CMP2022.pdf"
+  ],
+  "registration": {
+    "gateLatLon": [
+      35.276441,
+      136.247332
+    ],
+    "gateShiftFromInitialEstimateMetres": 45,
+    "method": "visible Google Maps coordinate menu; manually observed satellite outlines; approximate reconstruction, not a survey",
+    "streetViewCapture": "November 2022"
+  },
+  "verification": {
+    "fullRegression": {
+      "tests": 163,
+      "pass": 163,
+      "fail": 0,
+      "skipped": 0
+    },
+    "collision": "436 composite/individual objects; 6300 x 5125 cells at 0.2 m; 321509 blocked",
+    "navigation": {
+      "navigation": [
+        {
+          "mode": "walking",
+          "frames": 15909,
+          "distance": 636.3600000000012,
+          "end": [
+            -694.9391351992897,
+            211.0973783839531
+          ],
+          "ground": 0.01
+        },
+        {
+          "mode": "bicycle",
+          "frames": 15937,
+          "distance": 636.3479166666679,
+          "end": [
+            -694.9360497878477,
+            211.09791312862998
+          ],
+          "ground": 0.01
+        }
+      ],
+      "errors": []
+    },
+    "scenarioFlows": {
+      "results": [
+        {
+          "id": "builtin-01",
+          "start": {
+            "state": "playing",
+            "mode": "walking",
+            "x": 40,
+            "z": 14,
+            "y": 1.5912,
+            "ground": 0.01,
+            "yaw": 13.435523362319215
+          },
+          "turned": -36.18747663929011,
+          "moved": {
+            "x": 39.26786770139482,
+            "z": 15.000790835958762
+          },
+          "state": "results",
+          "replayed": true
+        },
+        {
+          "id": "builtin-07",
+          "start": {
+            "state": "playing",
+            "mode": "bicycle",
+            "x": -68.54,
+            "z": 22.77,
+            "y": 1.562013800095281,
+            "ground": 0.01,
+            "yaw": 270.99461847364057
+          },
+          "turned": 230.9476184752499,
+          "moved": {
+            "x": -69.02105243067432,
+            "z": 22.778351604699203
+          },
+          "state": "results",
+          "replayed": true
+        }
+      ],
+      "errors": []
+    },
+    "visual": {
+      "errors": [],
+      "views": [
+        "campus",
+        "gate",
+        "context",
+        "underpass",
+        "tenbin"
+      ],
+      "artifacts": "/Users/xinyu/.codex/visualizations/2026/10/19/hikone-campus-correction"
+    },
+    "notMeasured": [
+      "real phone",
+      "VR headset",
+      "peak memory",
+      "exact VRAM",
+      "survey-level footprint/height accuracy"
+    ]
+  },
+  "benchmarkLimits": [
+    "Same Chrome page, fixed cameras, 1280 x 720, reduced motion; benchmark=1 disables dynamic resolution.",
+    "Baseline is the saved working tree at the beginning of this correction, including the earlier campus extension; it is not Git HEAD.",
+    "Four seconds of settling precede the ordinary two-second warmup/eight-second samples. No build or test process runs during sampling.",
+    "Fixture routing and warm navigation make startup, transfer and heap fields unsuitable as loading or retained-memory comparisons.",
+    "Geometry bytes count active-scene buffers, not exact VRAM or peak memory. Frame-capped desktop timings establish no speed improvement."
+  ],
+  "benchmark": {
+    "date": "2026-10-19",
+    "viewport": [
+      1280,
+      720
+    ],
+    "renderer": "Chrome ANGLE Metal, reduced motion, fixed same page; before resources served from saved working-tree fixture",
+    "views": {
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ],
+      "west": [
+        -180,
+        14,
+        28,
+        -450,
+        8,
+        80,
+        65
+      ],
+      "campus": [
+        -680,
+        220,
+        -10,
+        -475,
+        5,
+        350,
+        72
+      ],
+      "gate": [
+        -590.3,
+        2.1,
+        182,
+        -647,
+        5,
+        188,
+        68
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 481,
+          "fps": 60.027455384999385,
+          "medianMs": 16.5,
+          "p95Ms": 26,
+          "updateMs": 0.1424116430931924,
+          "calls": 95,
+          "triangles": 904481,
+          "width": 1280,
+          "height": 720,
+          "geometries": 118,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 14591.799999982119,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 101232639,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "west",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.93856297304194,
+          "medianMs": 16.599999994039536,
+          "p95Ms": 25.80000001192093,
+          "updateMs": 0.08937499976406495,
+          "calls": 18,
+          "triangles": 321793,
+          "width": 1280,
+          "height": 720,
+          "geometries": 125,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 14591.799999982119,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 100066432,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 479,
+          "fps": 59.9919843696997,
+          "medianMs": 17.200000017881393,
+          "p95Ms": 25,
+          "updateMs": 0.0824634664865028,
+          "calls": 33,
+          "triangles": 503582,
+          "width": 1280,
+          "height": 720,
+          "geometries": 128,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 14591.799999982119,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 100441976,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "gate",
+        "probe": {
+          "geometryBytes": 53709144,
+          "sceneBufferBytes": 55676764,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 481,
+          "fps": 60.04319115201064,
+          "medianMs": 16.900000005960464,
+          "p95Ms": 25,
+          "updateMs": 0.11226611214219409,
+          "calls": 3,
+          "triangles": 19853,
+          "width": 1280,
+          "height": 720,
+          "geometries": 129,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 14591.799999982119,
+          "resourceTransferBytes": 60202380,
+          "resourceBodyBytes": 60159480,
+          "heapBytes": 100766289,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 68639709,
+          "sceneBufferBytes": 70607329,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 481,
+          "fps": 60.03269972430805,
+          "medianMs": 17.30000001192093,
+          "p95Ms": 24.799999982118607,
+          "updateMs": 0.14698544826180424,
+          "calls": 95,
+          "triangles": 985179,
+          "width": 1280,
+          "height": 720,
+          "geometries": 118,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 12333.90000000596,
+          "resourceTransferBytes": 75024874,
+          "resourceBodyBytes": 74981974,
+          "heapBytes": 135416516,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "west",
+        "probe": {
+          "geometryBytes": 68639709,
+          "sceneBufferBytes": 70607329,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 478,
+          "fps": 59.73730582237922,
+          "medianMs": 17.900000005960464,
+          "p95Ms": 22.30000001192093,
+          "updateMs": 0.17259414144889082,
+          "calls": 18,
+          "triangles": 1055700,
+          "width": 1280,
+          "height": 720,
+          "geometries": 126,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 12333.90000000596,
+          "resourceTransferBytes": 75024874,
+          "resourceBodyBytes": 74981974,
+          "heapBytes": 124399314,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "campus",
+        "probe": {
+          "geometryBytes": 68639709,
+          "sceneBufferBytes": 70607329,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.916865349372394,
+          "medianMs": 17.900000005960464,
+          "p95Ms": 18.5,
+          "updateMs": 0.12520833313465118,
+          "calls": 33,
+          "triangles": 614976,
+          "width": 1280,
+          "height": 720,
+          "geometries": 129,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 12333.90000000596,
+          "resourceTransferBytes": 75024874,
+          "resourceBodyBytes": 74981974,
+          "heapBytes": 124779738,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "gate",
+        "probe": {
+          "geometryBytes": 68639709,
+          "sceneBufferBytes": 70607329,
+          "placements": 440,
+          "meshes": 218,
+          "frames": 480,
+          "fps": 59.88621618932952,
+          "medianMs": 16.900000005960464,
+          "p95Ms": 18.400000005960464,
+          "updateMs": 0.17520833232750496,
+          "calls": 3,
+          "triangles": 182256,
+          "width": 1280,
+          "height": 720,
+          "geometries": 130,
+          "textures": 9,
+          "programs": 16,
+          "readyMs": 12333.90000000596,
+          "resourceTransferBytes": 75024874,
+          "resourceBodyBytes": 74981974,
+          "heapBytes": 124764483,
+          "multiDraw": true
+        }
+      }
+    ],
+    "errors": []
+  }
+}

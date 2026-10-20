@@ -1,0 +1,214 @@
+{
+  "date": "2026-10-21",
+  "purpose": "Coordinate-picked northeast bridge signal at x=42.00, z=33.30: clear Kyobashi name face and both pedestrian heads.",
+  "method": "Same headless Chrome page at benchmark=1; baseline source routes and final runtime source, fixed cameras, 2-second warmup and 8-second samples. Standalone geometry also tests actual post-triangle edges against the actual name face.",
+  "baseline": "Centered name face is pierced by truss/cable geometry; only the east-crossing pedestrian head exists on bridge-east.",
+  "after": "Name face moves beside the shaft, with rear-mounted brackets. A second pedestrian head serves the marked bridge-entrance crossing, paired with a new head on bridge-west.",
+  "sources": {
+    "signal-layout.js": {
+      "before": "0ed0549af54d7c81c8cd148ac8e75827010de0a1410dcb867fd6c1994f1498ab",
+      "after": "d6d5425e8fc8bd096204ff746a2035008f8dbac933220fc57d359713c4a69305"
+    },
+    "signals.js": {
+      "before": "5cb7c373064dd81a6e94dd9864ed1ece7d0726e25a5c5845bd9aae402beda2e2",
+      "after": "6734489dc25aad071e94330a1e538d9655a6e4f62ef181c191a48d41e6a2d197"
+    },
+    "prop-review.js": {
+      "before": "3085afd6786fdffde7b09556732dd2822d509a1b87f5f138e26b68972f6afc44",
+      "after": "f4c462a5ba85deb9a46ee1ad9fa1fad2c382ff7e5a10137317d3767d434fdc67"
+    }
+  },
+  "viewport": {
+    "width": 1440,
+    "height": 1080
+  },
+  "deviceScaleFactor": 1,
+  "reducedMotion": true,
+  "cameras": {
+    "photo": [
+      44.2,
+      1.65,
+      28.2,
+      41.6,
+      4.4,
+      32.2,
+      62
+    ],
+    "junction": [
+      54,
+      7,
+      16,
+      34,
+      3.5,
+      31,
+      62
+    ]
+  },
+  "results": [
+    {
+      "stage": "before",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70626814,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.00124742718144,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.700000002980232,
+        "updateMs": 0.06881496864767928,
+        "calls": 56,
+        "triangles": 828084,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 167,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 3783.5999999940395,
+        "resourceTransferBytes": 75263856,
+        "resourceBodyBytes": 75220356,
+        "heapBytes": 214938793,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "before",
+      "view": "junction",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70626814,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.0064871878264,
+        "medianMs": 16.599999994039536,
+        "p95Ms": 17.5,
+        "updateMs": 0.05883575913935838,
+        "calls": 87,
+        "triangles": 1025419,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 201,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 3783.5999999940395,
+        "resourceTransferBytes": 75263856,
+        "resourceBodyBytes": 75220356,
+        "heapBytes": 140630301,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "after",
+      "view": "photo",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70690270,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.007235799720696,
+        "medianMs": 16.69999998807907,
+        "p95Ms": 17.299999997019768,
+        "updateMs": 0.06798336966245933,
+        "calls": 56,
+        "triangles": 830456,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 167,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2097.0999999940395,
+        "resourceTransferBytes": 75264676,
+        "resourceBodyBytes": 75221176,
+        "heapBytes": 127358587,
+        "multiDraw": true
+      }
+    },
+    {
+      "stage": "after",
+      "view": "junction",
+      "probe": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70690270,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 481,
+        "fps": 60.00274440817892,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 16.899999991059303,
+        "updateMs": 0.07151767187083834,
+        "calls": 87,
+        "triangles": 1027791,
+        "width": 1440,
+        "height": 1080,
+        "geometries": 201,
+        "textures": 10,
+        "programs": 22,
+        "readyMs": 2097.0999999940395,
+        "resourceTransferBytes": 75264676,
+        "resourceBodyBytes": 75221176,
+        "heapBytes": 128710192,
+        "multiDraw": true
+      }
+    }
+  ],
+  "geometry": [
+    {
+      "stage": "before",
+      "intersections": 112,
+      "nameBounds": {
+        "min": [
+          -0.47999998927116394,
+          6.289999961853027,
+          -0.17000000178813934
+        ],
+        "max": [
+          0.47999998927116394,
+          7.010000228881836,
+          -0.17000000178813934
+        ]
+      },
+      "pedestrianInstances": 1
+    },
+    {
+      "stage": "after",
+      "intersections": 0,
+      "nameBounds": {
+        "min": [
+          -1.625,
+          6.25,
+          -0.17000000178813934
+        ],
+        "max": [
+          -0.2749999761581421,
+          7.050000190734863,
+          -0.17000000178813934
+        ]
+      },
+      "pedestrianInstances": 2
+    }
+  ],
+  "previews": [
+    {
+      "view": "signals-back"
+    },
+    {
+      "view": "signals-name"
+    },
+    {
+      "view": "signals-bridge-west"
+    }
+  ],
+  "errors": [],
+  "validation": {
+    "focusedTests": 58,
+    "failures": 0,
+    "skipped": 0,
+    "regressionFailsAgainstBaseline": true,
+    "collisionByteIdentical": true,
+    "blockedCells": 338379
+  },
+  "limits": "Intersection hits count triangle-edge/face crossings, including repeated shared edges, rather than unique defects. Refresh-capped samples do not establish a speed gain. No physical phone or VR headset tested."
+}

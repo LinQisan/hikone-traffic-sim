@@ -1,0 +1,441 @@
+{
+  "date": "2026-10-21",
+  "purpose": "Owner correction: centred mast-top Kyobashi name and pedestrian notices clear of hood occlusion.",
+  "sources": {
+    "signal-layout.js": {
+      "before": "d6d5425e8fc8bd096204ff746a2035008f8dbac933220fc57d359713c4a69305",
+      "after": "44afb84ef9d69a92f592fc2708b273682e0707a6bde72f6c8130fb1543d77c85"
+    },
+    "signals.js": {
+      "before": "6734489dc25aad071e94330a1e538d9655a6e4f62ef181c191a48d41e6a2d197",
+      "after": "e0ce93f566fc64dfc42321fd1647023c5d5271591cdf869093faf6cd8ba46b7b"
+    },
+    "prop-review.js": {
+      "before": "f4c462a5ba85deb9a46ee1ad9fa1fad2c382ff7e5a10137317d3767d434fdc67",
+      "after": "33d28632546e380f534ffb929d8ac2faefb3135088bd98e80262f7adad21ba82"
+    }
+  },
+  "reloadComparison": {
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "deviceScaleFactor": 1,
+    "reducedMotion": true,
+    "cameras": {
+      "photo": [
+        44.2,
+        1.65,
+        28.2,
+        41.6,
+        4.4,
+        32.2,
+        62
+      ],
+      "junction": [
+        54,
+        7,
+        16,
+        34,
+        3.5,
+        31,
+        62
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "photo",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70690270,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 480,
+          "fps": 59.99775008439419,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 17.5,
+          "updateMs": 0.1272916663127641,
+          "calls": 56,
+          "triangles": 830456,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 167,
+          "textures": 10,
+          "programs": 22,
+          "readyMs": 8062.70000000298,
+          "resourceTransferBytes": 75264676,
+          "resourceBodyBytes": 75221176,
+          "heapBytes": 142655588,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "view": "junction",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70690270,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 478,
+          "fps": 59.71566349342454,
+          "medianMs": 16.700000002980232,
+          "p95Ms": 23.900000005960464,
+          "updateMs": 0.1301255232993529,
+          "calls": 87,
+          "triangles": 1027791,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 201,
+          "textures": 10,
+          "programs": 22,
+          "readyMs": 8062.70000000298,
+          "resourceTransferBytes": 75264676,
+          "resourceBodyBytes": 75221176,
+          "heapBytes": 126384411,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "photo",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70819630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 253,
+          "fps": 31.592223068519335,
+          "medianMs": 30.799999997019768,
+          "p95Ms": 41,
+          "updateMs": 0.22055335996650424,
+          "calls": 56,
+          "triangles": 831436,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 167,
+          "textures": 10,
+          "programs": 22,
+          "readyMs": 14758.90000000596,
+          "resourceTransferBytes": 75265334,
+          "resourceBodyBytes": 75221834,
+          "heapBytes": 127017334,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "view": "junction",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 70819630,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 115,
+          "fps": 14.372125574868964,
+          "medianMs": 71.40000000596046,
+          "p95Ms": 81.20000000298023,
+          "updateMs": 0.19217391299164813,
+          "calls": 87,
+          "triangles": 1028771,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 201,
+          "textures": 10,
+          "programs": 22,
+          "readyMs": 14758.90000000596,
+          "resourceTransferBytes": 75265334,
+          "resourceBodyBytes": 75221834,
+          "heapBytes": 127138935,
+          "multiDraw": true
+        }
+      }
+    ],
+    "geometry": [
+      {
+        "stage": "before",
+        "intersections": 0,
+        "nameBounds": {
+          "min": [
+            -1.625,
+            6.25,
+            -0.17000000178813934
+          ],
+          "max": [
+            -0.2749999761581421,
+            7.050000190734863,
+            -0.17000000178813934
+          ]
+        },
+        "nameVisibility": [
+          {
+            "label": "photo",
+            "blocked": 0,
+            "total": 91
+          },
+          {
+            "label": "assembly",
+            "blocked": 0,
+            "total": 91
+          }
+        ],
+        "noticeVisibility": [
+          [
+            {
+              "label": "angle--35",
+              "blocked": 61,
+              "total": 91
+            },
+            {
+              "label": "angle-0",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-35",
+              "blocked": 22,
+              "total": 91
+            }
+          ],
+          [
+            {
+              "label": "angle--35",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-0",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-35",
+              "blocked": 22,
+              "total": 91
+            }
+          ]
+        ],
+        "pedestrianInstances": 2
+      },
+      {
+        "stage": "after",
+        "intersections": 0,
+        "nameBounds": {
+          "min": [
+            -0.675000011920929,
+            8.050000190734863,
+            -0.17000000178813934
+          ],
+          "max": [
+            0.675000011920929,
+            8.850000381469727,
+            -0.17000000178813934
+          ]
+        },
+        "nameVisibility": [
+          {
+            "label": "photo",
+            "blocked": 0,
+            "total": 91
+          },
+          {
+            "label": "assembly",
+            "blocked": 0,
+            "total": 91
+          }
+        ],
+        "noticeVisibility": [
+          [
+            {
+              "label": "angle--35",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-0",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-35",
+              "blocked": 0,
+              "total": 91
+            }
+          ],
+          [
+            {
+              "label": "angle--35",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-0",
+              "blocked": 0,
+              "total": 91
+            },
+            {
+              "label": "angle-35",
+              "blocked": 0,
+              "total": 91
+            }
+          ]
+        ],
+        "pedestrianInstances": 2
+      }
+    ],
+    "previews": [
+      {
+        "view": "signals-back"
+      },
+      {
+        "view": "signals-name"
+      },
+      {
+        "view": "signals-walk-detail"
+      },
+      {
+        "view": "signals-walk-side"
+      },
+      {
+        "view": "signals-double"
+      },
+      {
+        "view": "signals-walk"
+      }
+    ],
+    "errors": []
+  },
+  "residentComparison": {
+    "method": "Alternate existing roots within one fully loaded page, shared head materials, fixed camera. Both roots stay resident; only one is visible. Shadow refresh is excluded by warmup.",
+    "viewport": {
+      "width": 1440,
+      "height": 1080
+    },
+    "camera": [
+      54,
+      7,
+      16,
+      34,
+      3.5,
+      31,
+      62
+    ],
+    "results": [
+      {
+        "stage": "before",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 72052318,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 480,
+          "fps": 59.99550033740764,
+          "medianMs": 16.69999998807907,
+          "p95Ms": 18.399999991059303,
+          "updateMs": 0.14270833283662795,
+          "calls": 87,
+          "triangles": 1005864,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 190,
+          "textures": 14,
+          "programs": 22,
+          "readyMs": 6933.899999991059,
+          "resourceTransferBytes": 75294435,
+          "resourceBodyBytes": 75250335,
+          "heapBytes": 154814197,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 72052318,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 480,
+          "fps": 59.91910920259881,
+          "medianMs": 16.899999991059303,
+          "p95Ms": 24.700000002980232,
+          "updateMs": 0.11312499980752667,
+          "calls": 87,
+          "triangles": 1006844,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 190,
+          "textures": 14,
+          "programs": 22,
+          "readyMs": 6933.899999991059,
+          "resourceTransferBytes": 75294435,
+          "resourceBodyBytes": 75250335,
+          "heapBytes": 146452981,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "before",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 72052318,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 69,
+          "fps": 8.554319931555959,
+          "medianMs": 116.90000000596046,
+          "p95Ms": 118.5,
+          "updateMs": 0.1072463771139366,
+          "calls": 87,
+          "triangles": 1005864,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 190,
+          "textures": 14,
+          "programs": 22,
+          "readyMs": 6933.899999991059,
+          "resourceTransferBytes": 75294435,
+          "resourceBodyBytes": 75250335,
+          "heapBytes": 128382244,
+          "multiDraw": true
+        }
+      },
+      {
+        "stage": "after",
+        "probe": {
+          "geometryBytes": 68630810,
+          "sceneBufferBytes": 72052318,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 68,
+          "fps": 8.554319931562233,
+          "medianMs": 116.90000000596046,
+          "p95Ms": 118.29999999701977,
+          "updateMs": 0.10735294003697003,
+          "calls": 87,
+          "triangles": 1006844,
+          "width": 1440,
+          "height": 1080,
+          "geometries": 190,
+          "textures": 14,
+          "programs": 22,
+          "readyMs": 6933.899999991059,
+          "resourceTransferBytes": 75294435,
+          "resourceBodyBytes": 75250335,
+          "heapBytes": 127699496,
+          "multiDraw": true
+        }
+      }
+    ],
+    "errors": []
+  },
+  "validation": {
+    "focusedTests": 59,
+    "failures": 0,
+    "skipped": 0,
+    "previousSideMountRejected": true,
+    "collisionByteIdentical": true,
+    "blockedCells": 338379
+  },
+  "limits": "Reload samples had strong frame-time variation. Alternating already-loaded roots also slowed in both states, so these host measurements do not establish a frame-rate effect. The geometry/ray checks concern sampled text areas in stated viewpoints, not every possible angle. No physical phone or VR headset tested."
+}

@@ -54,7 +54,7 @@ export function instance(name, materials, { paint = null, shadow = true, steerab
     const mesh = new THREE.Mesh(part.geometry, m);
     mesh.matrixAutoUpdate = false;
     mesh.matrix.copy(part.matrix);
-    mesh.castShadow = shadow;
+    mesh.castShadow = shadow && !m.transparent;
     mesh.receiveShadow = true;
     group.add(mesh);
   }

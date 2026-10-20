@@ -8,8 +8,16 @@ import { packPigments, compactAttributes } from './geometry-budget.js';
 import { buildOverheadWires } from './overhead-wires.js';
 import { CameraObstacles } from './camera-obstacles.js';
 import { APPROACH_BUILDINGS } from './castle-approach.js';
+import { UNIVERSITY_SOLIDS, WEST_BUILDINGS, WEST_SOLIDS } from './university-layout.js';
+import { ambientMotion } from './ambient-motion.js';
 
 const NO_SHADOW = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/;
+// Broad composites need local LOD: a camera near one edge must not promote the entire hill/campus.
+export const ENVIRONMENT_CELLS = Object.freeze({
+  HK_Terrain_Hikone: 128, ART_ShigaCampus: 96, ART_WestMoat: 128, ART_HikoneCompound: 128,
+});
+// Dense foliage loses individual leaf detail long before a building loses its joinery.
+const TREE_ASSET = /^(HK_Tree_|ART_(TownTree$|MoatTree_|CastleGrove$))/;
 const loader = new GLTFLoader();
 const models = new Map();
 const loaded = new Map();
@@ -61,6 +69,12 @@ export function buildMaterials(specs) {
 }
 
 export function material(materials, m) {
+  // Thin glazing keeps its exported surface rather than becoming an opaque painted pigment.
+  if (m?.transparent) {
+    m.depthWrite = false;
+    m.forceSinglePass = true;
+    return m;
+  }
   const shared = m && materials.get(m.name);
   if (shared) return shared;
   if (m?.userData.hkPainted === true) return m;
@@ -91,7 +105,8 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
     byAsset.get(item.a).push(item);
   }
   // scene.json's pigments (and their emissive light) win over the GLB's own material
-  const resolve = parts => parts.map(part => ({ ...part, material: materials.get(part.material.name) ?? part.material }));
+  const resolve = parts => parts.map(part => ({ ...part,
+    material: part.material.transparent ? part.material : materials.get(part.material.name) ?? part.material }));
   // ground models pressed under the roads (one placement each)
   const pressUnderRoads = (parts, item) => parts.map(part => {
     const base = item.p[1];
@@ -113,12 +128,16 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
     // These are merge inputs, not reusable runtime models. Keeping them in the model cache
     // retains both original GLBs alongside the merged city for the lifetime of the page.
     let [high, low] = await Promise.all([loadParts(asset, 'high', false), loadParts(asset, 'low', false)]);
-    const background = items.every(item => item.g === 'WebLandmark');
+    const background = items.every(item => item.g === 'WebLandmark') ||
+      ['ART_ShigaCampus','ART_WestMoat','ART_CastleApproach'].includes(asset);
     if (ground && !background && UNDER_ROADS.test(asset) && items.length === 1)
       [high, low] = [pressUnderRoads(high, items[0]), pressUnderRoads(low, items[0])];
     return { asset, items, high: resolve(high), low: resolve(low), background,
-      batched: asset === 'ART_CastleApproach',
-      cameraSolids: asset === 'ART_CastleApproach' ? APPROACH_BUILDINGS : null };
+      cellSize: ENVIRONMENT_CELLS[asset],
+      lodFar: TREE_ASSET.test(asset) ? 24 : undefined,
+      batched: ['ART_CastleApproach', 'ART_ShigaCampus', 'ART_WestMoat'].includes(asset),
+      cameraSolids: asset === 'ART_CastleApproach' ? APPROACH_BUILDINGS
+        : asset === 'ART_ShigaCampus' ? UNIVERSITY_SOLIDS : asset === 'ART_WestMoat' ? [...WEST_BUILDINGS,...WEST_SOLIDS] : null };
   }));
   const palette = new PigmentPalette();
   const env = environmentInstances(definitions, palette, asset => !NO_SHADOW.test(asset), m => m.side);
@@ -129,7 +148,7 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
     cameraObstacles: new CameraObstacles(definitions) });
 }
 
-/** Bake the painted sky once; diffuse light and cached shadows follow the participant. */
+/** Bake the painted sky once; cloud drift rotates that texture without another sky pass. */
 export function buildLight(scene, renderer, light) {
   const rgb = c => new THREE.Color().setRGB(...c, THREE.SRGBColorSpace);
   const sky = new THREE.Mesh(new THREE.SphereGeometry(1500, 32, 16), paintedSky());
@@ -165,6 +184,10 @@ export function buildLight(scene, renderer, light) {
   const lightX = new THREE.Vector3(0, 1, 0).cross(lightZ).normalize(), lightY = lightZ.clone().cross(lightX);
   return {
     sky, sun,
+    animate(seconds) {
+      ambientMotion.advance(seconds);
+      scene.backgroundRotation.y = ambientMotion.skyAngle;
+    },
     /** The shadow camera as it stands (env culling keeps every caster inside it). */
     get shadowCamera() { return sun.shadow.camera; },
     invalidate() { sun.shadow.needsUpdate = true; },

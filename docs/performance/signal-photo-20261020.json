@@ -1,0 +1,261 @@
+{
+  "date": "2026-10-20",
+  "purpose": "Correct Kyobashi signals, lamp/name-board and support proportions from the owner's shop-side photograph.",
+  "reference": {
+    "photo": "Owner-supplied 1280 × 960 westward shop-side view",
+    "photoSha256": "39c95a796dabe37dd15b7c167132473bae104070bf942475faf974557270613f",
+    "scaleSource": "https://www.nippon-tsushin.jp/wp/wp-content/themes/nippontsushin/file/business/electric/singou.pdf",
+    "qualification": "General Kyosan 300 mm housing scale only; photographed model and site dimensions are unconfirmed."
+  },
+  "protocol": {
+    "browser": "Headless system Google Chrome",
+    "viewport": {
+      "width": 1280,
+      "height": 960
+    },
+    "deviceScaleFactor": 1,
+    "reducedMotion": "reduce",
+    "query": "?benchmark=1&view=signals-photo",
+    "samePage": true,
+    "order": [
+      "after",
+      "before"
+    ],
+    "warmupSeconds": 2,
+    "sampleSeconds": 8,
+    "baselineFixtures": [
+      "src/signal-layout.js",
+      "src/signals.js",
+      "src/prop-review.js",
+      "ART_Signal_Car.glb",
+      "ART_Signal_Car.lod.glb"
+    ],
+    "note": "Baseline is the existing dirty scene immediately before this correction. Only the listed signal fixtures are substituted. No concurrent build/test work during sampling."
+  },
+  "sources": {
+    "src/signal-layout.js": {
+      "before": "83ff2c3483c5352b06acc43b8383020f1ca7045e5aecaab187043fda22f18574",
+      "after": "3f3eb159ffecdab97e3855fcee004412b5b617f0e58967c6528fdf15646c295a"
+    },
+    "src/signals.js": {
+      "before": "92acb14fd75bfc4832aed5843482ebf5ac0a757589eae38a35c7fd9bee3eb691",
+      "after": "377e39661df737f0595853b5f543a4c84782cc412731f02fb5ff0a10ea05a6f9"
+    },
+    "src/prop-review.js": {
+      "before": "99ae1701bcef00726f1046c2f5ae21b8eb00f8be554ddf2034cff564ba5971f3",
+      "after": "092c341c741d02d1973109af4333512b121d0e78545b69b2b5404f9ab9b4ade8"
+    },
+    "tools/abstract_props.py": {
+      "before": "1adc1c09967b73a23281f1bd4bb86476fe47f36ec920d8f804cd0f9b3e4ebd1a",
+      "after": "0c4ae7d34ea0fc4f0f32ecf4fff8076931ec38ebaa83852caf8c48a78e5cf3d4"
+    },
+    "test/art.test.mjs": {
+      "before": "fb6e3db2d9271417d0692aeb38be9f45a57ae37044a2f16b3b0493795849f3cb",
+      "after": "0f4580ebf5b4dbdfa8d48a0390b5444c421caa23315946d4268f78d0114737c5"
+    },
+    "data/models/impressionist/ART_Signal_Car.glb": {
+      "before": "c2f99148b6c77de057e5070e4f2a5cc9ca9ccac1c9d5cfb4b630285ba3c0213c",
+      "after": "9f14a6c80d1901643e258682d2bb3040d91386d47b29471d2093c5e092cb6af2"
+    },
+    "data/models/impressionist/ART_Signal_Car.lod.glb": {
+      "before": "796c50a625c5a3558c332deb16a71798d706a37f97f0aabf4a1e8cb76cd43ffc",
+      "after": "7e8177f84d48c1c96d8b6c09314d10d28537d8d645379627466a777c67e39533"
+    }
+  },
+  "generated": {
+    "model": "ART_Signal_Car",
+    "before": {
+      "triangles": 2396,
+      "strokes": 0,
+      "bytes": 103920,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 2396,
+        "bytes": 103924
+      }
+    },
+    "after": {
+      "triangles": 2396,
+      "strokes": 0,
+      "bytes": 103892,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 2396,
+        "bytes": 103896
+      }
+    },
+    "collision": {
+      "beforeSha256": "6c029a36737ecfc996d097cf40a749d14f0692fdec0142333f43f83e1996c982",
+      "afterSha256": "6c029a36737ecfc996d097cf40a749d14f0692fdec0142333f43f83e1996c982",
+      "byteIdentical": true,
+      "blockedCells": 340024
+    },
+    "editorMapUnchanged": true,
+    "editorImageUnchanged": true
+  },
+  "verification": {
+    "command": "node --test test/art.test.mjs test/obstacles.test.mjs test/performance.test.mjs test/prop-review.test.mjs",
+    "tests": 53,
+    "passed": 53,
+    "failed": 0,
+    "skipped": 0,
+    "browserErrors": [],
+    "inspectedViews": [
+      "signals-photo",
+      "street",
+      "signals-walk",
+      "signals-double",
+      "signals",
+      "signals-town"
+    ]
+  },
+  "measurements": {
+    "views": {
+      "photo": [
+        52.8,
+        1.65,
+        21.8,
+        22,
+        16,
+        25.3,
+        64
+      ],
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ]
+    },
+    "results": [
+      {
+        "stage": "after",
+        "view": "photo",
+        "probe": {
+          "geometryBytes": 74407641,
+          "sceneBufferBytes": 76344461,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 188,
+          "fps": 23.384247972553283,
+          "medianMs": 43.20000000298023,
+          "p95Ms": 50.20000000298023,
+          "updateMs": 0.12712766016100316,
+          "calls": 100,
+          "triangles": 1052674,
+          "width": 1280,
+          "height": 960,
+          "geometries": 180,
+          "textures": 10,
+          "programs": 19,
+          "readyMs": 8730.09999999404,
+          "resourceTransferBytes": 82545888,
+          "resourceBodyBytes": 82502388,
+          "heapBytes": 150075649,
+          "multiDraw": true,
+          "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)"
+        },
+        "screenshot": "after-photo.png"
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74407641,
+          "sceneBufferBytes": 76344461,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 186,
+          "fps": 23.21199036579331,
+          "medianMs": 44.900000005960464,
+          "p95Ms": 50.70000000298023,
+          "updateMs": 0.11290322540588277,
+          "calls": 99,
+          "triangles": 1050526,
+          "width": 1280,
+          "height": 960,
+          "geometries": 181,
+          "textures": 10,
+          "programs": 19,
+          "readyMs": 8730.09999999404,
+          "resourceTransferBytes": 82545888,
+          "resourceBodyBytes": 82502388,
+          "heapBytes": 134493353,
+          "multiDraw": true,
+          "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)"
+        },
+        "screenshot": "after-street.png"
+      },
+      {
+        "stage": "before",
+        "view": "photo",
+        "probe": {
+          "geometryBytes": 74407641,
+          "sceneBufferBytes": 76379165,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 185,
+          "fps": 23.16031948722665,
+          "medianMs": 41.099999994039536,
+          "p95Ms": 50.20000000298023,
+          "updateMs": 0.11621621637730985,
+          "calls": 100,
+          "triangles": 1055330,
+          "width": 1280,
+          "height": 960,
+          "geometries": 180,
+          "textures": 10,
+          "programs": 19,
+          "readyMs": 7595.9000000059605,
+          "resourceTransferBytes": 82545287,
+          "resourceBodyBytes": 82501787,
+          "heapBytes": 133788408,
+          "multiDraw": true,
+          "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)"
+        },
+        "screenshot": "before-photo.png"
+      },
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74407641,
+          "sceneBufferBytes": 76379165,
+          "placements": 440,
+          "meshes": 413,
+          "frames": 185,
+          "fps": 23.20272914261913,
+          "medianMs": 40.5,
+          "p95Ms": 49.900000005960464,
+          "updateMs": 0.10324324321102452,
+          "calls": 99,
+          "triangles": 1053182,
+          "width": 1280,
+          "height": 960,
+          "geometries": 181,
+          "textures": 10,
+          "programs": 19,
+          "readyMs": 7595.9000000059605,
+          "resourceTransferBytes": 82545287,
+          "resourceBodyBytes": 82501787,
+          "heapBytes": 133998328,
+          "multiDraw": true,
+          "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)"
+        },
+        "screenshot": "before-street.png"
+      }
+    ]
+  },
+  "limitations": [
+    "Heights and reaches are visual estimates, not a survey.",
+    "One matched pair per view with variable desktop frame times; these samples establish no speed gain.",
+    "sceneBufferBytes counts retained scene geometry/instance attributes, not total VRAM.",
+    "Routed/warm views do not establish loading-time or retained-heap changes.",
+    "No real phone, VR headset or new event playthrough was tested."
+  ]
+}

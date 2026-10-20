@@ -1,0 +1,278 @@
+{
+  "date": "2026-10-20",
+  "purpose": "Make the junction display case visibly transparent following the owner correction.",
+  "baseline": {
+    "description": "The preceding opaque display-case correction in the already-dirty workspace, not Git HEAD.",
+    "fixture": "/tmp/hikone-clear-case/before",
+    "modelSha256": {
+      "before": "57bd02c23ad0a09680b266926ab74ab4ced080e7f6a3413cc5c8855218b7e9ab",
+      "after": "cc9bb7d8e503ef873284ceeb8bd2706b421d9edd683e9d2f9d4d3fb5d903728d"
+    }
+  },
+  "implementation": {
+    "model": "ART_DisplayKiosk",
+    "source": "tools/streetscape.py",
+    "glass": "Four thin double-sided alpha-blended panes, opacity 0.12, roughness 0.12; remove full opaque front/side/rear sheets. Retain fine lattice, frame, narrow glints and the campaign graphic with its paper back.",
+    "runtime": "Keep transparent parts outside opaque pigment and shadow merges. Share frame instance matrices, culling and LOD; disable depth writes and the redundant back-face draw. The standalone material resolver also preserves glass.",
+    "newImageAssets": 0,
+    "newPostProcessing": 0,
+    "reflectionCaptures": 0,
+    "screenSpaceTransmissionPasses": 0,
+    "lookupTexture": "The first standard material in the main city initializes the vendored renderer's built-in DFG_LUT, 16x16 RG half-float (1024 data bytes). This is not a new model image asset."
+  },
+  "models": {
+    "before": {
+      "triangles": 1352,
+      "strokes": 0,
+      "bytes": 71004,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 990,
+        "bytes": 54352
+      }
+    },
+    "after": {
+      "triangles": 1306,
+      "strokes": 0,
+      "bytes": 67700,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 944,
+        "bytes": 51048
+      }
+    },
+    "changedManifestEntries": [
+      "ART_DisplayKiosk"
+    ]
+  },
+  "collision": {
+    "regenerated": true,
+    "byteIdentical": true,
+    "blockedCells": 340015,
+    "objects": 436
+  },
+  "verification": {
+    "uniqueTests": 56,
+    "pass": 56,
+    "fail": 0,
+    "skipped": 0,
+    "groups": [
+      {
+        "command": "node --test test/art.test.mjs test/performance.test.mjs",
+        "tests": 36,
+        "pass": 36,
+        "log": "/tmp/hikone-clear-case/tests-final-rendering.log"
+      },
+      {
+        "command": "node --test test/obstacles.test.mjs",
+        "tests": 13,
+        "pass": 13,
+        "log": "/tmp/hikone-clear-case/tests-obstacles.log",
+        "reuse": "Collision regenerated again after the paper-back edit and confirmed byte-identical."
+      },
+      {
+        "command": "node --test test/turning.test.mjs",
+        "tests": 6,
+        "pass": 6,
+        "log": "/tmp/hikone-clear-case/tests-turning.log"
+      },
+      {
+        "command": "node --test test/art.test.mjs test/performance.test.mjs test/prop-review.test.mjs",
+        "testsCounted": 1,
+        "log": "/tmp/hikone-clear-case/tests-rendering.log",
+        "reuse": "Only the unchanged async prop-loading test is counted from this prior passing 37-test run. Art/performance reran after the final model edit."
+      }
+    ],
+    "regressions": [
+      "Both model LODs have real alpha blending and unobstructed front/back and side sight lines between structural bars.",
+      "The city merge excludes transparent panes from opaque geometry and shadows while preserving material, shared placement uploads, culling and near/far LOD."
+    ],
+    "syntax": [
+      "src/world.js",
+      "src/environment-instances.js",
+      "src/vehicles.js"
+    ],
+    "diffCheck": "passed"
+  },
+  "benchmark": {
+    "views": {
+      "corner": [
+        31.5,
+        2.1,
+        24.8,
+        47.2,
+        1.3,
+        16.1,
+        46
+      ],
+      "street": [
+        55,
+        2.15,
+        23,
+        0,
+        2.8,
+        27,
+        62
+      ]
+    },
+    "results": [
+      {
+        "stage": "before",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74841851,
+          "sceneBufferBytes": 76813375,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 479,
+          "fps": 60.01453379107542,
+          "medianMs": 16.600000001490116,
+          "p95Ms": 25.700000002980232,
+          "updateMs": 0.15177453054204615,
+          "calls": 71,
+          "triangles": 548059,
+          "width": 1280,
+          "height": 720,
+          "geometries": 90,
+          "textures": 9,
+          "programs": 15,
+          "readyMs": 15928.30000000447,
+          "resourceTransferBytes": 82982721,
+          "resourceBodyBytes": 82939221,
+          "heapBytes": 212253788,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-glass/before-corner.png"
+      },
+      {
+        "stage": "before",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74841851,
+          "sceneBufferBytes": 76813375,
+          "placements": 440,
+          "meshes": 409,
+          "frames": 476,
+          "fps": 59.57968783249816,
+          "medianMs": 17.5,
+          "p95Ms": 22.30000000447035,
+          "updateMs": 0.14642857132526507,
+          "calls": 106,
+          "triangles": 1141045,
+          "width": 1280,
+          "height": 720,
+          "geometries": 205,
+          "textures": 9,
+          "programs": 20,
+          "readyMs": 15928.30000000447,
+          "resourceTransferBytes": 82982721,
+          "resourceBodyBytes": 82939221,
+          "heapBytes": 135740094,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-glass/before-street.png"
+      },
+      {
+        "stage": "after",
+        "view": "corner",
+        "probe": {
+          "geometryBytes": 74837195,
+          "sceneBufferBytes": 76808719,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 481,
+          "fps": 60.03195047677219,
+          "medianMs": 16.5,
+          "p95Ms": 26.399999998509884,
+          "updateMs": 0.11580041568269353,
+          "calls": 72,
+          "triangles": 548013,
+          "width": 1280,
+          "height": 720,
+          "geometries": 91,
+          "textures": 10,
+          "programs": 16,
+          "readyMs": 23361.29999999702,
+          "resourceTransferBytes": 82977967,
+          "resourceBodyBytes": 82934467,
+          "heapBytes": 233220089,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-glass/after-corner.png"
+      },
+      {
+        "stage": "after",
+        "view": "street",
+        "probe": {
+          "geometryBytes": 74837195,
+          "sceneBufferBytes": 76808719,
+          "placements": 440,
+          "meshes": 411,
+          "frames": 480,
+          "fps": 59.96851652880003,
+          "medianMs": 16.700000002980232,
+          "p95Ms": 24.80000000447035,
+          "updateMs": 0.1154166668963929,
+          "calls": 107,
+          "triangles": 1140999,
+          "width": 1280,
+          "height": 720,
+          "geometries": 206,
+          "textures": 10,
+          "programs": 21,
+          "readyMs": 23361.29999999702,
+          "resourceTransferBytes": 82977967,
+          "resourceBodyBytes": 82934467,
+          "heapBytes": 239486860,
+          "multiDraw": true
+        },
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-glass/after-street.png"
+      }
+    ],
+    "previews": [
+      {
+        "view": "display-kiosk",
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-glass/display-kiosk.png",
+        "surfaces": [
+          {
+            "name": "ART_DisplayGlass",
+            "opacity": 0.11999999731779099,
+            "depthWrite": false,
+            "castShadow": false,
+            "side": 2,
+            "singlePass": true
+          }
+        ]
+      },
+      {
+        "view": "display-kiosk-back",
+        "screenshot": "/Users/xinyu/.codex/visualizations/2026/10/20/hikone-display-glass/display-kiosk-back.png",
+        "surfaces": [
+          {
+            "name": "ART_DisplayGlass",
+            "opacity": 0.11999999731779099,
+            "depthWrite": false,
+            "castShadow": false,
+            "side": 2,
+            "singlePass": true
+          }
+        ]
+      }
+    ],
+    "errors": [],
+    "methodology": [
+      "One headless Chrome page at 1280x720, device scale 1, reduced motion, benchmark=1 (adaptive resolution disabled).",
+      "Substitute only the saved preceding world/environment-instances/vehicles source and two case GLBs for the before stage; keep the remaining dirty scene identical.",
+      "Settle each camera for two seconds, then reset the standard two-second warmup and eight-second sample window. Dispose the old renderer/context before changing source stage.",
+      "No build or test overlaps benchmark sampling. Standalone preview pages follow the four measured view windows."
+    ],
+    "limits": [
+      "Capped desktop timings with differing p95 values do not establish a speed improvement.",
+      "Counted geometry buffers are not total VRAM; routing and sequential warm views do not establish loading-time or retained-heap changes.",
+      "Standard alpha blending gives visible transparency without physically refracting the background.",
+      "No real phone or VR headset was tested."
+    ]
+  }
+}

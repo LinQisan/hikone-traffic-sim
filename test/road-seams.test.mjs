@@ -1,4 +1,4 @@
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { registerHooks } from 'node:module';
@@ -10,12 +10,13 @@ registerHooks({ resolve(specifier, context, next) {
   return next(specifier, context);
 } });
 const THREE = await import('three');
+const { indexMeshRays } = await import('../tools/mesh-ray-index.mjs');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const tiles = JSON.parse(await fs.readFile(new URL('../data/road_tiles.json', import.meta.url)));
 const ground = new Ground(tiles);
 const material = new THREE.MeshBasicMaterial({ side: THREE.FrontSide });
 
-async function geometry(detail) {
+async function buildGeometry(detail) {
   const vertical = [], tops = [], caps = [];
   const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
   const normal = new THREE.Vector3(), edge = new THREE.Vector3(), secondEdge = new THREE.Vector3();
@@ -41,10 +42,24 @@ async function geometry(detail) {
       }
     });
   }
-  const mesh = positions => new THREE.Mesh(new THREE.BufferGeometry().setAttribute('position',
-    new THREE.Float32BufferAttribute(positions, 3)), material);
+  const mesh = positions => indexMeshRays(new THREE.Mesh(new THREE.BufferGeometry().setAttribute('position',
+    new THREE.Float32BufferAttribute(positions, 3)), material));
   return { vertical: mesh(vertical), tops: mesh(tops), caps };
 }
+
+// The four assertions query the same immutable exported surfaces at each detail level.
+const prepared = new Map();
+function geometry(detail) {
+  if (!prepared.has(detail)) prepared.set(detail, buildGeometry(detail));
+  return prepared.get(detail);
+}
+after(async () => {
+  for (const promise of prepared.values()) {
+    const meshes = await promise;
+    meshes.vertical.geometry.dispose(); meshes.tops.geometry.dispose();
+  }
+  material.dispose();
+});
 
 for (const detail of ['', '.lod']) {
   test(`the north bridge opening closes the exposed bank without covering the walking margin (${detail || 'high'})`, async () => {
@@ -59,7 +74,6 @@ for (const detail of ['', '.lod']) {
       assert.ok(hits.length, 'the bank is closed to the water bed instead of exposing sky');
     }
     assert.ok(Math.abs(ground.heightAt(37.6, 72) - 0.01) < 0.00001, 'the existing bridge walking margin stays flush');
-    meshes.vertical.geometry.dispose(); meshes.tops.geometry.dispose();
   });
 
   test(`road/pavement steps are closed across the complete exported network (${detail || 'high'})`, async () => {
@@ -91,17 +105,34 @@ for (const detail of ['', '.lod']) {
       }
     }
     assert.ok(checked > 500, `check the whole road network, not only the practice intersection: ${checked}`);
-    meshes.vertical.geometry.dispose(); meshes.tops.geometry.dispose();
   });
 
-  test(`curb tops meet the pavement at its true height without coplanar overlap (${detail || 'high'})`, async () => {
+  test(`flush footways retain both exposed kerb faces and open crossings (${detail || 'high'})`, async () => {
+    const meshes = await geometry(detail), ray = new THREE.Raycaster(), hits = [];
+    for (const [z, direction] of [[29.6, 1], [30.6, -1], [22.4, -1], [21.4, 1]]) {
+      ray.set(new THREE.Vector3(-60, 0.085, z), new THREE.Vector3(0, 0, direction));
+      ray.far = 0.7; hits.length = 0;
+      ray.intersectObject(meshes.vertical, false, hits);
+      assert.ok(hits.length, 'a low eye on either side sees a closed kerb face');
+    }
+    for (const x of [19.7, 44.3]) {
+      ray.set(new THREE.Vector3(-x, 0.085, 29.8), new THREE.Vector3(0, 0, 1));
+      ray.far = 0.5; hits.length = 0;
+      ray.intersectObject(meshes.vertical, false, hits);
+      assert.equal(hits.length, 0, 'the zebra opening has no upright kerb across it');
+    }
+    assert.ok(Math.abs(ground.heightAt(60, 30.6) - ground.heightAt(60, 29.6)) < 1e-6,
+      'the separated kerb stands between level road and walking surfaces');
+  });
+
+  test(`separate curb caps match ground queries without coplanar overlap (${detail || 'high'})`, async () => {
     const meshes = await geometry(detail), ray = new THREE.Raycaster(), hits = [], centre = new THREE.Vector3();
     for (const triangle of meshes.caps) {
       centre.copy(triangle[0]).add(triangle[1]).add(triangle[2]).divideScalar(3);
       const height = ground.heightAt(-centre.x, centre.z);
       assert.ok(Math.abs(centre.y - height) < 0.00005,
         `the cap has no extra renderer/mesh lift at ${-centre.x}, ${centre.z}: ${centre.y} / ${height}`);
-      assert.ok(centre.y <= 0.16001 && centre.y >= 0.00999, '15 cm kerbs and the authored bridge ramps');
+      assert.ok(centre.y <= 0.16001 && centre.y >= 0.00999, '15 cm kerb caps and the authored bridge ramps');
       ray.set(new THREE.Vector3(centre.x, 1, centre.z), new THREE.Vector3(0, -1, 0));
       ray.far = 2;
       hits.length = 0;
@@ -115,6 +146,5 @@ for (const detail of ['', '.lod']) {
     hits.length = 0;
     ray.intersectObject(meshes.tops, false, hits);
     assert.ok(hits.some(hit => Math.abs(hit.point.y - 0.16) < 0.00001), 'no pinhole at the northern bend join');
-    meshes.vertical.geometry.dispose(); meshes.tops.geometry.dispose();
   });
 }

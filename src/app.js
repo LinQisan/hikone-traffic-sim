@@ -22,6 +22,8 @@ import { Obstacles } from './obstacles.js';
 import { setSunDirection, alignBlobShadow } from './blob-shadow.js';
 import { webLayout } from './web-layout.js';
 import { geometryBytes } from './geometry-budget.js';
+import { ambientMotion } from './ambient-motion.js';
+import { buildWildlife } from './wildlife.js';
 
 const $ = id => document.getElementById(id);
 // loading screen (index.html): data files are the first 15 %, the models the next 75 %, building the rest
@@ -40,11 +42,15 @@ const status = text => showProgress(text);
 // screen-reader announcements of what happens (start, contact, goal, replay, results)
 const announce = text => { const el = $('announce'); el.textContent = ''; requestAnimationFrame(() => { el.textContent = text; }); };
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+ambientMotion.setReducedMotion(reducedMotion.matches);
+reducedMotion.addEventListener?.('change', e => { ambientMotion.setReducedMotion(e.matches); });
 
 // ---------------------------------------------------------------- set-up
 // Dual-GPU laptops otherwise render on the integrated GPU (about half the frame rate here).
-// Phones: no multisampling (dense screens, painted edges; it costs much of a mobile GPU's bandwidth).
-const renderer = new THREE.WebGLRenderer({ antialias: !isTouchDevice(), powerPreference: 'high-performance' });
+// Dense screens already resolve the painted edges. Multisampling a Retina canopy
+// costs substantial integrated-GPU bandwidth, even when its triangle count is low.
+const renderer = new THREE.WebGLRenderer({ antialias: !isTouchDevice() && devicePixelRatio < 1.5,
+  powerPreference: 'high-performance' });
 const params = new URLSearchParams(location.search);
 const nativeQuality = params.get('quality') === 'high';
 // Desktop resolution follows the GPU (resolution.js); fixed for measurements and quality=high.
@@ -85,6 +91,7 @@ const townLayout = webLayout(layout);
 const measuredLayout = params.has('benchmark') && params.get('landmarks') === 'off'
   ? { ...townLayout, items: townLayout.items.filter(item => item.g !== 'WebLandmark') } : townLayout;
 const env = await buildEnvironment(scene, measuredLayout, materials, ground);
+const wildlife = buildWildlife(scene);
 const vehicleModels = [...Object.values(BODY_MODEL), 'HK_Truck_Large', 'HK_Truck_Medium'];
 await Promise.all(vehicleModels.map(name => model(name)));
 
@@ -407,7 +414,7 @@ addEventListener('keydown', e => {
 const timer = new THREE.Timer();
 timer.connect(document);
 const probe = new PerformanceProbe($('fps'), renderer, new URLSearchParams(location.search).has('benchmark'),
-  () => ({ geometryBytes: env.geometryBytes, sceneBufferBytes: geometryBytes(scene, true),
+  () => ({ geometryBytes: env.geometryBytes + geometryBytes(wildlife.root), sceneBufferBytes: geometryBytes(scene, true),
     placements: env.objects, meshes: env.root.children.length }));
 const lightPosition = new THREE.Vector3();
 let debugCamera = null;
@@ -459,6 +466,8 @@ renderer.setAnimationLoop(() => {
   if (resolution.frame(elapsed, performance.now(), document.hidden)) sizeRenderer();
   const updateStart = performance.now();
   tick(dt);
+  light.animate(document.hidden ? 0 : dt);
+  wildlife.update(ambientMotion.time.value);
   if (debugCamera) lightPosition.copy(debugCamera.position).setY(0);
   else if (state === 'replay') lightPosition.copy(replay.focus).setY(0);
   else lightPosition.set(-player.x, 0, player.z);
@@ -467,7 +476,14 @@ renderer.setAnimationLoop(() => {
   light.follow(lightPosition);
   const view = debugCamera ?? (state === 'replay' ? replay.activeCamera : camera);
   const aspect = innerWidth / innerHeight;
-  if (view.aspect !== aspect) { view.aspect = aspect; view.updateProjectionMatrix(); }
+  if (view.aspect !== aspect) {
+    view.aspect = aspect;
+    if (view.isOrthographicCamera) {
+      const half=(view.top-view.bottom)/2;
+      view.left=-half*aspect; view.right=half*aspect;
+    }
+    view.updateProjectionMatrix();
+  }
   if (env.updateLOD(view, null, light.shadowCamera)) light.invalidate();
   env.casters(light.sun.shadow.needsUpdate);              // the shadow-only casters exist only for shadow frames
   const updateMs = performance.now() - updateStart;
@@ -478,7 +494,7 @@ renderer.setAnimationLoop(() => {
 });
 // debugging and tests
 window.vrlearn = {
-  scene, camera, renderer, player, obstacles, env, signals, ground, start, toTitle, resolution, replay, benchmark: probe,
+  scene, camera, renderer, player, obstacles, env, signals, ground, wildlife, start, toTitle, resolution, replay, benchmark: probe,
   select(id) { selected = scenarioIndex.find(e => e.id === id) ?? selected; customScenario = null; renderTitle(); },
   get run() { return run; }, get state() { return state; },
   setPainted,
@@ -493,6 +509,7 @@ window.vrlearn = {
     if (x == null) { debugCamera = null; return; }
     debugCamera ??= new THREE.PerspectiveCamera(fov, innerWidth / innerHeight, 0.1, 900);
     debugCamera.fov = fov;
+    debugCamera.updateProjectionMatrix();
     debugCamera.position.copy(toThree(x, y, z));
     debugCamera.lookAt(toThree(tx, ty, tz));
     light.follow(toThree(x, 0, z));
@@ -508,18 +525,39 @@ const reviewViews = {
   street: [55, 2.15, 23, 0, 2.8, 27, 62],
   'street-east': [30, 2.15, 26, 80, 2.8, 26, 62],
   'street-corner': [32, 2.15, 34, 49, 3.2, 14, 63],
+  'display-surroundings': [43.7, 1.8, 20.7, 47.4, 2.05, 15.3, 59],
   'street-west-corner': [33, 3.0, 34, 16, 3.3, 10, 62],
   'moat-overhead': [64, 95, -18, 60, 0.15, 35, 52],
   'road-network': [22, 130, -28, 22, 0.15, 42, 74],
   'moat-detail': [66, 52, -2, 64, 0.15, 34, 52],
   'bridge-detail': [23.2, 2.2, 32, 30, 1.2, 44, 52],
   'north-bank': [32, 2.1, 53, 30, 4.0, 91, 68],
+  'water-sky': [-35, 3.3, 51, -46, 8, 94, 65],
+  'wildlife': [-49, 1.8, 42, -45, 2.5, 57, 62],
+  'water-birds': [-36, 1, 49, -39, -1.1, 52, 43],
+  'crows': [-29, 15, 37, -18, 25, 60, 65],
   'castle-road': [33, 2.1, 12, 36, 3.5, -65, 66],
   'castle-road-north': [36.6, 1.6, -3, 30, 3.6, 14, 66],
   'parking-frontage': [-30, 2.2, 26, -78, 2.5, 16.5, 60],
   'castle-panorama': [32, 2.1, 34, -264, 61, 395, 60],
   'castle-detail': [-241.5, 67, 357, -264, 60.5, 395, 52],
   'castle-site': [-130, 205, 240, -264, 35, 395, 60],
+  'castle-compound': [-70, 260, 215, -265, 26, 420, 64],
+  'castle-paths': [-70, 260, 215, -265, 26, 420, 64],
+  'castle-underpass': [-162.89, 19.65, 328.98, -149.52, 22, 327.42, 68],
+  'castle-tenbin': [-115, 48, 295, -159, 31, 342, 54],
+  'castle-west-turret': [-390, 64, 435, -446, 46, 478, 52],
+  university: [-790, 100, 110, -725, 5, 300, 72],
+  'university-west-gate': [-778, 2.1, 154, -778, 3, 178, 68],
+  'university-neighborhood': [-900, 125, 90, -730, 0, 210, 68],
+  'university-gate': [-590.3, 2.1, 182, -647, 5, 188, 68],
+  'university-context': [-720, 300, 120, -490, 0, 370, 58],
+  'school-moat-lane': [-528.224, 1.7, 262.826, -528.996, 3, 291.662, 78],
+  'school-open-lot': [-496.23, 1.7, 250.48, -263.89, 21, 395.92, 72],
+  'school-neighborhood': [-645, 115, 160, -495, 0, 310, 68],
+  'school-map': [-550.491, 500, 315.021, -550.491, 0, 315.021, 45],
+  'university-hall': [-605, 5, 183, -656, 8, 199, 58],
+  'west-connection': [-180, 14, 28, -450, 8, 80, 65],
   'castle-approach': [105, 180, 50, -105, 0.15, 230, 62],
   'saigo-gate': [1.5, 2.0, 123, -8, 2.8, 130, 65],
   'otemon-bridge': [-177, 7, 193, -157, 3.0, 239, 62],
@@ -527,12 +565,24 @@ const reviewViews = {
   foliage: [38, 2.0, 36, 26, 5.0, 46, 65],
   bridge: [32, 2.0, 37, 32, 3.0, 65, 62],
   'signals-layout': [56, 24, 49, 33, 1.5, 26, 52],
+  'signals-photo': [52.8, 1.65, 21.8, 22, 16, 25.3, 64],
 };
 const propCamera = await propReview(review.get('view'), scene, materials);
 if (propCamera) {
   env.root.visible = signals.root.visible = false;
   window.vrlearn.debugView(...propCamera);
-} else if (reviewViews[review.get('view')]) window.vrlearn.debugView(...reviewViews[review.get('view')]);
+} else if (reviewViews[review.get('view')]) {
+  window.vrlearn.debugView(...reviewViews[review.get('view')]);
+  if (review.get('view') === 'school-map') {
+    const half=156543.03392*Math.cos(35.2772*Math.PI/180)/2**18*848/2;
+    debugCamera=new THREE.OrthographicCamera(-half*innerWidth/innerHeight,half*innerWidth/innerHeight,half,-half,.1,1000);
+    debugCamera.position.copy(toThree(-550.491,500,315.021));
+    // Geographic north, after the scene's 32-degree map rotation and X mirror.
+    debugCamera.up.set(Math.sin(32*Math.PI/180),0,Math.cos(32*Math.PI/180));
+    debugCamera.lookAt(toThree(-550.491,0,315.021));
+    scene.fog = null;
+  }
+}
 // Ad hoc comparison with a photograph: ?cam=x,y,z,tx,ty,tz[,fov] in map metres.
 else if (review.get('cam')) window.vrlearn.debugView(...review.get('cam').split(',').map(Number));
 if (review.get('finish') === 'off') setPainted(false);

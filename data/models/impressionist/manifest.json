@@ -84,13 +84,13 @@
       }
     },
     "HK_GroundFar": {
-      "triangles": 86994,
-      "strokes": 14497,
-      "bytes": 3945160,
+      "triangles": 68578,
+      "strokes": 11427,
+      "bytes": 3110504,
       "remodeled": false,
       "lod": {
-        "triangles": 62964,
-        "bytes": 2853356
+        "triangles": 4303,
+        "bytes": 170872
       }
     },
     "HK_GroundPaved": {
@@ -428,63 +428,69 @@
       }
     },
     "HK_Tree_Cedar": {
-      "triangles": 3332,
-      "strokes": 337,
-      "bytes": 141976,
+      "triangles": 10124,
+      "strokes": 238,
+      "bytes": 189252,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1442,
-        "bytes": 67628
+        "triangles": 2612,
+        "bytes": 49292
       }
     },
     "HK_Tree_Pine": {
-      "triangles": 2044,
-      "strokes": 195,
-      "bytes": 88508,
+      "triangles": 4816,
+      "strokes": 112,
+      "bytes": 91156,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 952,
-        "bytes": 45592
+        "triangles": 1272,
+        "bytes": 25164
       }
     },
     "HK_Tree_Round": {
-      "triangles": 2638,
-      "strokes": 251,
-      "bytes": 113408,
+      "triangles": 17674,
+      "strokes": 2016,
+      "bytes": 405728,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1222,
-        "bytes": 57808
+        "triangles": 2392,
+        "bytes": 60384
       }
     },
     "HK_Tree_RoundLow": {
-      "triangles": 1850,
-      "strokes": 177,
-      "bytes": 80284,
+      "triangles": 17674,
+      "strokes": 2016,
+      "bytes": 405856,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 854,
-        "bytes": 41128
+        "triangles": 2392,
+        "bytes": 60408
       }
     },
     "HK_Tree_Sakura": {
-      "triangles": 2590,
-      "strokes": 243,
-      "bytes": 111704,
+      "triangles": 17674,
+      "strokes": 2016,
+      "bytes": 405748,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1228,
-        "bytes": 58188
+        "triangles": 2392,
+        "bytes": 60404
       }
     },
     "HK_Tree_Zelkova": {
-      "triangles": 2650,
-      "strokes": 253,
-      "bytes": 114080,
+      "triangles": 17674,
+      "strokes": 2016,
+      "bytes": 405688,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 1228,
-        "bytes": 58264
+        "triangles": 2392,
+        "bytes": 60440
       }
     },
     "HK_Truck_Large": {
@@ -543,12 +549,12 @@
     "ART_Signal_Car": {
       "triangles": 2396,
       "strokes": 0,
-      "bytes": 103920,
+      "bytes": 103892,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
         "triangles": 2396,
-        "bytes": 103924
+        "bytes": 103896
       }
     },
     "ART_Signal_Pedestrian": {
@@ -570,7 +576,7 @@
       "design": "abstract-closed-solids-v2",
       "lod": {
         "triangles": 44,
-        "bytes": 2964
+        "bytes": 2968
       }
     },
     "HK_Sign_Speed40": {
@@ -596,25 +602,25 @@
       }
     },
     "ART_UtilityPole": {
-      "triangles": 924,
+      "triangles": 1316,
       "strokes": 0,
-      "bytes": 39968,
+      "bytes": 44740,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 924,
-        "bytes": 39972
+        "triangles": 1316,
+        "bytes": 44744
       }
     },
     "ART_CornerShop": {
-      "triangles": 16664,
+      "triangles": 9750,
       "strokes": 0,
-      "bytes": 726396,
+      "bytes": 435512,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 5624,
-        "bytes": 253088
+        "triangles": 2766,
+        "bytes": 135484
       }
     },
     "ART_KeiBox": {
@@ -629,14 +635,14 @@
       }
     },
     "ART_PavingDetails": {
-      "triangles": 8124,
+      "triangles": 8205,
       "strokes": 0,
-      "bytes": 365260,
+      "bytes": 369964,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 8124,
-        "bytes": 365264
+        "triangles": 8157,
+        "bytes": 366816
       }
     },
     "ART_ThreeStorey": {
@@ -651,24 +657,24 @@
       }
     },
     "ART_WhiteStorehouse": {
-      "triangles": 6018,
+      "triangles": 5004,
       "strokes": 0,
-      "bytes": 263684,
+      "bytes": 225272,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 1818,
-        "bytes": 85980
+        "triangles": 1032,
+        "bytes": 56600
       }
     },
     "ART_MoatBankPatch": {
-      "triangles": 1536,
-      "strokes": 167,
-      "bytes": 67760,
+      "triangles": 4306,
+      "strokes": 140,
+      "bytes": 93200,
       "remodeled": true,
       "lod": {
-        "triangles": 603,
-        "bytes": 31056
+        "triangles": 1134,
+        "bytes": 29156
       }
     },
     "ART_MoatRoadPaint": {
@@ -692,33 +698,35 @@
       }
     },
     "ART_MoatTree_Airy": {
-      "triangles": 1664,
-      "strokes": 144,
-      "bytes": 72876,
+      "triangles": 17674,
+      "strokes": 2016,
+      "bytes": 405788,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 854,
-        "bytes": 41016
+        "triangles": 2392,
+        "bytes": 60444
       }
     },
     "ART_MoatTree_Broad": {
-      "triangles": 1868,
-      "strokes": 162,
-      "bytes": 81400,
+      "triangles": 17674,
+      "strokes": 2016,
+      "bytes": 405736,
       "remodeled": true,
+      "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 962,
-        "bytes": 45760
+        "triangles": 2392,
+        "bytes": 60408
       }
     },
     "ART_KyobashiBanks": {
-      "triangles": 5084,
+      "triangles": 5088,
       "strokes": 0,
-      "bytes": 237088,
+      "bytes": 237272,
       "remodeled": false,
       "lod": {
-        "triangles": 5084,
-        "bytes": 237092
+        "triangles": 5088,
+        "bytes": 237276
       }
     },
     "ART_KyobashiBridge": {
@@ -732,23 +740,23 @@
       }
     },
     "ART_KyobashiLand": {
-      "triangles": 39697,
-      "strokes": 5735,
-      "bytes": 1590132,
+      "triangles": 39119,
+      "strokes": 5643,
+      "bytes": 1568644,
       "remodeled": false,
       "lod": {
-        "triangles": 7438,
-        "bytes": 321248
+        "triangles": 7376,
+        "bytes": 320056
       }
     },
     "ART_KyobashiRoads": {
-      "triangles": 77372,
-      "strokes": 10697,
-      "bytes": 3431904,
+      "triangles": 78647,
+      "strokes": 10614,
+      "bytes": 3493404,
       "remodeled": false,
       "lod": {
-        "triangles": 17201,
-        "bytes": 763596
+        "triangles": 18944,
+        "bytes": 843116
       }
     },
     "ART_KyobashiWater": {
@@ -817,14 +825,14 @@
       }
     },
     "ART_CastleGrove": {
-      "triangles": 976,
-      "strokes": 90,
-      "bytes": 44112,
+      "triangles": 35428,
+      "strokes": 4032,
+      "bytes": 812996,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 472,
-        "bytes": 24292
+        "triangles": 4784,
+        "bytes": 118600
       }
     },
     "ART_NorthLonghouse": {
@@ -839,14 +847,14 @@
       }
     },
     "ART_TownTree": {
-      "triangles": 1368,
-      "strokes": 126,
-      "bytes": 60572,
+      "triangles": 19434,
+      "strokes": 2058,
+      "bytes": 442420,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 654,
-        "bytes": 32488
+        "triangles": 2860,
+        "bytes": 72004
       }
     },
     "ART_ParkingPavilion": {
@@ -861,14 +869,14 @@
       }
     },
     "ART_ClippedHedge": {
-      "triangles": 1140,
-      "strokes": 108,
-      "bytes": 51148,
+      "triangles": 3508,
+      "strokes": 84,
+      "bytes": 72808,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 537,
-        "bytes": 27428
+        "triangles": 996,
+        "bytes": 26048
       }
     },
     "HK_Sign_ParkingDirection": {
@@ -894,36 +902,80 @@
       }
     },
     "HK_Terrain_Hikone": {
-      "triangles": 14589,
-      "strokes": 1404,
-      "bytes": 628660,
+      "triangles": 430792,
+      "strokes": 44016,
+      "bytes": 14214004,
       "remodeled": true,
       "design": "hikone-landmark-v1",
       "lod": {
-        "triangles": 6690,
-        "bytes": 317964
+        "triangles": 254728,
+        "bytes": 9068888
       }
     },
     "ART_CastleApproach": {
-      "triangles": 14147,
+      "triangles": 13956,
       "strokes": 0,
-      "bytes": 713996,
+      "bytes": 702904,
       "remodeled": true,
       "design": "hikone-approach-v1",
       "lod": {
-        "triangles": 12513,
-        "bytes": 643024
+        "triangles": 12322,
+        "bytes": 631612
       }
     },
     "ART_DisplayKiosk": {
-      "triangles": 1870,
+      "triangles": 2948,
       "strokes": 0,
-      "bytes": 88080,
+      "bytes": 108816,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 1870,
-        "bytes": 88084
+        "triangles": 951,
+        "bytes": 44952
+      }
+    },
+    "ART_HikoneCompound": {
+      "triangles": 74062,
+      "strokes": 0,
+      "bytes": 3669984,
+      "remodeled": true,
+      "design": "hikone-landmark-v1",
+      "lod": {
+        "triangles": 30328,
+        "bytes": 1455596
+      }
+    },
+    "ART_MoatUtilityPole": {
+      "triangles": 580,
+      "strokes": 0,
+      "bytes": 16968,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 580,
+        "bytes": 16972
+      }
+    },
+    "ART_ShigaCampus": {
+      "triangles": 83562,
+      "strokes": 4704,
+      "bytes": 4759696,
+      "remodeled": true,
+      "design": "shiga-connected-campus-v1",
+      "lod": {
+        "triangles": 48393,
+        "bytes": 2599164
+      }
+    },
+    "ART_WestMoat": {
+      "triangles": 97898,
+      "strokes": 5124,
+      "bytes": 5736616,
+      "remodeled": true,
+      "design": "shiga-connected-campus-v1",
+      "lod": {
+        "triangles": 73126,
+        "bytes": 4466216
       }
     }
   }

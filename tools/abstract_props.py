@@ -11,7 +11,7 @@ VEHICLE_MODELS = ('WEB_Sedan', 'HK_Kei_Tall', 'HK_Kei_Hatch', 'HK_Truck_Large', 
 # speed signs authored here: 40 is web-only (VRLearn has none); 30 replaces the rebuilt source,
 # whose digits came out mirrored in the browser ("OE")
 SIGN_MODELS = ('HK_Sign_Speed30', 'HK_Sign_Speed40')
-STREET_MODELS = ('ART_UtilityPole', 'ART_PathLamp')
+STREET_MODELS = ('ART_UtilityPole', 'ART_MoatUtilityPole', 'ART_PathLamp')
 MODEL_NAMES = (*SIGNAL_MODELS, *VEHICLE_MODELS, *SIGN_MODELS, *STREET_MODELS, 'HK_StreetLamp')
 
 
@@ -65,7 +65,7 @@ def beveled_box(b, center, size, material, bevel=0.06, transform=identity):
     loft(b, rings, material, transform)
 
 
-def cylinder(b, start, end, radius, material, segments=16, end_radius=None, bevel=0, transform=identity):
+def cylinder(b, start, end, radius, material, segments=16, end_radius=None, bevel=0, transform=identity, steps=1):
     a, c = Vector(start), Vector(end)
     axis = (c - a).normalized()
     ref = Vector((0, 1, 0)) if abs(axis.y) < 0.9 else Vector((1, 0, 0))
@@ -76,6 +76,8 @@ def cylinder(b, start, end, radius, material, segments=16, end_radius=None, beve
     t = min(bevel, length * 0.20, radius * 0.20)
     profiles = [(a, radius), (c, rt)] if not t else [
         (a, radius - t), (a + axis * t, radius), (c - axis * t, rt), (c, rt - t)]
+    if not t and steps > 1:
+        profiles = [(a.lerp(c, i / steps), radius + (rt - radius) * i / steps) for i in range(steps + 1)]
     rings = [[p + r * (u * math.cos(i * math.tau / segments) + v * math.sin(i * math.tau / segments))
               for i in range(segments)] for p, r in profiles]
     face(b, list(reversed(rings[0])), material, transform)
@@ -144,20 +146,27 @@ def street_furniture(b, name):
             for z in (-0.17, 0.17):
                 cylinder(b, (x, 2.67, z), (x, 3.17, z), 0.017, 'ART_Frame', segments=6)
         return
-    cylinder(b, (0, 0, 0), (0, 10.35, 0), 0.155, 'HK_MetalLight', segments=14, end_radius=0.095)
-    for y in (8.0, 9.8):
+    if name == 'ART_MoatUtilityPole':
+        cylinder(b, (0, 0, 0), (0, 10.6, 0), 0.17, 'HK_MetalLight', segments=14, end_radius=0.105, steps=14)
+        for y in (3.0, 6.0, 9.3):
+            cylinder(b, (0, y, 0), (0, y + 0.055, 0), 0.175 - y * 0.005, 'ART_Frame', segments=10)
+        cylinder(b, (0, 9.4, 0), (0, 9.4, -0.42), 0.03, 'ART_Frame', segments=8)
+        cylinder(b, (0, 9.4, -0.42), (0, 9.65, -0.42), 0.045, 'HK_WhitePaint', segments=8)
+        return
+    cylinder(b, (0, 0, 0), (0, 11.8, 0), 0.155, 'HK_MetalLight', segments=14, end_radius=0.095, steps=15)
+    for y in (8.9, 11.1):
         cylinder(b, (0, y, -1.1), (0, y, 1.1), 0.045, 'ART_Frame', segments=8)
         for z in (-0.85, 0, 0.85):
             cylinder(b, (0, y, z), (0, y + 0.25, z), 0.052, 'HK_WhitePaint', segments=8)
             for dy in (0.06, 0.16):
                 cylinder(b, (0, y + dy, z), (0, y + dy + 0.025, z), 0.074, 'HK_WhitePaint', segments=8)
     for z in (-0.42, 0.42):
-        cylinder(b, (0, 7.0, z), (0, 7.85, z), 0.18, 'HK_MetalLight', segments=12)
-    cylinder(b, (0, 7.0, -0.42), (0, 7.0, 0.42), 0.035, 'ART_Frame', segments=8)
+        cylinder(b, (0, 7.9, z), (0, 8.75, z), 0.18, 'HK_MetalLight', segments=12)
+    cylinder(b, (0, 7.9, -0.42), (0, 7.9, 0.42), 0.035, 'ART_Frame', segments=8)
     # A few clamps and a conduit carry the silhouette without tiny individual fittings.
-    for y in (2.0, 6.9, 8.0, 9.8):
+    for y in (2.0, 7.8, 8.9, 11.1):
         cylinder(b, (0, y, 0), (0, y + 0.06, 0), 0.16 if y < 3 else 0.13, 'ART_Frame', segments=12)
-    cylinder(b, (0.16, 0.3, 0), (0.16, 6.9, 0), 0.018, 'ART_Frame', segments=6)
+    cylinder(b, (0.16, 0.3, 0), (0.16, 7.8, 0), 0.018, 'ART_Frame', segments=6)
 
 
 def signal_lens(b, x, y, radius, material, front=0.16, hood=0.15, arc=(18, 162), hood_material='ART_Frame'):
@@ -211,13 +220,13 @@ def signals(b, name):
     if name == 'ART_Signal_Support':
         cylinder(b, (0, -1, 0), (0, 1, 0), 0.5, 'ART_Frame', segments=12, end_radius=0.43)
     elif name == 'ART_Signal_Car':
-        beveled_box(b, (0, 0, -0.05), (1.52, 0.40, 0.12), 'ART_SignalHousing', 0.05)
+        beveled_box(b, (0, 0, -0.05), (1.25, 0.40, 0.16), 'ART_SignalHousing', 0.05)
         # Authored X ends up mirrored in the GLB, and the lenses face the GLB's -Z: authored -X is
         # the left of whoever the lamps face. Japanese order from that side: green, yellow, red.
-        for x, color in ((-0.52, 'ART_SignalGreen'), (0, 'ART_SignalYellow'), (0.52, 'ART_SignalRed')):
-            cylinder(b, (x, 0, -0.09), (x, 0, 0.075), 0.235, 'ART_SignalHousing', segments=28, bevel=0.02)
-            signal_lens(b, x, 0, 0.165, color, front=0.08, hood=0.26, arc=(-28, 208), hood_material='ART_SignalHood')
-        for x in (-0.46, 0.46):     # brackets up to the mast arm (0.43 m above the head's centre)
+        for x, color in ((-0.42, 'ART_SignalGreen'), (0, 'ART_SignalYellow'), (0.42, 'ART_SignalRed')):
+            cylinder(b, (x, 0, -0.09), (x, 0, 0.075), 0.195, 'ART_SignalHousing', segments=28, bevel=0.02)
+            signal_lens(b, x, 0, 0.15, color, front=0.08, hood=0.26, arc=(-28, 208), hood_material='ART_SignalHood')
+        for x in (-0.36, 0.36):     # brackets meet the mast arm 0.47 m above the head's centre
             cylinder(b, (x, 0.19, -0.05), (x, 0.47, -0.05), 0.028, 'ART_Frame', segments=8)
     else:
         beveled_box(b, (0, 0, 0), (0.40, 0.74, 0.20), 'ART_SignalHousingDark', 0.04)
@@ -493,6 +502,32 @@ def truck(b, name):
     box((0, 0.70, rear - 0.01), (0.33, 0.17, 0.02), 'HK_PlateGreen', 0.005)
 
 
+def paint_street_prop(b):
+    """Baked, continuous ochre/violet-grey underpainting; lamp colours stay literal."""
+    palettes = {
+        'HK_MetalLight': ((0.51, 0.54, 0.61), (0.78, 0.73, 0.63)),
+        'HK_WhitePaint': ((0.77, 0.78, 0.76), (0.96, 0.91, 0.79)),
+        'ART_Frame': ((0.31, 0.34, 0.43), (0.48, 0.43, 0.35)),
+        'ART_SignalHousing': ((0.49, 0.55, 0.62), (0.76, 0.70, 0.58)),
+        'ART_SignalHood': ((0.43, 0.49, 0.56), (0.68, 0.62, 0.52)),
+        'ART_SignalHousingDark': ((0.27, 0.30, 0.38), (0.42, 0.38, 0.32)),
+        'ART_SignalHoodDark': ((0.25, 0.28, 0.35), (0.39, 0.35, 0.30)),
+    }
+    for i, face_indices in enumerate(b.faces):
+        material = b.materials[b.slots[i]]
+        if material not in palettes:
+            continue
+        cool, warm = palettes[material]
+        colors = []
+        for index in face_indices:
+            x, z, y = b.vertices[index]
+            t = 0.50 + 0.18 * math.sin(y * 2.2 + z * 0.7) + 0.15 * math.cos(x * 5 + z * 4)
+            colors.append(tuple(a + (c - a) * t for a, c in zip(cool, warm)))
+        b.pigments[i] = colors
+        if material == 'HK_MetalLight' and len(face_indices) == 4:
+            b.smooth[i] = True
+
+
 def build(name, mesh_class):
     b = mesh_class(name)
     b.abstract = True
@@ -513,4 +548,6 @@ def build(name, mesh_class):
         truck(b, name)
     else:
         car(b, name)
+    if name in STREET_MODELS or name in SIGNAL_MODELS:
+        paint_street_prop(b)
     return b

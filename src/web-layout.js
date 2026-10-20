@@ -1,7 +1,7 @@
 // Browser-owned street furniture on top of the generated layout. Rendering, collision and sight
 // lines use this same pure transformation; no upstream Unity placement is edited.
 import { MOAT_BANK_ITEMS, isMoatStraight } from './moat-layout.js';
-import { roadLayout, moatPathEdge, townTaper } from './road-layout.js';
+import { roadLayout, moatPathEdge } from './road-layout.js';
 
 /** Left out, matched by asset and position (Unity x, z, within 0.5 m). */
 export const WEB_HIDDEN = [
@@ -20,15 +20,16 @@ const automaticLamp = item => item.a === 'HK_StreetLamp' && (
   ((item.p[0] === 27 || item.p[0] === 37) && item.p[2] > 0));
 export const isHidden = item => WEB_HIDDEN.some(h => near(item, h)) || automaticLamp(item);
 
-const streetItem = (a, x, z) => ({ a, p: [x, 0.16, z], r: 0, s: [1, 1, 1], g: 'WebStreet' });
+const streetItem = (a, x, z, y = 0.15) => ({ a, p: [x, y, z], r: 0, s: [1, 1, 1], g: 'WebStreet' });
 // October 2024 Street View: low square lamps on the moat bank, distribution poles on the
 // town footway east of the crossing. Positions fit the existing map, not survey coordinates.
 export const WEB_STREET_ITEMS = [
   ...[-90, -58, -26, 6, 55, 87].map(x => streetItem('ART_PathLamp', x, moatPathEdge(x) + 0.3)),
   // On the narrowed footway the poles stand at its kerb side, clear of the frontage eaves.
-  ...[49.5, 74, 101].map(x => streetItem('ART_UtilityPole', x, 19 + 2.55 * townTaper(x))),
-  // The glazed display case on the apron at the east end of the corner shop (18 October 2026 photo).
-  { a: 'ART_DisplayKiosk', p: [47.2, 0.15, 17.0], r: 0, s: [1, 1, 1], g: 'WebStreet' },
+  ...[53, 83, 113].map(x => streetItem('ART_UtilityPole', x, 21.45, 0.01)),
+  streetItem('ART_MoatUtilityPole', 70, moatPathEdge(70) + 0.8),
+  // Nov 2022 / Oct 2024 Street View: the case stands close to the shop wall, behind the walking line.
+  { a: 'ART_DisplayKiosk', p: [47.2, 0.15, 16.1], r: 0, s: [1, 1, 1], g: 'WebStreet' },
 ];
 
 // Differentiate the junction frontages. The western compound replaces two isolated sheds;
@@ -57,11 +58,13 @@ const surfaces = ['ART_PavingDetails', 'ART_MoatRoadPaint'].map(a =>
   ({ a, p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebSurface' }));
 
 const powerPoles = WEB_STREET_ITEMS.filter(i => i.a === 'ART_UtilityPole');
-const overheadWires = powerPoles.slice(1).flatMap((pole, i) => [8.25, 10.05].flatMap(y =>
+const overheadWires = powerPoles.slice(1).flatMap((pole, i) => [9.15, 11.35].flatMap(y =>
   [-0.85, 0, 0.85].map(z => ({
-    a: [powerPoles[i].p[0], y + 0.16, powerPoles[i].p[2] + z],
-    b: [pole.p[0], y + 0.16, pole.p[2] + z], sag: 0.45,
+    a: [powerPoles[i].p[0], y + 0.01, powerPoles[i].p[2] + z],
+    b: [pole.p[0], y + 0.01, pole.p[2] + z], sag: 0.45,
   }))));
+// A single service span reaches the plain pole at the rear of the opposite footway.
+overheadWires.push({ a: [83, 9.16, 21.45], b: [70, 9.80, moatPathEdge(70) + 0.38], sag: 0.65 });
 
 /** Idempotent, with the same physical props for the renderer and collision builder. */
 export const webLayout = layout => layout.roadPlan ? layout : roadLayout({ ...layout,

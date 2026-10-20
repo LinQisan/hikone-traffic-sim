@@ -1,7 +1,8 @@
 // Visual reconstruction from Google Maps satellite, reviewed 2026-10-18. Metres, not a survey.
 // Pixel observations describe outlines only; no map imagery is shipped with the scene.
 // The shared registration preserves the existing bridge and hilltop coordinates.
-import { geographicPoint, CASTLE_SITE } from './castle-layout.js';
+import { geographicPoint, CASTLE_SITE, CASTLE_BUILDINGS, CASTLE_TERRACES, CASTLE_NORTH_BANK } from './castle-layout.js';
+import { castlePaths } from './castle-paths.js';
 
 export const APPROACH_REFERENCE = 'https://www.google.com/maps/@?api=1&map_action=map&center=35.2744,136.252&zoom=18&basemap=satellite';
 const latitude = 35.2744, longitude = 136.252;
@@ -20,9 +21,7 @@ export const NORTH_APPROACH = [[32, 74], [30, 81], [22, 88], ...outline([
 ])];
 // A pedestrian bridge and the visible access to the Otemon ticket office, not a vehicle lane.
 export const OTEMON_PATH = outline([
-  [608, 512], [650, 496], [693, 477], [697, 463], [681, 438], [679, 420],
-  [665, 401], [637, 384], [608, 368], [579, 350], [557, 330], [563, 316],
-  [553, 304],
+  [608, 512], [650, 496], [693, 477],
 ]);
 const outerPixels = [
   [316, 207], [405, 286], [489, 358], [570, 428], [631, 491], [702, 551],
@@ -38,6 +37,14 @@ export const INNER_MOAT_ROAD = outline(outerPixels.map(([x, y], i, ps) => {
   const dx = b[0] - a[0], dy = b[1] - a[1], length = Math.hypot(dx, dy);
   return [x - dy / length * 15, y + dx / length * 15];
 }));
+// At the school/tennis peninsula the street stands well back from the inner moat.
+// A fixed bank offset put the old western end through the timber-house plots.
+const westernStreet = [[35.2772,136.2487,944,752],[35.2772,136.2487,1035,830],
+  [35.2772,136.2487,1140,891]].map(([lat,lon,x,y])=>{
+  const m=156543.03392*Math.cos(lat*Math.PI/180)/2**18;
+  return geographicPoint(lat+(424-y)*m/111320,lon+(x-768)*m/(111320*Math.cos(lat*Math.PI/180)));
+});
+INNER_MOAT_ROAD.splice(0,westernStreet.length,...westernStreet);
 export const INNER_MOAT_INNER = outline([
   [354, 182], [438, 260], [520, 330], [596, 391], [649, 428], [663, 450],
   [686, 457], [697, 479], [715, 531], [743, 569], [756, 613], [807, 647],
@@ -70,7 +77,9 @@ export const APPROACH_PATCHES = [
 
 export const APPROACH_DATA = { north: NORTH_APPROACH, innerRoad: INNER_MOAT_ROAD, path: OTEMON_PATH,
   outerBank: INNER_MOAT_OUTER, innerBank: INNER_MOAT_INNER, buildings: APPROACH_BUILDINGS,
-  patches: APPROACH_PATCHES, castle: CASTLE_SITE };
+  patches: APPROACH_PATCHES, castle: CASTLE_SITE, compound: CASTLE_BUILDINGS,
+  terraces: CASTLE_TERRACES, northBank: CASTLE_NORTH_BANK,
+  paths: castlePaths(OTEMON_PATH.at(-1), INNER_MOAT_ROAD, INNER_MOAT_INNER, INNER_MOAT_OUTER) };
 
 export function distanceToPath(x, z, points) {
   let best = Infinity;
