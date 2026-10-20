@@ -11,19 +11,27 @@ function driveway(scenario, vehicle, x, z) {
 }
 
 export function inspectRoutes(scenario, map) {
-  const triangles = [];
+  // Body samples query nearby triangles; keep the original edge tests and tolerance below.
+  // Build per invocation so edited/replaced maps never reuse a stale spatial cache.
+  const cells = new Map(), cellSize = 16, epsilon = 1e-6;
   for (const surface of map.surfaces) {
     if (surface.kind !== 'carriageway') continue;
     const t = surface.triangles;
     for (let i = 0; i < t.length; i += 6) {
       const [ax, az, bx, bz, cx, cz] = t.slice(i, i + 6);
       if (Math.abs((bx - ax) * (cz - az) - (bz - az) * (cx - ax)) < 1e-7) continue;
-      triangles.push({ ax, az, bx, bz, cx, cz,
+      const triangle = { ax, az, bx, bz, cx, cz,
         xMin: Math.min(ax, bx, cx), xMax: Math.max(ax, bx, cx),
-        zMin: Math.min(az, bz, cz), zMax: Math.max(az, bz, cz) });
+        zMin: Math.min(az, bz, cz), zMax: Math.max(az, bz, cz) };
+      for (let x = Math.floor((triangle.xMin - epsilon) / cellSize); x <= Math.floor((triangle.xMax + epsilon) / cellSize); x++)
+        for (let z = Math.floor((triangle.zMin - epsilon) / cellSize); z <= Math.floor((triangle.zMax + epsilon) / cellSize); z++) {
+          const key = x + ',' + z;
+          if (!cells.has(key)) cells.set(key, []);
+          cells.get(key).push(triangle);
+        }
     }
   }
-  const contains = (x, z) => triangles.some(t => {
+  const contains = (x, z) => (cells.get(Math.floor(x / cellSize) + ',' + Math.floor(z / cellSize)) ?? []).some(t => {
     if (x < t.xMin - 1e-6 || x > t.xMax + 1e-6 || z < t.zMin - 1e-6 || z > t.zMax + 1e-6) return false;
     const a = (t.bx - t.ax) * (z - t.az) - (t.bz - t.az) * (x - t.ax);
     const b = (t.cx - t.bx) * (z - t.bz) - (t.cz - t.bz) * (x - t.bx);

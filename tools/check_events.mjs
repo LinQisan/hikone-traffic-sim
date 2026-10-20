@@ -17,6 +17,7 @@ registerHooks({ resolve(specifier, context, next) {
   return next(specifier, context);
 } });
 const THREE = await import('three');
+const { indexMeshRays } = await import('./mesh-ray-index.mjs');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const S = await import('../src/shared/scenario.js');
 const { Traffic, PLAYER_RADIUS, meetPoint, smoothRoute, BODY_SIZE } = await import('../src/traffic.js');
@@ -69,7 +70,7 @@ for (const item of layout.items) {
 const cityMeshes = [...cells.values()].map(list => {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(list, 3));
   g.computeBoundingSphere();
-  return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+  return indexMeshRays(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide })));
 });
 const truckSize = {};
 for (const name of ['HK_Truck_Large', 'HK_Truck_Medium']) {
