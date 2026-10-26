@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="按源文件查阅接口、默认值、状态、坐标和命令。生成表格直接读取当前源码。">
+  <title>运行时与数据接口参考 · Hikone 开发文档</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="developer.css">
+  <script type="module" src="developer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Hikone 开发文档概览"><span class="brand-mark" aria-hidden="true">H</span><span class="brand-text">Hikone <span class="brand-label">开发文档</span></span></a>
+    <nav class="doc-tabs" aria-label="开发文档"><a href="index.html">概览</a><a href="tutorial.html">教程</a><a href="how-to.html">操作指南</a><a href="reference.html" aria-current="page">参考</a><a href="architecture.html">设计解释</a></nav>
+    <nav class="site-links" aria-label="站点导航"><a href="../">体验 <span aria-hidden="true">↗</span></a><a href="../editor/">编辑器 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <details class="contents" open>
+        <summary>本页目录 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="本页章节"><ol><li><a href="#entry"><span>01</span> 页面与加载入口</a></li><li><a href="#modules"><span>02</span> 源码职责</a></li><li><a href="#runtime"><span>03</span> 应用状态与帧循环</a></li><li><a href="#scenario"><span>04</span> 场景格式</a></li><li><a href="#coordinates"><span>05</span> 坐标与接触查询</a></li><li><a href="#traffic"><span>06</span> 车辆调度与信号</a></li><li><a href="#replay"><span>07</span> 录制与回放</a></li><li><a href="#rendering"><span>08</span> 渲染资源与性能接口</a></li><li><a href="#editor"><span>09</span> 编辑器与本地 API</a></li><li><a href="#generation"><span>10</span> 数据生成命令</a></li><li><a href="#checks"><span>11</span> 检查命令</a></li><li><a href="#documentation"><span>12</span> 文档维护参考</a></li></ol></nav>
+      </details>
+      <p class="sidebar-note">源码核对于 <time datetime="2026-10-22">2026-10-22</time></p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="hero">
+        <p class="eyebrow"><span class="edition">参考</span></p>
+        <h1>运行时与数据接口参考</h1>
+        <p class="lead">按主题查阅源码职责、状态、场景字段、坐标、信号和命令。字段默认值、枚举、信号相位和录制常量等表格由脚本直接从当前源码生成。</p>
+      </div>
+<section id="entry" aria-labelledby="entry-title"><h2 id="entry-title">页面与加载入口</h2>
+<div class="table-wrap" role="region" aria-label="页面入口，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">路径</th><th scope="col">入口文件</th><th scope="col">内容</th></tr></thead><tbody><tr><td><code>./</code></td><td><code>index.html</code>、<code>src/app/main.tsx</code></td><td>交通体验、结果和回放。</td></tr><tr><td><code>editor/</code></td><td><code>editor/index.html</code>、<code>src/editor/main.tsx</code></td><td>SVG 地图、场景编辑和保存。</td></tr><tr><td><code>docs/</code></td><td><code>docs/index.html</code></td><td>中文开发文档。</td></tr></tbody></table></div>
+<p><code>vite.config.ts</code> 配置 React、模拟器、编辑器和文档的多页入口。<code>npm run typecheck</code> 检查 strict TypeScript。<code>three</code> 与 <code>three/addons/</code> 由 npm 解析。<code>npm run dev</code> 默认监听 <code>127.0.0.1:8770</code>，可追加 <code>-- --port 8771</code> 或 <code>-- --host 0.0.0.0</code>。<code>serve.mjs</code> 保留为 Vite 的兼容入口。模型由 <code>src/three/assets/models.js</code> 执行建模配方生成。</p>
+<p><code>src/three/engine/TrafficEngine.ts</code> 并行读取 <code>data/scene.json</code>、<code>data/layout.json</code>、<code>data/walls.json</code>、<code>data/road_tiles.json</code>、<code>data/scenarios/index.json</code> 和 <code>data/collision.json</code>。随后准备街区、车辆、信号灯、玩家和回放对象。</p>
+</section>
+<section id="modules" aria-labelledby="modules-title"><h2 id="modules-title">源码职责</h2>
+<div class="table-wrap" role="region" aria-label="源码职责，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">文件</th><th scope="col">符号或职责</th></tr></thead><tbody><tr><td><code>src/app/App.tsx</code>、<code>src/components/</code></td><td>React 界面、菜单、HUD、结果和编辑面板。</td></tr><tr><td><code>src/state/SimulatorStore.ts</code></td><td>普通 UI 的低频快照与订阅；逐帧模拟对象留在引擎中。</td></tr><tr><td><code>src/three/engine/TrafficEngine.ts</code></td><td><code>start()</code>、<code>tick()</code>、<code>toTitle()</code> 通过类型化 UI 快照连接场景、逐帧更新和状态转换，提供可销毁的引擎生命周期。</td></tr><tr><td><code>src/simulation/core/scenario.ts</code></td><td><code>newScenario()</code>、<code>newVehicle()</code>、<code>parseScenario()</code>、<code>normalize()</code>、<code>serialize()</code>、<code>validate()</code>。</td></tr><tr><td><code>src/data/scenario-import.ts</code></td><td><code>createScenarioReader()</code> 按需加载完整地图，供模拟器文件导入和编辑器交接共用。</td></tr><tr><td><code>src/simulation/traffic/Traffic.ts</code></td><td><code>Traffic</code>、<code>smoothRoute()</code>、<code>pathAt()</code>、<code>carPose()</code> 计算车辆运动、启动、停车和接触。</td></tr><tr><td><code>src/simulation/traffic/SignalCycle.ts</code></td><td><code>SignalCycle</code> 计算相位，<code>junctionStops()</code> 将路线与停车线相交。</td></tr><tr><td><code>src/three/scene/signal-layout.js</code>、<code>src/three/scene/signals.js</code></td><td><code>signalRigs()</code> 定义装置，<code>buildSignals()</code> 创建 Three.js 灯具。</td></tr><tr><td><code>src/three/scene/world.js</code></td><td><code>buildEnvironment()</code>、<code>buildMaterials()</code>、<code>buildLight()</code> 加载街区并准备绘制资源。</td></tr><tr><td><code>src/three/scene/environment-instances.js</code></td><td><code>environmentInstances()</code> 组织实例、空间分块、LOD 和剔除。</td></tr><tr><td><code>src/three/materials/style.js</code></td><td><code>PigmentPalette</code>、<code>PaintRenderer</code> 提供颜色数据和绘制入口。</td></tr><tr><td><code>src/three/controls/Player.ts</code>、<code>src/three/controls/TouchControls.ts</code></td><td><code>Player</code> 与触屏输入控制步行、自行车和视线。</td></tr><tr><td><code>src/simulation/metrics/analysis.ts</code></td><td><code>Recorder</code>、<code>sample()</code>、<code>accidentAnalysis()</code>、<code>crossingAnalysis()</code>。</td></tr><tr><td><code>src/three/entities/replay.js</code>、<code>src/three/camera/replay-camera.js</code></td><td><code>Replay</code> 重建回放，<code>ReplayCamera</code> 规划相机。</td></tr><tr><td><code>src/three/camera/camera-obstacles.js</code>、<code>src/three/camera/mesh-ray-index.js</code></td><td><code>CameraObstacles</code> 查询 CPU 遮挡轮廓，共享几何体的射线索引。</td></tr><tr><td><code>src/simulation/collision/Ground.ts</code>、<code>src/simulation/collision/Obstacles.ts</code></td><td><code>Ground</code> 查询道路高度，<code>Obstacles</code> 查询碰撞网格与固定占地区域。</td></tr><tr><td><code>src/editor/controller.ts</code>、<code>src/editor/store.ts</code></td><td>编辑界面与浏览器存储。</td></tr><tr><td><code>server/editor-api.mjs</code></td><td>本地文件 API、Unity 播放请求和 Quest 同步。</td></tr></tbody></table></div>
+<p>此表只列运行时和编辑器的主要文件，并非完整的文件清单。</p>
+</section>
+<section id="runtime" aria-labelledby="runtime-title"><h2 id="runtime-title">应用状态与帧循环</h2>
+<div class="table-wrap" role="region" aria-label="应用状态，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">state</th><th scope="col">更新与退出</th></tr></thead><tbody><tr><td><code>title</code></td><td>显示菜单。选择场景后，<code>start()</code> 进入 <code>playing</code>。</td></tr><tr><td><code>playing</code></td><td>更新玩家、触发区、交通和录制。接触车辆后进入 <code>impact</code>，到达终点后进入 <code>results</code>。</td></tr><tr><td><code>impact</code></td><td>播放倒地视点并保留事故后的录制片段，然后进入 <code>replay</code>。</td></tr><tr><td><code>replay</code></td><td>使用录制时间更新车辆、人物、相机和信号。播放结束后停在最后一帧，激活 <strong>結果へ進む / Next</strong> 后进入 <code>results</code>。播放期间支持 <strong>スキップ / Skip</strong>。</td></tr><tr><td><code>results</code></td><td>显示观察反馈。支持重新体验与回到 <code>title</code>。</td></tr></tbody></table></div>
+<p><code>renderer.setAnimationLoop()</code> 每帧调用 <code>tick(dt)</code>。<code>dt</code> 最大为 <code>0.1</code> 秒。交通更新对大于 <code>1 / 30</code> 秒的步长细分。</p>
+<p>帧内顺序为分辨率调整、逻辑更新、环境动画、阴影定位、相机选择、LOD 更新、绘制和性能采样。普通体验使用玩家相机，回放使用 <code>replay.activeCamera</code>，调试视角优先于两者。</p>
+<p><code>run.recordingHead</code> 复用逐帧头部快照。<code>Recorder.capture()</code> 只在采样到期时复制录制数据。</p>
+</section>
+<section id="scenario" aria-labelledby="scenario-title"><h2 id="scenario-title">场景格式</h2>
+<p><code>src/simulation/core/scenario.ts</code> 定义标准格式。以下表由构造函数的返回值生成，空字符串以 <code>""</code> 表示。</p>
+<h3>场景字段</h3>
+<!-- generated:scenario-defaults:start -->
+<div class="table-wrap" role="region" aria-label="场景字段，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">字段</th><th scope="col">默认值</th><th scope="col">含义</th></tr></thead><tbody>
+<tr><td><code>format</code></td><td><code>&quot;vrlearn-scenario&quot;</code></td><td>文件格式</td></tr>
+<tr><td><code>version</code></td><td><code>1</code></td><td>格式版本</td></tr>
+<tr><td><code>id</code></td><td><code>&quot;new-scenario&quot;</code></td><td>场景标识</td></tr>
+<tr><td><code>name</code></td><td><code>&quot;新しい場面&quot;</code></td><td>日文界面中的名称</td></tr>
+<tr><td><code>nameEn</code></td><td><code>&quot;New scenario&quot;</code></td><td>英文名称</td></tr>
+<tr><td><code>setting</code></td><td><code>&quot;crossing&quot;</code></td><td>场景分类</td></tr>
+<tr><td><code>learningGoal</code></td><td><code>&quot;&quot;</code></td><td>练习目标</td></tr>
+<tr><td><code>situation</code></td><td><code>&quot;&quot;</code></td><td>场景说明</td></tr>
+<tr><td><code>point</code></td><td><code>&quot;&quot;</code></td><td>反馈要点</td></tr>
+<tr><td><code>map</code></td><td><code>&quot;hikone-kyobashi&quot;</code></td><td>地图标识</td></tr>
+<tr><td><code>playerMode</code></td><td><code>&quot;walking&quot;</code></td><td>参与方式</td></tr>
+<tr><td><code>spawn</code></td><td><code>{&quot;x&quot;:40,&quot;z&quot;:14}</code></td><td>起点，单位为米</td></tr>
+<tr><td><code>goal</code></td><td><code>{&quot;x&quot;:40,&quot;z&quot;:32,&quot;width&quot;:5,&quot;depth&quot;:1,&quot;yaw&quot;:0}</code></td><td>终点矩形，yaw 单位为度</td></tr>
+<tr><td><code>trigger</code></td><td><code>{&quot;x&quot;:40,&quot;z&quot;:19.5,&quot;width&quot;:4,&quot;depth&quot;:4,&quot;yaw&quot;:0}</code></td><td>触发矩形，yaw 单位为度</td></tr>
+<tr><td><code>vehicles</code></td><td><code>[]</code></td><td>车辆定义数组</td></tr>
+</tbody></table></div>
+<!-- generated:scenario-defaults:end -->
+<h3>车辆字段</h3>
+<!-- generated:vehicle-defaults:start -->
+<div class="table-wrap" role="region" aria-label="车辆字段，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">字段</th><th scope="col">默认值</th><th scope="col">含义</th></tr></thead><tbody>
+<tr><td><code>name</code></td><td><code>&quot;車&quot;</code></td><td>车辆名称</td></tr>
+<tr><td><code>model</code></td><td><code>&quot;Car_Left&quot;</code></td><td>车辆模型名</td></tr>
+<tr><td><code>body</code></td><td><code>&quot;&quot;</code></td><td>车身类型</td></tr>
+<tr><td><code>route</code></td><td><code>[]</code></td><td>路径点数组，单位为米</td></tr>
+<tr><td><code>speedKmh</code></td><td><code>36</code></td><td>目标速度，单位为 km/h</td></tr>
+<tr><td><code>start</code></td><td><code>&quot;begin&quot;</code></td><td>启动条件</td></tr>
+<tr><td><code>delaySeconds</code></td><td><code>0</code></td><td>启动延迟，单位为秒</td></tr>
+<tr><td><code>repeatMinSeconds</code></td><td><code>0</code></td><td>最短重复间隔，单位为秒</td></tr>
+<tr><td><code>repeatMaxSeconds</code></td><td><code>0</code></td><td>最长重复间隔，单位为秒</td></tr>
+<tr><td><code>stopOnTrigger</code></td><td><code>false</code></td><td>触发后停止后续重复生成</td></tr>
+<tr><td><code>accident</code></td><td><code>false</code></td><td>教学事故车辆标记</td></tr>
+<tr><td><code>overrideYaw</code></td><td><code>false</code></td><td>启用固定朝向</td></tr>
+<tr><td><code>yaw</code></td><td><code>0</code></td><td>固定朝向，单位为度</td></tr>
+</tbody></table></div>
+<!-- generated:vehicle-defaults:end -->
+<h3>枚举与范围</h3>
+<!-- generated:scenario-constants:start -->
+<div class="table-wrap" role="region" aria-label="场景常量，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">符号</th><th scope="col">值</th></tr></thead><tbody>
+<tr><td><code>HIKONE_BOUNDS</code></td><td><code>{&quot;xMin&quot;:-220,&quot;zMin&quot;:-155,&quot;xMax&quot;:200,&quot;zMax&quot;:165}</code></td></tr>
+<tr><td><code>PLAYER_MODES</code></td><td><code>[&quot;walking&quot;,&quot;bicycle&quot;]</code></td></tr>
+<tr><td><code>SETTINGS</code></td><td><code>[&quot;crossing&quot;,&quot;midblock&quot;,&quot;bicycle&quot;]</code></td></tr>
+<tr><td><code>BODIES</code></td><td><code>[&quot;&quot;,&quot;kei-tall&quot;,&quot;kei-hatch&quot;]</code></td></tr>
+<tr><td><code>ID_PATTERN</code></td><td><code>/^[a-z0-9][a-z0-9_-]{0,39}$/</code></td></tr>
+</tbody></table></div>
+<!-- generated:scenario-constants:end -->
+<p><code>validateStructure()</code> 要求终点宽度和深度至少为 <code>0.5</code> 米，起终点间距至少为 <code>3</code> 米。车辆路线至少包含两个点，速度范围为 <code>5</code> 至 <code>80</code> km/h，启动延迟为 <code>0</code> 至 <code>120</code> 秒。</p>
+<p>有效重复间隔满足 <code>repeatMinSeconds ≤ repeatMaxSeconds</code>。启用重复时，最短间隔至少为 <code>1</code> 秒。<code>start</code> 为 <code>trigger</code> 或 <code>stopOnTrigger</code> 为 <code>true</code> 时，场景必须包含宽度和深度都大于零的触发区。</p>
+<p><code>validateOnMap()</code> 检查起终点和路线是否位于道路上，同时检查墙体、模型名和触发区。<code>validate()</code> 返回 <code>{level, message, target}</code> 数组，<code>level</code> 为 <code>error</code> 或 <code>warning</code>。编辑器使用这些问题标记无效场景。</p>
+<div class="callout"><strong>外部 JSON 的输入边界</strong><p><code>parseScenario(text)</code> 支持 UTF-8 BOM，先检查字段类型，再补默认值。失败抛出 <code>ScenarioInputError</code>，含 <code>code: INVALID_SCENARIO</code>、<code>status: 400</code> 和带 <code>path</code> 的 <code>problems</code>。编辑器允许保留语义无效的草稿供修改；模拟器的 <code>createScenarioReader()</code> 还会使用含 <code>surfaces</code> 的完整地图进行道路校验。地图只在导入或编辑器交接时请求，成功后复用，失败后可重试。导入失败保留当前选择，新选择不会被旧请求覆盖。</p></div>
+<h3>规范化与序列化</h3>
+<p><code>normalize()</code> 补齐默认值。序列化时，除兼容的基础字段外，还会保留已支持的驾驶者（<code>driver</code>）、危险策略（<code>hazardPolicy</code>）和道路环境（<code>environment</code>）扩展；未知扩展字段不保证保留。</p>
+</section>
+<section id="coordinates" aria-labelledby="coordinates-title"><h2 id="coordinates-title">坐标与接触查询</h2>
+<p>场景文件、编辑器和交通逻辑使用地图坐标，单位为米。<code>yaw</code> 单位为度，从 <code>+z</code> 朝向开始顺时针增加。</p>
+<div class="formula"><div><span>位置转换</span><code>toThree(x, y, z) = (-x, y, z)</code></div><div><span>朝向转换</span><code>yawToThree(yaw) = -yaw × π / 180</code></div></div>
+<p><code>src/three/scene/coords.ts</code> 负责 Three.js 坐标转换。编辑器地图的 X 轴向右，Z 轴向上，屏幕像素 Y 轴与 Z 轴方向相反。</p>
+<div class="table-wrap" role="region" aria-label="高度与接触查询，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">对象或查询</th><th scope="col">实现</th></tr></thead><tbody><tr><td>城镇路面与人行道</td><td>高度为 <code>0.01</code> 米。独立路缘顶面为 <code>0.16</code> 米，地块为 <code>0.15</code> 米。城堡方向的坡路跟随地形。</td></tr><tr><td><code>Ground.heightAt()</code></td><td>按空间格查询道路三角形，再求重心插值高度。</td></tr><tr><td><code>Obstacles</code></td><td>使用 <code>data/collision.json</code> 的位网格、信号杆占地和停放车辆矩形。</td></tr><tr><td><code>Traffic.hit()</code></td><td>使用交通车辆与参与者的平面接触范围。</td></tr><tr><td><code>CameraObstacles</code></td><td>使用静态低精度模型的 CPU 三角形轮廓，查询相机遮挡。</td></tr><tr><td><code>GroundContact.minimumY()</code></td><td>使用已摆出姿态的顶点求最低点，避免倒地人物和自行车穿过地面。</td></tr></tbody></table></div>
+<p>这些查询不依赖当前画面中哪些渲染网格被剔除。</p>
+</section>
+<section id="traffic" aria-labelledby="traffic-title"><h2 id="traffic-title">车辆调度与信号</h2>
+<p><code>Traffic</code> 将 <code>route</code> 转成 <code>smoothRoute()</code> 路径。<code>pathAt()</code> 按路径距离求位置，<code>carPose()</code> 计算车辆朝向和转向。<code>junctionStops()</code> 为路线生成停车线距离。</p>
+<h3>浏览器事件扩展</h3>
+<p>以下字段只在浏览器版中生效，Unity 版不保证兼容。</p>
+<p>编辑器会保留 <code>driver</code>、<code>environment</code>、<code>entrySpeedKmh</code> 和 <code>noStop</code>。默认的自适应驾驶者可能违反部分规则；<code>hazardPolicy</code> 控制基准概率和危险行为时的概率。显式设置的 <code>driver.behavior</code> 会原样保留。旧版的 <code>launch: "meet"</code> 以及等待、超时字段已不再影响车辆出发。驾驶者与道路环境设置的完整说明见 <a href="../RATIONALE.md#events">RATIONALE.md</a>（英文）。</p>
+
+<h3>共享信号周期</h3>
+<p><code>SignalCycle.at(seconds)</code> 返回复用的状态对象，字段为 <code>id</code>、<code>eastWest</code>、<code>northSouth</code>、<code>walk</code>、<code>walkOn</code> 和 <code>remaining</code>。负数和非有限时间按零处理。</p>
+<!-- generated:signal-phases:start -->
+<p><code>SIGNAL_PERIOD</code> 为 87 秒。区间中的 <code>t</code> 为场景时间对周期取余的结果。</p>
+<div class="table-wrap" role="region" aria-label="信号相位，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">id</th><th scope="col">区间，秒</th><th scope="col">持续，秒</th><th scope="col">eastWest</th><th scope="col">northSouth</th><th scope="col">walk</th></tr></thead><tbody>
+<tr><td><code>east-west</code></td><td>0 ≤ t &lt; 28</td><td>28</td><td>绿</td><td>红</td><td>红</td></tr>
+<tr><td><code>east-west-yellow</code></td><td>28 ≤ t &lt; 31</td><td>3</td><td>黄</td><td>红</td><td>红</td></tr>
+<tr><td><code>clear-east-west</code></td><td>31 ≤ t &lt; 34</td><td>3</td><td>红</td><td>红</td><td>红</td></tr>
+<tr><td><code>north-south</code></td><td>34 ≤ t &lt; 54</td><td>20</td><td>红</td><td>绿</td><td>红</td></tr>
+<tr><td><code>north-south-yellow</code></td><td>54 ≤ t &lt; 57</td><td>3</td><td>红</td><td>黄</td><td>红</td></tr>
+<tr><td><code>clear-north-south</code></td><td>57 ≤ t &lt; 60</td><td>3</td><td>红</td><td>红</td><td>红</td></tr>
+<tr><td><code>walk</code></td><td>60 ≤ t &lt; 78</td><td>18</td><td>红</td><td>红</td><td>绿</td></tr>
+<tr><td><code>walk-flash</code></td><td>78 ≤ t &lt; 84</td><td>6</td><td>红</td><td>红</td><td>绿灯闪烁</td></tr>
+<tr><td><code>clear-walk</code></td><td>84 ≤ t &lt; 87</td><td>3</td><td>红</td><td>红</td><td>红</td></tr>
+</tbody></table></div>
+<p><code>signalRigs()</code> 返回 5 组装置，共 6 个车行灯头和 8 个行人灯头。</p>
+<!-- generated:signal-phases:end -->
+<p>所有行人灯共用 <code>walk</code>。<code>flash</code> 状态每秒前半秒点亮。上述秒数是模拟设置，不是现场控制器的实测配时。</p>
+<p><code>src/three/scene/signal-layout.js</code> 保存灯杆、灯头、牌面和朝向。<code>src/three/scene/signals.js</code> 创建实例，复用只读几何属性，保留各自的亮度数据。灯态仅在变化时更新。</p>
+</section>
+<section id="replay" aria-labelledby="replay-title"><h2 id="replay-title">录制与回放</h2>
+<p><code>Recorder.capture(time, head, cars)</code> 保存参与者与车辆快照。采样到期前不写入数据，过期帧从缓冲区移除。</p>
+<!-- generated:recording-constants:start -->
+<div class="table-wrap" role="region" aria-label="录制与分析常量，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">符号</th><th scope="col">值</th><th scope="col">单位</th></tr></thead><tbody>
+<tr><td><code>SAMPLE_INTERVAL</code></td><td>0.05</td><td>秒</td></tr>
+<tr><td><code>BUFFER_SECONDS</code></td><td>12</td><td>秒</td></tr>
+<tr><td><code>SECONDS_BEFORE_IMPACT</code></td><td>8</td><td>秒</td></tr>
+<tr><td><code>SECONDS_AFTER_IMPACT</code></td><td>1.6</td><td>秒</td></tr>
+<tr><td><code>GAZE_HALF_ANGLE</code></td><td>35</td><td>度</td></tr>
+<tr><td><code>GAZE_MAX_DISTANCE</code></td><td>60</td><td>米</td></tr>
+<tr><td><code>SIDE_CHECK_MIN</code></td><td>35</td><td>度</td></tr>
+<tr><td><code>SIDE_CHECK_MAX</code></td><td>150</td><td>度</td></tr>
+</tbody></table></div>
+<!-- generated:recording-constants:end -->
+<p><code>Recorder.window(from, to, cut)</code> 返回时间窗口，并排除 <code>cut</code> 之前最后一次位置跳变以前的帧。<code>sample()</code> 对位置、朝向和转向作插值。</p>
+<p><code>accidentAnalysis()</code> 计算是否看见事故车、观察时长、最后一次观察时间和速度。<code>crossingAnalysis()</code> 计算左右观察时长与最近车距。</p>
+<p><code>Replay</code> 重建车辆、人物、自行车和驾驶席视角。<code>ReplayCamera</code> 在开始前规划轨迹，检查主体取景和遮挡，平滑后保存路径。播放阶段沿路径插值。减少动态效果偏好使用稳定的远景。</p>
+</section>
+<section id="rendering" aria-labelledby="rendering-title"><h2 id="rendering-title">渲染资源与性能接口</h2>
+<p><code>buildEnvironment()</code> 准备高低精度模型。<code>environmentInstances()</code> 按资产、LOD 和空间块组织实例。<code>PigmentPalette</code> 将材质颜色组织为共享数据，<code>PaintRenderer</code> 绘制场景，不运行后处理链。</p>
+<p>LOD 和视锥剔除使用迟滞，视角未达到移动或转动阈值时复用选择结果。静态低精度物体进入太阳阴影缓存，移动车辆、人物和自行车使用 <code>withBlobShadow()</code>。阴影覆盖范围变化时才重绘静态阴影。</p>
+<p><code>src/three/entities/vehicles.js</code> 缓存车辆模型，只为可转向前轮准备独立部件。<code>CameraObstacles</code> 按几何体缓存 CPU 射线索引，每个实例保存自己的变换。临时回放遮挡物随回放释放。</p>
+<h3>性能报告</h3>
+<p><code>?benchmark=1</code> 启用 <code>PerformanceProbe</code>，并禁用自适应分辨率。预热约两秒后，探针收集约八秒帧样本。<code>window.vrlearn.benchmark.report</code> 和 <code>#fps</code> 的 <code>data-benchmark</code> 提供报告。</p>
+<div class="table-wrap" role="region" aria-label="性能报告，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">字段</th><th scope="col">含义</th></tr></thead><tbody><tr><td><code>fps</code>、<code>medianMs</code>、<code>p95Ms</code></td><td>平均帧率、中位帧时和第 95 百分位帧时。</td></tr><tr><td><code>updateMs</code></td><td>绘制前的平均 CPU 更新时间。</td></tr><tr><td><code>calls</code>、<code>triangles</code></td><td>采样帧的平均绘制调用与三角形数量。</td></tr><tr><td><code>width</code>、<code>height</code></td><td>实际绘制缓冲区尺寸。</td></tr><tr><td><code>geometries</code>、<code>textures</code>、<code>programs</code></td><td>Three.js 资源计数，不表示显存字节数。</td></tr><tr><td><code>readyMs</code></td><td>探针首帧距离页面时间原点的毫秒数。</td></tr><tr><td><code>resourceTransferBytes</code>、<code>resourceBodyBytes</code></td><td>Resource Timing 记录的传输量与解码后资源体积。</td></tr><tr><td><code>heapBytes</code></td><td>浏览器支持时的 JavaScript 堆使用量，否则为 <code>null</code>。</td></tr><tr><td><code>multiDraw</code></td><td><code>WEBGL_multi_draw</code> 扩展是否可用。</td></tr></tbody></table></div>
+<p><code>window.vrlearn.benchmark.reset()</code> 重启采样。<code>window.vrlearn.debugView(x, y, z, tx, ty, tz, fov)</code> 设置固定观察点，参数使用地图坐标。</p>
+<p>具体模型参数、资源释放策略和测量记录保存在 <code>docs/art-and-performance.md</code>。</p>
+</section>
+<section id="editor" aria-labelledby="editor-title"><h2 id="editor-title">编辑器与本地 API</h2>
+<p><code>src/editor/controller.ts</code> 探测本地 API。API 不可用时，<code>src/editor/store.ts</code> 使用 <code>localStorage</code>，数据键为 <code>vrlearn.editor.scenarios</code>，回收区键为 <code>vrlearn.editor.trash</code>。</p>
+<p>浏览器体验交接使用 <code>vrlearn.editor.play</code> 和 <code>?play=editor</code>。两种存储方式都读取本仓库的模板。保存用户场景时，ID 不能以 <code>builtin-</code> 开头。</p>
+<p><code>server/editor-api.mjs</code> 在 <code>VRLEARN_ROOT</code> 指向的 Unity 项目包含 <code>ProjectSettings</code> 和 <code>Scenarios</code> 时启用。默认路径为兄弟目录 <code>../VRLearn</code>。API 只回答回环地址请求，并拒绝跨站写入。</p>
+<div class="table-wrap" role="region" aria-label="本地编辑器 API，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">方法与路径</th><th scope="col">请求或响应</th></tr></thead><tbody><tr><td><code>GET /api/status</code></td><td>响应 <code>{server: true, root}</code>。API 不可用时该路径返回 404。</td></tr><tr><td><code>GET /api/map</code></td><td>浏览器地图 JSON 与路线提示。</td></tr><tr><td><code>GET /api/map/image</code></td><td>地图 PNG。</td></tr><tr><td><code>GET /api/scenarios</code></td><td>用户场景与本仓库模板列表，包含错误和警告数量。</td></tr><tr><td><code>GET /api/scenario?path=…</code></td><td>指定相对路径的场景。模板位于 <code>templates/</code>。</td></tr><tr><td><code>PUT /api/scenarios/:id</code></td><td>请求体为场景 JSON。规范化、序列化并保存，响应 <code>{path, problems}</code>。允许保存语义校验失败的草稿；JSON 语法或字段类型错误返回 HTTP 400 和 <code>{error, code, problems}</code>，不覆盖已保存文件。</td></tr><tr><td><code>DELETE /api/scenarios/:id</code></td><td>将用户场景移到 <code>Scenarios/.trash/</code>。</td></tr><tr><td><code>POST /api/play</code></td><td>请求 <code>{path}</code>，写入供 Unity 读取的 <code>Scenarios/.play-request.json</code>。</td></tr><tr><td><code>GET /api/play</code></td><td>响应 <code>{pending}</code>。</td></tr><tr><td><code>GET /api/quest</code></td><td>adb 路径、应用包名与连接的头显。</td></tr><tr><td><code>POST /api/quest/sync</code></td><td>请求可含 <code>serial</code>，将有效场景镜像同步到 Quest。</td></tr></tbody></table></div>
+<p>无效 ID、模板覆盖和请求 ID 不一致返回 400。跨站写入返回 403，未找到资源返回 404，大于 <code>2,000,000</code> 字节的请求体返回 413。浏览器存储容量不足返回 507。静态站点不提供 Unity 播放与 Quest 同步。</p>
+</section>
+<section id="generation" aria-labelledby="generation-title"><h2 id="generation-title">数据生成命令</h2>
+<div class="table-wrap" role="region" aria-label="数据生成，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">命令或工具</th><th scope="col">输入与输出</th></tr></thead><tbody><tr><td><code>node tools/sync.mjs --events-only</code></td><td>从 <code>events/</code> 生成 <code>data/scenarios/</code>、<code>data/editor/templates/</code> 和 <code>data/editor/lanes.json</code>。</td></tr><tr><td><code>node tools/sync.mjs</code></td><td>完整同步，上游为 <code>VRLEARN_ROOT</code>。导入几何数据和兼容场景格式。</td></tr><tr><td><code>tools/export_models.py</code></td><td>Blender 导出 Unity 来源的模型。</td></tr><tr><td><code>tools/build_impressionist.py</code></td><td>生成绘画风格模型，支持 <code>-- --only NAME</code> 选择资产。</td></tr><tr><td><code>tools/build_editor_map.py</code></td><td>Blender 从实际静态模型与本地布局生成编辑器概览图和练习区详图。</td></tr><tr><td><code>node tools/build_collision.mjs</code></td><td>按当前模型与布局重建 <code>data/collision.json</code>。</td></tr></tbody></table></div>
+<p>完整资产流程依赖 Unity 的 <strong>Tools → VRLearn → Web → Export Scene For Web</strong> 导出结果。各资产的具体输入、输出和参数记录在 <code>docs/art-and-performance.md</code>。</p>
+</section>
+<section id="checks" aria-labelledby="checks-title"><h2 id="checks-title">检查命令</h2>
+<div class="table-wrap" role="region" aria-label="检查命令，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">命令</th><th scope="col">覆盖内容</th></tr></thead><tbody><tr><td><code>node tools/check_events.mjs builtin-01</code></td><td>该事件的直接前进、停下观察和起始可见性。</td></tr><tr><td><code>node tools/check_routes.mjs</code></td><td>事件路线、编辑器车辆和运行时车身是否留在道路上。</td></tr><tr><td><code>node --test test/turning.test.mjs</code></td><td>车辆转弯和转向。</td></tr><tr><td><code>node --test test/art.test.mjs test/obstacles.test.mjs</code></td><td>模型、布局和通行空间。</td></tr><tr><td><code>node --test test/performance.test.mjs</code></td><td>渲染资源与性能相关约束。</td></tr><tr><td><code>node --test test/editor-store.test.mjs test/editor-server.test.mjs test/editor-quest.test.mjs</code></td><td>编辑器浏览器存储、本地 API 和 Quest 连接逻辑。</td></tr><tr><td><code>node --test test/scenario-import.test.mjs</code></td><td>外部 JSON、字段错误、地图按需加载、重试和道路校验。</td></tr><tr><td><code>npm test</code></td><td>完整回归，包含事件检查。</td></tr><tr><td><code>npm run check</code></td><td>源码生成文档一致性、完整回归、Vite 生产构建；本地和部署 CI 共用。</td></tr><tr><td><code>git diff --check</code></td><td>空白错误与冲突标记。</td></tr></tbody></table></div>
+<p><code>AGENTS.md</code> 按改动范围定义必需检查。文档与格式变更只要求内容、路径和差异核对。可见页面变更另需页面、键盘、触屏可达性和控制台检查。</p>
+</section>
+<section id="documentation" aria-labelledby="documentation-title"><h2 id="documentation-title">文档维护参考</h2>
+<p><code>tools/build_developer_reference.mjs</code> 读取 <code>src/simulation/core/scenario.ts</code>、<code>src/simulation/traffic/SignalCycle.ts</code>、<code>src/three/scene/signal-layout.js</code> 和 <code>src/simulation/metrics/analysis.ts</code>，更新本页带 <code>generated:</code> 标记的静态内容。</p>
+<div class="table-wrap" role="region" aria-label="文档维护命令，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">命令</th><th scope="col">作用</th></tr></thead><tbody><tr><td><code>node tools/build_developer_reference.mjs</code></td><td>重建字段默认值、枚举与地图范围、信号相位、装置数量和录制常量。</td></tr><tr><td><code>npm run check:docs</code></td><td>比较生成内容与当前源码。不一致时以非零状态退出。</td></tr></tbody></table></div>
+<p>这些命令不影响网页的启动方式。GitHub Pages 发布的是 Vite 构建后的 HTML，部署 CI 会先执行 <code>npm run check</code>，确认已提交的文档与源码一致。</p>
+</section>
+      <nav class="pager" aria-label="上一篇与下一篇"><a class="prev" href="how-to.html"><span>上一篇</span>操作指南</a><a class="next" href="architecture.html"><span>下一篇</span>设计解释</a></nav>
+      <footer class="page-footer"><span>Hikone Traffic Simulator · 开发文档</span><a href="#main">回到顶部 ↑</a></footer>
+    </main>
+  </div>
+</body>
+</html>

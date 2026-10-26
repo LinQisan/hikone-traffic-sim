@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="为什么车辆、碰撞和信号逻辑不依赖正在绘制的网格，以及这种分离对回放、性能和编辑器的影响。">
+  <title>交通逻辑与 Three.js 画面的分离 · Hikone 开发文档</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="developer.css">
+  <script type="module" src="developer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Hikone 开发文档概览"><span class="brand-mark" aria-hidden="true">H</span><span class="brand-text">Hikone <span class="brand-label">开发文档</span></span></a>
+    <nav class="doc-tabs" aria-label="开发文档"><a href="index.html">概览</a><a href="tutorial.html">教程</a><a href="how-to.html">操作指南</a><a href="reference.html">参考</a><a href="architecture.html" aria-current="page">设计解释</a></nav>
+    <nav class="site-links" aria-label="站点导航"><a href="../">体验 <span aria-hidden="true">↗</span></a><a href="../editor/">编辑器 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <details class="contents" open>
+        <summary>本页目录 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="本页章节"><ol><li><a href="#separation"><span>01</span> 教学判定不依赖画面细节</a></li><li><a href="#queries"><span>02</span> 高度、碰撞和遮挡回答不同问题</a></li><li><a href="#time"><span>03</span> 信号与回放共用场景时间</a></li><li><a href="#camera"><span>04</span> 回放相机把规划计算放在播放前</a></li><li><a href="#rendering"><span>05</span> 渲染优化保持事件逻辑稳定</a></li><li><a href="#editor"><span>06</span> 编辑器共享格式而不共享部署环境</a></li></ol></nav>
+      </details>
+      <p class="sidebar-note">源码核对于 <time datetime="2026-10-22">2026-10-22</time></p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="hero">
+        <p class="eyebrow"><span class="edition">设计解释</span></p>
+        <h1>交通逻辑与 Three.js 画面的分离</h1>
+        <p class="lead">车辆、碰撞和信号的逻辑为什么不依赖屏幕上正在绘制的网格，以及这种分离给回放、性能和编辑器带来了什么。</p>
+      </div>
+<section id="separation" aria-labelledby="separation-title"><h2 id="separation-title">教学判定不依赖画面细节</h2>
+<p>交通安全练习要求车辆时序和接触判定稳定可复现。树木的 LOD、相机朝向和设备分辨率都会改变画面，但不应该改变同一个事件会不会发生。</p>
+<p>所以 <code>src/simulation/core/scenario.ts</code>、<code>Traffic</code>、<code>SignalCycle</code> 和 <code>Recorder</code> 只处理场景和时间，从不创建 Three.js 渲染对象；<code>src/three/engine/TrafficEngine.ts</code> 再把逻辑结果交给车辆网格、灯具和相机。好处之一是 Node.js 中的检查脚本可以直接运行同一套逻辑，无需 WebGL。</p>
+<figure class="architecture-diagram">
+<div class="diagram-layer"><span class="layer-label">界面与协调</span><div class="diagram-node"><b>React UI → SimulatorStore → TrafficEngine</b><small>界面生命周期、低频快照、原生更新与绘制</small></div></div>
+<div class="diagram-arrow" aria-hidden="true">↓</div>
+<div class="diagram-columns"><div class="diagram-node"><span class="node-tag">逻辑</span><b>Traffic · SignalCycle · Recorder</b><small>计算车辆、信号与录制状态</small></div><div class="diagram-node"><span class="node-tag">画面</span><b>buildEnvironment() · buildSignals() · Replay</b><small>显示街区、灯具、人物与相机</small></div></div>
+<div class="diagram-arrow" aria-hidden="true">↑</div>
+<div class="diagram-layer"><span class="layer-label">输入</span><div class="diagram-node"><b>events/ 与生成的 data/</b><small>场景、模型、道路和碰撞数据</small></div></div>
+<figcaption>React 处理普通界面，TrafficEngine 协调逻辑与画面。两者读取地图坐标中的数据。</figcaption>
+</figure>
+<p>React 组件负责菜单、HUD、结果和编辑面板；<code>SimulatorStore</code> 只发布发生变化的界面切片。<code>TrafficEngine</code> 持有唯一的渲染器和帧循环，车辆与人物的逐帧状态都留在引擎里，不进入 React state。引擎卸载时会取消加载并释放资源，因此 StrictMode 可以一直开着。交通计算使用 strict TypeScript，原有的程序化模型代码继续以 JavaScript 复用。迁移对照和验证结果见<a href="react-typescript-migration.md">迁移记录</a>；接口与文件位置见<a href="reference.html#modules">源码职责参考</a>。</p>
+</section>
+<section id="queries" aria-labelledby="queries-title"><h2 id="queries-title">高度、碰撞和遮挡回答不同问题</h2>
+<p>一套高精度的可见网格没办法高效地回答所有空间问题：玩家需要知道脚下多高、前面能不能走；交通系统要判断车身是否碰到参与者；回放相机要避开遮挡。三类问题各需要不同的数据。</p>
+<p><code>Ground</code> 从道路三角形求高度。<code>Obstacles</code> 使用预生成位网格与固定占地区域限制移动。<code>Traffic.hit()</code> 判断教学车辆与参与者的接触。<code>CameraObstacles</code> 保存独立的低精度 CPU 轮廓，供回放相机查询。</p>
+<p>独立的查询数据带来了同步成本：模型或布局一改，碰撞网格就得重新生成。换来的是，即使树木被剔除或切换到低精度模型，通行和遮挡判断依然成立。</p>
+<p>坐标系也是同样的思路。逻辑沿用导入地图的 X、Z 与朝向约定，只有 <code>src/three/scene/coords.ts</code> 负责转换到 Three.js。要是每个模块各自翻转 X 轴，同一个编辑器坐标就可能指向不同的物体。</p>
+</section>
+<section id="time" aria-labelledby="time-title"><h2 id="time-title">信号与回放共用场景时间</h2>
+<p>如果用浏览器的真实时间切换信号，暂停、倒放或慢放时灯色就会和录下来的车辆对不上。<code>SignalCycle.at(seconds)</code> 接收的是场景时间，所以同一时刻永远得到同一相位。</p>
+<p>正常体验时传入 <code>run.time</code>，回放时传入 <code>replay.time</code>；车辆的停车规则和画面中的灯具读的是同一个周期。所有行人灯共用一个通行相位，与该路口已确认的行人专用相位一致。不过周期里的具体秒数是模拟设置，不能当作现场配时依据。</p>
+<p>回放保存的是参与者和车辆的状态，而不是重新跑一遍随机交通。<code>Recorder</code> 在有限的时间窗口内保留快照，<code>sample()</code> 在快照之间插值。这样回看的就是同一次接触，事故车的位置也和观察反馈一致。</p>
+<p>倒地动作和回放属于教学表达，按 <code>src/simulation/collision/crash.ts</code> 中预设的运动规则生成，并不是碰撞物理的重建。</p>
+</section>
+<section id="camera" aria-labelledby="camera-title"><h2 id="camera-title">回放相机把规划计算放在播放前</h2>
+<p>如果相机每帧都去搜索取景位置，遮挡查询和路线选择的开销就会落在播放过程中——复杂街区里一次慢查询就能拖长一帧。</p>
+<p>因此 <code>ReplayCamera</code> 在回放开始前就检查整段轨迹的主体、遮挡和相机运动，平滑后保存路径；播放时只沿保存好的路径插值。开启“减少动态效果”时改用稳定的远景，避免镜头运动引起不适。</p>
+<p>预规划会增加回放开始前的计算量。为此 <code>CameraObstacles</code> 让同一几何体的所有实例共享一份 CPU 射线索引，每个实例只保存自己的变换，避免重复构建。</p>
+<p>这个取舍把可预期的准备时间挪到开始之前，降低播放中的帧时波动。它不保证所有设备都能达到固定帧率，实际效果仍取决于回放长度、遮挡物和设备性能。</p>
+</section>
+<section id="rendering" aria-labelledby="rendering-title"><h2 id="rendering-title">渲染优化保持事件逻辑稳定</h2>
+<p>街区里绝大多数物体是静止的。<code>environmentInstances()</code> 对可复用资产做实例化，按空间块管理大场景，并用 LOD 减少远处细节；切换带有迟滞，避免在距离边界附近来回跳。</p>
+<p>静态物体的太阳阴影可以缓存复用。车辆、人物和自行车改用 <code>withBlobShadow()</code> 的软阴影，移动时就不必让整张阴影贴图失效——牺牲一些轮廓精度，换来稳定的绘制开销。</p>
+<p>目前街区在启动时一次性准备好高低精度资源，剔除只用来减少绘制量，并不按玩家位置下载资源。这样行走和回放都不用等网络，代价是首次加载时间和内存占用偏大。分块下载还得处理回放跨区、CPU 遮挡数据和资源释放，当前实现有意没有承担这部分复杂度。</p>
+<p>自适应分辨率能缓解 GPU 压力，却会干扰性能对比。要评估一项改动，应在固定视角和绘制尺寸下比较帧时、绘制调用和三角形数量，而不是只看 FPS——屏幕刷新率本身也会封顶可观察的帧率。报告字段见<a href="reference.html#rendering">性能接口参考</a>，历史测量保存在 <code>docs/art-and-performance.md</code>。</p>
+</section>
+<section id="editor" aria-labelledby="editor-title"><h2 id="editor-title">编辑器共享格式而不共享部署环境</h2>
+<p>GitHub Pages 只能提供静态文件，既不能写入用户的电脑，也不能连接 Quest。本地开发服务可以做到，但只对本机请求开放，并且只有找到 Unity 项目时才提供 API。</p>
+<p><code>src/editor/controller.ts</code> 只使用一套请求接口：在静态站点上由 <code>src/editor/store.ts</code> 转给浏览器存储，在本地由 <code>server/editor-api.mjs</code> 转给文件和设备操作。界面因此不必为每种保存方式各写一遍编辑逻辑。</p>
+<p>两种后端都读取本仓库的内置模板，而用户保存必须使用独立 ID。这样 <code>events/</code> 始终是内置事件唯一的修改来源，生成的模板不会被用户保存覆盖。</p>
+<p>场景格式由浏览器端自行维护：序列化会保留驾驶者和道路环境设置，同步时也不会丢失这些扩展。内置事件的车辆出发时间独立于参与者的进度。驾驶者模型及其局限见 <a href="../RATIONALE.md#events">RATIONALE.md</a>（英文）。</p>
+</section>
+      <nav class="pager" aria-label="上一篇与下一篇"><a class="prev" href="reference.html"><span>上一篇</span>参考</a><span></span></nav>
+      <footer class="page-footer"><span>Hikone Traffic Simulator · 开发文档</span><a href="#main">回到顶部 ↑</a></footer>
+    </main>
+  </div>
+</body>
+</html>

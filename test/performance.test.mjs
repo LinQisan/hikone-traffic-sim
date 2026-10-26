@@ -1,25 +1,37 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-const { registerModel, material: resolveMaterial } = await import('../src/world.js');
-const { instance } = await import('../src/vehicles.js');
-const { environmentInstances, LOD_FAR, LOD_NEAR } = await import('../src/environment-instances.js');
-const { PigmentPalette, pigmentOf } = await import('../src/style.js');
-const { placement } = await import('../src/coords.js');
-const { buildLight, ENVIRONMENT_CELLS } = await import('../src/world.js');
-const { packPigments, geometryBytes } = await import('../src/geometry-budget.js');
-const { webLayout } = await import('../src/web-layout.js');
-const { PerformanceProbe } = await import('../src/performance.js');
+const { registerModel, material: resolveMaterial } = await import('../src/three/scene/world.js');
+const { instance } = await import('../src/three/entities/vehicles.js');
+const { environmentInstances, LOD_FAR, LOD_NEAR } = await import('../src/three/scene/environment-instances.js');
+const { PigmentPalette, pigmentOf } = await import('../src/three/materials/style.js');
+const { placement } = await import('../src/three/scene/coords.ts');
+const { buildLight, ENVIRONMENT_CELLS } = await import('../src/three/scene/world.js');
+const { packPigments, geometryBytes } = await import('../src/three/scene/geometry-budget.js');
+const { webLayout } = await import('../src/world/generators/web-layout.js');
+const { PerformanceProbe } = await import('../src/three/renderer/PerformanceProbe.ts');
+const { withBlobShadow, alignBlobShadow, setSunDirection } = await import('../src/three/materials/blob-shadow.js');
+
+test('moving shadow pools retain their world offset and ground clearance under parent yaw and rider scaling', () => {
+  setSunDirection([1, -1, 1]);
+  const parent = new THREE.Group(), object = new THREE.Group();
+  parent.position.set(-5, 0.41, 7); parent.scale.setScalar(0.8); parent.add(object);
+  object.position.set(2, 0, 3);
+  withBlobShadow(object, 1.1, 2.2, 0.8);
+  const origin = new THREE.Vector3(), shadow = new THREE.Vector3();
+  for (const height of [0.9, 1.7, 2.1]) for (let i = 0; i < 12; i++) {
+    parent.rotation.y = i / 5; object.rotation.y = -i / 3; object.scale.setScalar(height);
+    alignBlobShadow(object);
+    object.getWorldPosition(origin); object.userData.blob.getWorldPosition(shadow);
+    shadow.sub(origin);
+    assert.ok(shadow.distanceTo(new THREE.Vector3(-0.8, 0.03, 0.8)) < 1e-12,
+      'the shadow stays on the same sun side at the same height as the object turns and scales');
+  }
+});
 
 test('benchmark reset excludes warmup again and samples current resources rather than stale details', () => {
   const element = { dataset: {} }, renderer = { info: { render: { calls: 3, triangles: 12 },
@@ -462,7 +474,7 @@ test('moving vehicles do not cast into the shadow map: they carry a shadow pool;
 });
 
 test('desktop resolution steps down on a slow GPU, recovers with headroom and does not oscillate', async () => {
-  const { AdaptiveResolution } = await import('../src/resolution.js');
+  const { AdaptiveResolution } = await import('../src/three/renderer/AdaptiveResolution.ts');
   const r = new AdaptiveResolution();
   const run = (fps, seconds, start) => { let changed = 0; for (let t = 0; t < seconds; t += 1 / fps) if (r.frame(1 / fps, start + t * 1000)) changed++; return changed; };
   run(30, 4, 0);

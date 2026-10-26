@@ -51,7 +51,7 @@
                     "z": 26.41
                 },
                 {
-                    "x": 51.95,
+                    "x": 49.2,
                     "z": 26.41
                 },
                 {
@@ -84,9 +84,7 @@
             "accident": false,
             "overrideYaw": false,
             "yaw": 0,
-            "launch": "meet",
-            "entrySpeedKmh": 36,
-            "meetOffsetSeconds": -1.4
+            "entrySpeedKmh": 36
         },
         {
             "name": "事故車 1",
@@ -151,9 +149,7 @@
             "accident": true,
             "overrideYaw": false,
             "yaw": 0,
-            "launch": "meet",
-            "entrySpeedKmh": 36,
-            "launchAfterTriggerSeconds": 3
+            "entrySpeedKmh": 36
         }
     ]
 }

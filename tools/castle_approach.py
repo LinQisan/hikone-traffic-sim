@@ -1,4 +1,4 @@
-"""Reviewed Kyobashi–Otemon buildings. Source outlines live in src/castle-approach.js.
+"""Reviewed Kyobashi–Otemon buildings. Source outlines live in src/world/generators/castle-approach.js.
 
 The same coordinates drive roads, terrain cuts, collision and the editor. Roof/facade heights
 are approximate visual masses, not a survey or a reconstruction of hidden building interiors.
@@ -18,7 +18,7 @@ _data = None
 def data():
     global _data
     if _data is None:
-        script = "import {APPROACH_DATA} from './src/castle-approach.js';console.log(JSON.stringify(APPROACH_DATA));"
+        script = "import {APPROACH_DATA} from './src/world/generators/castle-approach.js';console.log(JSON.stringify(APPROACH_DATA));"
         _data = json.loads(subprocess.check_output(['node', '--input-type=module', '-e', script], cwd=ROOT))
     return _data
 

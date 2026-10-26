@@ -2,7 +2,7 @@
 // node tools/check_routes.mjs [--dir events|data/scenarios|data/editor/templates]
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { BODY_SIZE, WHEELBASE, smoothRoute, carPose } from '../src/traffic.js';
+import { BODY_SIZE, WHEELBASE, smoothRoute, carPose } from '../src/simulation/traffic/Traffic.ts';
 
 /** A bounded driveway crossing is intentional in 07/08; travel along the pavement is not. */
 function driveway(scenario, vehicle, x, z) {

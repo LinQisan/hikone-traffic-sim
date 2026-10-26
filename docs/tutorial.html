@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="在本机启动开发服务，玩一次内置场景 builtin-01，看完事故回放和结果后回到标题页。">
+  <title>在本机跑通一次练习 · Hikone 开发文档</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="developer.css">
+  <script type="module" src="developer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Hikone 开发文档概览"><span class="brand-mark" aria-hidden="true">H</span><span class="brand-text">Hikone <span class="brand-label">开发文档</span></span></a>
+    <nav class="doc-tabs" aria-label="开发文档"><a href="index.html">概览</a><a href="tutorial.html" aria-current="page">教程</a><a href="how-to.html">操作指南</a><a href="reference.html">参考</a><a href="architecture.html">设计解释</a></nav>
+    <nav class="site-links" aria-label="站点导航"><a href="../">体验 <span aria-hidden="true">↗</span></a><a href="../editor/">编辑器 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <details class="contents" open>
+        <summary>本页目录 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="本页章节"><ol><li><a href="#before"><span>01</span> 准备工作</a></li><li><a href="#steps"><span>02</span> 练习与回放</a></li><li><a href="#next"><span>03</span> 接下来</a></li></ol></nav>
+      </details>
+      <p class="sidebar-note">源码核对于 <time datetime="2026-10-22">2026-10-22</time></p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="hero">
+        <p class="eyebrow"><span class="edition">教程</span></p>
+        <h1>在本机跑通一次练习</h1>
+        <p class="lead">大约十分钟。你会启动开发服务，玩一次内置场景 <code>builtin-01</code>，看完事故回放和结果，再回到标题页——确认整条流程在你的机器上是通的。</p>
+      </div>
+<section id="before" aria-labelledby="before-title"><h2 id="before-title">准备工作</h2>
+<p>你需要桌面版 Chrome、Node.js（22.19 及以上或 24 及以上），以及本仓库的本地副本。下文所有命令都在仓库根目录执行。</p>
+<p>我们要玩的是内置场景 <code>builtin-01</code>。故意不观察直接往前走，就会触发模拟事故，正好能把练习、回放和结果三个画面都走一遍。</p>
+</section>
+<section id="steps" aria-labelledby="steps-title"><h2 id="steps-title">练习与回放</h2>
+<p>按顺序完成以下七步。</p>
+<ol class="steps">
+<li><p><strong>启动本地服务。</strong>在终端运行以下命令。</p><div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>npm ci
+npm run dev</code></pre></div>
+<p>看到 <code>Local: http://127.0.0.1:8770/</code> 就说明启动成功，保持这个终端开着。如果该地址上已有服务在运行，直接进入下一步。</p></li>
+<li><p><strong>打开标题页。</strong>在 Chrome 中打开 <code>http://127.0.0.1:8770/</code>。</p>
+<p>加载完成后会看到标题菜单：左侧是体格设置和自由探索，右侧是场景列表和 <strong>練習を始める</strong> 按钮。</p></li>
+<li><p><strong>选择事件。</strong>在 <strong>横断歩道・交差点</strong> 分组中选择 <strong>01 手前の車線を右から来る車</strong>。</p>
+<p>选中的卡片会变成浅蓝色。</p></li>
+<li><p><strong>开始练习。</strong>选择 <strong>練習を始める</strong>。</p>
+<p>画面切换到京桥街区，左上角显示当前场景名称。</p></li>
+<li><p><strong>触发事故演示。</strong>保持初始朝向，按住 <kbd>W</kbd> 向前走。</p>
+<p>与车辆接触后，画面先播放倒地过程，随后进入 <strong>事故のリプレイ / Accident replay</strong>。这时可以松开 <kbd>W</kbd>。</p></li>
+<li><p><strong>查看结果。</strong>等待回放停在最后一帧。</p>
+<p>按钮变成 <strong>結果へ進む / Next</strong>，点击它。结果页会显示 <strong>事故が起きました / What happened</strong> 以及这次的观察反馈。</p></li>
+<li><p><strong>回到标题页。</strong>选择 <strong>タイトルへ / Title (Enter)</strong>。</p>
+<p>标题菜单重新出现。到这里，你已经在本机完整跑通了一次练习与回放。</p></li>
+</ol>
+</section>
+<section id="next" aria-labelledby="next-title"><h2 id="next-title">接下来</h2>
+<p>想改这个场景里的车或路线，读<a href="how-to.html">修改一个内置事件</a>；想了解回放如何录制和插值，查<a href="reference.html#replay">录制与回放参考</a>。</p>
+</section>
+      <nav class="pager" aria-label="上一篇与下一篇"><a class="prev" href="index.html"><span>上一篇</span>概览</a><a class="next" href="how-to.html"><span>下一篇</span>操作指南</a></nav>
+      <footer class="page-footer"><span>Hikone Traffic Simulator · 开发文档</span><a href="#main">回到顶部 ↑</a></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// Scenario editor API, served by ../serve.mjs next to the static site when the VRLearn Unity
+// Scenario editor API, mounted by ../vite.config.js beside the Vite site when the VRLearn Unity
 // project is on this computer (VRLEARN_ROOT, default ../VRLearn): it reads and writes the
 // project's custom Scenarios/ files, asks the open Unity Editor to play a file and copies scenarios onto
 // a Quest through adb. Without the project (or on GitHub Pages) the editor keeps its files in the
@@ -23,7 +23,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { normalize, serialize, validate, ID_PATTERN } from '../src/shared/scenario.js';
+import { normalize, parseScenario, serialize, validate, ID_PATTERN } from '../src/simulation/core/scenario.ts';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const DATA = path.join(here, '..', 'data');
@@ -206,7 +206,7 @@ export async function handle(req, res) {
   const url = new URL(req.url, 'http://localhost');
   const p = decodeURIComponent(url.pathname);
   if (!p.startsWith('/api/')) return false;
-  // phones on the LAN (serve.mjs --host 0.0.0.0) get the browser-only editor
+  // phones on the LAN (npm run dev -- --host 0.0.0.0) get the browser-only editor
   if (!available || !LOOPBACK.has(req.socket.remoteAddress)) { send(res, 404, { error: 'no editor server' }); return true; }
   // another site open in the browser must not write files or run adb
   const origin = req.headers.origin;
@@ -214,7 +214,8 @@ export async function handle(req, res) {
   try {
     await route(req, res, url, p);
   } catch (error) {
-    send(res, error.status ?? 500, { error: String(error.message ?? error) });
+    send(res, error.status ?? 500, { error: String(error.message ?? error),
+      ...(error.code === 'INVALID_SCENARIO' ? { code: error.code, problems: error.problems } : {}) });
   }
   return true;
 }
@@ -236,7 +237,7 @@ async function route(req, res, url, p) {
     const id = match[1];
     if (!ID_PATTERN.test(id)) return send(res, 400, { error: 'id は英小文字・数字・-・_ の 1〜40 文字にしてください。' });
     if (id.startsWith('builtin-')) return send(res, 400, { error: '"builtin-" で始まる id はひな形用です。別の id にしてください。' });
-    const scenario = normalize(JSON.parse(await readBody(req)));
+    const scenario = parseScenario(await readBody(req));
     if (scenario.id !== id) return send(res, 400, { error: 'id がファイル名と一致しません。' });
     const text = serialize(scenario);
     await fs.writeFile(path.join(SCENARIOS, `${id}.json`), text, 'utf8');

@@ -32,6 +32,18 @@ test('event-only rebuild needs no Unity project and preserves custom scenarios a
     assert.equal(await fs.readFile(path.join(scenarios, custom.file), 'utf8'), 'custom scenario contents');
     assert.equal(await fs.readFile(path.join(root, 'data', 'map.json'), 'utf8'), 'local map contents');
     assert.equal(await fs.readFile(path.join(root, 'src', 'shared', 'scenario.js'), 'utf8'), 'local scenario model');
+    const unity = path.join(root, 'fake-unity');
+    await fs.mkdir(path.join(unity, 'ProjectSettings'), { recursive: true });
+    for (const file of ['Assets/_Project/Hikone/Layout/hikone_layout.json', 'Art/Hikone/road_tiles_geometry.json',
+      'Scenarios/maps/hikone-kyobashi/map.json', 'Scenarios/maps/hikone-kyobashi/map.png', 'ScenarioModel/scenario.js']) {
+      const target = path.join(unity, file);
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.writeFile(target, file.endsWith('.json') ? '{}' : 'upstream content');
+    }
+    await promisify(execFile)(process.execPath, [path.join(root, 'tools', 'sync.mjs')],
+      { env: { ...process.env, VRLEARN_ROOT: unity } });
+    assert.equal(await fs.readFile(path.join(root, 'src', 'shared', 'scenario.js'), 'utf8'), 'local scenario model',
+      'a full sync must preserve browser driver/environment extensions too');
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }

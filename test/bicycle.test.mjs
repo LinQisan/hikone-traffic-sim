@@ -1,17 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { createBicycle, WHEEL_RADIUS, CRANK_RADIUS } = await import('../src/bicycle.js');
-const { createReplayCyclist, ridingTrack, sampleRide } = await import('../src/replay-cyclist.js');
-const { Replay } = await import('../src/replay.js');
-const { Player } = await import('../src/player.js');
+const { createBicycle, WHEEL_RADIUS, CRANK_RADIUS } = await import('../src/three/geometry/bicycle.js');
+const { createReplayCyclist, ridingTrack, sampleRide } = await import('../src/three/entities/replay-cyclist.js');
+const { Replay } = await import('../src/three/entities/replay.js');
+const { Player } = await import('../src/three/controls/Player.ts');
 
 function budget(root) {
   let triangles = 0, meshes = 0;
@@ -137,9 +131,9 @@ test('live bicycle mode displays and rolls the bike, records travel yaw and rese
 });
 
 test('real-world sizes: an adult rides a 26-inch city bicycle, children a proportionally smaller one', async () => {
-  const { createReplayCyclist } = await import('../src/replay-cyclist.js');
-  const { SADDLE, GRIPS } = await import('../src/bicycle.js');
-  const { EYE_RATIO } = await import('../src/player.js');
+  const { createReplayCyclist } = await import('../src/three/entities/replay-cyclist.js');
+  const { SADDLE, GRIPS } = await import('../src/three/geometry/bicycle.js');
+  const { EYE_RATIO } = await import('../src/three/controls/Player.ts');
   const size = h => { const c = createReplayCyclist(h, {}), H = h / 100, k = c.bikeScale;
     const out = { wheel: 2 * WHEEL_RADIUS * H * k, saddle: SADDLE.y * H * k, grips: GRIPS[0].y * H * k, eye: c.eyeHeight * H };
     c.dispose(); return out; };

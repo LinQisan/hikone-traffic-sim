@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="彦根京桥交通安全练习工具的中文开发文档：上手教程、操作指南、接口参考与设计解释。">
+  <title>概览 · Hikone 开发文档</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="developer.css">
+  <script type="module" src="developer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Hikone 开发文档概览"><span class="brand-mark" aria-hidden="true">H</span><span class="brand-text">Hikone <span class="brand-label">开发文档</span></span></a>
+    <nav class="doc-tabs" aria-label="开发文档"><a href="index.html" aria-current="page">概览</a><a href="tutorial.html">教程</a><a href="how-to.html">操作指南</a><a href="reference.html">参考</a><a href="architecture.html">设计解释</a></nav>
+    <nav class="site-links" aria-label="站点导航"><a href="../">体验 <span aria-hidden="true">↗</span></a><a href="../editor/">编辑器 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <details class="contents" open>
+        <summary>本页目录 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="本页章节"><ol><li><a href="#documents"><span>01</span> 从哪里开始</a></li><li><a href="#scope"><span>02</span> 项目是什么</a></li><li><a href="#repository-docs"><span>03</span> 仓库里的其他文档</a></li><li><a href="#site"><span>04</span> 这套文档如何维护</a></li></ol></nav>
+      </details>
+      <p class="sidebar-note">源码核对于 <time datetime="2026-10-22">2026-10-22</time></p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="hero">
+        <p class="eyebrow"><span class="edition">概览</span></p>
+        <h1>Hikone 开发文档</h1>
+        <p class="lead">彦根京桥交通安全练习工具的开发资料。第一次接触项目，从教程开始；要完成具体任务，看操作指南；查字段和接口，翻参考；想知道为什么这样设计，读设计解释。</p>
+      </div>
+<section id="documents" aria-labelledby="documents-title"><h2 id="documents-title">从哪里开始</h2>
+<p>四篇文档各管一件事，按你现在要做的事挑一篇。</p>
+<div class="link-grid">
+<a href="tutorial.html"><strong>教程 <span aria-hidden="true">→</span></strong><b>在本机跑通一次练习</b><span>启动开发服务，玩一个内置场景，看完事故回放和结果。</span></a>
+<a href="how-to.html"><strong>操作指南 <span aria-hidden="true">→</span></strong><b>修改一个内置事件</b><span>改事件源文件、重新生成数据，再检查路线和教学行为。</span></a>
+<a href="reference.html"><strong>参考 <span aria-hidden="true">→</span></strong><b>运行时与数据接口</b><span>源码职责、状态机、场景字段、坐标、信号相位和本地 API。</span></a>
+<a href="architecture.html"><strong>设计解释 <span aria-hidden="true">→</span></strong><b>交通逻辑为何与画面分离</b><span>逻辑、渲染、碰撞、回放和编辑器之间的依赖与取舍。</span></a>
+</div>
+</section>
+<section id="scope" aria-labelledby="scope-title"><h2 id="scope-title">项目是什么</h2>
+<p>Hikone Traffic Simulator 是一个在浏览器里运行的交通安全练习工具。舞台是彦根京桥一带：参与者可以步行或骑自行车自由探索，也可以单独练习 10 个内置事故场景或自定义场景；每次练习结束后有事故回放和观察反馈。项目不收集任何实验数据。</p>
+<p>技术栈是 React + strict TypeScript + 原生 Three.js + Vite。运行 <code>npm ci</code> 安装依赖，<code>npm run dev</code> 启动开发服务（同时提供编辑器 API），<code>npm run build</code> 生成可部署到任意子目录的 <code>dist/</code>。街区模型在运行时由 <code>models/</code> 中的建模指令生成（入口为 <code>src/three/assets/models.js</code>），不加载 GLB。</p>
+<p>项目最初沿用 VRLearn 的地图和场景格式，如今事件、道路修正和编辑器模板都由本仓库维护，不要求与 VRLearn 保持一致。网页面向桌面和触屏设备，VR 体验由 Unity 项目提供。</p>
+</section>
+<section id="repository-docs" aria-labelledby="repository-docs-title"><h2 id="repository-docs-title">仓库里的其他文档</h2>
+<p>每条事实只记录在一个地方。下面这些文件与本站互补：</p>
+<dl class="file-index">
+<div><dt><code>README.md</code></dt><dd>面向使用者的日文说明：如何启动、如何操作、如何使用编辑器。</dd></div>
+<div><dt><code>AGENTS.md</code></dt><dd>开发规则（英文）：数据来源、约束，以及每类改动需要跑哪些检查。</dd></div>
+<div><dt><code>RATIONALE.md</code></dt><dd>设计理由（英文）：事件模型、驾驶者行为、回放等为何如此设计。</dd></div>
+<div><dt><code>DESIGN.md</code></dt><dd>界面设计规范（英文）：颜色、字号、组件与无障碍要求。</dd></div>
+<div><dt><code>docs/art-and-performance.md</code></dt><dd>模型生成、地图依据与性能测量记录（英文）。</dd></div>
+<div><dt><code>docs/event-review.md</code></dt><dd>内置事件的逐一检查记录（英文）。</dd></div>
+</dl>
+</section>
+<section id="site" aria-labelledby="site-title"><h2 id="site-title">这套文档如何维护</h2>
+<p><code>docs/</code> 路由对应 <code>docs/index.html</code>。每篇文档都是独立的静态 HTML，共用 <code>docs/developer.css</code> 与 <code>docs/developer.js</code>，不加载 Three.js、街区模型或编辑器 API，打开很快。</p>
+<p>脚本只做渐进增强：窄屏时折叠目录、高亮当前章节、为代码块加复制按钮。关闭 JavaScript 后正文和锚点照常可用。站内链接一律使用相对路径，以便部署在 GitHub Pages 的仓库子路径下。</p>
+<p>参考页中的场景默认值、信号相位和录制常量由 <code>tools/build_developer_reference.mjs</code> 直接从源码生成，不要手改。命令见<a href="reference.html#documentation">文档维护参考</a>。</p>
+</section>
+      <nav class="pager" aria-label="上一篇与下一篇"><span></span><a class="next" href="tutorial.html"><span>下一篇</span>教程</a></nav>
+      <footer class="page-footer"><span>Hikone Traffic Simulator · 开发文档</span><a href="#main">回到顶部 ↑</a></footer>
+    </main>
+  </div>
+</body>
+</html>

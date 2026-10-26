@@ -5,17 +5,15 @@ import { registerHooks } from 'node:module';
 const previewLoader = 'data:text/javascript,export const model = name => globalThis.__propPreviewLoad(name);';
 const signalPreviewLoader = 'data:text/javascript,export const buildSignals = (...args) => globalThis.__signalPreviewBuild(...args);';
 registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  if (specifier === './world.js' && context.parentURL?.endsWith('/src/prop-review.js'))
+  if (specifier === './world.js' && context.parentURL?.endsWith('/src/three/scene/prop-review.js'))
     return { url: previewLoader, shortCircuit: true };
-  if (specifier === './signals.js' && context.parentURL?.endsWith('/src/prop-review.js'))
+  if (specifier === './signals.js' && context.parentURL?.endsWith('/src/three/scene/prop-review.js'))
     return { url: signalPreviewLoader, shortCircuit: true };
   return next(specifier, context);
 } });
 const THREE = await import('three');
-const { loadedModel, registerModel } = await import('../src/world.js');
-const { propReview } = await import('../src/prop-review.js');
+const { loadedModel, registerModel } = await import('../src/three/scene/world.js');
+const { propReview } = await import('../src/three/scene/prop-review.js');
 
 test('standalone inspection awaits an uncached prop before creating its render meshes', async () => {
   const requests = [], geometry = new THREE.BoxGeometry(), material = new THREE.MeshLambertMaterial({ name: 'PreviewSurface' });

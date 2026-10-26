@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="修改内置事件的源文件，重新生成模拟器与编辑器使用的数据，并检查路线和教学行为。">
+  <title>修改一个内置事件 · Hikone 开发文档</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="developer.css">
+  <script type="module" src="developer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Hikone 开发文档概览"><span class="brand-mark" aria-hidden="true">H</span><span class="brand-text">Hikone <span class="brand-label">开发文档</span></span></a>
+    <nav class="doc-tabs" aria-label="开发文档"><a href="index.html">概览</a><a href="tutorial.html">教程</a><a href="how-to.html" aria-current="page">操作指南</a><a href="reference.html">参考</a><a href="architecture.html">设计解释</a></nav>
+    <nav class="site-links" aria-label="站点导航"><a href="../">体验 <span aria-hidden="true">↗</span></a><a href="../editor/">编辑器 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <details class="contents" open>
+        <summary>本页目录 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="本页章节"><ol><li><a href="#before"><span>01</span> 先找对文件</a></li><li><a href="#edit"><span>02</span> 修改并重新生成</a></li><li><a href="#verify"><span>03</span> 检查事件行为</a></li><li><a href="#review"><span>04</span> 提交前检查</a></li></ol></nav>
+      </details>
+      <p class="sidebar-note">源码核对于 <time datetime="2026-10-22">2026-10-22</time></p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="hero">
+        <p class="eyebrow"><span class="edition">操作指南</span></p>
+        <h1>修改一个内置事件</h1>
+        <p class="lead">以 <code>builtin-01</code> 为例：改源文件，重新生成模拟器和编辑器使用的数据，再确认路线和教学行为没有被改坏。</p>
+      </div>
+<section id="before" aria-labelledby="before-title"><h2 id="before-title">先找对文件</h2>
+<p>下文以 <code>builtin-01</code> 为例，修改其他事件时换成对应的 ID 即可。</p>
+<div class="callout amber"><strong>只改 <code>events/</code></strong><p><code>events/</code> 是内置事件的唯一源文件；<code>data/scenarios/</code> 和 <code>data/editor/templates/</code> 都是生成结果，手改会在下次生成时被覆盖。也不要用编辑器保存来代替：编辑器只保证保留已支持的字段，而且用户保存不能覆盖 <code>builtin-*</code> 模板。</p></div>
+<p>只改事件时，使用带 <code>--events-only</code> 的同步命令。不带该参数的完整同步会从 Unity 项目导入几何与场景格式，需要逐项审阅差异。</p>
+</section>
+<section id="edit" aria-labelledby="edit-title"><h2 id="edit-title">修改并重新生成</h2>
+<p>在仓库根目录依次执行：</p>
+<ol class="steps">
+<li><p>编辑 <code>events/builtin-01.json</code>。</p><p>字段含义见<a href="reference.html#scenario">场景格式</a>，驾驶者等浏览器扩展字段见<a href="reference.html#traffic">车辆调度与信号</a>。</p></li>
+<li><p>重新生成浏览器事件、编辑器模板和车线提示。</p><div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>node tools/sync.mjs --events-only</code></pre></div></li>
+<li><p>查看生成结果的差异，确认只有预期的改动。</p><div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>git diff -- events/builtin-01.json data/scenarios/ data/editor/templates/ data/editor/lanes.json</code></pre></div></li>
+</ol>
+</section>
+<section id="verify" aria-labelledby="verify-title"><h2 id="verify-title">检查事件行为</h2>
+<p>按改动范围选择检查，不必每次都跑全部。</p>
+<ol class="steps">
+<li><p>运行该事件的教学行为检查（谨慎通过能到达终点、车辆出现时被遮挡或位于远处）。</p><div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>node tools/check_events.mjs builtin-01</code></pre></div>
+<p>检查失败时，修正事件后回到上一节重新生成。</p></li>
+<li><p>改了车辆路线的话，再跑路线检查和路线测试。</p><div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>node tools/check_routes.mjs
+node --test test/routes.test.mjs</code></pre></div>
+<p>如果还动了共享时序或接触判定，运行完整回归。</p><div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>npm test</code></pre></div></li>
+<li><p>在<a href="../">体验首页</a>选择编号 <strong>01</strong> 的场景，亲自玩两遍：</p>
+<ul><li>不观察、直接往前走——应当会遇到该事件的车辆；</li><li>在路缘停下左右确认——应当能看到来车，等车过后安全到达终点。</li></ul></li>
+<li><p>在<a href="../editor/">场景编辑器</a>打开对应的内置模板，确认起点、终点和车辆路线与源文件一致。</p></li>
+</ol>
+</section>
+<section id="review" aria-labelledby="review-title"><h2 id="review-title">提交前检查</h2>
+<p>行为确认无误后，检查差异和空白错误：</p>
+<div class="code-block"><div class="code-heading">仓库根目录</div><pre tabindex="0"><code>git diff --check
+git diff --stat</code></pre></div>
+<p>在变更说明里写清：为什么改、跑了哪些检查、哪些设备没有验证。</p>
+<p>如果改动涉及共享流程或依赖，或者你拿不准影响范围，运行 <code>npm run check</code>：它依次执行类型检查、生成文档核对、完整测试和生产构建，部署 CI 用的也是这个入口。局部改动仍按 <code>AGENTS.md</code> 选最小检查即可。</p>
+<div class="callout amber"><strong>推送 <code>main</code> 即部署</strong><p>推送到 <code>main</code> 会通过 GitHub Actions 发布站点，推送前务必完成适用的检查。</p></div>
+</section>
+      <nav class="pager" aria-label="上一篇与下一篇"><a class="prev" href="tutorial.html"><span>上一篇</span>教程</a><a class="next" href="reference.html"><span>下一篇</span>参考</a></nav>
+      <footer class="page-footer"><span>Hikone Traffic Simulator · 开发文档</span><a href="#main">回到顶部 ↑</a></footer>
+    </main>
+  </div>
+</body>
+</html>

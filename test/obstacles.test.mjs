@@ -1,18 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { Obstacles, encodeBits, decodeBits } = await import('../src/obstacles.js');
-const { Player, BODY_RADIUS } = await import('../src/player.js');
-const S = await import('../src/shared/scenario.js');
-const { webLayout } = await import('../src/web-layout.js');
+const { Obstacles, encodeBits, decodeBits } = await import('../src/simulation/collision/Obstacles.ts');
+const { Player, BODY_RADIUS } = await import('../src/three/controls/Player.ts');
+const S = await import('../src/simulation/core/scenario.ts');
+const { webLayout } = await import('../src/world/generators/web-layout.js');
 
 const read = name => JSON.parse(fs.readFileSync(new URL('../data/' + name, import.meta.url)));
 const collision = read('collision.json');
@@ -161,7 +155,7 @@ test('the real town: a valid custom spawn on the pavement against a house front 
 });
 
 test('the signal posts are solid but stand clear of every scenario\'s way to the goal', async () => {
-  const { signalRigs, POLE } = await import('../src/signal-layout.js');
+  const { signalRigs, POLE } = await import('../src/three/scene/signal-layout.js');
   const posts = new Obstacles(null);
   posts.setFixed(signalRigs().map(r => ({ x: r.pole.x, z: r.pole.z, yaw: 0, size: [POLE[r.kind].base * 2, POLE[r.kind].base * 2] })));
   assert.equal(posts.fixed.length, 5);

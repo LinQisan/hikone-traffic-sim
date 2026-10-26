@@ -10,19 +10,13 @@
 // height (eaves, tree crowns, the gatehouses' upper floors) does not block. Parked vehicles of a
 // scenario are added at run time (src/obstacles.js); the map's invisible walls stay in map.json.
 import fs from 'node:fs';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-const { placement } = await import('../src/coords.js');
-const { Ground } = await import('../src/ground.js');
-const { CELL, BAND_LOW, BAND_HIGH, encodeBits } = await import('../src/obstacles.js');
-const { webLayout } = await import('../src/web-layout.js');
+const { buildNativeModel } = await import('../src/three/assets/models.js');
+const { placement } = await import('../src/three/scene/coords.ts');
+const { Ground } = await import('../src/simulation/collision/Ground.ts');
+const { CELL, BAND_LOW, BAND_HIGH, encodeBits } = await import('../src/simulation/collision/Obstacles.ts');
+const { webLayout } = await import('../src/world/generators/web-layout.js');
 
 const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
@@ -46,16 +40,11 @@ const mark = (x, z) => {
   bits[k >> 3] |= 1 << (k & 7);
 };
 
-const loader = new GLTFLoader();
 const cache = new Map();
 async function parts(name) {
   if (!cache.has(name)) {
-    const bytes = fs.readFileSync(new URL(`models/impressionist/${name}.glb`, data));
-    const gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
-    gltf.scene.updateMatrixWorld(true);
-    const list = [];
-    gltf.scene.traverse(o => { if (o.isMesh) list.push({ geometry: o.geometry,
-      material: o.material.name, matrix: o.matrixWorld.clone() }); });
+    const program = JSON.parse(fs.readFileSync(new URL(`../models/${name}.json`, data)));
+    const list = buildNativeModel(program).map(part => ({ ...part, material: part.material.name }));
     cache.set(name, list);
   }
   return cache.get(name);

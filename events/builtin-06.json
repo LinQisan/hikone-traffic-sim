@@ -59,7 +59,7 @@
                     "z": 26.41
                 },
                 {
-                    "x": 51.95,
+                    "x": 49.2,
                     "z": 26.41
                 },
                 {
@@ -92,10 +92,7 @@
             "accident": true,
             "overrideYaw": false,
             "yaw": 0,
-            "launch": "meet",
-            "entrySpeedKmh": 65,
-            "noStop": true,
-            "hold": true
+            "noStop": true
         }
     ]
 }

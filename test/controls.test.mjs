@@ -1,15 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { Player, FALL_SECONDS } = await import('../src/player.js');
-const { stickVector } = await import('../src/touch-controls.js');
+const { Player, FALL_SECONDS } = await import('../src/three/controls/Player.ts');
+const { stickVector } = await import('../src/three/controls/TouchControls.ts');
+const { Recorder } = await import('../src/simulation/metrics/analysis.ts');
 
 function makePlayer() {
   const original = globalThis.addEventListener;
@@ -18,6 +13,23 @@ function makePlayer() {
     return new Player(new THREE.PerspectiveCamera(), { domElement: { addEventListener() {} } }, { walls: [] }, { heightAt: () => 0.01 });
   } finally { globalThis.addEventListener = original; }
 }
+
+test('recording can reuse a head pose without mutating saved samples or retaining bicycle heading in walking mode', () => {
+  const player = makePlayer(), recorder = new Recorder(), pose = {};
+  try {
+    player.place(1, 2, 30, 170, 'bicycle');
+    assert.equal(player.head(pose), pose);
+    recorder.capture(0, pose, []);
+    const snapshot = player.head();
+    player.place(3, 4, 60, 170, 'walking');
+    assert.equal(player.head(pose), pose);
+    recorder.capture(0.1, pose, []);
+    assert.deepEqual(recorder.frames[0].head, { x: 1, z: 2, yaw: 30, rideYaw: 30 });
+    assert.deepEqual(recorder.frames[1].head, { x: 3, z: 4, yaw: 60 });
+    assert.deepEqual(snapshot, recorder.frames[0].head, 'the default API still returns an independent snapshot');
+    assert.notEqual(player.head(), player.head());
+  } finally { player.bicycle.dispose(); }
+});
 
 test('the touch stick gives a clamped [strafe, forward] vector; up on screen walks forward', () => {
   assert.deepEqual(stickVector(0, 0, 50), [0, 0]);

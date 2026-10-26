@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { AmbientMotion } from '../src/ambient-motion.js';
+import { AmbientMotion } from '../src/three/materials/ambient-motion.js';
 
 test('ambient motion freezes in place for reduced motion and resumes without a jump', () => {
   const motion = new AmbientMotion(), uniform = motion.time;

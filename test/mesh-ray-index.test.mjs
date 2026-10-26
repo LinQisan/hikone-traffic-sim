@@ -1,16 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { indexMeshRays } = await import('../tools/mesh-ray-index.mjs');
+const { indexMeshRays } = await import('../src/three/camera/mesh-ray-index.js');
 
 for (const indexed of [true, false]) for (const side of [THREE.FrontSide, THREE.BackSide, THREE.DoubleSide]) {
-  test(`offline ray index retains exact hits, faces and attributes: indexed=${indexed}, side=${side}`, () => {
+  test(`static ray index retains exact hits, faces and attributes: indexed=${indexed}, side=${side}`, () => {
     const source = new THREE.TorusKnotGeometry(1, .35, 64, 8);
     const geometry = indexed ? source : source.toNonIndexed();
     geometry.setDrawRange(6, (geometry.index?.count ?? geometry.attributes.position.count) - 12);
@@ -46,7 +41,7 @@ for (const indexed of [true, false]) for (const side of [THREE.FrontSide, THREE.
   });
 }
 
-test('offline indexing leaves deformable and multi-material raycasting unchanged', () => {
+test('static indexing leaves deformable and multi-material raycasting unchanged', () => {
   const root = new THREE.Group(), geometry = new THREE.SphereGeometry(1, 24, 16);
   const multiple = new THREE.Mesh(geometry, [new THREE.MeshBasicMaterial(), new THREE.MeshBasicMaterial()]);
   const morph = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial()); morph.morphTargetInfluences = [1];

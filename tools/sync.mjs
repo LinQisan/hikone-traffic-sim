@@ -1,5 +1,4 @@
-// Copies the data the web port needs from the VRLearn Unity project into ./data (and the shared
-// scenario model, VRLearn's ScenarioModel/scenario.js, into ./src/shared). The scenario editor
+// Copies upstream assets into ./data, retaining the browser-owned scenario model. The scenario editor
 // (./editor) uses the map image and this project's events in data/editor/templates. Run after changing the environment, scenarios or the map:
 //   node tools/sync.mjs            (VRLEARN_ROOT overrides ../VRLearn)
 //   node tools/sync.mjs --events-only  (rebuild browser events and editor templates without Unity)
@@ -29,7 +28,7 @@ if (!eventsOnly) {
   copy('Art/Hikone/road_tiles_geometry.json', path.join(data, 'road_tiles.json'));
   copy('Scenarios/maps/hikone-kyobashi/map.json', path.join(data, 'map.json'));
   copy('Scenarios/maps/hikone-kyobashi/map.png', path.join(data, 'map.png'));
-  copy('ScenarioModel/scenario.js', path.join(web, 'src', 'shared', 'scenario.js'));
+  // Keep browser driver/environment extensions; Unity's optional bridge ignores those fields.
 }
 
 // One built-in authority for both the simulator and the editor; never restore Unity's old routes.
@@ -74,5 +73,5 @@ fs.writeFileSync(path.join(scenarioDir, 'index.json'), JSON.stringify(list, null
 
 const missing = ['scene.json', 'models/HK_RoadSurf_Cross.glb', 'models/WEB_Sedan.glb'].filter(f => !fs.existsSync(path.join(data, f)));
 console.log(eventsOnly ? `rebuilt from events/: ${templateNames.length} browser events and editor templates` :
-  `synced assets from ${root}; ${list.length} scenarios, ${templateNames.length} browser event templates, shared/scenario.js`);
+  `synced assets from ${root}; ${list.length} scenarios, ${templateNames.length} browser event templates`);
 if (missing.length) console.warn('still missing (run the Unity exporter / tools/export_models.py):', missing.join(', '));

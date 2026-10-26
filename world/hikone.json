@@ -1,0 +1,79 @@
+{
+  "format": "hikone-world",
+  "version": 1,
+  "id": "hikone-kyobashi-corridor",
+  "map": "hikone-kyobashi",
+  "note": "The two midblock trucks are those of builtin-04 as practice places them (src/parked-layout.js); eastbound traffic keeps to z 28.55 beside them (builtin-09 authors 28.4, which route smoothing flattens toward 28.2). Open exploration of the Kyobashi / Route 25 corridor. Routes are references into events/builtin-*.json; nothing here copies or edits them.",
+  "starts": {
+    "walking": { "x": 40, "z": 14, "yaw": 0 },
+    "bicycle": { "x": -68.54, "z": 22.77, "yaw": 270 }
+  },
+  "recovery": [
+    { "x": 40, "z": 14 }, { "x": 45.3, "z": 35.4 }, { "x": 62.62, "z": 20.05 }, { "x": 76, "z": 20.05 },
+    { "x": 63.63, "z": 31.77 }, { "x": -37.54, "z": 21.6 }, { "x": -68.54, "z": 22.77 }, { "x": -114.62, "z": 23.57 }
+  ],
+  "maxCars": 24,
+  "redEntryResponse": {
+    "flows": ["east", "west", "north", "south"],
+    "speedKmh": 55, "reactionTimeSeconds": 2.5, "maxBrakingMps2": 3,
+    "maxVehicles": 2, "cooldownSeconds": 8, "timeoutSeconds": 0.75
+  },
+  "hiddenAdmission": { "farMeters": 75, "nearMeters": 25, "viewHalfAngle": 80, "stopLineMargin": 35, "searchMeters": 320 },
+  "noAdmission": [
+    { "x": 32, "z": 26, "width": 34, "depth": 26, "yaw": 0 }
+  ],
+  "props": {
+    "parked": [
+      { "kind": "truck", "model": "HK_Truck_Large", "x": 55.348506927490234, "z": 23.65, "yaw": 0, "source": "builtin-04 (src/parked-layout.js)" },
+      { "kind": "truck", "model": "HK_Truck_Medium", "x": 68.30677795410156, "z": 23.65, "yaw": 0, "source": "builtin-04 (src/parked-layout.js)" }
+    ],
+    "slots": [
+      { "id": "parking-exit", "event": "builtin-07", "vehicle": 2 }
+    ]
+  },
+  "flows": [
+    { "id": "east", "name": "東行きの車の流れ", "speedKmh": 36, "delay": 1, "repeat": [3, 5],
+      "route": [{ "event": "builtin-07", "vehicle": 0, "to": 1 }, { "event": "builtin-01", "vehicle": 0, "from": 2, "to": 2 },
+        { "points": [{ "x": 40, "z": 28.55 }, { "x": 80.51, "z": 28.55 }] }, { "event": "builtin-09", "vehicle": 1, "from": 4 }] },
+    { "id": "west", "name": "西行きの車の流れ", "speedKmh": 36, "delay": 3, "repeat": [3, 5],
+      "route": [{ "event": "builtin-01", "vehicle": 1, "to": 4 }, { "event": "builtin-06", "vehicle": 0 }] },
+    { "id": "north", "name": "北行きの車の流れ", "speedKmh": 36, "delay": 2, "repeat": [6, 9],
+      "route": [{ "event": "builtin-02", "vehicle": 0 }] },
+    { "id": "south", "name": "南行きの車の流れ", "speedKmh": 36, "delay": 6, "repeat": [6, 9],
+      "route": [{ "event": "builtin-02", "vehicle": 1 }] },
+    { "id": "north-west", "name": "北から西へ曲がる車の流れ", "speedKmh": 36, "delay": 9, "repeat": [9, 14],
+      "route": [{ "event": "builtin-02", "vehicle": 0, "to": 4 }, { "event": "builtin-07", "vehicle": 1 }] }
+  ],
+  "events": [
+    { "id": "builtin-01", "group": "kyobashi-east-crossing", "modes": ["walking"],
+      "zone": { "x": 44.5, "z": 18, "width": 8, "depth": 8, "yaw": 0 }, "heading": 0,
+      "candidates": [{ "flow": "west", "vehicle": 2, "anchor": { "x": 78, "z": 26.3 } }] },
+    { "id": "builtin-02", "group": "kyobashi-east-crossing", "modes": ["walking"],
+      "zone": { "x": 44.5, "z": 18, "width": 8, "depth": 8, "yaw": 0 }, "heading": 0,
+      "candidates": [{ "vehicle": 2, "prefix": "north" }] },
+    { "id": "builtin-05", "group": "kyobashi-east-crossing", "modes": ["walking"],
+      "zone": { "x": 44.8, "z": 35, "width": 9, "depth": 6, "yaw": 0 }, "heading": 180,
+      "candidates": [{ "vehicle": 2, "prefix": "south" }] },
+    { "id": "builtin-03", "group": "midblock", "modes": ["walking"],
+      "zone": { "x": 76, "z": 21, "width": 6, "depth": 4, "yaw": 0 }, "heading": 0,
+      "candidates": [{ "vehicle": 0, "prefix": "east" }, { "vehicle": 1, "prefix": "east" }] },
+    { "id": "builtin-04", "group": "midblock", "modes": ["walking"],
+      "zone": { "x": 62.6, "z": 21, "width": 7, "depth": 4, "yaw": 0 }, "heading": 0,
+      "candidates": [{ "flow": "west", "vehicle": 0, "anchor": { "x": 76, "z": 26.3 } }] },
+    { "id": "builtin-06", "group": "midblock", "modes": ["walking"],
+      "zone": { "x": 62.6, "z": 21, "width": 7, "depth": 4, "yaw": 0 }, "heading": 0,
+      "candidates": [{ "flow": "west", "vehicle": 0, "anchor": { "x": 94, "z": 24 } }] },
+    { "id": "builtin-09", "group": "midblock", "modes": ["walking"],
+      "zone": { "x": 62.6, "z": 21, "width": 7, "depth": 4, "yaw": 0 }, "heading": 0,
+      "candidates": [{ "flow": "west", "vehicle": 0, "anchor": { "x": 76, "z": 26.3 } }, { "vehicle": 1, "prefix": "east" }] },
+    { "id": "builtin-07", "group": "parking-exit", "modes": ["bicycle"],
+      "zone": { "x": -86, "z": 23, "width": 16, "depth": 6, "yaw": 0 }, "heading": 270,
+      "candidates": [{ "vehicle": 2, "slot": "parking-exit" }] },
+    { "id": "builtin-08", "group": "parking-exit", "modes": ["bicycle"],
+      "zone": { "x": -86, "z": 23, "width": 16, "depth": 6, "yaw": 0 }, "heading": 270,
+      "candidates": [{ "vehicle": 2, "slot": "parking-exit" }] },
+    { "id": "builtin-10", "group": "wrong-way", "modes": ["bicycle"],
+      "zone": { "x": -95, "z": 27.5, "width": 210, "depth": 5, "yaw": 0 }, "requires": "wrongWay",
+      "candidates": [{ "flow": "east", "vehicle": 0, "anchor": "participant" }] }
+  ]
+}

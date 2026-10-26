@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { SignalCycle, SIGNAL_PERIOD } from '../src/signal-cycle.js';
-import { Traffic } from '../src/traffic.js';
-import { normalize } from '../src/shared/scenario.js';
+import { SignalCycle, SIGNAL_PERIOD } from '../src/simulation/traffic/SignalCycle.ts';
+import { Traffic } from '../src/simulation/traffic/Traffic.ts';
+import { normalize } from '../src/simulation/core/scenario.ts';
 
 test('the junction cycle separates both vehicle axes and the single shared pedestrian phase', () => {
   const cycle = new SignalCycle(), state = cycle.state, seen = new Set();
@@ -55,7 +55,7 @@ test('all four approaches stop before their painted bars and resume on their own
 });
 
 test('yellow stops a distant car but lets a car too close to brake clear the junction', () => {
-  const far = traffic(approaches[0]); far.time = 28; far.step(3);
+  const far = traffic(approaches[0]); far.time = 28; far.step(7);
   assert.ok(far.cars[0].x + far.cars[0].size[2] / 2 < 16.4);
   assert.equal(far.cars[0].currentSpeed, 0);
   const near = traffic(approaches[0]); near.step(0.1);
@@ -66,15 +66,16 @@ test('yellow stops a distant car but lets a car too close to brake clear the jun
   assert.ok(car.x > 16.4 && car.currentSpeed > 9, 'no sudden stop inside the junction');
 });
 
-test('a red-light queue does not overlap and an authored accident car retains its hazardous motion', () => {
+test('a red-light queue does not overlap and accident labels obey the same rules', () => {
   const t = traffic(approaches[0], { repeatMinSeconds: 2, repeatMaxSeconds: 2 }); t.time = 60;
   t.step(15);
   const cars = [...t.cars].sort((a, b) => b.x - a.x);
   assert.ok(cars.length >= 2);
   for (let i = 1; i < cars.length; i++)
     assert.ok(cars[i - 1].x - cars[i].x > (cars[i - 1].size[2] + cars[i].size[2]) / 2 + 1.8);
-  const hazard = traffic(approaches[0], { accident: true }); hazard.time = 60; hazard.step(5);
-  assert.ok(hazard.cars[0].x > 16.4, 'the explicit accident flag preserves the preauthored violation');
+  const hazard = traffic(approaches[0], { accident: true }); hazard.time = 60; hazard.step(14);
+  assert.ok(hazard.cars[0].x + hazard.cars[0].size[2] / 2 < 16.4, 'accident metadata cannot bypass red');
+  assert.equal(hazard.cars[0].currentSpeed, 0);
   const inside = traffic({ route: [{ x: 30, z: 27.8 }, { x: 80, z: 27.8 }] });
   inside.time = 60; inside.step(3);
   assert.ok(inside.cars[0].x > 40, 'a car already inside clears instead of stopping at an unrelated outgoing bar');

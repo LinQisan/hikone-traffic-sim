@@ -4,10 +4,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import * as S from '../src/shared/scenario.js';
-import { Traffic, BODY_SIZE } from '../src/traffic.js';
-import { Ground } from '../src/ground.js';
-import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, deltaYaw, yawTo, sample } from '../src/analysis.js';
+import * as S from '../src/simulation/core/scenario.ts';
+import { Traffic, BODY_SIZE } from '../src/simulation/traffic/Traffic.ts';
+import { Ground } from '../src/simulation/collision/Ground.ts';
+import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, deltaYaw, yawTo, sample } from '../src/simulation/metrics/analysis.ts';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const data = f => JSON.parse(fs.readFileSync(path.join(root, 'data', f), 'utf8'));
@@ -54,28 +54,19 @@ test('ground heights match the browser road plan', () => {
   }
 });
 
-test('cars appear on time, accelerate at 8 m/s² and leave at the end of their route', () => {
-  const s = scenario('builtin-01');
+test('cars depart by the scenario clock, use their own acceleration and leave the route', () => {
+  const s = S.normalize({ ...S.newScenario('motion'), vehicles: [S.newVehicle({
+    route: [{ x: 0, z: 100 }, { x: 20, z: 100 }], delaySeconds: 5,
+    driver: { accelerationMps2: 2, desiredSpeedKmh: 36 } })] });
   const t = new Traffic(s, { seed: 3 });
   t.step(4.9);
-  assert.equal(t.cars.length, 0, 'background traffic waits 5 s');
-  t.step(0.2);
-  assert.equal(t.cars.length, 2);
+  assert.equal(t.cars.length, 0);
+  t.step(1.1);
   const car = t.cars[0];
-  t.step(1);
-  assert.ok(Math.abs(car.distance - S.distanceAt(car.speed > 0 ? 1.1 : 0, car.speed)) < 0.2);
-  // the accident car of 01 leaves when the participant sets off towards the road (traffic.js "meet")
-  t.step(20, { x: s.spawn.x, z: s.spawn.z, vx: 0, vz: 0 });
-  assert.ok(!t.cars.some(c => c.accident), 'not while the participant stands and looks');
-  const len = Math.hypot(s.goal.x - s.spawn.x, s.goal.z - s.spawn.z);
-  const dir = { x: (s.goal.x - s.spawn.x) / len, z: (s.goal.z - s.spawn.z) / len };
-  let launched = false;
-  for (let i = 1; i <= 6 && !launched; i++) {
-    t.step(0.1, { x: s.spawn.x + dir.x * 0.24 * i, z: s.spawn.z + dir.z * 0.24 * i, vx: dir.x * 2.4, vz: dir.z * 2.4 });
-    launched = t.cars.some(c => c.accident);
-  }
-  assert.ok(launched, 'as soon as they walk on towards the road (within 0.6 s at the normal pace)');
-  assert.ok(t.cars.every(c => c.body === 'sedan'), 'files use their own body (the templates say sedan)');
+  assert.ok(Math.abs(car.currentSpeed - 2) < 1e-8);
+  assert.ok(Math.abs(car.distance - 1) < 1e-8);
+  t.step(8);
+  assert.equal(t.cars.length, 0);
 });
 
 test('built-in scenarios mix kei cars into the ordinary traffic, never into the accident car', () => {
@@ -131,7 +122,7 @@ test('analysis: looking toward the car, side checks, verdicts and the placement 
 });
 
 test('flush footways and separate 15 cm kerbs: placements follow the road plan', async () => {
-  const { webLayout } = await import('../src/web-layout.js');
+  const { webLayout } = await import('../src/world/generators/web-layout.js');
   const layout = JSON.parse(fs.readFileSync(new URL('../data/layout.json', import.meta.url)));
   const shown = webLayout(layout);
   const g = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));

@@ -7,7 +7,7 @@ VRLEARN_ROOT points at the Unity project (default: ../VRLearn next to this folde
 The generators author in Unity coordinates and write Blender vertices as (-x, -z, y) (see
 hk_lib.U); Blender's glTF export turns that into (-x, y, z). The web port therefore maps Unity
 world coordinates to three.js as (-x, y, z) and negates yaw, which keeps models and placements
-consistent (src/coords.js).
+consistent (src/three/scene/coords.ts).
 
 Besides the project's models this retains the legacy WEB_Sedan raw model. The runtime uses
 independently generated impressionist models. Unity's signal export preserves the original

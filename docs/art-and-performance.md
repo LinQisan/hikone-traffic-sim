@@ -2,7 +2,113 @@
 
 How the web-authored models are built and checked, and what the scene costs to render. Why: [../RATIONALE.md](../RATIONALE.md). Raw benchmark samples: [performance/](performance/).
 
-## Models
+## Native three.js runtime
+
+The current runtime uses `src/models.js`, `src/model-builder.js` and `src/model-vegetation.js`.
+`models/` contains construction programs: bevelled boxes, closed cylinders, loft profiles,
+panels, parametric foliage and custom polygon boundaries. Three.js constructs `BufferGeometry`
+in a bounded module-worker pool and transfers its attribute storage to the main thread. Material names,
+vehicle wheel separation, instance batching, LOD selection and static/blob shadows retain their
+existing interfaces. No runtime GLB loader or imported scene graph is used. Existing GLBs in
+`data/models/` remain offline reference fixtures; Vite excludes them from `dist/`.
+
+New JavaScript-authored assets can use `ModelBuilder` directly, or add a construction program
+with the same operations. Dimensions are map metres; `src/coords.js` owns the handedness change.
+The one-time author migration is reproducible with
+`blender -b --factory-startup --python tools/build_native_models.py`: it executes the project's
+existing procedural authors and records construction intent, without reading or exporting a GLB.
+This optional compiler uses Blender's Python/mathutils environment, but ordinary development,
+builds and playback require only Node.js and npm. After changing recipes or layout, run
+`node tools/build_collision.mjs`; collision and the event checker's sight lines use these same
+native geometries. The editor's existing overhead imagery remains an illustration of the shared
+plan rather than a separate collision source.
+
+Use `npm ci`, `npm run dev`, `npm run build` and `npm run preview`. The Vite configuration builds
+the simulator, editor and documentation together, preserves relative deployment paths, and mounts
+the existing loopback-only editor API in development and local preview. Deploy the contents of
+`dist/`; GitHub Pages must use GitHub Actions as its deployment source. `serve.mjs` is a compatibility
+entry point for Vite. Historical measurements and the GLB author pipeline below describe earlier
+snapshots; they are not benchmarks of the native runtime.
+
+### Migration validation, 2026-10-25
+
+[Raw validation and A/B samples](performance/native-vite-20261025.json) cover 53 native assets at
+both detail levels, the rebuilt collision grid, 253 passing tests (none failed/skipped), the
+production build under a Pages subpath, walking/cycling contact-debug replay flows, exploration
+resume/menu, the static editor and a 390 px touch/reduced-motion check. Production browser checks
+report no console errors, failed resources or GLB requests. The old GLBs remain offline geometry
+fixtures; native envelopes stay within 8 mm per axis. Native triangle indexing retains colour and
+normal seams exactly, and its optimization leaves the collision grid unchanged.
+
+The same desktop Chrome page at 1280 × 720/high quality submits 108 street and 63 castle-view draws
+with either loader. Street p95 is 17.7 → 18.2 ms; castle p95 is 20.5 → 17.7 ms. Resident geometry
+attributes report 68,630,810 → 60,779,232 bytes, but worker heap/network usage is outside the
+window's performance counters. These observations do not establish smoother rendering or a total
+memory/download improvement. **That migration sample recorded 13.13 → 54.65 s first-ready time.**
+Worker construction keeps the loading interface responsive; preallocated byte attributes and
+exact native indexing reduce a separate Node construction sample for the largest terrain from
+11.31 to 4.81 s, without proving an end-to-end loading gain. The controlled follow-up below supersedes that snapshot for the current startup path.
+No real phone, hosted deployment or VR hardware was tested.
+
+### Startup diagnosis and optimization, 2026-10-26
+
+[Raw startup timings and validation](performance/startup-20261026.json) separate page/module and
+WebGL initialization, data reads, worker model decoding/construction, main-thread assembly,
+camera silhouettes and the first rendered frame. The earlier 54.65 s sample did not reproduce:
+fresh Chrome contexts, request interception and disabled cache measured about 8.4–9.5 s before
+this optimization. Its exact historical machine/browser state is unavailable; do not claim a
+55-to-5-second improvement.
+
+The reproducible bottleneck was serial native construction: 91 jobs consumed 4.5–4.7 s of worker
+CPU, with the terrain's two levels accounting for about 2.5 s. JSON parsing was about 0.45 s,
+main-thread merging about 0.7 s and camera silhouettes about 0.1 s. These are overlapping CPU and
+wall-clock observations, not values to sum into a navigation time. Initial WebGL context and
+first-render costs also varied, so complete first-frame timing remains the acceptance measure.
+The uncompressed first-scene recipe payload was 93,997,721 bytes.
+
+`src/model-pool.js` bounds construction to two workers on suitable desktop CPUs, retaining one
+on touch devices. Geometry, both LODs, batching, animation and collision rules are unchanged.
+`tools/pack_models.mjs` gzip-compresses the programs without baking any mesh; a generated
+`models/runtime.json` selects content-addressed files in ignored `models/packed/`. Vite prepares
+these files automatically at startup/build, and the optional Python author compiler also runs
+the packer. For standalone recipe work, run `node tools/pack_models.mjs` before opening the page.
+The worker accepts either explicit gzip or HTTP-decoded gzip. Browsers without
+`DecompressionStream` retain the uncompressed JSON path. Source programs and packed programs
+are checked byte-for-byte; no Blender or GLB is used by this transport step.
+
+Production-build A/B uses the same Chrome page, 1280 × 720, fixed high quality, disabled cache
+and A–B–B–A ordering. The baseline uses one worker/plain JSON; the final path uses two workers/
+gzip. Two samples per condition give:
+
+| Condition | Baseline first frame | Optimized first frame |
+| --- | ---: | ---: |
+| Local static delivery | 8.22–9.26 s | 5.41–5.46 s |
+| Model-body delivery capped at 100 Mbps | 21.07–21.21 s | 6.77–6.95 s |
+
+The cap applies to model bodies only, with other files unthrottled; it is a controlled delivery
+experiment, not a real mobile network measurement. Actual model response bodies fall to
+22,270,937 bytes (76.3% less). All eight runs submit 108 draws and 1,143,542 triangles, with street
+p95 around 18.4–18.6 ms. This establishes a startup reduction in these conditions, not faster
+steady-state rendering. Two worker isolates can raise peak construction memory; real-phone
+memory/performance remains unmeasured.
+
+Inspect `window.vrlearn.startup` with `?benchmark=1&quality=high&view=street`. For the baseline add
+`&modelWorkers=1&modelEncoding=plain`; these overrides apply only in benchmark mode. Worker
+records include construction/parse/decode times and encoded body size, unlike the window-only
+resource counters. `259` tests pass with no failures/skips. Production subpath checks cover
+walking/cycling replay, keyboard look, exploration resume/menu, the static editor, the JSON
+fallback with decompression disabled and 390 px touch/reduced motion. Browser errors, failed
+resources and runtime GLB requests are zero. No hosted deployment or real phone was tested.
+
+### Lighthouse audit, 2026-10-26
+
+[Results, scope and report downloads](performance/lighthouse-20261026/README.md) cover three
+navigation samples per device preset before/after, plus Lighthouse snapshots of the ready menu.
+The navigation LCP belongs to the loading screen, so these scores do not measure native-model
+readiness. The bounded fixes address document metadata, the main landmark and voice-control
+label matching; rendering quality and model transport are retained.
+
+## Historical GLB author pipeline
 
 `tools/export_models.py` turns VRLearn's generators into `data/models/*.glb`; `tools/build_impressionist.py` rebuilds each into `data/models/impressionist/` (the runtime set: vertex pigments, brush strokes, a distant LOD, `manifest.json`). Houses and trees get new silhouettes. Lamps, utility poles, signals, vehicles and speed signs are authored as closed solids in `tools/abstract_props.py`: a few weighty colour planes, only the outlines needed to read the object. Browser-only `ART_PathLamp`, `ART_UtilityPole` and `ART_MoatUtilityPole` need no upstream raw GLB.
 
@@ -117,6 +223,7 @@ What keeps the budget:
 - **Shadows:** the sun's map holds only still things, drawn from the light LOD by shadow-only instanced meshes with their own caster list (shown only on frames that redraw it). View LOD switches never touch it; it is redrawn when the shadow box re-centres (4 m). Moving things carry a shadow pool (`src/blob-shadow.js`) instead.
 - Dynamic resolution on desktop (DPR ≤ 1.25, ≤ 1.6 Mpx), backing off when a raise fails (each change resizes the canvas); no MSAA on phones; `?quality=high` fixes full resolution.
 - Three palette reads per vertex; cached brush textures and sky; positions written in place in hot paths.
+- **Open exploration traffic:** background flows stop departing at `maxCars` (14, `world/hikone.json`); encounter cars are admitted on top. One unmatched sample (hidden-pane in-app browser, same camera at the walking start, 2026-10-23): 102 draws with practice 01's 9 cars vs 124 with 16 exploration cars before the cap was lowered — about 3 draws per visible car. Not a frame-time measurement; run a `?benchmark=1` A/B before raising the cap.
 
 ### Download and load size (2026-10-18)
 
@@ -359,7 +466,7 @@ Final same-page A/B at 1280 × 720, with animation active and fixed street/water
 
 ### Offline test-query acceleration (2026-10-20)
 
-`tools/mesh-ray-index.mjs` bounds static triangle batches for offline geometry and event checks. Median partitioning uses typed bounds/centres rather than repeatedly sorting object arrays. A query culls batches, then invokes the original three.js raycast for the surviving triangles. Source indices, vertex attributes, material sidedness, transforms, hit objects, face numbers and finite near/far behavior are retained. Unsupported deformable/instanced/multi-material/custom-raycast meshes keep their original implementation. Each index is scoped to freshly loaded static geometry; rebuild it after editing geometry. No persistent pass/fail cache or browser dependency is introduced.
+`src/mesh-ray-index.js` (originally `tools/mesh-ray-index.mjs`) bounds static triangle batches for geometry and event checks, and now also the CPU-only replay probes described below. Median partitioning uses typed bounds/centres rather than repeatedly sorting object arrays. A query culls batches, then invokes the original three.js raycast for the surviving triangles. Source indices, vertex attributes, material sidedness, transforms, hit objects, face numbers and finite near/far behavior are retained. Unsupported deformable/instanced/multi-material/custom-raycast meshes keep their original implementation. Each index is scoped to freshly loaded static geometry; rebuild it after editing geometry. There is no persistent pass/fail cache.
 
 Castle terrace/path checks and event sight lines use the index. Road-seam tests prepare their immutable high/low surfaces once per file instead of reloading and reclassifying them for every assertion; cleanup runs after the file's checks. `tools/check_routes.mjs` bins carriageway triangles into horizontal cells while keeping the original edge tests, tolerances, vehicle footprints and sampling density. Its index is rebuilt per invocation so editing a map cannot reuse stale carriageway coverage. All existing assertions and samples remain.
 
@@ -556,3 +663,40 @@ Ordinary traffic brakes at the four actual authored stop bars, with front-bumper
 Validation passes **204 full regression tests**, zero failures or skips, including all ten event checks. Signal-specific regressions cover phase conflicts and exact boundaries, all eight synchronized pedestrian optics/figures, both reverse vehicle heads, stable-state upload reuse, shared-material isolation, every stop-bar approach and body size, yellow braking, queued clearance cancellation and the accident exception. Final Chrome playthroughs check walking event 01 and cycling event 08 through contact, replay, rewind, results and menu, with displayed states matching replay time. Live traffic waits in both Route 25 lanes during the common walk phase. Eighteen standalone phase/view captures load without console/page errors. A 390 × 844 touch-emulated, reduced-motion, forced-colour check keeps status visible and both retry/menu buttons at least 44 px, and exits through the menu; the older narrow-screen rule now hides only the keyboard hint.
 
 The [same-page A/B and raw verification](performance/signal-cycle-20261021.json) retains junction/corner draws at **87/99**, submitted triangles at **1,009,436/802,251**, and textures at ten. Scene buffer accounting rises **70,845,886 → 70,846,086 bytes** (+200); shader programs rise 22 → 24. Median frame intervals change **28.1/22.4 → 28.0/22.5 ms**, with p95 **29.3/23.9 → 29.4/23.9 ms**. These short desktop samples establish workload parity, not an FPS improvement or stutter bound. Buffer accounting is not total VRAM or retained heap. No physical phone or VR headset was tested. No geometry, map registration or collider changes require regenerated data outputs.
+
+
+### Runtime audit with preserved art and behavior (2026-10-21)
+
+The review covers the browser/editor import graph, simulation and replay loops, loading, environment batching/culling, shaders, vehicles, signals, wildlife and resource ownership, plus their offline generators and checks. The final browser/editor graph has **47 modules, 97 local import edges and no cycles**. There are no npm dependencies to remove. `GLTFLoader`, geometry utilities and `SkeletonUtils` remain required; the unused `VRButton.js` and unreferenced `unityYaw` export are removed. Generated assets, compatibility fixtures and test/tool exports retain their consumers. Existing pure simulation modules, the small rendering adapter and the environment's instancing/LOD/shadow design remain appropriate; no new service layer or general resource manager is added.
+
+Measurements identify two different costs. Fixed-view updates take about **0.08–0.11 ms** and CPU rendering about **1.3 ms**, while a junction GPU timer reports **26.52 → 26.55 ms**. This supports a GPU drawing bottleneck for that view. Separately, walking event 01 blocks for several seconds while planning its replay camera; profiling finds exact triangle intersections dominating that work. The following changes are ordered by practical benefit and risk. [Raw samples, method, hashes and per-change checks](performance/code-audit-20261021.json) accompany this audit.
+
+| Change and reason | Matched before → after | Risk control |
+| --- | --- | --- |
+| Share the existing exact static ray index between offline checks and CPU camera silhouettes; avoid scanning every triangle for each proposed sight line. | Replay planning, walking 01: **4,447.4 → 385.1 ms**; cycling 08: **491.2 → 467.8 ms**. | Original three.js intersection tests, triangle identity and sidedness are retained. Repeated placements share one index while keeping separate transforms. Complete overview/driver camera samples at 60 Hz have identical hashes. |
+| Remove the brush texture's obsolete leaf-mask calculation; current shaders sample only its RGB channels. | Texture creation: **44.1 → 35.3 ms**. | Every sampled RGB byte has the same SHA-256; RGBA storage, filtering and mipmap settings remain. |
+| Expand only tyres/hubs when splitting steerable wheels; body and glazing are already retained unchanged. | Four checked models: **10.3 → 7.7 ms**, **480,816 → 200,232 bytes** of temporary expanded attributes; 32 → 8 expanded parts. | All output geometry/transform fingerprints match, with no lost or duplicated triangles. This measures splitting after model decoding, not whole-app startup. |
+| Reuse one recording head pose per run and the world scale already obtained while aligning a moving shadow. | 1,000 head updates: **1,000 → 1** result objects. 100,000 shadow updates: **200,000 → 100,000** matrix decompositions, **57.1 → 39.9 ms** in the isolated loop. | Accepted recorder frames remain independent snapshots, walking clears bicycle heading, and the default `head()` API still returns a fresh object. Shadow positions match under rotated/nonuniform parents. |
+| Share immutable optic position/normal/colour/index attributes with loaded models; only lamp-state attributes need private storage. | Model-cache-plus-signal attribute storage: **1,551,704 → 1,514,624 bytes** (−37,080). Private light-state storage remains 200 bytes. | Model geometry and shared materials stay untouched. A preview assembly cannot change the live heads. This reduces duplicate CPU attributes; production scene buffer accounting stays the same. |
+
+Camera indexing has an explicit startup tradeoff: rebuilding the same **1,940** CPU silhouettes takes **18.6 → 65.5 ms**, once per probe set. It adds CPU tree nodes and reordered query indices; their total retained heap size was not measured. Camera geometry is never added to the rendered scene. The shared implementation moves from `tools/mesh-ray-index.mjs` to `src/mesh-ray-index.js`, with the offline checks importing that same implementation instead of maintaining another algorithm.
+
+Chrome 155 on this laptop's AMD Radeon Pro 5300M uses the same page, fixed 1440 × 1080 viewport/DPR 1 and `benchmark=1`, with reduced decorative motion, two seconds warmup and eight seconds sampling. Four alternating source reloads establish matching workloads; the final pair supplies the timing table. GPU queries run afterward, with `GPU_DISJOINT_EXT=false`, so their instrumentation does not enter the frame samples. Component timings alternate old/new modules in one loaded page and use the upper middle observation for even sample counts, matching `PerformanceProbe`.
+
+| Fixed view | Median frame ms | p95 ms | Draw calls | Submitted triangles |
+| --- | --- | --- | --- | --- |
+| Junction, camera `[50,9,25,32,1.5,27,62]` | **27.9 → 27.9** | 29.3 → 29.4 | **92 → 92** | **1,001,345 → 1,001,345** |
+| Display-kiosk corner, camera `[52.8,2.5,23,37,4,20,65]` | **22.6 → 22.6** | 24.1 → 23.9 | **98 → 98** | **846,018 → 846,018** |
+
+Both views retain **70,846,086 counted scene-buffer bytes** and ten textures. Five deterministic rendered captures—junction, corner, shop, castle and campus—are byte-identical before/after. No sustained FPS gain or p95 improvement is established. The main visible benefit is the much shorter replay-planning pause. Subroutine savings must not be added up as a whole-app startup claim; local decoded resource bytes are not compressed GitHub Pages transfer sizes, counted buffers are not total VRAM, and desktop results do not predict phone frame rates.
+
+Resource ownership was checked through repeated walking/cycling runs, driver/overview changes, replay restart, results and menu exit. After the viewpoint/shader warmup, the final four samples plateau at **256 renderer geometries, 11 textures and 27 programs**, including resources first exercised by live traffic and replay. This is a bounded resource-counter check, not a general heap-leak proof. Vehicle/model/paint/blob-shadow buffers stay shared for the page. Replay-owned animals, bicycles, overlays and cockpit resources retain their existing disposal; accepted recordings own their snapshots. Camera indices are shared only for immutable CPU geometry, and parked-vehicle probe sets are released with the replay. No blanket disposal of shared caches is introduced.
+
+Further work is deliberately deferred according to measured benefit and risk. Near foliage and baked brush geometry remain the largest steady drawing cost; changing LOD distances, canopy shapes, resolution, shaders' precision or shadow quality would require a separate visual budget. The existing instanced batches, local cells, hysteresis, stable instance uploads, far proxies and cached static sun map already address draw overhead without moving silhouettes. Eager high/low model loading still contributes most of the roughly 75 MB locally decoded resource budget; streaming needs explicit readiness/fallback rules for replay viewpoints and surrounding landmarks. It is not replaced with partial loading in this behavior-preserving pass. Static matrix updates, ground queries and remaining small replay interpolation objects are lower-priority CPU work given the measured update budget. Editor SVG updates are interaction-driven, not part of the Three.js frame loop.
+
+Each implementation step passed its focused checks before the next. Final **`npm test`: 207 passed, zero failed or skipped**, including all ten event-purpose checks, art/clearance, both editor backends, exact ray hits/attributes, replay grounding and camera framing. New regressions cover head-snapshot independence and mode transitions, transformed shared CPU ray indices, and scaled/rotated moving shadows; the optic test now verifies immutable sharing and independent preview state. Production Chrome checks walking 01 and cycling 08 through keyboard look, contact, both views, restart, replay end, results and menu, plus three repeated run pairs. A 390 × 844 touch-emulated reduced-motion/forced-colour run retains 44 px controls and menu exit; the editor loads without console/page errors. `git diff --check` passes. No physical phone or headset was tested. No model/layout/collider/event data changed, so generated collision/map outputs require no rebuild. These changes remain local until publication is requested.
+
+
+## React and TypeScript migration (2026-10-26)
+
+Current source locations, baseline fingerprints, rendering comparisons and lifecycle checks are recorded in [the migration record](react-typescript-migration.md). Earlier sections retain the paths and measurements used at their original checkpoints. The migration moves source modules without regenerating native recipes, scene placements, events or collision data. Rendering algorithms, quality defaults and simulation parameters are preserved.

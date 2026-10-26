@@ -1,0 +1,38 @@
+{
+  "checks": [
+    "production subpath startup does not fetch the optional validation map",
+    "BOM file import succeeds and focuses Start",
+    "field errors are inline, accessible, preserve selection and need no second map request",
+    "a structurally valid spawn in water is rejected by road validation",
+    "same file can be retried and entered as the selected practice",
+    "walking: keyboard look, traffic, debug contact, replay views/end, results, menu",
+    "bicycle: keyboard look, traffic, debug contact, replay views/end, results, menu",
+    "exploration menu, resume and return",
+    "static editor accepts the same BOM file",
+    "editor malformed import preserves its current draft",
+    "editor Browser Play handoff validates the map and starts the edited scenario",
+    "semantically invalid drafts remain editable",
+    "updated documentation pages load under the deployment subpath",
+    "incomplete map reports a retryable infrastructure error",
+    "changing to a built-in cancels the pending file selection without a late overwrite",
+    "retry succeeds and reuses the map fetched by the cancelled selection",
+    "390px touch, reduced motion and forced colors retain readable errors, 44px file target and keyboard access"
+  ],
+  "errors": [],
+  "bad": [],
+  "dialogs": [
+    [
+      "confirm",
+      "保存していない変更があります。破棄しますか？"
+    ],
+    [
+      "confirm",
+      "保存していない変更があります。破棄しますか？"
+    ],
+    [
+      "beforeunload",
+      ""
+    ]
+  ],
+  "scope": "Local headless Chrome production build under /hikone-traffic-sim/. Debug contact verifies flow, not natural collision probability. No real phone, screen reader, Unity/Quest or deployed network."
+}

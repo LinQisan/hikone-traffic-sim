@@ -1,0 +1,1297 @@
+{
+  "date": "2026-10-21",
+  "baseCommit": "3b75439f4888e33722fa10b84eb6a717f7e36261",
+  "scope": {
+    "browserModules": 47,
+    "localImportEdges": 97,
+    "importCycles": 0,
+    "npmDependencies": 0
+  },
+  "host": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+    "gl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+    "gpuTimerAvailable": true
+  },
+  "method": {
+    "frames": "One Chrome page alternated task-start and edited source over four reloads at the same URL, 1440x1080, DPR 1, benchmark=1, reduced motion. The renderer and camera settings match. Each sample warms for 2 seconds and measures for 8 seconds. Rounds 2/3 are the final timing pair; all rounds establish identical workloads.",
+    "cameras": {
+      "junction": [
+        50,
+        9,
+        25,
+        32,
+        1.5,
+        27,
+        62
+      ],
+      "corner": [
+        52.8,
+        2.5,
+        23,
+        37,
+        4,
+        20,
+        65
+      ]
+    },
+    "gpu": "20 EXT_disjoint_timer_query_webgl2 queries after each final junction frame sample, not during it. Disjoint=false in both versions. CPU render timing covers renderer.render only.",
+    "components": "Old/new modules alternate in one loaded page. Model decode is excluded from wheel splitting. Camera planning uses identical deterministic recorded frames, fixed viewport, reduced motion and the same 1,940 CPU silhouettes. Entire overview/driver paths are hashed at 60 Hz.",
+    "median": "Upper middle observation for even sample counts, matching PerformanceProbe.",
+    "buffers": "Unique logical typed attribute/index/instance bytes, not total VRAM or retained heap. CPU ray indices introduce extra nodes and reordered triangle indices; their total retained size was not measured."
+  },
+  "summary": {
+    "brush": {
+      "before": 44.099999994039536,
+      "after": 35.30000001192093
+    },
+    "wheels": {
+      "before": 10.299999997019768,
+      "after": 7.700000002980232
+    },
+    "shadow": {
+      "before": 57.1000000089407,
+      "after": 39.900000005960464
+    },
+    "builtin-01": {
+      "before": 4447.4000000059605,
+      "after": 385.1000000089407
+    },
+    "builtin-08": {
+      "before": 491.20000000298023,
+      "after": 467.79999999701977
+    }
+  },
+  "frameSamples": [
+    {
+      "round": 0,
+      "version": "before",
+      "name": "junction",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 286,
+      "fps": 35.77235772357724,
+      "medianMs": 28,
+      "p95Ms": 29.5,
+      "updateMs": 0.10209790174360875,
+      "calls": 92,
+      "triangles": 1001345,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 191,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2787.2999999970198,
+      "resourceTransferBytes": 75275068,
+      "resourceBodyBytes": 75231268,
+      "heapBytes": 221072697,
+      "multiDraw": true,
+      "gpu": null
+    },
+    {
+      "round": 1,
+      "version": "after",
+      "name": "junction",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 286,
+      "fps": 35.76385849514022,
+      "medianMs": 28,
+      "p95Ms": 29.299999997019768,
+      "updateMs": 0.10349650410088626,
+      "calls": 92,
+      "triangles": 1001345,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 191,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2368.699999988079,
+      "resourceTransferBytes": 75280775,
+      "resourceBodyBytes": 75236675,
+      "heapBytes": 330187195,
+      "multiDraw": true,
+      "gpu": null
+    },
+    {
+      "round": 2,
+      "version": "before",
+      "name": "junction",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 286,
+      "fps": 35.765647470768464,
+      "medianMs": 27.900000005960464,
+      "p95Ms": 29.299999997019768,
+      "updateMs": 0.11013985946253463,
+      "calls": 92,
+      "triangles": 1001345,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 191,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2265.5999999940395,
+      "resourceTransferBytes": 75275068,
+      "resourceBodyBytes": 75231268,
+      "heapBytes": 128962354,
+      "multiDraw": true,
+      "gpu": {
+        "disjoint": false,
+        "gpuMedianMs": 26.521159,
+        "cpuRenderMedianMs": 1.2999999970197678,
+        "gpuMs": [
+          26.44028,
+          26.442479,
+          26.4754,
+          26.49164,
+          26.5024,
+          26.508519,
+          26.50988,
+          26.510199,
+          26.51364,
+          26.519199,
+          26.521159,
+          26.534839,
+          26.541239,
+          26.54632,
+          26.55716,
+          26.568479,
+          26.587319,
+          26.657399,
+          26.66232,
+          26.723079
+        ],
+        "cpuRenderMs": [
+          1.199999988079071,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.300000011920929,
+          1.3999999910593033,
+          1.3999999910593033,
+          1.3999999910593033,
+          1.3999999910593033,
+          1.5,
+          1.5,
+          1.7000000029802322
+        ]
+      }
+    },
+    {
+      "round": 3,
+      "version": "after",
+      "name": "junction",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 286,
+      "fps": 35.77012069288975,
+      "medianMs": 27.900000005960464,
+      "p95Ms": 29.400000005960464,
+      "updateMs": 0.10279720276594162,
+      "calls": 92,
+      "triangles": 1001345,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 191,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2448,
+      "resourceTransferBytes": 75280775,
+      "resourceBodyBytes": 75236675,
+      "heapBytes": 244566842,
+      "multiDraw": true,
+      "gpu": {
+        "disjoint": false,
+        "gpuMedianMs": 26.554519,
+        "cpuRenderMedianMs": 1.2999999970197678,
+        "gpuMs": [
+          26.46716,
+          26.47044,
+          26.48908,
+          26.491759,
+          26.492039,
+          26.49964,
+          26.520399,
+          26.537319,
+          26.546599,
+          26.55092,
+          26.554519,
+          26.56024,
+          26.57912,
+          26.601439,
+          26.602919,
+          26.61148,
+          26.617839,
+          26.61796,
+          26.655919,
+          26.6816
+        ],
+        "cpuRenderMs": [
+          0.9000000059604645,
+          1.0999999940395355,
+          1.1000000089406967,
+          1.199999988079071,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2000000029802322,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.2999999970197678,
+          1.4000000059604645,
+          1.5,
+          1.6000000089406967
+        ]
+      }
+    },
+    {
+      "round": 0,
+      "version": "before",
+      "name": "corner",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 353,
+      "fps": 44.19847997293854,
+      "medianMs": 22.600000008940697,
+      "p95Ms": 24.099999994039536,
+      "updateMs": 0.07903682750784304,
+      "calls": 98,
+      "triangles": 846018,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 201,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 6652.70000000298,
+      "resourceTransferBytes": 75275068,
+      "resourceBodyBytes": 75231268,
+      "heapBytes": 132699607,
+      "multiDraw": true
+    },
+    {
+      "round": 1,
+      "version": "after",
+      "name": "corner",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 354,
+      "fps": 44.18041584507692,
+      "medianMs": 22.600000008940697,
+      "p95Ms": 24,
+      "updateMs": 0.06892655314193608,
+      "calls": 98,
+      "triangles": 846018,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 201,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2446.2999999970198,
+      "resourceTransferBytes": 75280823,
+      "resourceBodyBytes": 75236723,
+      "heapBytes": 143358114,
+      "multiDraw": true
+    },
+    {
+      "round": 2,
+      "version": "before",
+      "name": "corner",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 354,
+      "fps": 44.196411850614666,
+      "medianMs": 22.599999994039536,
+      "p95Ms": 24.100000008940697,
+      "updateMs": 0.08022598833855936,
+      "calls": 98,
+      "triangles": 846018,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 201,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2287.6000000089407,
+      "resourceTransferBytes": 75275068,
+      "resourceBodyBytes": 75231268,
+      "heapBytes": 131877165,
+      "multiDraw": true
+    },
+    {
+      "round": 3,
+      "version": "after",
+      "name": "corner",
+      "geometryBytes": 68630810,
+      "sceneBufferBytes": 70846086,
+      "placements": 440,
+      "meshes": 413,
+      "frames": 354,
+      "fps": 44.19641185069689,
+      "medianMs": 22.600000008940697,
+      "p95Ms": 23.900000005960464,
+      "updateMs": 0.07796610159389043,
+      "calls": 98,
+      "triangles": 846018,
+      "width": 1440,
+      "height": 1080,
+      "geometries": 201,
+      "textures": 10,
+      "programs": 23,
+      "readyMs": 2429.5,
+      "resourceTransferBytes": 75280823,
+      "resourceBodyBytes": 75236723,
+      "heapBytes": 142381846,
+      "multiDraw": true
+    }
+  ],
+  "visualParity": [
+    {
+      "name": "junction",
+      "version": "before",
+      "sha256": "7de5cc0b64b41f1c5f94b35643aaec2f4d9ac7351e40126dd843f98bdb3dfc52"
+    },
+    {
+      "name": "shop",
+      "version": "before",
+      "sha256": "846156857f84e645a4dbee3153233a7d0bc2534097b8dbbbb49b306a2e8a076e"
+    },
+    {
+      "name": "castle",
+      "version": "before",
+      "sha256": "0a72b54c4a02bb03e033976ef985eda3e9ed799259182c383a9beb218e90e434"
+    },
+    {
+      "name": "university",
+      "version": "before",
+      "sha256": "9fa2a19b0e26ab85662eb8b0cfa7418fd4a4da2098f4444ed41cd6466a5644d8"
+    },
+    {
+      "name": "junction",
+      "version": "after",
+      "sha256": "7de5cc0b64b41f1c5f94b35643aaec2f4d9ac7351e40126dd843f98bdb3dfc52"
+    },
+    {
+      "name": "shop",
+      "version": "after",
+      "sha256": "846156857f84e645a4dbee3153233a7d0bc2534097b8dbbbb49b306a2e8a076e"
+    },
+    {
+      "name": "castle",
+      "version": "after",
+      "sha256": "0a72b54c4a02bb03e033976ef985eda3e9ed799259182c383a9beb218e90e434"
+    },
+    {
+      "name": "university",
+      "version": "after",
+      "sha256": "9fa2a19b0e26ab85662eb8b0cfa7418fd4a4da2098f4444ed41cd6466a5644d8"
+    },
+    {
+      "name": "corner",
+      "version": "before",
+      "sha256": "471dfb5b485fec172507a6ecb7a8de680375c83fd1314a754f5ecb9b4781fb42"
+    },
+    {
+      "name": "corner",
+      "version": "after",
+      "sha256": "471dfb5b485fec172507a6ecb7a8de680375c83fd1314a754f5ecb9b4781fb42"
+    }
+  ],
+  "brush": {
+    "errors": [],
+    "samples": [
+      {
+        "version": "before",
+        "ms": 49.8999999910593,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 41.79999999701977,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 44.099999994039536,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 36,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 45.20000000298023,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 34.599999994039536,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 43.599999994039536,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 35.1000000089407,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 44.29999999701977,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 35.5,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 44.099999994039536,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 35,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 43.20000000298023,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 35.30000001192093,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "before",
+        "ms": 43.400000005960464,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      },
+      {
+        "version": "after",
+        "ms": 34.29999999701977,
+        "hash": "8896e1b9197fb519a53ccb171622ce33fad5ba88a4a5413b7673b6be1d1c89a4"
+      }
+    ]
+  },
+  "wheels": {
+    "names": [
+      "WEB_Sedan",
+      "ART_KeiBox",
+      "HK_Kei_Hatch",
+      "HK_Kei_Tall"
+    ],
+    "errors": [],
+    "samples": [
+      {
+        "version": "before",
+        "ms": 15,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 8.599999994039536,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 13.399999991059303,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.700000002980232,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 10.100000008940697,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.299999997019768,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 10.799999997019768,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.5999999940395355,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 10.299999997019768,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.5999999940395355,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 10,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.299999997019768,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 9.899999991059303,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.799999997019768,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "before",
+        "ms": 9.700000002980232,
+        "expandedBytes": 480816,
+        "expandedParts": 32,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      },
+      {
+        "version": "after",
+        "ms": 7.799999997019768,
+        "expandedBytes": 200232,
+        "expandedParts": 8,
+        "hashes": [
+          "a66b2c9fc2318332d9132438cfb6f1d7ffe5dddf20f008a81afa90853c9f0ecc",
+          "e00cee3cc17f80087ab1a8dcbf441b9248a3d50d790bff2d5f6136dfdcebdc6a",
+          "ec22fd7eded895b940e5482fe946d38c3e95900e0ddaab131e424c3609e3e047",
+          "49f3241561eec4e3ea324d081177f0386f62b6f77374130ddd5580258a459e8d"
+        ]
+      }
+    ]
+  },
+  "signals": {
+    "errors": [],
+    "samples": [
+      {
+        "version": "before",
+        "modelAndSceneAttributeBytes": 1551704,
+        "sceneAttributeBytes": 1514624,
+        "mutableOpticBytes": 200,
+        "stateHash": "e1269eb4d7cb7025bc230b807b41e378b5467c7e4768ab2d7e5544f0d42feff0"
+      },
+      {
+        "version": "after",
+        "modelAndSceneAttributeBytes": 1514624,
+        "sceneAttributeBytes": 1514624,
+        "mutableOpticBytes": 200,
+        "stateHash": "e1269eb4d7cb7025bc230b807b41e378b5467c7e4768ab2d7e5544f0d42feff0"
+      }
+    ],
+    "statesIdentical": true
+  },
+  "hotPaths": {
+    "errors": [],
+    "samples": [
+      {
+        "version": "before",
+        "shadowMs": 63.20000000298023,
+        "decompositions": 200000,
+        "headResultsFor1000Frames": 1000,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "after",
+        "shadowMs": 39.900000005960464,
+        "decompositions": 100000,
+        "headResultsFor1000Frames": 1,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "before",
+        "shadowMs": 57.1000000089407,
+        "decompositions": 200000,
+        "headResultsFor1000Frames": 1000,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "after",
+        "shadowMs": 41.3999999910593,
+        "decompositions": 100000,
+        "headResultsFor1000Frames": 1,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "before",
+        "shadowMs": 57.599999994039536,
+        "decompositions": 200000,
+        "headResultsFor1000Frames": 1000,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "after",
+        "shadowMs": 41.3999999910593,
+        "decompositions": 100000,
+        "headResultsFor1000Frames": 1,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "before",
+        "shadowMs": 56.79999999701977,
+        "decompositions": 200000,
+        "headResultsFor1000Frames": 1000,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "after",
+        "shadowMs": 38.5,
+        "decompositions": 100000,
+        "headResultsFor1000Frames": 1,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "before",
+        "shadowMs": 55.599999994039536,
+        "decompositions": 200000,
+        "headResultsFor1000Frames": 1000,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      },
+      {
+        "version": "after",
+        "shadowMs": 38.8999999910593,
+        "decompositions": 100000,
+        "headResultsFor1000Frames": 1,
+        "positionHash": "eb01af9214eb7285e819435b4d4dc61b227f35b3ea614483a4f7f9a345939981"
+      }
+    ]
+  },
+  "camera": {
+    "errors": [],
+    "builds": [
+      {
+        "version": "before",
+        "ms": 18.600000008940697,
+        "parts": 1940
+      },
+      {
+        "version": "after",
+        "ms": 65.5,
+        "parts": 1940
+      }
+    ],
+    "samples": [
+      {
+        "id": "builtin-01",
+        "version": "before",
+        "ms": 4459.600000008941,
+        "pathHash": "7e08cadbf1136c84702aba183b0c77aab0b93db49740b6993daeb4717fca4a12",
+        "trackLength": 56,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-01",
+        "version": "after",
+        "ms": 414.20000000298023,
+        "pathHash": "7e08cadbf1136c84702aba183b0c77aab0b93db49740b6993daeb4717fca4a12",
+        "trackLength": 56,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-01",
+        "version": "before",
+        "ms": 4437.20000000298,
+        "pathHash": "7e08cadbf1136c84702aba183b0c77aab0b93db49740b6993daeb4717fca4a12",
+        "trackLength": 56,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-01",
+        "version": "after",
+        "ms": 385.1000000089407,
+        "pathHash": "7e08cadbf1136c84702aba183b0c77aab0b93db49740b6993daeb4717fca4a12",
+        "trackLength": 56,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-01",
+        "version": "before",
+        "ms": 4447.4000000059605,
+        "pathHash": "7e08cadbf1136c84702aba183b0c77aab0b93db49740b6993daeb4717fca4a12",
+        "trackLength": 56,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-01",
+        "version": "after",
+        "ms": 377.5,
+        "pathHash": "7e08cadbf1136c84702aba183b0c77aab0b93db49740b6993daeb4717fca4a12",
+        "trackLength": 56,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-08",
+        "version": "before",
+        "ms": 491.20000000298023,
+        "pathHash": "2637a24f886055855b0dcdf8a76f861bec780f5b849dcce029a75bcdac504d5b",
+        "trackLength": 85,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-08",
+        "version": "after",
+        "ms": 467.79999999701977,
+        "pathHash": "2637a24f886055855b0dcdf8a76f861bec780f5b849dcce029a75bcdac504d5b",
+        "trackLength": 85,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-08",
+        "version": "before",
+        "ms": 488.29999999701977,
+        "pathHash": "2637a24f886055855b0dcdf8a76f861bec780f5b849dcce029a75bcdac504d5b",
+        "trackLength": 85,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-08",
+        "version": "after",
+        "ms": 467.8999999910593,
+        "pathHash": "2637a24f886055855b0dcdf8a76f861bec780f5b849dcce029a75bcdac504d5b",
+        "trackLength": 85,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-08",
+        "version": "before",
+        "ms": 515.5,
+        "pathHash": "2637a24f886055855b0dcdf8a76f861bec780f5b849dcce029a75bcdac504d5b",
+        "trackLength": 85,
+        "pathLength": 1
+      },
+      {
+        "id": "builtin-08",
+        "version": "after",
+        "ms": 466.1000000089407,
+        "pathHash": "2637a24f886055855b0dcdf8a76f861bec780f5b849dcce029a75bcdac504d5b",
+        "trackLength": 85,
+        "pathLength": 1
+      }
+    ]
+  },
+  "baselineCPU": [
+    {
+      "name": "(idle)",
+      "url": "",
+      "line": 0,
+      "hits": 36665
+    },
+    {
+      "name": "(program)",
+      "url": "",
+      "line": 0,
+      "hits": 368
+    },
+    {
+      "name": "multiplyMatrices",
+      "url": "http://127.0.0.1:8770/vendor/three/three.core.js",
+      "line": 10570,
+      "hits": 119
+    },
+    {
+      "name": "setProgram",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 18407,
+      "hits": 106
+    },
+    {
+      "name": "updateMatrixWorld",
+      "url": "http://127.0.0.1:8770/vendor/three/three.core.js",
+      "line": 13067,
+      "hits": 78
+    },
+    {
+      "name": "bindVertexArray",
+      "url": "",
+      "line": 0,
+      "hits": 68
+    },
+    {
+      "name": "getParameters",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 7357,
+      "hits": 65
+    },
+    {
+      "name": "onAnimationFrame",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 16,
+      "hits": 51
+    },
+    {
+      "name": "getProgram",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 18224,
+      "hits": 50
+    },
+    {
+      "name": "projectObject",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 17897,
+      "hits": 47
+    },
+    {
+      "name": "WebGLRenderer.renderBufferDirect",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 17233,
+      "hits": 42
+    },
+    {
+      "name": "updateMatrixWorld",
+      "url": "http://127.0.0.1:8770/vendor/three/three.core.js",
+      "line": 13067,
+      "hits": 41
+    },
+    {
+      "name": "flatten",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 5029,
+      "hits": 38
+    },
+    {
+      "name": "getBindingState",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 1680,
+      "hits": 38
+    },
+    {
+      "name": "projectObject",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 17897,
+      "hits": 34
+    },
+    {
+      "name": "update",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 4612,
+      "hits": 34
+    },
+    {
+      "name": "needsUpdate",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 1759,
+      "hits": 32
+    },
+    {
+      "name": "cellInFrustum",
+      "url": "http://127.0.0.1:8770/src/environment-instances.js",
+      "line": 30,
+      "hits": 31
+    },
+    {
+      "name": "setup",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 1623,
+      "hits": 31
+    },
+    {
+      "name": "renderObject",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 18192,
+      "hits": 30
+    },
+    {
+      "name": "setValue",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 6107,
+      "hits": 28
+    },
+    {
+      "name": "update",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 242,
+      "hits": 27
+    },
+    {
+      "name": "drawElementsInstanced",
+      "url": "",
+      "line": 0,
+      "hits": 27
+    },
+    {
+      "name": "arraysEqual",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 5064,
+      "hits": 25
+    },
+    {
+      "name": "update",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 4192,
+      "hits": 24
+    },
+    {
+      "name": "casters",
+      "url": "http://127.0.0.1:8770/src/environment-instances.js",
+      "line": 322,
+      "hits": 24
+    },
+    {
+      "name": "WebGLRenderer.render",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 17674,
+      "hits": 23
+    },
+    {
+      "name": "refreshFogUniforms",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 15026,
+      "hits": 23
+    },
+    {
+      "name": "upload",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 6123,
+      "hits": 21
+    },
+    {
+      "name": "markUniformsLightsNeedsUpdate",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 18874,
+      "hits": 21
+    },
+    {
+      "name": "updateMatrixWorld",
+      "url": "http://127.0.0.1:8770/vendor/three/three.core.js",
+      "line": 13067,
+      "hits": 20
+    },
+    {
+      "name": "sort",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 8213,
+      "hits": 20
+    },
+    {
+      "name": "uniformMatrix4fv",
+      "url": "",
+      "line": 0,
+      "hits": 20
+    },
+    {
+      "name": "renderObjects",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 18165,
+      "hits": 19
+    },
+    {
+      "name": "painterSortStable",
+      "url": "http://127.0.0.1:8770/vendor/three/three.module.js",
+      "line": 8048,
+      "hits": 18
+    }
+  ],
+  "verification": {
+    "tests": 207,
+    "failures": 0,
+    "skips": 0,
+    "perChange": [
+      {
+        "item": "unused paint alpha and XR button",
+        "command": "node --test test/art.test.mjs test/performance.test.mjs",
+        "passed": 44
+      },
+      {
+        "item": "front-wheel initialization",
+        "command": "node --test test/turning.test.mjs test/performance.test.mjs",
+        "passed": 20
+      },
+      {
+        "item": "shared immutable optic buffers",
+        "command": "node --test test/signal-render.test.mjs test/prop-review.test.mjs test/performance.test.mjs",
+        "passed": 17
+      },
+      {
+        "item": "frame-loop head/shadow reuse",
+        "command": "node --test test/controls.test.mjs test/bicycle.test.mjs test/replay.test.mjs test/performance.test.mjs; then the added shadow property case",
+        "passed": 33
+      },
+      {
+        "item": "shared exact camera ray index",
+        "command": "node --test test/mesh-ray-index.test.mjs test/replay-camera.test.mjs",
+        "passed": 20
+      },
+      {
+        "item": "final cross-cutting regression",
+        "command": "npm test",
+        "passed": 207
+      }
+    ],
+    "browser": {
+      "host": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "gl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+        "renderer": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+        "gpuTimerAvailable": true
+      },
+      "flows": [
+        {
+          "iteration": 0,
+          "id": "builtin-01",
+          "signal": {
+            "time": 5.715499999999985,
+            "id": "east-west",
+            "walk": "red"
+          },
+          "geometries": 182,
+          "textures": 11,
+          "programs": 26,
+          "exit": "replay -> results -> title"
+        },
+        {
+          "iteration": 0,
+          "id": "builtin-08",
+          "signal": {
+            "time": 13.851066666672896,
+            "id": "east-west",
+            "walk": "red"
+          },
+          "geometries": 252,
+          "textures": 11,
+          "programs": 27,
+          "exit": "replay -> results -> title"
+        },
+        {
+          "iteration": 1,
+          "id": "builtin-01",
+          "signal": {
+            "time": 5.366666666666653,
+            "id": "east-west",
+            "walk": "red"
+          },
+          "geometries": 256,
+          "textures": 11,
+          "programs": 27,
+          "exit": "replay -> results -> title"
+        },
+        {
+          "iteration": 1,
+          "id": "builtin-08",
+          "signal": {
+            "time": 13.516666666666918,
+            "id": "east-west",
+            "walk": "red"
+          },
+          "geometries": 256,
+          "textures": 11,
+          "programs": 27,
+          "exit": "replay -> results -> title"
+        },
+        {
+          "iteration": 2,
+          "id": "builtin-01",
+          "signal": {
+            "time": 5.366666666666653,
+            "id": "east-west",
+            "walk": "red"
+          },
+          "geometries": 256,
+          "textures": 11,
+          "programs": 27,
+          "exit": "replay -> results -> title"
+        },
+        {
+          "iteration": 2,
+          "id": "builtin-08",
+          "signal": {
+            "time": 13.516666666666918,
+            "id": "east-west",
+            "walk": "red"
+          },
+          "geometries": 256,
+          "textures": 11,
+          "programs": 27,
+          "exit": "replay -> results -> title"
+        }
+      ],
+      "touch": {
+        "width": 390,
+        "height": 844,
+        "reducedMotion": true,
+        "forcedColors": true,
+        "controls": [
+          {
+            "id": "again",
+            "width": 192.09375,
+            "height": 44
+          },
+          {
+            "id": "next",
+            "width": 143.625,
+            "height": 44
+          },
+          {
+            "id": "replaymenu",
+            "width": 158.953125,
+            "height": 44
+          }
+        ],
+        "menuExit": true
+      },
+      "editorLoaded": true,
+      "errors": []
+    },
+    "visualsIdentical": true,
+    "diffCheck": true,
+    "physicalPhone": false,
+    "headset": false
+  },
+  "notes": [
+    "No model, layout, LOD threshold, shadow policy, resolution policy, event or collision data changed.",
+    "The first two frame rounds are exploratory, the last pair is used in the document.",
+    "Replay resource counts warm as driver/overview/title viewpoints and shader variants are first rendered, then plateau. Resource counts are not a general heap-leak proof.",
+    "Local decoded resource bytes include uncompressed assets, scripts and data; they are not the GitHub Pages compressed network-transfer budget.",
+    "Static model/material/texture caches live for the page; replay-owned parts retain their existing disposal. The CPU ray index is rebuilt with each new immutable probe geometry."
+  ]
+}

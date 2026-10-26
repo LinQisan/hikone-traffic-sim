@@ -7,11 +7,13 @@ The design language of the interface: colours, type, shapes, components, motion 
 
 ## 1. Principles
 
+The developer documentation at `docs/` uses the navy, sky, and amber palette defined here. The owner requested Chinese content. A sticky header carries the page tabs (overview, tutorial, how-to, reference, explanation) and links back to the simulator and editor; each page ends with previous/next links. Each page has a desktop table of contents that collapses on narrow screens, where the tabs scroll horizontally. Command blocks gain a copy button when the clipboard is available. Content and anchors work without JavaScript. Code and tables scroll in their own regions. Print and forced-colour styles preserve readability. The title page links to the static documentation without loading its assets into the game.
+
 1. **The town comes first.** The interface is a dark, quiet frame around the 3D view: translucent navy panels, no decoration that competes with the painting.
-2. **One obvious next step.** Each screen has a single amber primary action (開始 / Start, 保存, タイトルへ, 送る). Everything else is a plain button.
+2. **One obvious next step.** Each screen has a single amber primary action (探索を始める, 保存, タイトルへ, 送る). Everything else is a plain button.
 3. **Colour carries meaning, consistently.** Sky blue = selected / where you are; amber = do this; coral = accident, danger, error; lime = safe, done, OK. Never reuse a meaning colour for decoration.
 4. **Legible on a phone in daylight.** Text contrast at least 4.5:1 (7:1 for body text where possible), touch targets at least 44 px.
-5. **Bilingual, Japanese first.** Labels read `日本語 / English` where space allows; Japanese alone where it does not (the editor, which is a tool for Japanese-speaking staff).
+5. **Let the layout explain.** Group related choices and place their action next to them. Use one Japanese title or action instead of a second line repeating it in English. Keep complete accessible names, error recovery and consequential information; put optional setup behind native disclosures, but keep settings that change the experience (body size) visible. Existing bilingual play/replay controls remain available where they help participants.
 
 ## 2. Colour
 
@@ -34,12 +36,12 @@ Editor-only tokens (`editor/editor.css`): `--panel #111a2e` (side panels), `--fi
 
 **Text on colour.** Amber, sky blue and coral fills take dark ink `#0f172a`, never white. Blue fills that need white text use `#0369a1` or darker (5.9:1), and darken rather than brighten on hover.
 
-**Map colours (editor).** Carriageway blue 28 %, sidewalk gold 26 %, ramps amber 38 %, invisible walls magenta (`#e879f9`), built-in lanes dashed white, signals gold. Vehicle routes use an eight-colour categorical palette (`PALETTE` in `editor/app.js`); the accident car is always coral, whatever its index. The legend under the map must list every colour used.
+**Map colours (editor).** Carriageway blue 28 %, sidewalk gold 26 %, ramps amber 38 %, invisible walls magenta (`#e879f9`), built-in lanes dashed white, signals gold. Vehicle routes use an eight-colour categorical palette (`PALETTE` in `src/editor/controller.ts`); the accident car is always coral, whatever its index. The legend under the map must list every colour used.
 
 ## 3. Type
 
 - **Family:** `system-ui, "Hiragino Sans", "Noto Sans JP", sans-serif` — native on every platform, good kana and kanji, no web font to download.
-- **Simulator scale:** title `h1` 28 px (20 px on phones, the English line below the Japanese), result heading `h2` 26 px (20 px), group heading `h3` 15 px in accent, body 16 px, tile subtitles and help 13 px, loading text 14 px. Start button 20 px.
+- **Simulator scale:** title `h1` 28 px (20 px on phones), result heading `h2` 26 px (20 px), group heading `h3` 14 px in secondary ink, body 16 px, tile names 14 px and help 13 px, loading text 14 px. Start button 16 px.
 - **Editor scale:** base 14 px; panel headings 13 px bold in accent with `.04em` tracking; form labels 13 px in `--sub`; notes 12 px; nothing below 11 px (chips, ids, legends).
 - **Weight:** 400 for text, 600 for labels and tabs, 700 for headings, primary buttons and values; 800 only for the coral accident chip.
 - **Numbers** that change (time, coordinates, speeds) use `font-variant-numeric: tabular-nums` so they do not jitter.
@@ -47,7 +49,7 @@ Editor-only tokens (`editor/editor.css`): `--panel #111a2e` (side panels), `--fi
 
 ## 4. Shape, space and depth
 
-- **Radius:** 18 px for cards and dialogs (14 px on phones), 12 px for buttons, segmented controls and toasts, 10 px (`--radius`) for list rows and editor controls, 8 px for inputs, 999 px for chips, pills and the loading bar.
+- **Radius:** 20 px for simulator cards, 18 px for dialogs (16 px on phones), 16 px for panel cards and docs link cards, 12 px for buttons, segmented controls and toasts, 10 px (`--radius`) for list rows and editor controls, 8 px for inputs, 999 px for chips, pills and the loading bar.
 - **Borders before shadows.** Every surface has a 1 px `--edge` border. Shadows only for things floating over the map or the 3D view (tool groups, toasts, dialogs, menus): `0 4px 16px` to `0 20px 60px` of black at 35–55 %.
 - **Spacing:** a 4 px rhythm — 4 / 6 / 8 / 10 / 12 / 14 px gaps; 24–28 px card padding (14–16 px on phones); 14 px panel padding in the editor.
 - **Control height:** editor `--control` 36 px (44 px on coarse pointers); simulator buttons pad to about 44 px, and every button on a touch device has `min-height: 44px`.
@@ -61,10 +63,12 @@ Editor-only tokens (`editor/editor.css`): `--panel #111a2e` (side panels), `--fi
 | **Primary** (`.primary`) | amber fill, dark ink, bold | One per screen or dialog |
 | **Accent** (`.accent`, editor) | `#0369a1` fill, white bold text; hover `#075985` | Secondary "go" action that leaves the page (▶ ブラウザで試す) |
 | **Danger** (`.danger`) | transparent, coral text and 45 % coral border | Destructive actions; always behind a confirmation |
-| **Tile** (`.tile`) | button with a bold name and a `--sub` subtitle; selected = `--accent` fill with dark ink (subtitle `#0c4a6e`), light border `#e0f2fe`, `aria-pressed="true"` | Scenario choice; numbers `01`–`10` are 1-based |
-| **Card / overlay** (`.card`) | navy at 94 %, 18 px radius, centred, scrolls inside | Title, results; never wider than 1100 px |
+| **Tile** (`.tile`) | number and short name, grouped by setting; selected = `--accent` fill with dark ink, light border `#e0f2fe`, `aria-pressed="true"` | The group supplies the category. The accessible name starts with the visible number and name, followed by category and mode, so voice control can match the visible text. English names are available on hover. Numbers `01`–`10` are 1-based. |
+| **Card / overlay** (`.card`) | navy gradient at 97 %, 20 px radius (`--radius-lg`), deep shadow, centred, scrolls inside | Title, results; never wider than 1120 px |
+| **Panel card** (`.panel-card`) | translucent `--card` surface, 16 px radius, 1 px border | Groups one task on the title (体格, 自由探索, 場面の練習) |
+| **Stepper** (`.stepper`) | − / value + unit / ＋ on a `--field` track, 52 px high, 26 px tabular value | Numeric settings with limits; invalid = coral border and a range message |
 | **Bar** (`.bar`) | floating pill-shaped strip at the bottom centre | Replay controls; wraps on phones |
-| **Segmented control** (`.views`, editor `.segmented`, `.tabs`) | joined buttons, active part sky blue with dark ink | 2–4 mutually exclusive choices |
+| **Segmented control** (`.views`, editor `.segmented`, `.tabs`, `.group`) | joined buttons on a sunken `--field` track, active part sky blue with dark ink | 2–4 mutually exclusive choices |
 | **Chip / pill** | 999 px radius, small bold text | Status only (事故, 歩行, OK, 注意 2), not clickable |
 | **List row** (editor) | 48 px min height, two-line name, status dot (lime / amber / coral) | Active row: `--accent-soft` with an accent border |
 | **Input** | `--field` fill, `--edge` border, accent border on focus | Units sit to the right in `--sub` |
@@ -72,8 +76,12 @@ Editor-only tokens (`editor/editor.css`): `--panel #111a2e` (side panels), `--fi
 | **Toast** | card above the timeline, coral border for errors | 3 s, errors 6 s; never the only place an error is reported |
 | **Dialog** | native `<dialog>`, 18 px radius, dimmed backdrop | Title in accent, buttons right-aligned, primary last but one, 閉じる last |
 | **HUD** | top-left translucent box | Short state only; hides its help line on phones |
+| **Mode choice** (`.modes`) | two 44 px radio labels on a sunken track; checked = `--accent` fill with dark ink | Walking / bicycle for open exploration; native radios keep arrow-key use |
+| **Encounter note** (`#toast`) | top-centre card, 4 px left bar: amber, lime (no harm), coral (risk) | `role=status`; 7 s; after an encounter or a rule observation, never before a hazard; red-entry observations stay in the record without a toast |
 
 The editor's header uses the loading screen's bear (head only) as its logo and links back to the simulator; the simulator's title links to the editor (`.editor-link`, accent text).
+
+The title places open exploration before scenario practice in reading order. Practice cards are grouped by setting, with import and launch directly below; that action row stays within reach on narrow screens. A selected built-in is identified by its tile; a custom scenario has one visible name. Body size is an always-visible card at the top of the side column (highlighted with an accent border): height and weight are large numeric inputs with 48 px − / ＋ steppers; an out-of-range value turns the field coral and its range line names the limits (the run clamps on start). Exploration follows in the same column; control keys and the safety tip sit in a visible footer row. The editor keeps its guide and coordinate panel collapsed until requested; choosing the coordinate tool or a location opens that panel. Storage location, unsaved state, field labels and validation errors remain explicit. The replay title supplies context without a second REPLAY badge; its playback announcement remains available to assistive technology.
 
 ## 6. The loading screen
 

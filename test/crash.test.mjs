@@ -1,18 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { classifyCrash, crashMotion } = await import('../src/crash.js');
-const { createReplayAnimal, bearGirth } = await import('../src/replay-animal.js');
-const { Replay } = await import('../src/replay.js');
-const { registerModel } = await import('../src/world.js');
-const { cockpitLayout } = await import('../src/cockpit.js');
+const { classifyCrash, crashMotion } = await import('../src/simulation/collision/crash.ts');
+const { createReplayAnimal, bearGirth } = await import('../src/three/entities/replay-animal.js');
+const { Replay } = await import('../src/three/entities/replay.js');
+const { registerModel } = await import('../src/three/scene/world.js');
+const { cockpitLayout } = await import('../src/three/entities/cockpit.js');
 // a box stands in for the sedan model (the GLB loads only in a browser)
 registerModel('WEB_Sedan', [{ geometry: new THREE.BoxGeometry(1.76, 1.45, 4.6), material: new THREE.MeshLambertMaterial({ name: 'Box' }), matrix: new THREE.Matrix4() }]);
 

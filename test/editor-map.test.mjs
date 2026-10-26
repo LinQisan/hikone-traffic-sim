@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { inflateSync } from 'node:zlib';
-import { toMapPixel, fromMapPixel, coordinateGrid, coordinateText, containsPoint, imagePlacement } from '../editor/map-coordinates.js';
+import { toMapPixel, fromMapPixel, coordinateGrid, coordinateText, containsPoint, imagePlacement } from '../src/editor/map-coordinates.ts';
 
 const map = JSON.parse(fs.readFileSync(new URL('../data/map.json', import.meta.url)));
 

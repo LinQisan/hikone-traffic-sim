@@ -1,5 +1,7 @@
 # Built-in event review — 2026-10-16
 
+**Historical review:** the timing and guaranteed-contact results below describe the former scripted model. The 2026-10-23 driver model supersedes those scheduling claims; see [RATIONALE.md](../RATIONALE.md#events) for current behavior and checks. Route geometry findings remain historical evidence, not a new playthrough.
+
 All ten browser events were inspected on the map and played through contact, replay and results. The review uses `events/builtin-*.json`, which supplies both `data/scenarios/` and `data/editor/templates/` through `tools/sync.mjs --events-only`. Both editor backends now open these browser events by default.
 
 ## Process and decisions

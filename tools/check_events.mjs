@@ -1,29 +1,22 @@
 // Checks every built-in event against its purpose, with the web traffic model and the real city
 // geometry for sight lines (no browser):  node tools/check_events.mjs [--dir events] [id…]
 //
-// For each event:
-//   naive    — goes straight on towards the goal at the app's pace without looking (after 0 s and
-//              after standing 3 s): must be hit by the event's accident car (not by other traffic)
-//   careful  — goes to the edge of the first lane the accident car uses (for 04: the edge of the
-//              truck), stops and watches until the accident cars have passed, then goes on: must
-//              see each accident car for a while before it passes, and reach the goal unhurt
-//   spawn    — where each car appears: hidden from the participant's eyes, or far away
+// Reports hasty departures at different times and a cautious traversal. Crashes are outcomes,
+// not assertions: regression cases in test/driver.test.mjs cover avoidable/unavoidable contact.
+// Participant sight lines use city meshes; driver perception shares the browser's collision grid.
 import fs from 'node:fs';
-import { registerHooks } from 'node:module';
+import { parkedFor } from '../src/world/generators/parked-layout.js';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { indexMeshRays } = await import('./mesh-ray-index.mjs');
-const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-const S = await import('../src/shared/scenario.js');
-const { Traffic, PLAYER_RADIUS, meetPoint, smoothRoute, BODY_SIZE } = await import('../src/traffic.js');
-const { placement } = await import('../src/coords.js');
-const { webLayout } = await import('../src/web-layout.js');
-const { Ground } = await import('../src/ground.js');
+const { indexMeshRays } = await import('../src/three/camera/mesh-ray-index.js');
+const { buildNativeModel } = await import('../src/three/assets/models.js');
+const S = await import('../src/simulation/core/scenario.ts');
+const { Traffic, PLAYER_RADIUS, meetPoint, smoothRoute, BODY_SIZE } = await import('../src/simulation/traffic/Traffic.ts');
+const { placement } = await import('../src/three/scene/coords.ts');
+const { webLayout } = await import('../src/world/generators/web-layout.js');
+const { Ground } = await import('../src/simulation/collision/Ground.ts');
+const { Obstacles } = await import('../src/simulation/collision/Obstacles.ts');
+const collision = JSON.parse(fs.readFileSync(new URL('../data/collision.json', import.meta.url)));
 
 const args = process.argv.slice(2);
 const dirArg = args.indexOf('--dir');
@@ -35,14 +28,9 @@ const scene = JSON.parse(fs.readFileSync(new URL('scene.json', data)));
 const PACE = 2.4;
 
 // ---- sight lines: buildings, walls, trees, gates and the event's parked trucks, cut into cells
-const loader = new GLTFLoader();
-const glb = async name => {
-  const bytes = fs.readFileSync(new URL(`models/impressionist/${name}.lod.glb`, data));
-  const gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
-  gltf.scene.updateMatrixWorld(true);
-  const parts = [];
-  gltf.scene.traverse(o => { if (o.isMesh) parts.push(o.geometry.clone().applyMatrix4(o.matrixWorld)); });
-  return parts;
+const nativeGeometry = async name => {
+  const program = JSON.parse(fs.readFileSync(new URL(`../models/${name}.lod.json`, data)));
+  return buildNativeModel(program).map(part => part.geometry.applyMatrix4(part.matrix));
 };
 const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|ChainFence|Guardrail|StreetLamp|GuidePost|Hedge)|ART_Kyobashi(Roads|Land|Water))/;
 // the city as the browser shows it (web-layout.js)
@@ -64,7 +52,7 @@ const addTriangles = (geometry, matrix) => {
 const m = new THREE.Matrix4();
 for (const item of layout.items) {
   if (NOT_SOLID.test(item.a)) continue;
-  if (!cache.has(item.a)) cache.set(item.a, await glb(item.a));
+  if (!cache.has(item.a)) cache.set(item.a, await nativeGeometry(item.a));
   for (const g of cache.get(item.a)) addTriangles(g, placement(...item.p, item.r, item.s, m));
 }
 const cityMeshes = [...cells.values()].map(list => {
@@ -74,11 +62,11 @@ const cityMeshes = [...cells.values()].map(list => {
 });
 const truckSize = {};
 for (const name of ['HK_Truck_Large', 'HK_Truck_Medium']) {
-  const box = new THREE.Box3(); for (const g of await glb(name)) { g.computeBoundingBox(); box.union(g.boundingBox); }
+  const box = new THREE.Box3(); for (const g of await nativeGeometry(name)) { g.computeBoundingBox(); box.union(g.boundingBox); }
   truckSize[name] = box;
 }
 function parkedMeshes(builtIn) {
-  const list = scene.scenarios.find(s => s.id === builtIn)?.parked ?? [];
+  const list = parkedFor(scene, builtIn);
   return list.map(p => {
     const box = p.kind === 'truck' ? truckSize[p.model] : new THREE.Box3(new THREE.Vector3(-0.88, 0, -2.3), new THREE.Vector3(0.88, 1.45, 2.3));
     const size = box.getSize(new THREE.Vector3()), centre = box.getCenter(new THREE.Vector3());
@@ -122,8 +110,52 @@ function waypoints(spawn, goal) {
   return best ? [best.c, goal] : [goal];
 }
 
+/** Walk around parked bodies. A straight walker blocked by live traffic is reported separately. */
+function obstacleDetour(from, goal, obstacles) {
+  if (!obstacles.boxes.length) return null;
+  const nodes = [from, goal];
+  for (const b of obstacles.boxes) for (const side of [-1, 1]) for (const along of [-1, 1]) {
+    const x = side * (b.hw + 0.8), z = along * (b.hl + 0.8);
+    nodes.push({ x: b.x + x * b.c + z * b.s, z: b.z - x * b.s + z * b.c });
+  }
+  const clear = (a, b) => {
+    if (S.crossesWall(map, a, b)) return false;
+    const n = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z) / 0.15);
+    for (let i = 1; i <= n; i++) if (obstacles.blocked(a.x + (b.x - a.x) * i / n,
+      a.z + (b.z - a.z) * i / n, PLAYER_RADIUS - 0.01)) return false;
+    return true;
+  };
+  const costs = nodes.map(() => Infinity), previous = [], visited = new Set(); costs[0] = 0;
+  for (let count = 0; count < nodes.length; count++) {
+    let at = -1;
+    for (let i = 0; i < nodes.length; i++) if (!visited.has(i) && (at < 0 || costs[i] < costs[at])) at = i;
+    if (at < 0 || !Number.isFinite(costs[at])) break;
+    if (at === 1) {
+      const path = [];
+      for (let i = 1; i !== 0; i = previous[i]) path.unshift(nodes[i]);
+      return path;
+    }
+    visited.add(at);
+    for (let i = 1; i < nodes.length; i++) {
+      const cost = costs[at] + Math.hypot(nodes[i].x - nodes[at].x, nodes[i].z - nodes[at].z);
+      if (!visited.has(i) && cost < costs[i] && clear(nodes[at], nodes[i])) { costs[i] = cost; previous[i] = at; }
+    }
+  }
+  return null;
+}
+
 function run(scenario, occluders, behaviour) {
-  const traffic = new Traffic(scenario, { seed: behaviour.seed ?? 7, builtInMix: true });
+  const obstacles = new Obstacles(collision);
+  const builtIn = Number(scenario.id.replace('builtin-', '')) - 1;
+  obstacles.setParked(parkedFor(scene, builtIn).map(p => {
+    const box = p.kind === 'truck' ? truckSize[p.model] : new THREE.Box3(new THREE.Vector3(-0.88, 0, -2.3), new THREE.Vector3(0.88, 1.45, 2.3));
+    const size = box.getSize(new THREE.Vector3()), centre = box.getCenter(new THREE.Vector3());
+    const a = p.yaw * Math.PI / 180, cx = -centre.x, cz = centre.z;
+    return { x: p.x + cx * Math.cos(a) + cz * Math.sin(a), z: p.z - cx * Math.sin(a) + cz * Math.cos(a), yaw: p.yaw, size: [size.x, size.z] };
+  }));
+  const traffic = new Traffic(scenario, { seed: behaviour.seed ?? 7, builtInMix: true,
+    canSee: (car, participant) => obstacles.clearSight(car, participant) });
+  obstacles.setTraffic(traffic.cars);
   const { spawn } = scenario;
   const goal = behaviour.edge != null ? { ...scenario.goal, z: behaviour.edge } : scenario.goal;
   // straight at the goal; round a wall only once it stops them (edge riders move to the edge first)
@@ -131,26 +163,27 @@ function run(scenario, occluders, behaviour) {
   const eyeH = scenario.playerMode === 'bicycle' ? 1.55 : 1.59;
   let x = spawn.x, z = spawn.z, t = 0, travelled = 0;
   const out = { contact: null, spawns: [], seenBefore: {}, reached: false };
-  const firstSeen = {}, passed = {};
-  let waitFrom = null;
+  const firstSeen = {}, passed = {}, states = new Set(), decisions = new Map();
+  let waitFrom = null, nextDetour = 0;
   // a gap is safe when no car reaches the participant's path within 3.5 s (careful participants)
   const pathDir = (() => { const l = Math.hypot(goal.x - spawn.x, goal.z - spawn.z); return { x: (goal.x - spawn.x) / l, z: (goal.z - spawn.z) / l }; })();
   const along = () => (x - spawn.x) * pathDir.x + (z - spawn.z) * pathDir.z;
   const unsafe = () => traffic.cars.some(c => {
-    if (!c.crossing) return false;
+    if (!c.crossing || c.currentSpeed < 0.2) return false;
     const left = c.crossing.distance - c.distance;
     return left > -c.size[2] && left / Math.max(c.currentSpeed, 1) < 3.5;
-  }) || traffic.plans.some(p => p.v.accident && !p.done && p.meet);
-  for (; t < 60; t += 1 / 30) {
+  });
+  for (; t < 150; t += 1 / 30) {
     let speed = t < (behaviour.idle ?? 0) ? 0 : PACE;
     if (behaviour.stopAt != null && along() >= behaviour.stopAt && !behaviour.crossing) {
       waitFrom ??= t;
-      if ((t - waitFrom < 1.5 || unsafe()) && t - waitFrom < 20) speed = 0; else behaviour.crossing = true;
+      if (t - waitFrom < 1.5 || unsafe() || scenario.setting === 'crossing' && traffic.signalCycle.state.walk !== 'green') speed = 0;
+      else behaviour.crossing = true;
     }
     if (behaviour.slowFrom != null && along() >= behaviour.slowFrom && along() < behaviour.slowUntil) {
       speed = Math.min(speed, 1.0);
       // a careful rider also stops while a car is about to cross in front (and goes on after it)
-      if (behaviour.edge == null && traffic.cars.some(c => c.accident && c.crossing && c.distance < c.crossing.distance + c.size[2]
+      if (behaviour.edge == null && traffic.cars.some(c => c.currentSpeed > 0.2 && c.crossing && c.distance < c.crossing.distance + c.size[2]
         && Math.hypot(c.x - x, c.z - z) < 9)) speed = 0;
     }
     // move like player.js: towards the goal, stopped by the map's invisible walls, sliding along them
@@ -163,12 +196,28 @@ function run(scenario, occluders, behaviour) {
       if (reach(dx, dz)) { mx = dx; mz = dz; }
       else if (way.length === 1) { way = waypoints({ x, z }, goal); }   // blocked: head for the wall's end
     }
+    if (!obstacles.allows(x, z, x + mx, z + mz, PLAYER_RADIUS)) {
+      if (t >= nextDetour) {
+        const detour = obstacleDetour({ x, z }, goal, obstacles);
+        if (detour) way = detour;
+        nextDetour = t + 1;
+      }
+      if (obstacles.allows(x, z, x + mx, z, PLAYER_RADIUS)) mz = 0;
+      else if (obstacles.allows(x, z, x, z + mz, PLAYER_RADIUS)) mx = 0;
+      else { mx = 0; mz = 0; }
+    }
     x += mx; z += mz; travelled += Math.hypot(mx, mz);
     if (S.hasTrigger(scenario) && traffic.triggerTime == null && S.pointInArea([x, z], scenario.trigger)) traffic.trigger();
     const before = new Set(traffic.cars.map(c => c.id));
-    traffic.step(1 / 30, { x, z, vx: mx * 30, vz: mz * 30 });
+    const scanning = behaviour.stopAt != null || behaviour.slowFrom != null;
+    const axis = ((traffic.participantRules.lane.yaw ?? 90) % 180 + 180) % 180;
+    const yaw = scanning ? axis + (t % 1.2 < 0.6 ? 0 : 180) : Math.atan2(pathDir.x, pathDir.z) * 180 / Math.PI;
+    traffic.step(1 / 30, { x, z, vx: mx * 30, vz: mz * 30, yaw });
     const eye = { x, y: ground.heightAt(x, z) + eyeH, z };       // above the ground underfoot, as in the app
     for (const car of traffic.cars) {
+      states.add(car.driver.state);
+      if (car.driver.behavior !== 'pending' && !decisions.has(car.id)) decisions.set(car.id,
+        { id: car.id, behavior: car.driver.behavior, probability: car.driver.decisionProbability });
       if (!before.has(car.id) && !out.spawns.some(e => e.id === car.id)) {
         const dist = Math.hypot(car.x - x, car.z - z);
         out.spawns.push({ id: car.id, name: car.name, accident: car.accident, t: +t.toFixed(2), dist: +dist.toFixed(1), visible: sees(eye, car, occluders) });
@@ -181,11 +230,20 @@ function run(scenario, occluders, behaviour) {
     }
     const hit = traffic.hit(x, z, PLAYER_RADIUS);
     if (hit) { out.contact = { at: [+x.toFixed(2), +z.toFixed(2)], car: [+hit.x.toFixed(2), +hit.z.toFixed(2), Math.round(hit.yaw)], name: hit.name, accident: hit.accident, t: +t.toFixed(2), kmh: Math.round(hit.currentSpeed * 3.6), s: +travelled.toFixed(1),
-      seenFor: firstSeen[hit.id] != null ? +(t - firstSeen[hit.id]).toFixed(2) : 0 }; break; }
+      seenFor: firstSeen[hit.id] != null ? +(t - firstSeen[hit.id]).toFixed(2) : 0,
+      driverBehavior: hit.driver.behavior, violation: hit.violation }; break; }
     if (S.pointInArea([x, z], scenario.goal) || (behaviour.edge != null && Math.abs(x - goal.x) < 0.5)) { out.reached = true; break; }
   }
   for (const id of Object.keys(passed)) out.seenBefore[id] = firstSeen[id] != null ? +(passed[id] - firstSeen[id]).toFixed(2) : 0;
   out.time = +t.toFixed(1);
+  out.states = [...states];
+  out.waitingForTraffic = !out.reached && !out.contact && traffic.cars.some(c => c.currentSpeed < 0.1
+    && Math.hypot(c.x - x, c.z - z) < 8);
+  out.position = { x, z };
+  out.decisions = [...decisions.values()];
+  const rules = traffic.participantRules;
+  out.rules = { score: rules.score, probability: rules.probability, redEntries: rules.redEntries,
+    uncheckedEntries: rules.uncheckedEntries, wrongWaySeconds: rules.wrongWaySeconds };
   return out;
 }
 
@@ -227,14 +285,16 @@ for (const file of files) {
     : { stopAt: Math.max(0, careStop) };
   const r = { id: scenario.id, name: scenario.name,
     naive: run(scenario, occluders, { idle: 0 }), naiveLate: run(scenario, occluders, { idle: 3 }),
-    naiveSeed: run(scenario, occluders, { idle: 7.3, seed: 1234 }), careful: run(scenario, occluders, careful) };
+    naiveSeed: run(scenario, occluders, { idle: 7.3, seed: 1234 }), careful: run(scenario, occluders, { ...careful }),
+    referenceCareful: run({ ...scenario, hazardPolicy: { safeProbability: 0, unsafeProbability: 0 } }, occluders, { ...careful }) };
   results.push(r);
-  const fmt = o => o.contact ? `HIT by ${o.contact.name}${o.contact.accident ? '' : ' [NOT accident car]'} at ${o.contact.kmh} km/h after ${o.contact.s} m (seen ${o.contact.seenFor} s before)` : (o.reached ? 'reached the goal' : 'stopped');
+  const fmt = o => o.contact ? `HIT by ${o.contact.name}${o.contact.accident ? '' : ' [other traffic]'} at ${o.contact.kmh} km/h after ${o.contact.s} m (seen ${o.contact.seenFor} s before)` : (o.reached ? 'reached the goal' : o.waitingForTraffic ? 'blocked by stopped traffic; needs a different path' : 'stopped');
   console.log(`\n${r.id} ${r.name}`);
   console.log(`  naive          : ${fmt(r.naive)}`);
   console.log(`  naive, 3 s late: ${fmt(r.naiveLate)}`);
   console.log(`  naive, 7 s late: ${fmt(r.naiveSeed)}`);
   console.log(`  careful        : ${fmt(r.careful)}; accident cars seen before passing: ${JSON.stringify(r.careful.seenBefore)}`);
+  console.log(`  lawful reference: ${fmt(r.referenceCareful)}; observed risk: ${r.careful.rules.probability.toFixed(3)}`);
   const pops = r.naive.spawns.filter(e => e.visible && e.dist < 60 && e.t > 0.2);   // t ≈ 0: there from the start
   console.log(`  spawns (naive) : ${r.naive.spawns.map(e => `${e.accident ? '★' : ''}${e.name}@${e.t}s ${e.dist}m ${e.t <= 0.2 ? 'there from the start' : e.visible ? 'VISIBLE' : 'hidden'}`).join(' | ')}`);
   if (pops.length) console.log(`  !! visible pop-in within 60 m: ${pops.map(e => e.name).join(', ')}`);

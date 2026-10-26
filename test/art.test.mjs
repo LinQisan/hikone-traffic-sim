@@ -3,12 +3,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { signalPlacements, signalRigs, signalNamePlate, signalWalkPlate, POLE, ARM_ABOVE_HEAD } from '../src/signal-layout.js';
-import { webLayout, WEB_HIDDEN, isHidden } from '../src/web-layout.js';
-import { Ground } from '../src/ground.js';
-import { moatBend, moatPathEdge } from '../src/road-layout.js';
-import { CASTLE_SITE } from '../src/castle-layout.js';
-import { HIKONE_BOUNDS } from '../src/shared/scenario.js';
+import { signalPlacements, signalRigs, signalNamePlate, signalWalkPlate, POLE, ARM_ABOVE_HEAD } from '../src/three/scene/signal-layout.js';
+import { webLayout, WEB_HIDDEN, isHidden } from '../src/world/generators/web-layout.js';
+import { Ground } from '../src/simulation/collision/Ground.ts';
+import { moatBend, moatPathEdge } from '../src/world/generators/road-layout.js';
+import { CASTLE_SITE } from '../src/world/generators/castle-layout.js';
+import { HIKONE_BOUNDS } from '../src/simulation/core/scenario.ts';
 
 const modelRoot = new URL('../data/models/', import.meta.url);
 const glb = (name, painted = true) => {

@@ -2,14 +2,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { Ground } from '../src/ground.js';
-import { Obstacles } from '../src/obstacles.js';
-import { crossesWall } from '../src/shared/scenario.js';
-import { INNER_MOAT_INNER, INNER_MOAT_OUTER } from '../src/castle-approach.js';
+import { Ground } from '../src/simulation/collision/Ground.ts';
+import { Obstacles } from '../src/simulation/collision/Obstacles.ts';
+import { crossesWall } from '../src/simulation/core/scenario.ts';
+import { INNER_MOAT_INNER, INNER_MOAT_OUTER } from '../src/world/generators/castle-approach.js';
 import { WEST_ROUTE, UNIVERSITY_ENTRANCE, UNIVERSITY_AXIS, UNIVERSITY_WEST_LANE,
   UNIVERSITY_BUILDINGS, CASTLE_CAMPUS_LINK, UNIVERSITY_BOUNDARY,
   UNIVERSITY_FRONT_LANE, UNIVERSITY_WEST_ENTRY, UNIVERSITY_WEST_GATE,
-  SCHOOL_LANES, SCHOOL_LOT_ENTRY, SCHOOL_LOT, WEST_BUILDINGS, UNIVERSITY_FIELDS } from '../src/university-layout.js';
+  SCHOOL_LANES, SCHOOL_LOT_ENTRY, SCHOOL_LOT, WEST_BUILDINGS, UNIVERSITY_FIELDS } from '../src/world/generators/university-layout.js';
 
 const read = name => JSON.parse(fs.readFileSync(new URL('../data/'+name,import.meta.url)));
 const ground = new Ground(read('road_tiles.json'));
@@ -105,11 +105,9 @@ test('school buildings, tennis grounds and the open lot stand on dry exported la
 // Check the exported surfaces at the shared seam. Comparing source arrays alone would
 // miss a generator that cropped the hill at an obsolete radial ring.
 import { registerHooks } from 'node:module';
-import { UNIVERSITY_DATA } from '../src/university-layout.js';
-import { CASTLE_SITE } from '../src/castle-layout.js';
+import { UNIVERSITY_DATA } from '../src/world/generators/university-layout.js';
+import { CASTLE_SITE } from '../src/world/generators/castle-layout.js';
 registerHooks({resolve(specifier,context,next){
-  if(specifier==='three')return {url:new URL('../vendor/three/three.module.js',import.meta.url).href,shortCircuit:true};
-  if(specifier.startsWith('three/addons/'))return {url:new URL('../vendor/three/addons/'+specifier.slice(13),import.meta.url).href,shortCircuit:true};
   return next(specifier,context);
 }});
 const {GLTFLoader}=await import('three/addons/loaders/GLTFLoader.js');

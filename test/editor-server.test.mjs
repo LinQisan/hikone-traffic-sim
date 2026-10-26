@@ -1,4 +1,4 @@
-// Editor server (server/editor-api.mjs, needs the VRLearn project): list, read, save (with path
+// Editor server (server/editor-api.mjs, isolated project fixture): list, read, save (with path
 // safety), delete, play request, and the guards for other computers and other sites.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -8,7 +8,7 @@ import path from 'node:path';
 import './editor-project.mjs';
 import { handle, SCENARIOS, available } from '../server/editor-api.mjs';
 
-const skip = !available && 'the VRLearn project is not next to this one (VRLEARN_ROOT)';
+assert.ok(available, 'the isolated editor project fixture must be available');
 
 async function withServer(run) {
   const server = http.createServer(handle);
@@ -17,12 +17,31 @@ async function withServer(run) {
   try { await run(base); } finally { server.close(); }
 }
 
-test('lists templates, saves, reloads, deletes to .trash and requests play', { skip }, async () => withServer(async base => {
+test('malformed input returns actionable 400 errors without overwriting a saved scenario', async () => withServer(async base => {
+  const scenario = { ...await (await fetch(base + '/api/scenario?path=templates/builtin-01.json')).json(), id: 'zz-input' };
+  const target = base + '/api/scenarios/zz-input';
+  await fetch(target, { method: 'PUT', body: JSON.stringify(scenario) });
+  const file = path.join(SCENARIOS, 'zz-input.json'), before = await fs.readFile(file, 'utf8');
+  try {
+    for (const body of ['{', JSON.stringify({ ...scenario, vehicles: {} }), JSON.stringify({ ...scenario, name: 2 })]) {
+      const response = await fetch(target, { method: 'PUT', body });
+      assert.equal(response.status, 400);
+      const problem = await response.json();
+      assert.equal(problem.code, 'INVALID_SCENARIO'); assert.ok(problem.problems[0].path);
+      assert.equal(await fs.readFile(file, 'utf8'), before);
+    }
+  } finally { await fs.rm(file, { force: true }); }
+}));
+
+test('lists templates, saves, reloads, deletes to .trash and requests play', async () => withServer(async base => {
   const list = await (await fetch(base + '/api/scenarios')).json();
   assert.equal(list.filter(e => e.template).length, 10);
   assert.ok(list.filter(e => e.template).every(e => e.errors === 0));
 
   const template = await (await fetch(base + '/api/scenario?path=templates/builtin-01.json')).json();
+  template.vehicles[0].driver = { reactionTimeSeconds: 1.4, maxBrakingMps2: 5, behavior: 'red-light' };
+  template.environment = { visibilityMeters: 40, roadGrip: 0.7 };
+  template.hazardPolicy = { safeProbability: 0.05, unsafeProbability: 0.75 };
   const id = 'zz-server-test';
   const saved = await fetch(base + '/api/scenarios/' + id, { method: 'PUT', body: JSON.stringify({ ...template, id }) });
   assert.equal(saved.status, 200);
@@ -30,6 +49,10 @@ test('lists templates, saves, reloads, deletes to .trash and requests play', { s
   try {
     const text = await fs.readFile(file, 'utf8');
     assert.equal(JSON.parse(text).id, id);
+    const reopened = await (await fetch(base + '/api/scenario?path=' + id + '.json')).json();
+    assert.deepEqual(reopened.vehicles[0].driver, template.vehicles[0].driver);
+    assert.deepEqual(reopened.environment, template.environment);
+    assert.deepEqual(reopened.hazardPolicy, template.hazardPolicy);
     const play = await fetch(base + '/api/play', { method: 'POST', body: JSON.stringify({ path: id + '.json' }) });
     assert.equal(play.status, 200);
     assert.equal((await (await fetch(base + '/api/play')).json()).pending, true);
@@ -46,7 +69,7 @@ test('lists templates, saves, reloads, deletes to .trash and requests play', { s
   }
 }));
 
-test('refuses unsafe paths, template ids and mismatched ids', { skip }, async () => withServer(async base => {
+test('refuses unsafe paths, template ids and mismatched ids', async () => withServer(async base => {
   assert.equal((await fetch(base + '/api/scenario?path=../AGENTS.md')).status, 400);
   assert.equal((await fetch(base + '/api/scenario?path=' + encodeURIComponent('../../etc/passwd'))).status, 400);
   assert.equal((await fetch(base + '/api/scenarios/builtin-01', { method: 'PUT', body: '{}' })).status, 400);
@@ -55,7 +78,7 @@ test('refuses unsafe paths, template ids and mismatched ids', { skip }, async ()
   assert.equal((await fetch(base + '/api/play', { method: 'POST', body: JSON.stringify({ path: '../AGENTS.md' }) })).status, 400);
 }));
 
-test('the local editor opens the same built-in events as the browser-only editor', { skip }, async () => withServer(async base => {
+test('the local editor opens the same built-in events as the browser-only editor', async () => withServer(async base => {
   const map = await (await fetch(base + '/api/map')).json();
   const source = JSON.parse(await fs.readFile(new URL('../data/map.json', import.meta.url)));
   assert.deepEqual(map.world, source.world, 'the API serves the regenerated overview registration');
@@ -71,7 +94,7 @@ test('the local editor opens the same built-in events as the browser-only editor
   }
 }));
 
-test('reports the server, leaves other paths to the static site and refuses other sites', { skip }, async () => withServer(async base => {
+test('reports the server, leaves other paths to the static site and refuses other sites', async () => withServer(async base => {
   assert.equal((await (await fetch(base + '/api/status')).json()).server, true);
   assert.equal((await fetch(base + '/api/map/image')).headers.get('content-type'), 'image/png');
   const put = await fetch(base + '/api/scenarios/zz-cross-site', { method: 'PUT', body: '{}', headers: { Origin: 'https://example.com' } });

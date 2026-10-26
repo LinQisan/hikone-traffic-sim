@@ -1,18 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { registerHooks } from 'node:module';
-import { CROWS, WATER_BIRDS, WATER_LEVEL, birdPose } from '../src/wildlife-layout.js';
-import { AmbientMotion } from '../src/ambient-motion.js';
+import { CROWS, WATER_BIRDS, WATER_LEVEL, birdPose } from '../src/world/generators/wildlife-layout.js';
+import { AmbientMotion } from '../src/three/materials/ambient-motion.js';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { buildWildlife } = await import('../src/wildlife.js');
-const { geometryBytes } = await import('../src/geometry-budget.js');
+const { buildWildlife } = await import('../src/three/entities/wildlife.js');
+const { geometryBytes } = await import('../src/three/scene/geometry-budget.js');
 
 function inside(x, z, p) {
   let hit = false;

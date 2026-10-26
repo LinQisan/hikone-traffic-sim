@@ -19,7 +19,7 @@ globalThis.fetch = async (url, options) => {
   try { return new Response(await fs.readFile(fileURLToPath(u))); }
   catch { return new Response('', { status: 404, statusText: 'Not Found' }); }
 };
-const { request } = await import('../editor/store.js');
+const { request } = await import('../src/editor/store.ts');
 
 test('lists the ten browser event templates without errors and opens one', async () => {
   const map = await request('/api/map');
@@ -60,13 +60,20 @@ test('lane presets and snapping guides also use corrected event routes', async (
 
 test('saves, lists, reopens and deletes my scenarios in the browser', async () => {
   const template = await request('/api/scenario?path=templates/builtin-03.json');
+  template.vehicles[0].driver = { reactionTimeSeconds: 1.4, maxBrakingMps2: 5, behavior: 'red-light' };
+  template.environment = { visibilityMeters: 40, roadGrip: 0.7 };
+  template.hazardPolicy = { safeProbability: 0.05, unsafeProbability: 0.75 };
   const body = JSON.stringify({ ...template, id: 'zz-store' });
   const saved = await request('/api/scenarios/zz-store', { method: 'PUT', body });
   assert.equal(saved.path, 'zz-store.json');
   assert.equal(saved.problems.filter(p => p.level === 'error').length, 0);
   const mine = (await request('/api/scenarios')).filter(e => !e.template);
   assert.deepEqual(mine.map(e => [e.path, e.errors]), [['zz-store.json', 0]]);
-  assert.equal((await request('/api/scenario?path=zz-store.json')).id, 'zz-store');
+  const reopened = await request('/api/scenario?path=zz-store.json');
+  assert.equal(reopened.id, 'zz-store');
+  assert.deepEqual(reopened.vehicles[0].driver, template.vehicles[0].driver);
+  assert.deepEqual(reopened.environment, template.environment);
+  assert.deepEqual(reopened.hazardPolicy, template.hazardPolicy);
   await request('/api/scenarios/zz-store', { method: 'DELETE' });
   assert.equal((await request('/api/scenarios')).filter(e => !e.template).length, 0);
   assert.equal(JSON.parse(localStorage.getItem('vrlearn.editor.trash'))[0].id, 'zz-store');
@@ -80,7 +87,20 @@ test('refuses what the server refuses and has no Unity or Quest', async () => {
   await fails('/api/scenarios/Bad!', { method: 'PUT', body: '{}' }, /英小文字/);
   await fails('/api/scenarios/abc', { method: 'PUT', body: JSON.stringify({ id: 'other' }) }, /一致しません/);
   await fails('/api/scenario?path=../AGENTS.md', {}, /not found/);
-  await fails('/api/play', { method: 'POST', body: '{}' }, /serve\.mjs/);
-  await fails('/api/quest', {}, /serve\.mjs/);
+  await assert.rejects(request('/api/play', { method: 'POST', body: '{}' }), { status: 404 });
+  await assert.rejects(request('/api/quest'), { status: 404 });
   assert.deepEqual(await request('/api/status'), { server: false });
+});
+
+test('malformed input is a client error and cannot overwrite a saved scenario', async () => {
+  const scenario = { ...await request('/api/scenario?path=templates/builtin-01.json'), id: 'zz-input' };
+  await request('/api/scenarios/zz-input', { method: 'PUT', body: JSON.stringify(scenario) });
+  const before = await request('/api/scenario?path=zz-input.json');
+  try {
+    for (const body of ['{', JSON.stringify({ ...scenario, vehicles: {} }), JSON.stringify({ ...scenario, name: 2 })]) {
+      await assert.rejects(request('/api/scenarios/zz-input', { method: 'PUT', body }),
+        error => error.status === 400 && error.code === 'INVALID_SCENARIO' && error.problems.length > 0);
+      assert.deepEqual(await request('/api/scenario?path=zz-input.json'), before);
+    }
+  } finally { await request('/api/scenarios/zz-input', { method: 'DELETE' }); }
 });

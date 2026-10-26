@@ -1,16 +1,10 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import { registerHooks } from 'node:module';
-import { Ground } from '../src/ground.js';
+import { Ground } from '../src/simulation/collision/Ground.ts';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { indexMeshRays } = await import('../tools/mesh-ray-index.mjs');
+const { indexMeshRays } = await import('../src/three/camera/mesh-ray-index.js');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const tiles = JSON.parse(await fs.readFile(new URL('../data/road_tiles.json', import.meta.url)));
 const ground = new Ground(tiles);

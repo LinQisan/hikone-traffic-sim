@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-25",
+  "change": "Vite multi-page startup and native three.js construction programs",
+  "versions": {
+    "node": "26.7.0",
+    "three": "0.186.0",
+    "vite": "8.3.5"
+  },
+  "models": {
+    "assets": 53,
+    "detailLevels": [
+      "high",
+      "low"
+    ],
+    "referenceEnvelopeTolerancePerAxisMeters": 0.008,
+    "runtimeGLBRequests": 0,
+    "legacyGLBs": "offline reference fixtures only"
+  },
+  "validation": {
+    "regression": {
+      "tests": 253,
+      "passed": 253,
+      "failed": 0,
+      "skipped": 0
+    },
+    "focusedRenderingAfterEmissionMatch": {
+      "tests": 7,
+      "passed": 7
+    },
+    "build": "passed",
+    "production": {
+      "checks": [
+        "production under GitHub Pages subpath",
+        "walking: start, traffic, debug contact, replay views/restart/end, results, menu",
+        "bicycle: start, traffic, debug contact, replay views/restart/end, results, menu",
+        "exploration record, resume and menu",
+        "static editor: 10 browser templates, map/detail image, cycling template validation",
+        "all five built documentation pages",
+        "390px touch exploration, reduced motion, menu"
+      ],
+      "errors": [],
+      "bad": [],
+      "glb": []
+    },
+    "realPhone": false,
+    "deployment": false
+  },
+  "collision": {
+    "objects": 436,
+    "cellMeters": 0.2,
+    "width": 6300,
+    "height": 5125,
+    "blockedCells": 338426,
+    "indexOptimizationChangedGrid": false
+  },
+  "constructionCPU": {
+    "environment": "Node on this Mac, one sample per model; not device or end-to-end loading evidence",
+    "beforeMilliseconds": {
+      "HK_Terrain_Hikone": 11312,
+      "ART_ShigaCampus": 1829,
+      "ART_WestMoat": 2328
+    },
+    "afterMilliseconds": {
+      "HK_Terrain_Hikone": 4809,
+      "ART_ShigaCampus": 563,
+      "ART_WestMoat": 966
+    }
+  },
+  "renderingAB": {
+    "errors": [],
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    },
+    "note": "Same Chrome page and fixed high quality; baseline GLB loader injected only by the test. No fallback is shipped.",
+    "legacy": {
+      "street": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70846086,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 479,
+        "fps": 59.87499999999999,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 17.700000002980232,
+        "updateMs": 0.3202505220264383,
+        "calls": 108,
+        "triangles": 1135493,
+        "width": 1280,
+        "height": 720,
+        "geometries": 186,
+        "textures": 10,
+        "programs": 21,
+        "readyMs": 13128.59999999404,
+        "resourceTransferBytes": 82395500,
+        "resourceBodyBytes": 82345400,
+        "heapBytes": 220635212,
+        "multiDraw": true
+      },
+      "castle-panorama": {
+        "geometryBytes": 68630810,
+        "sceneBufferBytes": 70846086,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 452,
+        "fps": 56.11839491464314,
+        "medianMs": 16.700000002980232,
+        "p95Ms": 20.5,
+        "updateMs": 0.3504424783178663,
+        "calls": 63,
+        "triangles": 888570,
+        "width": 1280,
+        "height": 720,
+        "geometries": 199,
+        "textures": 10,
+        "programs": 23,
+        "readyMs": 13128.59999999404,
+        "resourceTransferBytes": 82395500,
+        "resourceBodyBytes": 82345400,
+        "heapBytes": 153196842,
+        "multiDraw": true
+      }
+    },
+    "native": {
+      "street": {
+        "geometryBytes": 60779232,
+        "sceneBufferBytes": 62994508,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 401,
+        "fps": 55.174880981887846,
+        "medianMs": 16.599999994039536,
+        "p95Ms": 18.19999998807907,
+        "updateMs": 0.313216957442481,
+        "calls": 108,
+        "triangles": 1143542,
+        "width": 1280,
+        "height": 720,
+        "geometries": 186,
+        "textures": 9,
+        "programs": 21,
+        "readyMs": 54648.79999999702,
+        "resourceTransferBytes": 17433110,
+        "resourceBodyBytes": 17407610,
+        "heapBytes": 141996177,
+        "multiDraw": true
+      },
+      "castle-panorama": {
+        "geometryBytes": 60779232,
+        "sceneBufferBytes": 62994508,
+        "placements": 440,
+        "meshes": 413,
+        "frames": 463,
+        "fps": 57.985171826491936,
+        "medianMs": 16.600000008940697,
+        "p95Ms": 17.69999998807907,
+        "updateMs": 0.27991360712386104,
+        "calls": 63,
+        "triangles": 887912,
+        "width": 1280,
+        "height": 720,
+        "geometries": 199,
+        "textures": 9,
+        "programs": 23,
+        "readyMs": 54648.79999999702,
+        "resourceTransferBytes": 17433110,
+        "resourceBodyBytes": 17407610,
+        "heapBytes": 143390173,
+        "multiDraw": true
+      }
+    },
+    "glbRequests": {
+      "legacy": 91,
+      "native": 0
+    },
+    "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)"
+  },
+  "limits": [
+    "One desktop Chrome/Metal comparison, fixed high quality, same page and camera; no phone performance claim.",
+    "The GLB loader was injected only by the benchmark. The application has no GLB runtime fallback.",
+    "Native first-ready time remains materially slower: 54.65 s versus 13.13 s in this sample.",
+    "Native scene construction runs in a worker. Window performance resource/heap counters exclude worker resources and must not be used to claim a download or total-memory improvement.",
+    "Draw counts are unchanged. Street p95 is 17.7 to 18.2 ms, castle p95 is 20.5 to 17.7 ms; these samples do not establish smoother rendering."
+  ]
+}

@@ -128,7 +128,7 @@
             "delaySeconds": 1,
             "repeatMinSeconds": 4,
             "repeatMaxSeconds": 6,
-            "stopOnTrigger": true,
+            "stopOnTrigger": false,
             "accident": false,
             "overrideYaw": false,
             "yaw": -90
@@ -167,11 +167,7 @@
             "stopOnTrigger": false,
             "accident": true,
             "overrideYaw": false,
-            "yaw": 0,
-            "launch": "meet",
-            "hold": true,
-            "meetOffsetSeconds": 0.15,
-            "launchAfterTriggerSeconds": 4
+            "yaw": 0
         }
     ]
 }

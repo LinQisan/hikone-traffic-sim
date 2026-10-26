@@ -1,7 +1,7 @@
 """Store GLB normals and vertex colours as normalized bytes (KHR_mesh_quantization).
 
 The browser merges every asset into byte normals and byte pigments anyway
-(src/environment-instances.js mergeParts, src/geometry-budget.js packPigments), so
+(src/three/scene/environment-instances.js mergeParts, src/three/scene/geometry-budget.js packPigments), so
 float32 normals/colours only cost download and parse time. Positions and indices stay
 exact. Idempotent: already quantized attributes are left alone.
 

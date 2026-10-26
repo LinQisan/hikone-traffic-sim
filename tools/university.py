@@ -18,7 +18,7 @@ EXTENT = [(-1060, -100), (-220, -100), (-220, 870), (-1060, 870)]
 
 @lru_cache(maxsize=1)
 def data():
-    script = "import {UNIVERSITY_DATA} from './src/university-layout.js';console.log(JSON.stringify(UNIVERSITY_DATA));"
+    script = "import {UNIVERSITY_DATA} from './src/world/generators/university-layout.js';console.log(JSON.stringify(UNIVERSITY_DATA));"
     return json.loads(subprocess.check_output(['node', '--input-type=module', '-e', script], cwd=ROOT))
 
 

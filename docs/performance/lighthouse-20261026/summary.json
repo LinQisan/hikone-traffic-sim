@@ -1,0 +1,1317 @@
+{
+  "date": "2026-10-26",
+  "scope": "Local production snapshot under /hikone-traffic-sim/, not a deployed-site or real-phone audit.",
+  "protocol": {
+    "tool": "Lighthouse 13.5.0 CLI and ready-state snapshot API; Chrome 155; Node 26.7.0",
+    "order": "Before: desktop 1, mobile 1, desktop 2, mobile 2, desktop 3, mobile 3. After: the same alternating sequence. Snapshots and interaction checks run separately.",
+    "delivery": "Same loopback HTTP URL; gzip text responses and Cache-Control public,max-age=600 in both snapshots; fresh Chrome profile per navigation. Host/GPU warm-up remains uncontrolled.",
+    "performance": "Built-in desktop and mobile presets, default simulated throttling, normal application settings; no benchmark query, cache bypass flag, or quality reduction.",
+    "ready": "Snapshot only after vrlearn.state is title and the loading overlay is hidden. Snapshot timing is unthrottled and is not a first-ready A/B benchmark.",
+    "limitation": "Navigation LCP is the loading title; the final navigation screenshot still shows the loader. These performance scores do not measure completion of native model construction."
+  },
+  "groups": [
+    {
+      "phase": "before",
+      "mode": "desktop",
+      "medianScores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "performanceRange": [
+        86,
+        100
+      ],
+      "medianMetrics": {
+        "first-contentful-paint": 495.1683,
+        "largest-contentful-paint": 495.1683,
+        "speed-index": 495.1683,
+        "total-blocking-time": 63,
+        "cumulative-layout-shift": 0
+      }
+    },
+    {
+      "phase": "before",
+      "mode": "mobile",
+      "medianScores": {
+        "performance": 93,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "performanceRange": [
+        83,
+        95
+      ],
+      "medianMetrics": {
+        "first-contentful-paint": 2404.2101000000002,
+        "largest-contentful-paint": 2404.2101000000002,
+        "speed-index": 2404.2101000000002,
+        "total-blocking-time": 133,
+        "cumulative-layout-shift": 0
+      }
+    },
+    {
+      "phase": "after",
+      "mode": "desktop",
+      "medianScores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "performanceRange": [
+        100,
+        100
+      ],
+      "medianMetrics": {
+        "first-contentful-paint": 490.6225,
+        "largest-contentful-paint": 490.6225,
+        "speed-index": 490.6225,
+        "total-blocking-time": 13.999999999999943,
+        "cumulative-layout-shift": 0
+      }
+    },
+    {
+      "phase": "after",
+      "mode": "mobile",
+      "medianScores": {
+        "performance": 94,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "performanceRange": [
+        91,
+        94
+      ],
+      "medianMetrics": {
+        "first-contentful-paint": 2403.9997000000003,
+        "largest-contentful-paint": 2403.9997000000003,
+        "speed-index": 2403.9997000000003,
+        "total-blocking-time": 102.50000000000045,
+        "cumulative-layout-shift": 0
+      }
+    }
+  ],
+  "runs": [
+    {
+      "id": "before-desktop-1",
+      "phase": "before",
+      "mode": "desktop",
+      "sample": 1,
+      "time": "2026-10-26T02:02:57.709Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1796,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 86,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "metrics": {
+        "first-contentful-paint": 513.5709999999999,
+        "largest-contentful-paint": 680.0709999999999,
+        "speed-index": 905.755895719204,
+        "total-blocking-time": 322,
+        "cumulative-layout-shift": 0.0001571492389749876
+      },
+      "transferredBytes": 22612042,
+      "lcpNode": "body > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "before-desktop-2",
+      "phase": "before",
+      "mode": "desktop",
+      "sample": 2,
+      "time": "2026-10-26T02:08:04.436Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1808.5,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "metrics": {
+        "first-contentful-paint": 492.4573,
+        "largest-contentful-paint": 492.4573,
+        "speed-index": 492.4573,
+        "total-blocking-time": 41.00000000000006,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612042,
+      "lcpNode": "body > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "before-desktop-3",
+      "phase": "before",
+      "mode": "desktop",
+      "sample": 3,
+      "time": "2026-10-26T02:08:33.059Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1718.5,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "metrics": {
+        "first-contentful-paint": 495.1683,
+        "largest-contentful-paint": 495.1683,
+        "speed-index": 495.1683,
+        "total-blocking-time": 63,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612042,
+      "lcpNode": "body > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "before-mobile-1",
+      "phase": "before",
+      "mode": "mobile",
+      "sample": 1,
+      "time": "2026-10-26T02:04:51.863Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1796,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 83,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "metrics": {
+        "first-contentful-paint": 2404.6018,
+        "largest-contentful-paint": 2470.1018,
+        "speed-index": 2404.6018,
+        "total-blocking-time": 470.00000000000045,
+        "cumulative-layout-shift": 0.0003226767616279518
+      },
+      "transferredBytes": 22612042,
+      "lcpNode": "body > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "before-mobile-2",
+      "phase": "before",
+      "mode": "mobile",
+      "sample": 2,
+      "time": "2026-10-26T02:08:19.144Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1794.5,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 93,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "metrics": {
+        "first-contentful-paint": 2404.2101000000002,
+        "largest-contentful-paint": 2404.2101000000002,
+        "speed-index": 2404.2101000000002,
+        "total-blocking-time": 133,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612042,
+      "lcpNode": "body > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "before-mobile-3",
+      "phase": "before",
+      "mode": "mobile",
+      "sample": 3,
+      "time": "2026-10-26T02:08:47.817Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1812,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 95,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 90
+      },
+      "metrics": {
+        "first-contentful-paint": 2404.1972,
+        "largest-contentful-paint": 2404.1972,
+        "speed-index": 2404.1972,
+        "total-blocking-time": 26.999999999999545,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612042,
+      "lcpNode": "body > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "after-desktop-1",
+      "phase": "after",
+      "mode": "desktop",
+      "sample": 1,
+      "time": "2026-10-26T02:15:37.305Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1817.5,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "first-contentful-paint": 506.3974,
+        "largest-contentful-paint": 506.3974,
+        "speed-index": 506.3974,
+        "total-blocking-time": 0,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612158,
+      "lcpNode": "main > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "after-desktop-2",
+      "phase": "after",
+      "mode": "desktop",
+      "sample": 2,
+      "time": "2026-10-26T02:16:05.793Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1796,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "first-contentful-paint": 486.045,
+        "largest-contentful-paint": 486.045,
+        "speed-index": 486.045,
+        "total-blocking-time": 32.00000000000006,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612158,
+      "lcpNode": "main > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "after-desktop-3",
+      "phase": "after",
+      "mode": "desktop",
+      "sample": 3,
+      "time": "2026-10-26T02:16:34.297Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1778.5,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 100,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "first-contentful-paint": 490.6225,
+        "largest-contentful-paint": 490.6225,
+        "speed-index": 490.6225,
+        "total-blocking-time": 13.999999999999943,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612158,
+      "lcpNode": "main > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "after-mobile-1",
+      "phase": "after",
+      "mode": "mobile",
+      "sample": 1,
+      "time": "2026-10-26T02:15:52.090Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1791,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 94,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "first-contentful-paint": 2403.9997000000003,
+        "largest-contentful-paint": 2403.9997000000003,
+        "speed-index": 2403.9997000000003,
+        "total-blocking-time": 102.50000000000045,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612158,
+      "lcpNode": "main > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "after-mobile-2",
+      "phase": "after",
+      "mode": "mobile",
+      "sample": 2,
+      "time": "2026-10-26T02:16:20.315Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1777,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 91,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "first-contentful-paint": 2404.1638000000003,
+        "largest-contentful-paint": 2404.1638000000003,
+        "speed-index": 2404.1638000000003,
+        "total-blocking-time": 212,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612158,
+      "lcpNode": "main > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    },
+    {
+      "id": "after-mobile-3",
+      "phase": "after",
+      "mode": "mobile",
+      "sample": 3,
+      "time": "2026-10-26T02:16:49.201Z",
+      "toolVersion": "13.5.0",
+      "environment": {
+        "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36",
+        "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/155.0.0.0 Safari/537.36",
+        "benchmarkIndex": 1781,
+        "credits": {
+          "axe-core": "4.14.0"
+        }
+      },
+      "settings": {
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "disableStorageReset": false
+      },
+      "scores": {
+        "performance": 94,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "metrics": {
+        "first-contentful-paint": 2403.8772,
+        "largest-contentful-paint": 2403.8772,
+        "speed-index": 2403.8772,
+        "total-blocking-time": 79,
+        "cumulative-layout-shift": 0
+      },
+      "transferredBytes": 22612158,
+      "lcpNode": "main > section#loading > div.loader > h1#loadtitle",
+      "errors": null,
+      "warnings": []
+    }
+  ],
+  "readySnapshots": {
+    "before": [
+      {
+        "phase": "before",
+        "mode": "desktop",
+        "menuReadyMs": 7350.899999976158,
+        "observedReadyMs": 7822.899999976158,
+        "calls": 64,
+        "triangles": 887047,
+        "geometryCount": 122,
+        "touch": false,
+        "scores": {
+          "accessibility": 0.98,
+          "best-practices": 1,
+          "seo": 0.75
+        },
+        "failures": [
+          {
+            "id": "label-content-name-mismatch",
+            "title": "Elements with visible text labels do not have matching accessible names.",
+            "details": {
+              "type": "table",
+              "headings": [
+                {
+                  "key": "node",
+                  "valueType": "node",
+                  "subItemsHeading": {
+                    "key": "relatedNode",
+                    "valueType": "node"
+                  },
+                  "label": "Failing Elements"
+                }
+              ],
+              "items": [
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-0-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,0,SECTION,1,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 314,
+                      "bottom": 392,
+                      "left": 406,
+                      "right": 661,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile on\" data-scenario=\"builtin-01\" aria-pressed=\"true\" aria-label=\"01 横断歩道：手前の車線を右から来る車（歩行）\">",
+                    "nodeLabel": "01\n手前の車線を右から来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-1-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,0,SECTION,2,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 400,
+                      "bottom": 478,
+                      "left": 406,
+                      "right": 661,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-02\" aria-pressed=\"false\" aria-label=\"02 交差点：横から曲がってくる車（歩行）\">",
+                    "nodeLabel": "02\n横から曲がってくる車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-2-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,0,SECTION,3,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 486,
+                      "bottom": 564,
+                      "left": 406,
+                      "right": 661,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-05\" aria-pressed=\"false\" aria-label=\"05 交差点：うしろから曲がってくる車（歩行）\">",
+                    "nodeLabel": "05\nうしろから曲がってくる車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-3-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,1,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 314,
+                      "bottom": 392,
+                      "left": 673,
+                      "right": 929,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-03\" aria-pressed=\"false\" aria-label=\"03 道路の途中：左から続けて来る車（歩行）\">",
+                    "nodeLabel": "03\n左から続けて来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-4-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,2,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 400,
+                      "bottom": 478,
+                      "left": 673,
+                      "right": 929,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-04\" aria-pressed=\"false\" aria-label=\"04 道路の途中：止まっている車の陰から来る車（歩行）\">",
+                    "nodeLabel": "04\n止まっている車の陰から来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-5-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,3,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 486,
+                      "bottom": 564,
+                      "left": 673,
+                      "right": 929,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-06\" aria-pressed=\"false\" aria-label=\"06 道路の途中：スピードを出して止まらない車（歩行）\">",
+                    "nodeLabel": "06\nスピードを出して止まらない車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-6-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,4,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 572,
+                      "bottom": 650,
+                      "left": 673,
+                      "right": 929,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-09\" aria-pressed=\"false\" aria-label=\"09 道路の途中：左右から時間差で来る車（歩行）\">",
+                    "nodeLabel": "09\n左右から時間差で来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-7-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,2,SECTION,1,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 314,
+                      "bottom": 392,
+                      "left": 941,
+                      "right": 1196,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-07\" aria-pressed=\"false\" aria-label=\"07 自転車：駐車場から急に出てくる車（自転車）\">",
+                    "nodeLabel": "07\n駐車場から急に出てくる車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-8-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,2,SECTION,2,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 400,
+                      "bottom": 478,
+                      "left": 941,
+                      "right": 1196,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-08\" aria-pressed=\"false\" aria-label=\"08 自転車：出入口の前を通るときの車（自転車）\">",
+                    "nodeLabel": "08\n出入口の前を通るときの車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-9-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,2,SECTION,3,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 486,
+                      "bottom": 564,
+                      "left": 941,
+                      "right": 1196,
+                      "width": 255,
+                      "height": 78
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-10\" aria-pressed=\"false\" aria-label=\"10 自転車：道路の右側を走る（逆走）（自転車）\">",
+                    "nodeLabel": "10\n道路の右側を走る（逆走）",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                }
+              ],
+              "debugData": {
+                "type": "debugdata",
+                "impact": "serious",
+                "tags": [
+                  "cat.semantics",
+                  "wcag21a",
+                  "wcag253",
+                  "EN-301-549",
+                  "EN-9.2.5.3",
+                  "RGAAv4",
+                  "RGAA-6.1.5"
+                ]
+              }
+            }
+          },
+          {
+            "id": "landmark-one-main",
+            "title": "Document does not have a main landmark.",
+            "details": {
+              "type": "table",
+              "headings": [
+                {
+                  "key": "node",
+                  "valueType": "node",
+                  "subItemsHeading": {
+                    "key": "relatedNode",
+                    "valueType": "node"
+                  },
+                  "label": "Failing Elements"
+                }
+              ],
+              "items": [
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-10-HTML",
+                    "path": "1,HTML",
+                    "selector": "html",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 940,
+                      "left": 0,
+                      "right": 1350,
+                      "width": 1350,
+                      "height": 940
+                    },
+                    "snippet": "<html lang=\"ja\">",
+                    "nodeLabel": "html",
+                    "explanation": "Fix all of the following:\n  Document does not have a main landmark"
+                  }
+                }
+              ],
+              "debugData": {
+                "type": "debugdata",
+                "impact": "moderate",
+                "tags": [
+                  "cat.semantics",
+                  "best-practice"
+                ]
+              }
+            }
+          },
+          {
+            "id": "meta-description",
+            "title": "Document does not have a meta description"
+          }
+        ],
+        "errors": []
+      },
+      {
+        "phase": "before",
+        "mode": "mobile",
+        "menuReadyMs": 9038.59999999404,
+        "observedReadyMs": 9475.199999988079,
+        "calls": 45,
+        "triangles": 593378,
+        "geometryCount": 83,
+        "touch": true,
+        "scores": {
+          "accessibility": 1,
+          "best-practices": 1,
+          "seo": 0.75
+        },
+        "failures": [
+          {
+            "id": "label-content-name-mismatch",
+            "title": "Elements with visible text labels do not have matching accessible names.",
+            "details": {
+              "type": "table",
+              "headings": [
+                {
+                  "key": "node",
+                  "valueType": "node",
+                  "subItemsHeading": {
+                    "key": "relatedNode",
+                    "valueType": "node"
+                  },
+                  "label": "Failing Elements"
+                }
+              ],
+              "items": [
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-0-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,0,SECTION,1,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 389,
+                      "bottom": 433,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile on\" data-scenario=\"builtin-01\" aria-pressed=\"true\" aria-label=\"01 横断歩道：手前の車線を右から来る車（歩行）\">",
+                    "nodeLabel": "01\n手前の車線を右から来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-1-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,0,SECTION,2,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 441,
+                      "bottom": 485,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-02\" aria-pressed=\"false\" aria-label=\"02 交差点：横から曲がってくる車（歩行）\">",
+                    "nodeLabel": "02\n横から曲がってくる車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-2-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,0,SECTION,3,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 493,
+                      "bottom": 537,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-05\" aria-pressed=\"false\" aria-label=\"05 交差点：うしろから曲がってくる車（歩行）\">",
+                    "nodeLabel": "05\nうしろから曲がってくる車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-3-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,1,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 590,
+                      "bottom": 634,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-03\" aria-pressed=\"false\" aria-label=\"03 道路の途中：左から続けて来る車（歩行）\">",
+                    "nodeLabel": "03\n左から続けて来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-4-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,2,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 642,
+                      "bottom": 686,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-04\" aria-pressed=\"false\" aria-label=\"04 道路の途中：止まっている車の陰から来る車（歩行）\">",
+                    "nodeLabel": "04\n止まっている車の陰から来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-5-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,3,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 694,
+                      "bottom": 738,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-06\" aria-pressed=\"false\" aria-label=\"06 道路の途中：スピードを出して止まらない車（歩行）\">",
+                    "nodeLabel": "06\nスピードを出して止まらない車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                },
+                {
+                  "node": {
+                    "type": "node",
+                    "lhId": "1-6-BUTTON",
+                    "path": "1,HTML,1,BODY,6,SECTION,1,DIV,1,SECTION,1,DIV,1,SECTION,4,BUTTON",
+                    "selector": "section.practice > div#scenarios > section.scenario-group > button.tile",
+                    "boundingRect": {
+                      "top": 746,
+                      "bottom": 790,
+                      "left": 25,
+                      "right": 387,
+                      "width": 362,
+                      "height": 44
+                    },
+                    "snippet": "<button type=\"button\" class=\"tile\" data-scenario=\"builtin-09\" aria-pressed=\"false\" aria-label=\"09 道路の途中：左右から時間差で来る車（歩行）\">",
+                    "nodeLabel": "09\n左右から時間差で来る車",
+                    "explanation": "Fix any of the following:\n  Text inside the element is not included in the accessible name"
+                  }
+                }
+              ],
+              "debugData": {
+                "type": "debugdata",
+                "impact": "serious",
+                "tags": [
+                  "cat.semantics",
+                  "wcag21a",
+                  "wcag253",
+                  "EN-301-549",
+                  "EN-9.2.5.3",
+                  "RGAAv4",
+                  "RGAA-6.1.5"
+                ]
+              }
+            }
+          },
+          {
+            "id": "meta-description",
+            "title": "Document does not have a meta description"
+          }
+        ],
+        "errors": []
+      }
+    ],
+    "after": [
+      {
+        "phase": "after",
+        "mode": "desktop",
+        "menuReadyMs": 7337.0999999940395,
+        "observedReadyMs": 7822.699999988079,
+        "calls": 64,
+        "triangles": 887047,
+        "geometryCount": 122,
+        "touch": false,
+        "scores": {
+          "accessibility": 1,
+          "best-practices": 1,
+          "seo": 1
+        },
+        "failures": [],
+        "errors": []
+      },
+      {
+        "phase": "after",
+        "mode": "mobile",
+        "menuReadyMs": 9605.800000011921,
+        "observedReadyMs": 10044.199999988079,
+        "calls": 45,
+        "triangles": 593378,
+        "geometryCount": 83,
+        "touch": true,
+        "scores": {
+          "accessibility": 1,
+          "best-practices": 1,
+          "seo": 1
+        },
+        "failures": [],
+        "errors": []
+      }
+    ]
+  },
+  "changes": [
+    "Japanese document description",
+    "One native main landmark for application content",
+    "Accessible card names start with the visible number and name; category and mode follow"
+  ],
+  "deferred": [
+    "No model streaming, image-quality change, service worker, source-map publishing, bundler customization or extra project dependency.",
+    "Cache lifetime belongs to the Pages host; changing a local audit server would not improve deployed caching.",
+    "Unused-JavaScript coverage is collected before practice/replay; do not remove required features from that report alone.",
+    "Level-9 gzip on the largest 15,163,380-byte recipe: 4,086,524 to 4,050,905 bytes (0.87% saving), taking 2.04s in an isolated packaging sample. Not adopted."
+  ],
+  "browserVerification": {
+    "checks": [
+      "production subpath startup does not fetch the optional validation map",
+      "all 10 cards retain complete accessible names, category grouping and keyboard selection",
+      "320/375/700/1440px and 844px landscape: no title overflow, visible Explore, reachable sticky practice action and 44px targets",
+      "native settings disclosure opens by keyboard and preserves profile inputs when closed",
+      "BOM file import succeeds and focuses Start",
+      "field errors are inline, accessible, preserve selection and need no second map request",
+      "a structurally valid spawn in water is rejected by road validation",
+      "same file can be retried and entered as the selected practice",
+      "walking: keyboard look, traffic, debug contact, replay views/end, results, menu",
+      "bicycle: keyboard look, traffic, debug contact, replay views/end, results, menu",
+      "exploration menu, resume and return",
+      "editor disclosures: coordinate tool opens panel, Enter chooses a point, copy/typed navigation work without changing the scenario, guide opens by keyboard",
+      "static editor accepts the same BOM file",
+      "editor malformed import preserves its current draft",
+      "editor Browser Play handoff validates the map and starts the edited scenario",
+      "semantically invalid drafts remain editable",
+      "updated documentation pages load under the deployment subpath",
+      "shared coordinate links reveal their panel automatically",
+      "incomplete map reports a retryable infrastructure error",
+      "changing to a built-in cancels the pending file selection without a late overwrite",
+      "retry succeeds and reuses the map fetched by the cancelled selection",
+      "390px touch, reduced motion and forced colors retain readable errors, 44px file target and keyboard access"
+    ],
+    "errors": [],
+    "bad": [],
+    "dialogs": [
+      [
+        "confirm",
+        "保存していない変更があります。破棄しますか？"
+      ],
+      [
+        "confirm",
+        "保存していない変更があります。破棄しますか？"
+      ],
+      [
+        "beforeunload",
+        ""
+      ]
+    ],
+    "scope": "Layout and interaction checks in local headless Chrome production build under /hikone-traffic-sim/. Debug contact verifies flow, not natural collision probability. No real phone, screen reader, Unity/Quest or deployed network."
+  },
+  "representativeReports": {
+    "beforeDesktop": "before-desktop-3",
+    "beforeMobile": "before-mobile-2",
+    "afterDesktop": "after-desktop-3",
+    "afterMobile": "after-mobile-1"
+  },
+  "conclusion": "Confirmed semantic and SEO fixes. Performance differences overlap the baseline range; no reliable first-ready speedup is established."
+}

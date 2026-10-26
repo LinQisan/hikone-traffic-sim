@@ -1,19 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { registerHooks } from 'node:module';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-const { smoothRoute, pathAt, carPose, Traffic, TURN_RADIUS, MAX_STEER } = await import('../src/traffic.js');
-const { registerModel } = await import('../src/world.js');
-const { instance, frontWheels } = await import('../src/vehicles.js');
-const S = await import('../src/shared/scenario.js');
+const { buildNativeModel } = await import('../src/three/assets/models.js');
+const { smoothRoute, pathAt, carPose, Traffic, TURN_RADIUS, MAX_STEER } = await import('../src/simulation/traffic/Traffic.ts');
+const { registerModel } = await import('../src/three/scene/world.js');
+const { instance, frontWheels } = await import('../src/three/entities/vehicles.js');
+const S = await import('../src/simulation/core/scenario.ts');
 
 const dyaw = (a, b) => ((b - a + 540) % 360) - 180;
 // a right-angle turn to the right: north 20 m, then east 20 m
@@ -101,13 +95,8 @@ test('a short lateral correction on a straight does not become a sharp steering 
 });
 
 test('the front wheels of each car model are cut out on pivots at the wheel centres and steer', async () => {
-  const loader = new GLTFLoader();
   for (const name of ['WEB_Sedan', 'HK_Kei_Tall', 'ART_KeiBox', 'HK_Kei_Hatch']) {
-    const bytes = fs.readFileSync(new URL(`../data/models/impressionist/${name}.glb`, import.meta.url));
-    const gltf = await loader.parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
-    gltf.scene.updateMatrixWorld(true);
-    const parts = [];
-    gltf.scene.traverse(o => { if (o.isMesh) parts.push({ geometry: o.geometry, material: o.material, matrix: o.matrixWorld.clone() }); });
+    const parts = buildNativeModel(JSON.parse(fs.readFileSync(new URL(`../models/${name}.json`, import.meta.url))));
     registerModel(name, parts);
     const split = frontWheels(name);
     assert.equal(split.wheels.length, 2, name);

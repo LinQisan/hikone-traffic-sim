@@ -1,17 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 
-// Match the browser import map to the repository's vendored three.js, without npm packages.
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
+// Rendering checks use the same npm three.js package as the browser.
 const THREE = await import('three');
-const { createReplayAnimal } = await import('../src/replay-animal.js');
-const { Replay } = await import('../src/replay.js');
-const { GroundContact } = await import('../src/ground-contact.js');
+const { createReplayAnimal } = await import('../src/three/entities/replay-animal.js');
+const { Replay } = await import('../src/three/entities/replay.js');
+const { GroundContact } = await import('../src/three/scene/ground-contact.js');
 
 test('ground contact matches precise posed vertices under nested rotations and nonuniform scales', () => {
   const root = new THREE.Group(), pivot = new THREE.Group();

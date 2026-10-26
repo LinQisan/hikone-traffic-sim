@@ -1,18 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { registerHooks } from 'node:module';
 import fs from 'node:fs/promises';
 
-registerHooks({ resolve(specifier, context, next) {
-  if (specifier === 'three') return { url: new URL('../vendor/three/three.module.js', import.meta.url).href, shortCircuit: true };
-  if (specifier.startsWith('three/addons/')) return { url: new URL(`../vendor/three/addons/${specifier.slice(13)}`, import.meta.url).href, shortCircuit: true };
-  return next(specifier, context);
-} });
 const THREE = await import('three');
-const { CameraObstacles } = await import('../src/camera-obstacles.js');
-const { ReplayCamera, replaySampleTimes } = await import('../src/replay-camera.js');
-const { Replay } = await import('../src/replay.js');
-const { registerModel } = await import('../src/world.js');
+const { CameraObstacles } = await import('../src/three/camera/camera-obstacles.js');
+const { ReplayCamera, replaySampleTimes } = await import('../src/three/camera/replay-camera.js');
+const { Replay } = await import('../src/three/entities/replay.js');
+const { registerModel } = await import('../src/three/scene/world.js');
 
 test('camera silhouettes share compact position/index copies without retaining render attributes', () => {
   const source = new THREE.BoxGeometry();
@@ -29,10 +23,35 @@ test('camera silhouettes share compact position/index copies without retaining r
   assert.equal(obstacles.clear(new THREE.Vector3(-2, 0, 0), new THREE.Vector3(2, 0, 0)), false);
   source.dispose(); a.dispose();
 });
-const { replayReviewFrames } = await import('../src/replay-review.js');
+
+test('shared camera ray indices retain exact occlusion across independently transformed placements', () => {
+  const source = new THREE.TorusKnotGeometry(1, 0.35, 64, 8), obstacles = new CameraObstacles();
+  const material = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }), originals = [];
+  for (const x of [-4, 4]) {
+    const mesh = new THREE.Mesh(source, material);
+    mesh.position.set(x, 2, 1); mesh.rotation.set(0.3, x / 3, -0.2); mesh.scale.set(x < 0 ? -1.2 : 0.7, 1.3, 0.9);
+    mesh.updateMatrixWorld(true); originals.push(mesh); obstacles.add(source, mesh.matrixWorld);
+  }
+  assert.equal(obstacles.parts[0].mesh.raycast, obstacles.parts[1].mesh.raycast, 'repeated geometry shares its CPU index');
+  assert.notEqual(obstacles.parts[0].mesh.raycast, THREE.Mesh.prototype.raycast, 'dense probes use the index');
+  const ray = new THREE.Raycaster(), direction = new THREE.Vector3();
+  let clear = 0, blocked = 0;
+  for (let i = 0; i < 180; i++) {
+    const angle = i * 2.399963, from = new THREE.Vector3(Math.cos(angle) * 9, 2 + Math.sin(i * 0.7) * 4, Math.sin(angle) * 9);
+    const to = new THREE.Vector3((i % 3 - 1) * 4, i % 4, 1);
+    const distance = direction.subVectors(to, from).length();
+    ray.set(from, direction.divideScalar(distance)); ray.near = 0.02; ray.far = distance - 0.02;
+    const expected = ray.intersectObjects(originals, false).length === 0;
+    assert.equal(obstacles.clear(from, to), expected, `same double-sided segment result at ray ${i}`);
+    if (expected) clear++; else blocked++;
+  }
+  assert.ok(clear && blocked, 'rays exercise openings as well as solid silhouettes');
+  source.dispose(); obstacles.parts[0].mesh.geometry.dispose(); material.dispose();
+});
+const { replayReviewFrames } = await import('../src/three/scene/replay-review.js');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
-const { webLayout } = await import('../src/web-layout.js');
-const { Ground } = await import('../src/ground.js');
+const { webLayout } = await import('../src/world/generators/web-layout.js');
+const { Ground } = await import('../src/simulation/collision/Ground.ts');
 
 const flat = { heightAt: () => 0.01 };
 const vector = (x, y, z) => new THREE.Vector3(x, y, z);

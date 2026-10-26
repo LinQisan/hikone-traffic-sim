@@ -19,11 +19,11 @@ MODELS = os.path.join(DATA, 'models', 'impressionist')
 def scene_sources():
     script = """
 import fs from 'node:fs';
-import {webLayout} from './src/web-layout.js';
-import {signalRigs} from './src/signal-layout.js';
-import {HIKONE_BOUNDS} from './src/shared/scenario.js';
-import {CASTLE_SITE} from './src/castle-layout.js';
-import {UNIVERSITY_DATA} from './src/university-layout.js';
+import {webLayout} from './src/world/generators/web-layout.js';
+import {signalRigs} from './src/three/scene/signal-layout.js';
+import {HIKONE_BOUNDS} from './src/simulation/core/scenario.ts';
+import {CASTLE_SITE} from './src/world/generators/castle-layout.js';
+import {UNIVERSITY_DATA} from './src/world/generators/university-layout.js';
 console.log(JSON.stringify({items:webLayout(JSON.parse(fs.readFileSync('data/layout.json'))).items,
  practice:HIKONE_BOUNDS, signals:signalRigs().map((r,i)=>({name:'信号柱 '+(i+1),x:r.pole.x,z:r.pole.z,yaw:0})),
  places:[{name:'京橋',x:32,z:26},{name:'彦根城',x:CASTLE_SITE.x,z:CASTLE_SITE.z},

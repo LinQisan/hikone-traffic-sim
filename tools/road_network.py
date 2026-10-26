@@ -63,7 +63,7 @@ def north_shore(x):
 
 
 # The castle-side bank and the masugata walls at the bridge's north end stand ~4.5 m above the
-# road (18 October 2026 photographs; formerly 3 m). Same profile in src/road-layout.js.
+# road (18 October 2026 photographs; formerly 3 m). Same profile in src/world/generators/road-layout.js.
 BANK_RISE = 4.2
 
 
@@ -889,7 +889,7 @@ def export_plan(markings=()):
     with open(path) as f:
         meta = json.load(f)
     ppm = 6
-    signal_script = "import {signalRigs} from './src/signal-layout.js';console.log(JSON.stringify(signalRigs().map((r,i)=>({name:'信号柱 '+(i+1),x:r.pole.x,z:r.pole.z,yaw:0}))));"
+    signal_script = "import {signalRigs} from './src/three/scene/signal-layout.js';console.log(JSON.stringify(signalRigs().map((r,i)=>({name:'信号柱 '+(i+1),x:r.pole.x,z:r.pole.z,yaw:0}))));"
     signals = json.loads(subprocess.check_output(['node', '--input-type=module', '-e', signal_script], cwd=ROOT))
     water_walls = []
     for label, xs in [('west', list(range(-220, 25, 2)) + [25]), ('east', [39] + list(range(40, 201, 2)))]:

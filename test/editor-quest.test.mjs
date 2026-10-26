@@ -10,9 +10,9 @@ import './editor-project.mjs';
 import { handle, SCENARIOS, packageId, available } from '../server/editor-api.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const skip = !available && 'the VRLearn project is not next to this one (VRLEARN_ROOT)';
+assert.ok(available, 'the isolated editor project fixture must be available');
 
-test('sync pushes valid scenarios, skips broken ones and removes stale files', { skip }, async () => {
+test('sync pushes valid scenarios, skips broken ones and removes stale files', async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'fake-quest-'));
   process.env.ADB = path.join(here, 'fake-adb.mjs');
   process.env.FAKE_ADB_ROOT = root;
