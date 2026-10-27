@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="事件、自由探索配置、模型、地图和碰撞数据的生成链，以及构建与部署。">
+  <title>数据与资源 · Hikone 开发文档</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="developer.css">
+  <script type="module" src="developer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Hikone 开发文档概览"><span class="brand-mark" aria-hidden="true">H</span><span class="brand-text">Hikone <span class="brand-label">开发文档</span></span></a>
+    <nav class="doc-tabs" aria-label="开发文档"><a href="index.html">概览</a><a href="tutorial.html">快速上手</a><a href="architecture.html">系统结构</a><a href="pipeline.html" aria-current="page">数据与资源</a><a href="how-to.html">常见任务</a><a href="reference.html">参考</a></nav>
+    <nav class="site-links" aria-label="站点导航"><a href="../">体验 <span aria-hidden="true">↗</span></a><a href="../editor/">编辑器 <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <details class="contents" open>
+        <summary>本页目录 <span aria-hidden="true">＋</span></summary>
+        <nav aria-label="本页章节"><ol><li><a href="#overview"><span>01</span> 数据从哪里来</a></li><li><a href="#files"><span>02</span> data/ 中的文件</a></li><li><a href="#coordinates"><span>03</span> 坐标与高度</a></li><li><a href="#models"><span>04</span> 模型如何到达浏览器</a></li><li><a href="#build"><span>05</span> 构建与部署</a></li></ol></nav>
+      </details>
+      <p class="sidebar-note">按源码核对于 <time datetime="2026-10-27">2026-10-27</time></p>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div class="hero">
+        <p class="eyebrow"><span class="edition">数据与资源</span></p>
+        <h1>数据与资源</h1>
+        <p class="lead">每份数据从哪个源头来、由哪个命令生成、被谁使用，以及站点如何构建发布。</p>
+      </div>
+<section id="overview" aria-labelledby="overview-title"><h2 id="overview-title">数据从哪里来</h2>
+<figure class="diagram" role="group" aria-label="四条数据生成链"><ul class="legend" aria-label="颜色说明"><li class="data">手写源</li><li class="sim">生成或解析</li><li class="engine">运行时使用</li></ul><p class="flow-title">内置事件</p><ol class="flow"><li class="data"><b>事件源</b><small>手写的 10 个事件</small><code>events/builtin-*.json</code></li><li class="sim"><b>同步</b><small>不需要 Unity</small><code>node tools/sync.mjs --events-only</code></li><li class="sim"><b>生成副本</b><small>模拟器场景、编辑器模板、车线提示</small><code>data/scenarios/ · data/editor/</code></li><li class="engine"><b>使用</b><small>标题菜单、编辑器模板、事件检查</small></li></ol><p class="flow-title">自由探索</p><ol class="flow"><li class="data"><b>配置</b><small>车流与遭遇，路线引用事件</small><code>world/hikone.json</code></li><li class="sim"><b>解析</b><small>展开引用并检查</small><code>resolveWorld()</code></li><li class="engine"><b>使用</b><small>Traffic 车流 + ScenarioManager 遭遇</small></li></ol><p class="flow-title">街区模型</p><ol class="flow"><li class="data"><b>建模程序</b><small>Python 程序化建模</small><code>tools/*.py</code></li><li class="sim"><b>编译指令</b><small>Blender 编译为构建指令（高/低精度）</small><code>tools/build_native_models.py</code></li><li class="sim"><b>打包</b><small>Vite 启动时 gzip 压缩并生成清单</small><code>tools/pack_models.mjs → models/runtime.json</code></li><li class="engine"><b>构建</b><small>浏览器在 Worker 中生成几何体</small><code>ModelWorkerPool</code></li></ol><p class="flow-title">地图与碰撞</p><ol class="flow"><li class="data"><b>上游场景</b><small>Unity 导出布局与模型（可选）</small><code>Export Scene For Web</code></li><li class="sim"><b>导出与风格化</b><small>Blender 导出、绘画风格化</small><code>export_models.py · build_impressionist.py</code></li><li class="sim"><b>同步</b><small>复制到 data/</small><code>node tools/sync.mjs</code></li><li class="engine"><b>碰撞与地图</b><small>人体高度的通行网格；编辑器地图图片</small><code>build_collision.mjs · build_editor_map.py</code></li></ol><figcaption>四条生成链。只修改最左边的源头，再运行对应的命令。</figcaption></figure>
+</section>
+<section id="files" aria-labelledby="files-title"><h2 id="files-title">data/ 中的文件</h2>
+<div class="table-wrap" role="region" aria-label="data 目录，可横向滚动" tabindex="0"><table><thead><tr><th scope="col">文件</th><th scope="col">内容</th><th scope="col">生成方式</th></tr></thead><tbody><tr><td><code>scene.json</code></td><td>材质、光照、各场景的停放车辆</td><td>Unity 导出 + <code>sync.mjs</code></td></tr><tr><td><code>layout.json</code></td><td>街区物体的摆放（资产、位置、朝向、缩放）</td><td><code>sync.mjs</code>，浏览器再用 <code>src/world/generators/</code> 补充</td></tr><tr><td><code>road_tiles.json</code></td><td>路面三角形，供路面高度查询</td><td><code>sync.mjs</code></td></tr><tr><td><code>walls.json</code>、<code>map.json</code></td><td>不可通行区域；含路面的完整地图（导入校验时按需加载）</td><td><code>sync.mjs</code></td></tr><tr><td><code>collision.json</code></td><td>0.2 m 网格的人体高度通行数据</td><td><code>build_collision.mjs</code></td></tr><tr><td><code>map.png</code>、<code>map-detail.png</code></td><td>编辑器地图底图</td><td><code>build_editor_map.py</code></td></tr><tr><td><code>scenarios/</code></td><td>模拟器使用的内置场景与索引</td><td><code>sync.mjs --events-only</code></td></tr><tr><td><code>editor/</code></td><td>编辑器模板与车线提示</td><td><code>sync.mjs --events-only</code></td></tr></tbody></table></div><div class="callout amber"><strong>不要手改 data/</strong><p>这些文件都会被重新生成。要改内容，改 <code>events/</code>、<code>world/</code>、<code>models/</code> 或生成器，再运行对应命令。</p></div>
+</section>
+<section id="coordinates" aria-labelledby="coordinates-title"><h2 id="coordinates-title">坐标与高度</h2>
+<p>所有数据都用导入地图的坐标，单位为米：在编辑器地图上 X 向右、Z 向上，<code>yaw</code> 从 +Z 起顺时针计角度。只有 <code>src/three/scene/coords.ts</code> 负责转换到 Three.js（X 取反）。</p>
+<p>高度约定：车道和城区人行道 0.01 m，独立路缘顶 0.16 m，城区地块 0.15 m，城堡坡道跟随地形。改高度要改生成几何，不要在渲染时加偏移。</p>
+</section>
+<section id="models" aria-labelledby="models-title"><h2 id="models-title">模型如何到达浏览器</h2>
+<p><code>models/</code> 中每个资产有高精度 <code>NAME.json</code> 和低精度 <code>NAME.lod.json</code> 两份构建指令，不是网格文件。Vite 启动或构建时，<code>pack_models.mjs</code> 把它们压缩到 <code>models/packed/</code>（可随时删除），并写出清单 <code>models/runtime.json</code>。</p>
+<p>浏览器用有限数量的 Worker 执行这些指令，生成原生 Three.js 几何体；触屏设备只用一个 Worker，以控制内存峰值。旧的 GLB 文件只作为离线对照样本，运行时不加载。</p>
+</section>
+<section id="build" aria-labelledby="build-title"><h2 id="build-title">构建与部署</h2>
+<ol class="flow"><li class="engine"><b>检查</b><small>类型 → 文档生成核对 → 完整测试 → 生产构建</small><code>npm run check</code></li><li class="engine"><b>打包</b><small>Vite 多页构建；复制 data/、models/、world/、*.md</small><code>dist/</code></li><li class="engine"><b>发布</b><small>推送 main 后由 GitHub Actions 部署</small><code>GitHub Pages</code></li></ol><p>站点部署在仓库子路径下，所以页面中的链接和数据地址都用相对路径。工具、测试和旧 GLB 不进入 <code>dist/</code>。</p>
+</section>
+      <nav class="pager" aria-label="上一篇与下一篇"><a class="prev" href="architecture.html"><span>上一篇</span>系统结构</a><a class="next" href="how-to.html"><span>下一篇</span>常见任务</a></nav>
+      <footer class="page-footer"><span>Hikone Traffic Simulator · 开发文档</span><a href="#main">回到顶部 ↑</a></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -8,7 +8,7 @@ test('Vite serves all entries and mounts the guarded editor API on the same orig
   await server.listen();
   const base = `http://127.0.0.1:${server.httpServer.address().port}`;
   try {
-    for (const url of ['/', '/editor/', '/docs/', '/docs/tutorial.html']) {
+    for (const url of ['/', '/editor/', '/docs/', '/docs/tutorial.html', '/docs/pipeline.html']) {
       const response = await fetch(base + url);
       assert.equal(response.status, 200, url);
       assert.match(await response.text(), /@vite\/client/, 'the HTML is transformed by Vite');

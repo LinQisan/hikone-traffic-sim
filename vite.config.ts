@@ -64,7 +64,7 @@ export default defineConfig({
     target: 'esnext',
     rolldownOptions: {
       input: ['index.html', 'editor/index.html', 'docs/index.html', 'docs/tutorial.html',
-        'docs/how-to.html', 'docs/reference.html', 'docs/architecture.html'].map(file => path.join(root, file)),
+        'docs/how-to.html', 'docs/reference.html', 'docs/architecture.html', 'docs/pipeline.html'].map(file => path.join(root, file)),
       output: { codeSplitting: { groups: [{ name: 'three', test: /node_modules[\\/]three[\\/](?!examples[\\/]jsm[\\/]exporters[\\/])/ }] } },
     },
   },

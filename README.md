@@ -101,7 +101,7 @@ Unity 用の交換 API は `vrlearn.exportScene()`（JSON の配置と全イベ�
 
 ## 開発者向け
 
-[開発ドキュメント（中国語）](docs/)は、[チュートリアル](docs/tutorial.html)、[組み込み場面の変更手順](docs/how-to.html)、[実装・データ形式のリファレンス](docs/reference.html)、[設計の解説](docs/architecture.html)に分かれています。ローカルの入口は `http://127.0.0.1:8770/docs/` です。
+[開発ドキュメント（中国語）](docs/)は、[クイックスタート](docs/tutorial.html)、[システム構成](docs/architecture.html)、[データと資源](docs/pipeline.html)、[よくある作業](docs/how-to.html)、[リファレンス](docs/reference.html)に分かれ、構成図で全体のつくりを説明しています。ローカルの入口は `http://127.0.0.1:8770/docs/` です。
 
 [AGENTS.md](AGENTS.md)（作業のきまりとコマンド）、[RATIONALE.md](RATIONALE.md)（設計の理由）、[DESIGN.md](DESIGN.md)（画面のデザイン）、[docs/art-and-performance.md](docs/art-and-performance.md)（模型と性能）。いずれも英語です。テストは `npm test`。`npm run check` は参照文書の整合性確認・全テスト・公開用ビルドをまとめて実行します。GitHub Actions も同じコマンドを使います。
 

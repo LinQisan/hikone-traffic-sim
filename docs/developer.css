@@ -143,6 +143,42 @@ section > ul { padding-left: 22px; }
 section > ul > li { margin: 12px 0; }
 .replay-columns { margin: 24px 0; }
 
+/* ---------------------------------------------------------------- structure diagrams
+   HTML diagrams (no images): layered boxes, pipelines and state loops. Colour marks the layer:
+   sky = interface, amber = engine/rendering, lime = simulation logic, violet = data and tools. */
+.diagram { margin: 28px 0; padding: 22px; border: 1px solid var(--edge); border-radius: 16px; background: var(--bg-raised); }
+.diagram figcaption { margin-top: 16px; }
+.d-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: stretch; gap: 14px; }
+.d-label { display: flex; align-items: center; color: var(--sub); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.d-nodes { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 10px; }
+.d-node { display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 12px 14px; border: 1px solid var(--edge); border-left: 4px solid var(--tone, var(--edge)); border-radius: 10px; background: var(--card); }
+.d-node b { font-size: 14px; line-height: 1.45; }
+.d-node small { color: var(--sub); font-size: 12px; line-height: 1.7; }
+.d-node code { font-size: 11px; color: var(--code); overflow-wrap: anywhere; }
+.d-node.wide { grid-column: 1 / -1; }
+.d-arrow { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 14px; }
+.d-arrow span { padding: 4px 0; color: var(--accent); font-size: 12px; text-align: center; }
+.d-arrow span:last-child::before { content: "↓ "; font-size: 16px; }
+.ui { --tone: #7dd3fc; } .engine { --tone: #f59e0b; } .sim { --tone: #4ade80; } .data { --tone: #c4b5fd; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 16px; padding: 0; list-style: none; color: var(--sub); font-size: 12px; }
+.legend li { display: inline-flex; align-items: center; gap: 6px; }
+.legend li::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--tone); }
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.flow > li { position: relative; flex: 1 1 140px; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border: 1px solid var(--edge); border-top: 3px solid var(--tone, var(--edge)); border-radius: 10px; background: var(--card); font-size: 13px; }
+.flow > li b { font-size: 14px; }
+.flow > li small { color: var(--sub); font-size: 12px; line-height: 1.7; }
+.flow > li code { font-size: 11px; overflow-wrap: anywhere; }
+.flow > li + li::before { content: "→"; position: absolute; left: -8px; top: 50%; transform: translate(-50%, -50%); color: var(--accent); font-size: 14px; }
+.flow + .flow { margin-top: 12px; }
+.flow-title { margin: 18px 0 8px; color: var(--sub); font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+.flow-title:first-of-type { margin-top: 0; }
+.cycle { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.cycle li { display: inline-flex; flex-direction: column; padding: 8px 12px; border: 1px solid var(--edge); border-radius: 999px; background: var(--card); font-size: 13px; }
+.cycle li small { color: var(--sub); font-size: 11px; }
+.cycle li + li::before { content: none; }
+.cycle .to { padding: 0; border: 0; background: none; color: var(--accent); }
+.cycle-note { margin: 12px 0 0; color: var(--sub); font-size: 13px; }
+
 /* ---------------------------------------------------------------- overview cards and file index */
 .link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 24px 0 8px; }
 .link-grid > a { display: flex; flex-direction: column; gap: 6px; padding: 20px 22px; border: 1px solid var(--edge); border-radius: 16px; background: linear-gradient(160deg, var(--card), var(--bg-raised));
@@ -204,6 +240,13 @@ section > ul > li { margin: 12px 0; }
   h2 { font-size: 22px; }
   section { padding: 32px 0; }
   .diagram-columns, .link-grid, .pager { grid-template-columns: 1fr; }
+  .diagram { padding: 14px; }
+  .d-row, .d-arrow { grid-template-columns: 1fr; gap: 6px; }
+  .d-arrow span:first-child { display: none; }
+  .d-nodes { grid-template-columns: 1fr; }
+  .flow { flex-direction: column; }
+  .flow > li { flex-basis: auto; }
+  .flow > li + li::before { content: "↓"; left: 50%; top: -8px; }
   .pager .next { grid-column: 1; }
   .architecture-diagram { padding: 16px; }
   .diagram-layer { grid-template-columns: 1fr; gap: 8px; }
@@ -236,12 +279,13 @@ section > ul > li { margin: 12px 0; }
   .callout { background: #f5f5f5; }
   p code, li code, td code, dd code { background: transparent; }
   h2, h3 { break-after: avoid; }
-  tr, .diagram-node { break-inside: avoid; }
+  tr, .diagram-node, .d-node, .flow > li, .diagram { break-inside: avoid; }
+  .diagram { background: #fff; }
 }
 @media (forced-colors: active) {
   h1 { background: none; color: CanvasText; }
   .contents a[aria-current="location"], .doc-tabs a[aria-current="page"] { border: 2px solid Highlight; color: LinkText; }
   .brand-mark { background: none; border: 1px solid CanvasText; color: CanvasText; }
-  .callout, .diagram-node, .table-wrap, .code-block, .link-grid > a, .pager a, .file-index { border-color: CanvasText; }
+  .callout, .diagram-node, .d-node, .flow > li, .cycle li, .table-wrap, .code-block, .link-grid > a, .pager a, .file-index { border-color: CanvasText; }
   :focus-visible { outline-color: Highlight; }
 }
