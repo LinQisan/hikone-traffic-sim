@@ -4,7 +4,7 @@ import type {RandomSource, DriverReason, PathPoint, PathPose, Crossing, Prepared
 // speed. Departures never depend on the participant's position, goal, or predicted arrival time.
 import { START_TRIGGER, isRepeating } from '../core/scenario.ts';
 import { SignalCycle, junctionStops } from './SignalCycle.ts';
-import { createDriver, safeSpeed, chooseDriverBehavior } from './driver.ts';
+import { createDriver, safeSpeed, chooseDriverBehavior, SURPRISE_REACTION_SECONDS } from './driver.ts';
 import { ParticipantRules } from '../events/ParticipantRules.ts';
 
 /** Route/path intersection used only for event inspection, never for vehicle control. */
@@ -400,7 +400,8 @@ export class Traffic {
     }
     // Predict a conflict with the actual participant velocity along the upcoming curved lane.
     // This does not inspect spawn/goal/trigger, or modify the route to create a collision.
-    const q = this.participant;
+    // Near a signal crosswalk on red, a pedestrian on the pavement is expected to wait at the kerb.
+    const q = this.participant, rules = this.participantRules, kerb = rules.kerbExpected;
     let hazard = Infinity;
     if (q && this.sees(car, q)) {
       const speed = Math.max(car.currentSpeed, 1), look = Math.min(this.visibility, speed * (d.reactionTimeSeconds + 4) + front);
@@ -408,7 +409,7 @@ export class Traffic {
       for (let ahead = 0; ahead <= look; ahead += 0.75) {
         const p = pathAt(car.path, car.distance + ahead, car.probe);
         const time = Math.min(4, Math.max(0, (ahead - car.size[2] / 2) / speed));
-        const px = q.x + (q.vx ?? 0) * time, pz = q.z + (q.vz ?? 0) * time;
+        const px = kerb ? q.x : q.x + (q.vx ?? 0) * time, pz = kerb ? q.z : q.z + (q.vz ?? 0) * time;
         if (Math.hypot(px - p.x, pz - p.z) <= radius) { hazard = Math.max(0, ahead - front - PLAYER_RADIUS); break; }
       }
     }
@@ -419,7 +420,8 @@ export class Traffic {
       if (d.clearSeconds > 0.6) { d.hazardDistance = Infinity; d.hazardSeconds = 0; }
     }
     if (Number.isFinite(d.hazardDistance)) {
-      const reaction = d.reactionTimeSeconds + (d.behavior === 'failure-to-yield' ? 1.5 : 0);
+      const reaction = d.reactionTimeSeconds + (d.behavior === 'failure-to-yield' ? 1.5 : 0)
+        + (rules.againstSignal ? SURPRISE_REACTION_SECONDS : 0);
       if (d.behavior === 'failure-to-yield' && d.hazardSeconds >= d.reactionTimeSeconds
         && car.currentSpeed > safeSpeed(d.hazardDistance - car.distance - 0.3, braking * 0.65)) car.violation = 'failure-to-yield';
       if (d.hazardSeconds + 1e-9 < reaction) d.state = 'reacting';

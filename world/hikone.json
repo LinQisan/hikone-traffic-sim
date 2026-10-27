@@ -16,7 +16,7 @@
   "redEntryResponse": {
     "flows": ["east", "west", "north", "south"],
     "speedKmh": 55, "reactionTimeSeconds": 2.5, "maxBrakingMps2": 3,
-    "maxVehicles": 2, "cooldownSeconds": 8, "timeoutSeconds": 0.75
+    "maxVehicles": 2, "cooldownSeconds": 8, "timeoutSeconds": 6
   },
   "hiddenAdmission": { "farMeters": 75, "nearMeters": 25, "viewHalfAngle": 80, "stopLineMargin": 35, "searchMeters": 320 },
   "noAdmission": [

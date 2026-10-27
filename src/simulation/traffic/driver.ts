@@ -8,6 +8,9 @@ export const DRIVER_LIMITS: Record<keyof DriverParameters, [number, number]> = {
   accelerationMps2: [0.5, 4],
   timeHeadwaySeconds: [0.8, 3],
 };
+// Extra perception time when a participant enters a signal crossing against the light: the driver
+// does not expect a pedestrian there (Green 2000 reports ~0.75 s expected vs ~1.5 s surprise responses).
+export const SURPRISE_REACTION_SECONDS = 0.75;
 export const DRIVER_BEHAVIORS = ['adaptive', 'lawful', 'red-light', 'speeding', 'failure-to-yield'];
 export const DRIVER_BEHAVIOR_LABELS = { adaptive: '行動に応じて抽選', pending: '通行判断前', lawful: '通常運転',
   'red-light': '信号無視', speeding: '速度超過', 'failure-to-yield': '譲らず反応が遅れる' };

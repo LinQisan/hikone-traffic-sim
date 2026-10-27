@@ -6,11 +6,12 @@ import type {ParticipantRules} from './ParticipantRules.ts';
 type BindingState = {phase: string; until: number; inside: boolean; entries: number};
 export interface EncounterInstance {id: string; binding: Binding; start: number; pending: Candidate[]; cars: TrafficCar[]; minGap: number; gapSpeed: number; yielded: boolean; contact: boolean; behaviors: Map<number, string>}
 interface Context {participant: Participant; mode: PlayerMode; rules?: ParticipantRules}
-interface RedResponse {entry: number; started: number; crossing: number; pending: {flow: ResolvedWorld['flows'][number]; prepared: PreparedRoute; at: number}[]; admitted: number}
+interface RedResponse {entry: number; started: number; crossing: number; pending: {flow: ResolvedWorld['flows'][number]; prepared: PreparedRoute; at: number; x: number; z: number}[]; admitted: number; hx: number; hz: number}
 interface ManagerOptions {random?: () => number; lineOfSight?: (from: Point, to: Point) => boolean; log?: (type: string, data: object) => void; onOutcome?: (record: EncounterRecord, binding: Binding) => void}
 // Open-world encounters: decides when one of the ten built-in events may take place around the
 // participant, admits its cars through hidden, clear points of their own routes, and observes how
-// it ends. Red crossing entries can also admit a bounded pair of slow-reacting crossing drivers.
+// it ends. Red crossing entries can also admit a bounded pair of slow-reacting crossing drivers
+// on the lanes still ahead of the participant.
 // It never places the participant, retimes an existing car, or reports contact itself:
 // contact is an input from the physical check (onContact). Pure logic (node:test).
 import { pointInArea } from '../core/scenario.ts';
@@ -22,6 +23,7 @@ export const ADMISSION_PATIENCE = 6;         // s an encounter waits for a hidde
 export const NEAR_MISS_GAP = 1.0;            // m between body edges, with the car still moving
 export const NEAR_MISS_SPEED = 1.5;          // m/s
 export const ENCOUNTER_TIMEOUT = 60;         // s
+export const PASSED_LANE = 1.5;              // m beyond a lane centre, along the crossing direction
 export const OUTCOME_LABELS = {
   contact: '接触', 'near-miss': 'ヒヤリ', yielded: '車が止まった', passed: '無事に通過', deferred: '見送り', left: '離れた',
 };
@@ -104,7 +106,11 @@ export class ScenarioManager {
     this.consider(ctx);
   }
 
-  /** One response per new red entry, independent of the earlier encounter lottery. */
+  /**
+   * One response per new red entry, independent of the earlier encounter lottery. While the
+   * participant stays on that crossing, each conflicting lane still ahead of them may admit one
+   * slow-reacting driver at its nearest hidden, clear point.
+   */
   respondToRedEntry({ participant: q, rules }: Pick<Context, 'participant' | 'rules'>) {
     const config = this.world.redEntryResponse;
     if (!config) return;
@@ -118,9 +124,10 @@ export class ScenarioManager {
           if (!config.flows.includes(flow.id)) continue;
           const prepared = this.traffic.prepared(flow.route), at = projectOnPath(prepared.path, q.x, q.z);
           const pose = pathAt(prepared.path, at.s, this.point), turn = Math.abs(deltaYaw(heading, pose.yaw));
-          if (at.distance <= 8 && turn >= 55 && turn <= 125) flows.push({ flow, prepared, at: at.s });
+          if (at.distance <= 8 && turn >= 30 && turn <= 150) flows.push({ flow, prepared, at: at.s, x: pose.x, z: pose.z });
         }
-        this.redResponse = { entry: entries, started: this.time, crossing: rules!.crossing, pending: flows, admitted: 0 };
+        this.redResponse = { entry: entries, started: this.time, crossing: rules!.crossing, pending: flows, admitted: 0,
+          hx: Math.sin(heading * Math.PI / 180), hz: Math.cos(heading * Math.PI / 180) };
         this.nextRedResponse = this.time + config.cooldownSeconds;
         this.log('red-entry-response', { entry: entries, x: round(q.x), z: round(q.z), flows: flows.map(f => f.flow.id) });
       }
@@ -132,6 +139,8 @@ export class ScenarioManager {
     for (let i = response.pending.length - 1; i >= 0; i--) {
       if (this.traffic.cars.length >= this.world.maxCars + config.maxVehicles) break;
       const candidate = response.pending[i], { flow, prepared } = candidate;
+      // A lane the participant has already crossed can no longer conflict with this crossing.
+      if ((q.x - candidate.x) * response.hx + (q.z - candidate.z) * response.hz > PASSED_LANE) { response.pending.splice(i, 1); continue; }
       for (let distance = Math.max(0, candidate.at - 6); distance >= Math.max(0, candidate.at - this.world.hidden.searchMeters); distance -= 2) {
         const p = pathAt(prepared.path, distance, this.point);
         if (this.world.noAdmission.some(a => pointInArea([p.x, p.z], a))) continue;

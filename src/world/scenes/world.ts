@@ -132,7 +132,7 @@ export function resolveWorld(manifest: WorldManifest, eventList: Scenario[]): Re
     if (!Array.isArray(redEntryResponse.flows) || !redEntryResponse.flows.length
       || redEntryResponse.flows.some(id => !flows.has(id))) problems.push('redEntryResponse.flows: 車の流れの参照が不正です。');
     for (const [key, lo, hi] of [['speedKmh', 5, 80], ['reactionTimeSeconds', 0.2, 2.5],
-      ['maxBrakingMps2', 2, 9], ['maxVehicles', 1, 2], ['cooldownSeconds', 1, 60], ['timeoutSeconds', 0, 2]] as const)
+      ['maxBrakingMps2', 2, 9], ['maxVehicles', 1, 2], ['cooldownSeconds', 1, 60], ['timeoutSeconds', 0, 10]] as const)
       if (!(Number.isFinite(redEntryResponse[key]) && redEntryResponse[key] >= lo && redEntryResponse[key] <= hi))
         problems.push(`redEntryResponse.${key}: ${lo}〜${hi} にしてください。`);
     if (!Number.isInteger(redEntryResponse.maxVehicles)) problems.push('redEntryResponse.maxVehicles: 整数にしてください。');

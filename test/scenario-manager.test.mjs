@@ -142,15 +142,57 @@ test('a red crossing immediately admits a bounded blind response despite a skipp
   assert.equal(s.log.filter(e => e.type === 'red-entry-car').length, admitted.length);
 });
 
-test('red responses cannot spawn in a visible or occupied lane and their retries expire', () => {
+test('red responses cannot spawn in a visible or occupied lane; retries drop crossed lanes and end with the crossing', () => {
   for (const blocked of [false, true]) {
     const s = redCrossing();
     if (blocked) s.traffic.clearAt = () => false;
     else s.manager.world = { ...world, hidden: { ...world.hidden, farMeters: 1e6, viewHalfAngle: 180 } };
-    s.advance(1.2, 2.4);
+    s.advance(0.5, 2.4);
+    const lanes = s.manager.redResponse?.pending.length;
+    assert.equal(lanes, 2, 'both lanes ahead keep retrying while the participant is on the crossing');
+    s.advance(2, 2.4);
+    assert.ok(s.manager.redResponse?.pending.length < lanes, 'a lane already crossed is dropped');
+    s.advance(2, 2.4);
+    assert.equal(s.traffic.participantRules.crossing, -1);
+    assert.equal(s.manager.redResponse, null, 'leaving the crossing ends the response');
     assert.ok(s.log.some(e => e.type === 'red-entry-response'));
     assert.equal(s.log.filter(e => e.type === 'red-entry-car').length, 0);
-    assert.equal(s.manager.redResponse, null);
+  }
+});
+
+test('drivers expect a waiting pedestrian at a red crosswalk and react late to one walking out against it', () => {
+  const lane = { x: 44.3, z: 26.3 }, run = (walk, entered) => {
+    const traffic = new Traffic({ id: 't', map: 'm', playerMode: 'walking', vehicles: [] }, { seed: 1 });
+    traffic.signalCycle.at(walk === 'green' ? 70 : 10);
+    const car = traffic.admit({ ...world.flows.find(f => f.id === 'west'), driver: { behavior: 'lawful', reactionTimeSeconds: 1 } },
+      { distance: 0, entryKmh: 36 });
+    // The car 17 m upstream of the east crosswalk meets a 2.4 m/s walk off the kerb in its lane.
+    const path = car.path, at = path.find(p => Math.hypot(p.x - lane.x, p.z - lane.z) < 2).s;
+    car.distance = at - 17; traffic.move(car, 0);
+    const q = entered ? { x: 44.3, z: 22.3, vx: 0, vz: 2.4, yaw: 0 } : { x: 44.3, z: 20.6, vx: 0, vz: 2.4, yaw: 0 };
+    if (entered) { traffic.participantRules.wasOnRoad = false; traffic.participantRules.step(1 / 60, { ...q, z: 21.9 }, traffic.signalCycle.state); }
+    traffic.participantRules.step(1 / 60, q, traffic.signalCycle.state);
+    traffic.participant = q;
+    for (let t = 0; t < 1.2; t += 1 / 60) traffic.decide(car, 1 / 60);     // longer than the 1 s base reaction
+    return { rules: traffic.participantRules, driver: car.driver };
+  };
+  const waiting = run('red', false);
+  assert.ok(waiting.rules.kerbExpected && !Number.isFinite(waiting.driver.hazardDistance), 'no extrapolation off the kerb on red');
+  const green = run('green', false);
+  assert.ok(!green.rules.kerbExpected && Number.isFinite(green.driver.hazardDistance), 'on the walk signal drivers anticipate the walk');
+  const out = run('red', true);
+  assert.ok(out.rules.againstSignal && Number.isFinite(out.driver.hazardDistance), 'a participant on the road is seen');
+  assert.equal(out.driver.state, 'reacting', 'after 1.2 s the surprise delay still holds back the brakes');
+});
+
+test('walking into the junction interior on red is a red entry; the diagonal walk on green is not', () => {
+  for (const [time, expected] of [[10, 1], [70, 0]]) {
+    const s = session('walking');
+    s.traffic.signalCycle.at(time);
+    const rules = s.traffic.participantRules, q = { x: 22, z: 20, vx: 2, vz: 1.2, yaw: 60 };
+    for (let i = 0; i < 60; i++) { q.x += q.vx / 60; q.z += q.vz / 60; rules.step(1 / 60, q, s.traffic.signalCycle.state); }
+    assert.equal(rules.redEntries, expected);
+    assert.equal(rules.againstSignal, expected === 1);
   }
 });
 

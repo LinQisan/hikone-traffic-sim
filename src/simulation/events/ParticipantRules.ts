@@ -8,8 +8,13 @@ const CROSSINGS = [
   { x0: 41.3, x1: 47.3, z0: 22, z1: 30.1, axis: 'z' },
   { x0: 28, x1: 36.1, z0: 14.7, z1: 20.7, axis: 'x' },
   { x0: 28, x1: 36.1, z0: 31.4, z1: 37.4, axis: 'x' },
+  // The junction interior between the stripes: legal only for the diagonal walk of the pedestrian phase.
+  { x0: 22.7, x1: 41.3, z0: 20.7, z1: 31.4, axis: 'any' },
 ];
 export const DEFAULT_HAZARD_POLICY = { safeProbability: 0.03, unsafeProbability: 0.6 };
+// Within this distance of a signal crosswalk, drivers expect a pedestrian on the pavement to wait
+// for the walk signal instead of extrapolating their walk off the kerb.
+export const KERB_EXPECTATION_METERS = 4;
 
 export function hazardProbability(score: number, policy: HazardPolicy | null = DEFAULT_HAZARD_POLICY) {
   policy ??= DEFAULT_HAZARD_POLICY;
@@ -39,6 +44,7 @@ export class ParticipantRules {
   declare alongLook: number; declare againstLook: number; declare lastAlong: number; declare lastAgainst: number;
   declare redEntries: number; declare uncheckedEntries: number; declare wrongWaySeconds: number;
   declare onRoad: boolean; declare wrongWay: boolean;
+  declare againstSignal: boolean; declare kerbExpected: boolean;
   declare wasOnRoad: boolean | null;
   constructor(paths: PathPoint[][], mode: PlayerMode, policy?: HazardPolicy | null) {
     this.paths = paths; this.mode = mode; this.policy = policy;
@@ -48,6 +54,7 @@ export class ParticipantRules {
     this.lastAlong = -Infinity; this.lastAgainst = -Infinity;
     this.redEntries = 0; this.uncheckedEntries = 0; this.wrongWaySeconds = 0;
     this.onRoad = false; this.wrongWay = false;    // current state, read by the open-world session
+    this.againstSignal = false; this.kerbExpected = false;   // current state, read by drivers
   }
 
   step(dt: number, q: Participant | null, signal: SignalState) {
@@ -70,15 +77,21 @@ export class ParticipantRules {
       && (this.time - this.lastAlong > 6 || this.time - this.lastAgainst > 6)) {
       this.uncheckedEntries++; this.score = Math.min(1, this.score + 0.65);
     }
-    let crossing = -1;
+    let crossing = -1, nearCrossing = false;
+    const m = KERB_EXPECTATION_METERS;
     for (let i = 0; i < CROSSINGS.length; i++) {
       const c = CROSSINGS[i];
       if (q.x >= c.x0 && q.x <= c.x1 && q.z >= c.z0 && q.z <= c.z1) { crossing = i; break; }
+      if (q.x >= c.x0 - m && q.x <= c.x1 + m && q.z >= c.z0 - m && q.z <= c.z1 + m) nearCrossing = true;
     }
     if (this.wasOnRoad != null && crossing >= 0 && crossing !== this.crossing
-      && Math.abs(CROSSINGS[crossing].axis === 'x' ? vx : vz) > 0.15 && signal.walk !== 'green') {
-      this.redEntries++; this.score = 1;
+      && (CROSSINGS[crossing].axis === 'any' ? speed : Math.abs(CROSSINGS[crossing].axis === 'x' ? vx : vz)) > 0.15
+      && signal.walk !== 'green') {
+      this.redEntries++; this.score = 1; this.againstSignal = true;
     }
+    // A crossing entered against the signal stays unexpected until the participant leaves it.
+    if (crossing < 0) this.againstSignal = false;
+    this.kerbExpected = signal.walk !== 'green' && crossing < 0 && !onRoad && nearCrossing;
     let wrongWay = false;
     if (this.mode === 'bicycle' && onRoad && speed > 0.4) {
       const a = lane.yaw * Math.PI / 180;

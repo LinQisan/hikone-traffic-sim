@@ -16,6 +16,7 @@ npm run dev                       # http://127.0.0.1:8770/ ; add -- --host 0.0.0
 npm run build                     # build dist/ for GitHub Pages; npm run preview to inspect
 node tools/check_events.mjs [id]  # event purposes, with real sight lines
 node tools/check_routes.mjs       # authored segments, editor cars and runtime bodies stay on roads
+node tools/check_red_crossings.mjs [n] [walking|bicycle] [gaze°]  # open-world red crossings: contact rate by crossed road signal
 node tools/sync.mjs --events-only # build simulator/editor built-ins from events/; no Unity needed
 ```
 
