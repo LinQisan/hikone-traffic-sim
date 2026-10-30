@@ -1,0 +1,741 @@
+{
+  "reviewed": "2026-10-30",
+  "source": {
+    "photo": "10.29/IMG_0848.HEIC",
+    "photoSha256": "feaa552147f04ba176d796741bd669e5bf7528a49154e5a570e1265e6a0f8a1a",
+    "supportingPhoto": "10.29/IMG_0849.HEIC",
+    "osm": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2468,35.2712,136.2534,35.2777",
+    "osmSha256": "cf1f05c9c0ea4a0e8a3d4a3adb366acd411a69246fd8b31e48d110ae73f4689d",
+    "license": "OpenStreetMap contributors, ODbL-1.0; GSI elevation API (PDL-1.0), processed into an estimated relative profile; source: https://maps.gsi.go.jp/development/elevation_s.html; terms: https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html"
+  },
+  "wallEvidence": [
+    {
+      "osm": "way/1449647546",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -544.51859,
+          151.57215
+        ],
+        [
+          -544.49268,
+          152.55971
+        ],
+        [
+          -543.90129,
+          172.99984
+        ],
+        [
+          -544.03803,
+          230.72401
+        ],
+        [
+          -541.39717,
+          232.46609
+        ],
+        [
+          -541.92847,
+          178.31498
+        ],
+        [
+          -542.85541,
+          153.21525
+        ],
+        [
+          -544.51859,
+          151.57215
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647545",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -396.05732,
+          138.89496
+        ],
+        [
+          -450.435,
+          144.00707
+        ],
+        [
+          -503.89175,
+          148.21133
+        ],
+        [
+          -543.21932,
+          151.46516
+        ],
+        [
+          -544.51859,
+          151.57215
+        ],
+        [
+          -542.85541,
+          153.21525
+        ],
+        [
+          -515.0723,
+          152.43508
+        ],
+        [
+          -486.46522,
+          150.54209
+        ],
+        [
+          -461.40668,
+          148.70262
+        ],
+        [
+          -430.76368,
+          146.24409
+        ],
+        [
+          -400.2439,
+          143.4854
+        ],
+        [
+          -392.22596,
+          142.6936
+        ],
+        [
+          -396.05732,
+          138.89496
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647544",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -397.81402,
+          105.5189
+        ],
+        [
+          -396.05732,
+          138.89496
+        ],
+        [
+          -392.22596,
+          142.6936
+        ],
+        [
+          -395.74282,
+          107.46947
+        ],
+        [
+          -397.81402,
+          105.5189
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647543",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -381.90952,
+          104.74582
+        ],
+        [
+          -397.81402,
+          105.5189
+        ],
+        [
+          -395.74282,
+          107.46947
+        ],
+        [
+          -384.00019,
+          107.28553
+        ],
+        [
+          -381.90952,
+          104.74582
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647542",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -383.29499,
+          111.78231
+        ],
+        [
+          -384.00019,
+          107.28553
+        ],
+        [
+          -381.90952,
+          104.74582
+        ],
+        [
+          -381.46456,
+          109.09311
+        ],
+        [
+          -383.29499,
+          111.78231
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647541",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -116.59464,
+          90.1339
+        ],
+        [
+          -132.03258,
+          92.23553
+        ],
+        [
+          -163.02769,
+          96.33802
+        ],
+        [
+          -198.61441,
+          99.48784
+        ],
+        [
+          -243.20666,
+          103.14051
+        ],
+        [
+          -268.30536,
+          104.49545
+        ],
+        [
+          -307.6752,
+          106.8565
+        ],
+        [
+          -332.55505,
+          108.65011
+        ],
+        [
+          -368.19498,
+          111.04471
+        ],
+        [
+          -383.29499,
+          111.78231
+        ],
+        [
+          -381.46456,
+          109.09311
+        ],
+        [
+          -368.03103,
+          108.14117
+        ],
+        [
+          -332.49271,
+          105.84059
+        ],
+        [
+          -307.87177,
+          103.96396
+        ],
+        [
+          -268.56647,
+          100.81436
+        ],
+        [
+          -243.71336,
+          98.97779
+        ],
+        [
+          -198.97589,
+          96.19033
+        ],
+        [
+          -163.5375,
+          93.15785
+        ],
+        [
+          -132.59605,
+          89.41563
+        ],
+        [
+          -119.11924,
+          87.96566
+        ],
+        [
+          -116.59464,
+          90.1339
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647540",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -119.72992,
+          74.98252
+        ],
+        [
+          -119.11924,
+          87.96566
+        ],
+        [
+          -116.59464,
+          90.1339
+        ],
+        [
+          -117.33415,
+          77.25403
+        ],
+        [
+          -119.72992,
+          74.98252
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647539",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -108.45165,
+          77.0681
+        ],
+        [
+          -117.33415,
+          77.25403
+        ],
+        [
+          -119.72992,
+          74.98252
+        ],
+        [
+          -106.3234,
+          74.6569
+        ],
+        [
+          -108.45165,
+          77.0681
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647538",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          -106.20479,
+          76.31933
+        ],
+        [
+          -106.3234,
+          74.6569
+        ],
+        [
+          -108.45165,
+          77.0681
+        ],
+        [
+          -108.23522,
+          79.05419
+        ],
+        [
+          -106.20479,
+          76.31933
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647537",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          0.03254,
+          70.24487
+        ],
+        [
+          -26.74135,
+          72.77143
+        ],
+        [
+          -43.32321,
+          74.30265
+        ],
+        [
+          -64.33338,
+          75.88897
+        ],
+        [
+          -87.3966,
+          77.79385
+        ],
+        [
+          -108.23522,
+          79.05419
+        ],
+        [
+          -106.20479,
+          76.31933
+        ],
+        [
+          -87.95684,
+          74.83158
+        ],
+        [
+          -64.4974,
+          73.25304
+        ],
+        [
+          -43.68324,
+          71.91179
+        ],
+        [
+          -27.07597,
+          70.35707
+        ],
+        [
+          -10.87643,
+          68.88886
+        ],
+        [
+          1.92759,
+          68.12113
+        ],
+        [
+          0.03254,
+          70.24487
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647536",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          0.53578,
+          76.28254
+        ],
+        [
+          0.03254,
+          70.24487
+        ],
+        [
+          1.92759,
+          68.12113
+        ],
+        [
+          2.38601,
+          73.97326
+        ],
+        [
+          0.53578,
+          76.28254
+        ]
+      ]
+    },
+    {
+      "osm": "way/1449647535",
+      "tags": {
+        "area": "yes",
+        "barrier": "retaining_wall",
+        "height": "5.5",
+        "material": "stone"
+      },
+      "outline": [
+        [
+          26.51392,
+          73.46876
+        ],
+        [
+          25.21043,
+          72.75926
+        ],
+        [
+          2.38601,
+          73.97326
+        ],
+        [
+          0.53578,
+          76.28254
+        ],
+        [
+          25.942,
+          74.77847
+        ],
+        [
+          26.51392,
+          73.46876
+        ]
+      ]
+    }
+  ],
+  "elevationEvidence": [
+    {
+      "name": "street",
+      "xz": [
+        -590,
+        150
+      ],
+      "lat": 35.276130929436896,
+      "lon": 136.2473691383811,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.276130929&lon=136.247369138&outtype=JSON",
+      "result": {
+        "elevation": 86.5,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "toe",
+      "xz": [
+        -544,
+        170
+      ],
+      "lat": 35.27606431675066,
+      "lon": 136.24791498753865,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.276064317&lon=136.247914988&outtype=JSON",
+      "result": {
+        "elevation": 88.5,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "crest",
+      "xz": [
+        -540,
+        170
+      ],
+      "lat": 35.276045275454784,
+      "lon": 136.24795231222512,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.276045275&lon=136.247952312&outtype=JSON",
+      "result": {
+        "elevation": 90.4,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "crest-2",
+      "xz": [
+        -537,
+        170
+      ],
+      "lat": 35.27603099448288,
+      "lon": 136.24798030573996,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.276030994&lon=136.247980306&outtype=JSON",
+      "result": {
+        "elevation": 89.5,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "interior",
+      "xz": [
+        -525,
+        170
+      ],
+      "lat": 35.27597387059525,
+      "lon": 136.24809227979935,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.275973871&lon=136.248092280&outtype=JSON",
+      "result": {
+        "elevation": 87.5,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "field",
+      "xz": [
+        -500,
+        170
+      ],
+      "lat": 35.275854862496026,
+      "lon": 136.24832555908978,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.275854862&lon=136.248325559&outtype=JSON",
+      "result": {
+        "elevation": 87.5,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "south-wall",
+      "xz": [
+        -400,
+        120
+      ],
+      "lat": 35.274997924558264,
+      "lon": 136.2489671380934,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.274997925&lon=136.248967138&outtype=JSON",
+      "result": {
+        "elevation": 89,
+        "hsrc": "10m"
+      }
+    },
+    {
+      "name": "south-inside",
+      "xz": [
+        -400,
+        125
+      ],
+      "lat": 35.27503601511235,
+      "lon": 136.2489962919092,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.275036015&lon=136.248996292&outtype=JSON",
+      "result": {
+        "elevation": 89,
+        "hsrc": "10m"
+      }
+    },
+    {
+      "name": "seam",
+      "xz": [
+        -220,
+        84
+      ],
+      "lat": 35.273866814254426,
+      "lon": 136.2504368415106,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.273866814&lon=136.250436842&outtype=JSON",
+      "result": {
+        "elevation": 88,
+        "hsrc": "10m"
+      }
+    },
+    {
+      "name": "seam-inside",
+      "xz": [
+        -220,
+        90
+      ],
+      "lat": 35.273912522919325,
+      "lon": 136.25047182608955,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.273912523&lon=136.250471826&outtype=JSON",
+      "result": {
+        "elevation": 88,
+        "hsrc": "10m"
+      }
+    },
+    {
+      "name": "kyobashi-wall",
+      "xz": [
+        0,
+        84
+      ],
+      "lat": 35.27281954298124,
+      "lon": 136.25248969926625,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.272819543&lon=136.252489699&outtype=JSON",
+      "result": {
+        "elevation": 91.4,
+        "hsrc": "1m（レーザ）"
+      }
+    },
+    {
+      "name": "kyobashi-street",
+      "xz": [
+        32,
+        81
+      ],
+      "lat": 35.272644358281774,
+      "lon": 136.2527708044685,
+      "url": "https://cyberjapandata2.gsi.go.jp/general/dem/scripts/getelevation.php?lat=35.272644358&lon=136.252770804&outtype=JSON",
+      "result": {
+        "elevation": 88.6,
+        "hsrc": "1m（レーザ）"
+      }
+    }
+  ],
+  "profile": {
+    "coastVertices": 15,
+    "toeHeight": -1.35,
+    "crestHeight": 4.15,
+    "heightBasis": "OSM total wall height 5.5 m, relative to the retained water/toe datum; GSI supports a raised crest. Not a surveyed vertical registration.",
+    "batter": 3,
+    "backEdge": 9,
+    "seamX": -220,
+    "seamCrest": 4.35,
+    "seamBatter": 4,
+    "seamPlateau": 20,
+    "seamBackEdge": 32,
+    "transition": 40,
+    "shoreBasis": "Retained registered SCHOOL_BANK water edge; source wall outlines confirm extent, but are not substituted for every existing shoreline coordinate."
+  },
+  "street": {
+    "positionBasis": "Photo-relative estimates projected to the existing road-side shoulder; GPS is not a calibrated pose.",
+    "pole": {
+      "z": 150.2,
+      "offset": -3.95,
+      "height": 10.8
+    },
+    "cabinet": {
+      "z": 147.6,
+      "offset": -4.0,
+      "width": 0.7,
+      "height": 0.88,
+      "depth": 0.3,
+      "bottom": 0.38,
+      "label": "城町2丁目自治会"
+    },
+    "mirror": {
+      "z": 147.6,
+      "offset": -4.38,
+      "height": 3.5,
+      "label": "左右確認"
+    }
+  }
+}

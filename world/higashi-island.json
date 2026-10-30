@@ -1,0 +1,1071 @@
+{
+ "reviewed": "2026-10-30",
+ "frame": "geographic-frame.json; anchor, metres and bearing unchanged",
+ "evidence": [
+  {
+   "source": "Owner oblique image supplied 2026-10-30",
+   "use": "Current roof forms, two adjoining arenas, tennis court, green playground roof, wood and rampart extent. Capture date unknown."
+  },
+  {
+   "source": "Owner photographs 10.29/IMG_0883-0888, IMG_0895-0898",
+   "use": "Rampart corner, batter and wood seen from the promenade and east road. GPS error about 4-7 m."
+  },
+  {
+   "source": "Google Street View",
+   "captures": {
+    "Oct 2024": "rampart and wood from Route 25",
+    "Nov 2022": "north gym, roadside hedge on dark stone base, east rampart"
+   },
+   "use": "Facade and boundary treatment only; no imagery is shipped."
+  },
+  {
+   "source": "GSI seamlessphoto zoom 18, tiles 230288-230290 / 103590-103592, retrieved 2026-10-30",
+   "use": "Rotated to the local frame to read shore jog, court and yard outlines. Capture date not established; it predates the second arena and still shows a pool now absent from OSM and the owner image.",
+   "license": "GSI terms; no aerial image is shipped"
+  },
+  {
+   "source": "OpenStreetMap bbox 136.2525,35.2715,136.2575,35.2765, retrieved 2026-10-30",
+   "sha256": "e6001a8af3b5263bdcf359458581468c866bc267c9ed9f66f354549e554fbd31",
+   "license": "ODbL-1.0; OpenStreetMap contributors",
+   "use": "Building, pitch, wood, retaining-wall outlines (ways recorded per feature)."
+  }
+ ],
+ "limits": [
+  "Heights, roof rises, storey counts and hedge sizes are visual estimates.",
+  "The tennis court and yard outlines are read from a roughly 0.16 m/px upscaled aerial and are good to about 2 m.",
+  "Hidden elevations are simplified continuations; no interiors are modelled.",
+  "Private school grounds are not surveyed from inside."
+ ],
+ "buildings": [
+  {
+   "name": "Hikone Higashi north gymnasium",
+   "osm": "way/380217943",
+   "footprint": [
+    [
+     51.26,
+     241.94
+    ],
+    [
+     74.61,
+     232.88
+    ],
+    [
+     61.64,
+     197.45
+    ],
+    [
+     60.39,
+     194.05
+    ],
+    [
+     59.66,
+     192.04
+    ],
+    [
+     35.69,
+     201.13
+    ]
+   ],
+   "profile": "barrel",
+   "height": 8.0,
+   "roof": "metal",
+   "rise": 3.0,
+   "basis": "Street View Nov 2022: white walls, small square windows, low curved metal roof"
+  },
+  {
+   "name": "Hikone Higashi main arena",
+   "osm": "way/380217957",
+   "footprint": [
+    [
+     134.05,
+     183.8
+    ],
+    [
+     189.55,
+     179.16
+    ],
+    [
+     186.88,
+     143.54
+    ],
+    [
+     131.47,
+     147.89
+    ],
+    [
+     131.65,
+     150.48
+    ],
+    [
+     133.8,
+     181.1
+    ]
+   ],
+   "profile": "arena",
+   "height": 9.5,
+   "roof": "metal",
+   "rise": 3.0,
+   "basis": "Owner aerial and GSI: two-tone ribbed gable; height is an estimate"
+  },
+  {
+   "name": "Hikone Higashi second arena",
+   "osm": "way/1376920835",
+   "footprint": [
+    [
+     132.59,
+     186.31
+    ],
+    [
+     134.07,
+     207.28
+    ],
+    [
+     173.95,
+     204.37
+    ],
+    [
+     173.72,
+     201.37
+    ],
+    [
+     186.55,
+     200.13
+    ],
+    [
+     185.4,
+     185.04
+    ],
+    [
+     172.61,
+     186.01
+    ],
+    [
+     172.36,
+     183.22
+    ]
+   ],
+   "profile": "arena",
+   "height": 8.0,
+   "roof": "metal",
+   "rise": 2.4,
+   "basis": "Owner aerial shows the adjoining hall; absent from the older GSI photograph"
+  },
+  {
+   "name": "Hikone Higashi third block",
+   "osm": "way/1210660983",
+   "footprint": [
+    [
+     124.92,
+     144.89
+    ],
+    [
+     114.07,
+     148.93
+    ],
+    [
+     102.1,
+     117.33
+    ],
+    [
+     108.56,
+     115.08
+    ],
+    [
+     109.22,
+     116.47
+    ],
+    [
+     113.65,
+     114.8
+    ]
+   ],
+   "profile": "block",
+   "height": 10.2,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "Owner aerial and GSI: white flat-roofed block; storeys estimated"
+  },
+  {
+   "name": "Hikone Higashi club house",
+   "osm": "way/1376920838",
+   "footprint": [
+    [
+     176.53,
+     139.17
+    ],
+    [
+     174.91,
+     115.88
+    ],
+    [
+     184.93,
+     115.17
+    ],
+    [
+     187.43,
+     134.28
+    ],
+    [
+     193.42,
+     135.04
+    ],
+    [
+     193.78,
+     141.23
+    ],
+    [
+     183.99,
+     141.96
+    ],
+    [
+     183.5,
+     139.17
+    ]
+   ],
+   "profile": "hall",
+   "height": 6.4,
+   "roof": "metal",
+   "rise": 2.0,
+   "basis": "Owner aerial and GSI: dark gabled two-storey roof"
+  },
+  {
+   "name": "Hikone Higashi east service range",
+   "osm": "way/1376920839",
+   "footprint": [
+    [
+     192.66,
+     206.73
+    ],
+    [
+     187.91,
+     143.67
+    ],
+    [
+     193.88,
+     143.66
+    ],
+    [
+     198.81,
+     206.47
+    ]
+   ],
+   "profile": "service",
+   "height": 3.4,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM outline; roof partly hidden by trees"
+  },
+  {
+   "name": "Hikone Higashi playground shed",
+   "osm": "way/1210660984",
+   "footprint": [
+    [
+     109.52,
+     302.16
+    ],
+    [
+     157.87,
+     297.11
+    ],
+    [
+     158.8,
+     306.09
+    ],
+    [
+     106.64,
+     311.55
+    ],
+    [
+     106.11,
+     306.57
+    ],
+    [
+     109.94,
+     306.18
+    ]
+   ],
+   "profile": "shed",
+   "height": 3.2,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "Owner aerial: long green roof at the playground edge",
+   "roofColor": [
+    0.36,
+    0.6,
+    0.5
+   ]
+  },
+  {
+   "name": "Hikone Higashi cycle shed north",
+   "osm": "way/1459799845",
+   "footprint": [
+    [
+     61.25,
+     258.25
+    ],
+    [
+     63.43,
+     257.73
+    ],
+    [
+     76.69,
+     310.24
+    ],
+    [
+     74.45,
+     310.8
+    ]
+   ],
+   "profile": "shed",
+   "height": 2.6,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM bicycle_parking",
+   "roofColor": [
+    0.52,
+    0.54,
+    0.54
+   ]
+  },
+  {
+   "name": "Hikone Higashi cycle shed middle",
+   "osm": "way/1459799846",
+   "footprint": [
+    [
+     64.1,
+     257.59
+    ],
+    [
+     66.29,
+     257.08
+    ],
+    [
+     79.53,
+     309.59
+    ],
+    [
+     77.3,
+     310.13
+    ]
+   ],
+   "profile": "shed",
+   "height": 2.6,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM bicycle_parking",
+   "roofColor": [
+    0.52,
+    0.54,
+    0.54
+   ]
+  },
+  {
+   "name": "Hikone Higashi cycle shed south",
+   "osm": "way/1459799847",
+   "footprint": [
+    [
+     58.87,
+     265.11
+    ],
+    [
+     61.08,
+     264.57
+    ],
+    [
+     71.62,
+     306.4
+    ],
+    [
+     69.32,
+     306.91
+    ]
+   ],
+   "profile": "shed",
+   "height": 2.6,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM bicycle_parking",
+   "roofColor": [
+    0.5,
+    0.32,
+    0.28
+   ]
+  },
+  {
+   "name": "Hikone Higashi playground store",
+   "osm": "way/1459799848",
+   "footprint": [
+    [
+     77.81,
+     297.36
+    ],
+    [
+     76.54,
+     292.48
+    ],
+    [
+     79.52,
+     291.74
+    ],
+    [
+     80.89,
+     296.69
+    ]
+   ],
+   "profile": "service",
+   "height": 3.0,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM outline"
+  },
+  {
+   "name": "Hikone Higashi gym link",
+   "osm": "way/1459799844",
+   "footprint": [
+    [
+     29.01,
+     204.23
+    ],
+    [
+     31.4,
+     203.47
+    ],
+    [
+     37.95,
+     221.12
+    ],
+    [
+     35.61,
+     221.88
+    ]
+   ],
+   "profile": "covered-walk",
+   "height": 3.0,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM building=roof"
+  },
+  {
+   "name": "Hikone Higashi arena link",
+   "osm": "way/1459799851",
+   "footprint": [
+    [
+     113.33,
+     177.39
+    ],
+    [
+     129.32,
+     171.17
+    ],
+    [
+     129.59,
+     174.6
+    ],
+    [
+     114.35,
+     180.06
+    ]
+   ],
+   "profile": "covered-walk",
+   "height": 3.0,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM building=roof"
+  },
+  {
+   "name": "Hikone Higashi arena porch",
+   "osm": "way/1459799837",
+   "footprint": [
+    [
+     133.8,
+     181.1
+    ],
+    [
+     130.12,
+     181.41
+    ],
+    [
+     129.59,
+     174.6
+    ],
+    [
+     129.32,
+     171.17
+    ],
+    [
+     127.76,
+     150.91
+    ],
+    [
+     131.65,
+     150.48
+    ]
+   ],
+   "profile": "covered-walk",
+   "height": 3.0,
+   "roof": "flat",
+   "rise": 0,
+   "basis": "OSM building=roof"
+  }
+ ],
+ "shore": {
+  "osm": [
+   "way/1449642344",
+   "way/1449642342",
+   "way/1449642340",
+   "way/1449642341"
+  ],
+  "points": [
+   [
+    104,
+    94.7
+   ],
+   [
+    141.6,
+    96.1
+   ],
+   [
+    190,
+    96.1
+   ],
+   [
+    192,
+    92.8
+   ]
+  ],
+  "basis": "Water side of the mapped retaining walls, confirmed by the GSI shore jog and IMG_0884."
+ },
+ "grounds": [
+  {
+   "name": "Higashi playground",
+   "osm": "way/1070665281",
+   "footprint": [
+    [
+     87.3,
+     221.22
+    ],
+    [
+     75.73,
+     253.08
+    ],
+    [
+     83.5,
+     289.41
+    ],
+    [
+     79.86,
+     291.51
+    ],
+    [
+     82.53,
+     302.14
+    ],
+    [
+     90.7,
+     307.1
+    ],
+    [
+     102.17,
+     304.73
+    ],
+    [
+     102.09,
+     302.82
+    ],
+    [
+     105.01,
+     302.28
+    ],
+    [
+     106.5,
+     297.8
+    ],
+    [
+     152.22,
+     291.65
+    ],
+    [
+     163.14,
+     282.61
+    ],
+    [
+     189.56,
+     278.51
+    ],
+    [
+     196.17,
+     266.56
+    ],
+    [
+     189.62,
+     204.43
+    ],
+    [
+     118.88,
+     209.33
+    ]
+   ],
+   "material": "ART_Sand",
+   "height": 0.15,
+   "basis": "OSM pitch; confirmed by the owner image"
+  },
+  {
+   "name": "Higashi tennis court",
+   "footprint": [
+    [
+     129.5,
+     146
+    ],
+    [
+     171,
+     142.5
+    ],
+    [
+     170,
+     118
+    ],
+    [
+     128,
+     121
+    ]
+   ],
+   "material": "ART_Sand",
+   "height": 0.15,
+   "basis": "Estimated from GSI and the owner image"
+  },
+  {
+   "name": "Higashi arena yard",
+   "footprint": [
+    [
+     92,
+     212
+    ],
+    [
+     128,
+     205
+    ],
+    [
+     129,
+     147
+    ],
+    [
+     125,
+     147
+    ],
+    [
+     118,
+     190
+    ],
+    [
+     100,
+     192
+    ]
+   ],
+   "material": "HK_Asphalt",
+   "height": 0.15,
+   "basis": "Estimated from GSI"
+  },
+  {
+   "name": "Higashi gym yard",
+   "footprint": [
+    [
+     77,
+     241
+    ],
+    [
+     90,
+     213
+    ],
+    [
+     82,
+     196
+    ],
+    [
+     62,
+     198
+    ],
+    [
+     74.6,
+     232.9
+    ]
+   ],
+   "material": "HK_Asphalt",
+   "height": 0.15,
+   "basis": "Estimated from GSI"
+  }
+ ],
+ "forest": {
+  "osm": "way/404612729",
+  "outline": [
+   [
+    72.61,
+    370.2
+   ],
+   [
+    74.1,
+    382.94
+   ],
+   [
+    135.25,
+    374.27
+   ],
+   [
+    212.39,
+    366.14
+   ],
+   [
+    214.69,
+    381.72
+   ],
+   [
+    226.18,
+    380.18
+   ],
+   [
+    219.99,
+    252.62
+   ],
+   [
+    211.85,
+    251.94
+   ],
+   [
+    206.22,
+    152.46
+   ],
+   [
+    206.94,
+    95.32
+   ],
+   [
+    193.52,
+    95.23
+   ],
+   [
+    193.62,
+    99.1
+   ],
+   [
+    177.53,
+    99.77
+   ],
+   [
+    144.72,
+    99.72
+   ],
+   [
+    101.27,
+    98.45
+   ],
+   [
+    98.68,
+    76.58
+   ],
+   [
+    40.63,
+    76.58
+   ],
+   [
+    41.46,
+    101.11
+   ],
+   [
+    22.62,
+    101.71
+   ],
+   [
+    22.51,
+    105.52
+   ],
+   [
+    36.07,
+    105.03
+   ],
+   [
+    37.21,
+    111.79
+   ],
+   [
+    41.19,
+    112.26
+   ],
+   [
+    48.28,
+    108.97
+   ],
+   [
+    50.62,
+    101.93
+   ],
+   [
+    68.7,
+    98.4
+   ],
+   [
+    72.25,
+    105.54
+   ],
+   [
+    84.08,
+    102.03
+   ],
+   [
+    94.02,
+    108.22
+   ],
+   [
+    107.05,
+    113.62
+   ],
+   [
+    114.87,
+    113.26
+   ],
+   [
+    121.21,
+    116.42
+   ],
+   [
+    132.68,
+    113.47
+   ],
+   [
+    144.15,
+    115.1
+   ],
+   [
+    162.65,
+    109.24
+   ],
+   [
+    193.16,
+    112.3
+   ],
+   [
+    195.11,
+    129.29
+   ],
+   [
+    196.01,
+    140.67
+   ],
+   [
+    198.5,
+    149.38
+   ],
+   [
+    197.89,
+    165.59
+   ],
+   [
+    201.02,
+    190.06
+   ],
+   [
+    202.5,
+    216.31
+   ],
+   [
+    197.5,
+    263.56
+   ],
+   [
+    203.21,
+    272.54
+   ],
+   [
+    201.79,
+    301.37
+   ],
+   [
+    193.22,
+    300.9
+   ],
+   [
+    188.88,
+    298.57
+   ],
+   [
+    177.36,
+    299.09
+   ],
+   [
+    172.1,
+    303.4
+   ],
+   [
+    107.73,
+    311.93
+   ],
+   [
+    108.92,
+    314.34
+   ],
+   [
+    113.01,
+    315.61
+   ],
+   [
+    113.55,
+    323.4
+   ],
+   [
+    109.0,
+    324.29
+   ],
+   [
+    102.84,
+    329.83
+   ],
+   [
+    103.78,
+    335.95
+   ],
+   [
+    115.61,
+    350.55
+   ],
+   [
+    111.06,
+    356.2
+   ],
+   [
+    100.0,
+    357.01
+   ],
+   [
+    103.77,
+    353.44
+   ],
+   [
+    93.29,
+    348.82
+   ],
+   [
+    85.4,
+    349.93
+   ],
+   [
+    85.9,
+    340.48
+   ],
+   [
+    85.25,
+    335.95
+   ],
+   [
+    71.13,
+    338.57
+   ],
+   [
+    69.67,
+    347.22
+   ],
+   [
+    73.65,
+    352.24
+   ],
+   [
+    83.62,
+    353.59
+   ],
+   [
+    94.1,
+    353.7
+   ],
+   [
+    94.95,
+    365.3
+   ],
+   [
+    89.95,
+    372.07
+   ],
+   [
+    79.04,
+    370.4
+   ],
+   [
+    78.25,
+    361.16
+   ],
+   [
+    68.78,
+    360.65
+   ],
+   [
+    69.65,
+    370.05
+   ],
+   [
+    72.61,
+    370.2
+   ]
+  ],
+  "spacing": 7,
+  "margin": 4.5
+ },
+ "garden": [
+  [
+   80,
+   151
+  ],
+  [
+   93,
+   180
+  ],
+  [
+   88,
+   174
+  ],
+  [
+   96,
+   187
+  ],
+  [
+   76,
+   162
+  ],
+  [
+   80,
+   174
+  ]
+ ],
+ "hedge": {
+  "line": [
+   [
+    24.5,
+    207.6
+   ],
+   [
+    32.8,
+    225.1
+   ],
+   [
+    42.3,
+    238.5
+   ],
+   [
+    54.5,
+    261.7
+   ],
+   [
+    67.2,
+    309
+   ]
+  ],
+  "gap": [
+   [
+    50.5,
+    254
+   ],
+   [
+    56,
+    265
+   ]
+  ],
+  "base": 0.7,
+  "height": 2.6,
+  "basis": "OSM school boundary way/180832530; Street View Nov 2022"
+ }
+}

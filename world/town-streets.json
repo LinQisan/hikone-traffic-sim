@@ -1,0 +1,16 @@
+{
+  "reference": "../docs/geography-audit.md",
+  "attribution": "Road observations: Geospatial Information Authority of Japan. Connectivity and approximate positions: © OpenStreetMap contributors.",
+  "license": "https://opendatacommons.org/licenses/odbl/1-0/",
+  "sources": ["https://maps.gsi.go.jp/development/ichiran.html", "https://www.openstreetmap.org/copyright"],
+  "note": "Local tie points retained. GSI aerial observations, checked against OSM connectivity; approximate metres, not survey coordinates. Minor streets are shared asphalt without invented raised footways.",
+  "castleRoad": { "originX": 32, "southSlope": 0.009 },
+  "streets": [
+    { "id": "east-alley", "halfWidth": 2.2, "points": [[114, 26.084], [115, 4], [116, -28], [116, -64], [117, -142.2]] },
+    { "id": "south-cross-street", "halfWidth": 2.2, "points": [[-160, -126], [33.242, -138], [117, -142.2], [160, -145]] }
+  ],
+  "crossings": [
+    { "id": "honmachi-south", "z": -69, "depth": 2.6 },
+    { "id": "south-block-south", "z": -145.5, "depth": 2.6 }
+  ]
+}

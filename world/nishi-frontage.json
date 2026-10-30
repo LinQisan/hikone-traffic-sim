@@ -1,0 +1,523 @@
+{
+  "reviewed": "2026-10-30",
+  "frame": "geographic-frame.json, existing X/Z metres and heading retained",
+  "photos": [
+    {
+      "file": "10.29/IMG_0855.HEIC",
+      "xz": [
+        -587.2739408540185,
+        232.96643393301332
+      ],
+      "gps": {
+        "Altitude": 90.56436487638534,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 29.17584228515625,
+        "DestBearingRef": "T",
+        "HPositioningError": 4.502920745184717,
+        "ImgDirection": 29.17584228515625,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.27675,
+        "LatitudeRef": "N",
+        "Longitude": 136.24787833333335,
+        "LongitudeRef": "E",
+        "Speed": 1.1226138048101477,
+        "SpeedRef": "K",
+        "TimeStamp": "07:03:35"
+      },
+      "sha256": "2a9134bc0debcc2c4842842f7531f2d6e1c9fc1fa0b02520decfc2c2d1485e08"
+    },
+    {
+      "file": "10.29/IMG_0856.HEIC",
+      "xz": [
+        -569.252094677764,
+        243.57140257385936
+      ],
+      "gps": {
+        "Altitude": 90.55415636588381,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 319.8002318392581,
+        "DestBearingRef": "T",
+        "HPositioningError": 3.621437105308073,
+        "ImgDirection": 319.8002318392581,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.276745,
+        "LatitudeRef": "N",
+        "Longitude": 136.24810833333333,
+        "LongitudeRef": "E",
+        "Speed": 0.6668007425742575,
+        "SpeedRef": "K",
+        "TimeStamp": "07:04:01"
+      },
+      "sha256": "79320e0f41bd5940ae53eab7d5f6261eed3b4191497f91b98e7a39406af2a3f7"
+    },
+    {
+      "file": "10.29/IMG_0857.HEIC",
+      "xz": [
+        -569.252094677764,
+        243.57140257385936
+      ],
+      "gps": {
+        "Altitude": 90.48965546183221,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 353.5172117039587,
+        "DestBearingRef": "T",
+        "HPositioningError": 3.8254680247951907,
+        "ImgDirection": 353.5172117039587,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.276745,
+        "LatitudeRef": "N",
+        "Longitude": 136.24810833333333,
+        "LongitudeRef": "E",
+        "Speed": 0,
+        "SpeedRef": "K",
+        "TimeStamp": "07:04:04"
+      },
+      "sha256": "c8fafa8dc6ad9a39f7edd94b49700cce3d7c2dee80de78b0f6141a860bd19df9"
+    },
+    {
+      "file": "10.29/IMG_0858.HEIC",
+      "xz": [
+        -546.0495491238845,
+        245.5996788896158
+      ],
+      "gps": {
+        "Altitude": 89.97693399574166,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 78.22116091109478,
+        "DestBearingRef": "T",
+        "HPositioningError": 3.6640666124324066,
+        "ImgDirection": 78.22116091109478,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.27665,
+        "LatitudeRef": "N",
+        "Longitude": 136.24833666666666,
+        "LongitudeRef": "E",
+        "Speed": 0.8739032865209208,
+        "SpeedRef": "K",
+        "TimeStamp": "07:04:27"
+      },
+      "sha256": "e11d083614ff4c1566058dae0abe13a896a19142fde2662241b53c4adc6cb7f2"
+    },
+    {
+      "file": "10.29/IMG_0859.HEIC",
+      "xz": [
+        -523.2165637945274,
+        245.64681314990787
+      ],
+      "gps": {
+        "Altitude": 90.09107946026987,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 108.37832446808511,
+        "DestBearingRef": "T",
+        "HPositioningError": 3.869052682748982,
+        "ImgDirection": 108.37832446808511,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.27654166666667,
+        "LatitudeRef": "N",
+        "Longitude": 136.24855,
+        "LongitudeRef": "E",
+        "Speed": 0.2405380373005515,
+        "SpeedRef": "K",
+        "TimeStamp": "07:04:47"
+      },
+      "sha256": "25ccecb49a900b230824acf47c4207a117139adf084aa1be648329f27798bfa8"
+    },
+    {
+      "file": "10.29/IMG_0860.HEIC",
+      "xz": [
+        -524.1997406694674,
+        247.220225051029
+      ],
+      "gps": {
+        "Altitude": 90.0830255953139,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 71.55435175153485,
+        "DestBearingRef": "T",
+        "HPositioningError": 4.1614621409921675,
+        "ImgDirection": 71.55435175153485,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.276558333333334,
+        "LatitudeRef": "N",
+        "Longitude": 136.24855,
+        "LongitudeRef": "E",
+        "Speed": 0,
+        "SpeedRef": "K",
+        "TimeStamp": "07:04:50"
+      },
+      "sha256": "39b7a74ac62ee107f7b0e3be8e91cf3d26f004d1a75f0363d934e90b3292d379"
+    },
+    {
+      "file": "10.29/IMG_0861.HEIC",
+      "xz": [
+        -488.1076749318057,
+        241.76960760678975
+      ],
+      "gps": {
+        "Altitude": 89.75103707544724,
+        "AltitudeRef": 0,
+        "DateStamp": "2026:10:29",
+        "DestBearing": 84.97283935546875,
+        "DestBearingRef": "T",
+        "HPositioningError": 6.176194511439932,
+        "ImgDirection": 84.97283935546875,
+        "ImgDirectionRef": "T",
+        "Latitude": 35.276345,
+        "LatitudeRef": "N",
+        "Longitude": 136.248855,
+        "LongitudeRef": "E",
+        "Speed": 0.12465121576220033,
+        "SpeedRef": "K",
+        "TimeStamp": "07:05:23"
+      },
+      "sha256": "c8934812c577201a850208c52d47017b5ddbac63fe1982200a609ed9f07ffe06"
+    }
+  ],
+  "references": [
+    {
+      "url": "https://www.city.hikone.lg.jp/kosodate/kosodate_shien/1/hoiku/2/9631.html",
+      "use": "School identity and address; gate lettering independently readable in owner photos."
+    },
+    {
+      "url": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2468,35.2712,136.2534,35.2777",
+      "retrieved": "2026-10-30",
+      "use": "Existing selected wall polygons and public road vertices retained; cached API extract from the earlier same-day map audit.",
+      "license": "ODbL-1.0, © OpenStreetMap contributors"
+    }
+  ],
+  "gate": {
+    "center": [
+      -587,
+      263.2
+    ],
+    "width": 5.6,
+    "height": 4.2,
+    "pier": 0.64,
+    "depth": 0.78,
+    "lintel": 0.56,
+    "grilleHeight": 1.65,
+    "name": "彦根市立西中学校",
+    "closed": true,
+    "basis": "Position retained from the registered existing gate; brown frame and accordion grille observed in 0855/0857. Width/height estimated from photo proportions, not surveyed."
+  },
+  "walls": [
+    {
+      "osm": "way/1449647548",
+      "outline": [
+        [
+          -584.19823,
+          235.19027
+        ],
+        [
+          -583.99631,
+          245.17453
+        ],
+        [
+          -584.47985,
+          245.50245
+        ],
+        [
+          -585.25692,
+          233.55735
+        ]
+      ],
+      "height": 3.2,
+      "heightBasis": "photo estimate",
+      "photos": [
+        855,
+        856,
+        857
+      ]
+    },
+    {
+      "osm": "way/1449647549",
+      "outline": [
+        [
+          -584.47985,
+          245.50245
+        ],
+        [
+          -577.25983,
+          245.30157
+        ],
+        [
+          -577.31274,
+          244.94034
+        ],
+        [
+          -583.99631,
+          245.17453
+        ]
+      ],
+      "height": 3.2,
+      "heightBasis": "photo estimate",
+      "photos": [
+        855,
+        856,
+        857
+      ]
+    },
+    {
+      "osm": "way/1481336254",
+      "outline": [
+        [
+          -601.50928,
+          257.26841
+        ],
+        [
+          -603.62573,
+          234.4839
+        ],
+        [
+          -601.50858,
+          236.06937
+        ],
+        [
+          -599.04397,
+          259.13708
+        ]
+      ],
+      "height": 3.2,
+      "heightBasis": "photo estimate",
+      "photos": [
+        855,
+        856,
+        857
+      ]
+    },
+    {
+      "osm": "way/1481336255",
+      "outline": [
+        [
+          -603.62573,
+          234.4839
+        ],
+        [
+          -594.05378,
+          233.91493
+        ],
+        [
+          -594.35967,
+          234.52452
+        ],
+        [
+          -595.00913,
+          235.83827
+        ],
+        [
+          -601.50858,
+          236.06937
+        ]
+      ],
+      "height": 3.2,
+      "heightBasis": "photo estimate",
+      "photos": [
+        855,
+        856,
+        857
+      ]
+    },
+    {
+      "osm": "way/1481336256",
+      "outline": [
+        [
+          -594.35967,
+          234.52452
+        ],
+        [
+          -591.42974,
+          262.04412
+        ],
+        [
+          -591.98881,
+          263.00743
+        ],
+        [
+          -595.00913,
+          235.83827
+        ]
+      ],
+      "height": 3.2,
+      "heightBasis": "photo estimate",
+      "photos": [
+        855,
+        856,
+        857
+      ]
+    },
+    {
+      "osm": "way/1481336257",
+      "outline": [
+        [
+          -591.42974,
+          262.04412
+        ],
+        [
+          -589.8,
+          262.27846
+        ],
+        [
+          -589.8,
+          262.83394
+        ],
+        [
+          -591.98881,
+          263.00743
+        ]
+      ],
+      "height": 3.2,
+      "heightBasis": "photo estimate",
+      "photos": [
+        855,
+        856,
+        857
+      ],
+      "sourceOutline": [
+        [
+          -591.42974,
+          262.04412
+        ],
+        [
+          -587.3096,
+          262.63655
+        ],
+        [
+          -591.98881,
+          263.00743
+        ]
+      ],
+      "correction": "0855/0857 show the wall ending at the left gate pier. Trim the inherited pointed OSM registration at that pier, retaining the rest of the source outline."
+    }
+  ],
+  "trees": [
+    {
+      "point": [
+        -599,
+        270
+      ],
+      "species": "zelkova",
+      "height": 12,
+      "spread": 7.3
+    },
+    {
+      "point": [
+        -602,
+        252
+      ],
+      "species": "zelkova",
+      "height": 11.5,
+      "spread": 6.2
+    },
+    {
+      "point": [
+        -596,
+        281
+      ],
+      "species": "tabu",
+      "height": 11.8,
+      "spread": 6.4
+    },
+    {
+      "point": [
+        -580,
+        271
+      ],
+      "species": "tabu",
+      "height": 11.2,
+      "spread": 6.3
+    },
+    {
+      "point": [
+        -574,
+        264
+      ],
+      "species": "tabu",
+      "height": 10.2,
+      "spread": 5.6
+    },
+    {
+      "point": [
+        -577,
+        280
+      ],
+      "species": "cedar",
+      "height": 10.4,
+      "spread": 3.5
+    },
+    {
+      "point": [
+        -587,
+        279
+      ],
+      "species": "tabu",
+      "height": 10.2,
+      "spread": 7.5
+    }
+  ],
+  "palm": {
+    "point": [
+      -582.5,
+      268.4
+    ],
+    "height": 5.0
+  },
+  "utilities": {
+    "pole": [
+      -575.5,
+      257.6
+    ],
+    "height": 10.4,
+    "lamp": [
+      -592.4,
+      243.5
+    ],
+    "pedestrianSign": [
+      -593.0,
+      241.6
+    ],
+    "restrictionSign": [
+      -592.7,
+      247.2
+    ],
+    "basis": "Photo sequence 0855–0858; individual placements and fixture dimensions are estimates.",
+    "restrictionTimetable": [
+      "路線バスを除く",
+      "3月15日–5月15日 8–18",
+      "5月16日–10月31日 日曜・休日 8–18"
+    ],
+    "restrictionBasis": "Readable in the full-resolution IMG_0855 crop; static photo-date signage only, no new runtime driver rule."
+  },
+  "notice": {
+    "point": [
+      -590.8,
+      261.6
+    ],
+    "basis": "Native simplified map and notice panels, no copied poster or unreadable event text."
+  },
+  "limits": [
+    "GPS is not a surveyed control; heights, widths and vegetation are photo estimates. Species labels describe silhouette recipes, not botanical identification.",
+    "School building footprints, court, pool, public road, bank heights and simulation rules are retained. Photos mostly hide the school facades, so no unsupported facade reconstruction is claimed.",
+    "Gate remains closed as photographed; public corner and crossing remain traversable.",
+    "No satellite or Street View imagery accessed in this local pass; owner photos 0855–0861 provide the visual evidence.",
+    "Restriction timetable was transcribed from the owner photo, not verified as a live regulation."
+  ],
+  "gardenEdge": [
+    [
+      -584.2,
+      263.2
+    ],
+    [
+      -583.5,
+      259.5
+    ],
+    [
+      -566,
+      258
+    ]
+  ]
+}
