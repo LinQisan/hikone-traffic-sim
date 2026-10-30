@@ -10,7 +10,7 @@ from abstract_props import beveled_box as box, cylinder, face, car_body, wheel, 
 from display_case import display_kiosk
 
 MODELS = ('ART_CornerShop', 'ART_WhiteStorehouse', 'ART_EavesStorehouse', 'ART_ThreeStorey',
-          'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_IslandWood', 'ART_TownTree',
+          'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_IslandWood', 'ART_StreetWillow', 'ART_GardenPine', 'ART_StreetHedge', 'ART_TownTree',
           'HK_Sign_ParkingDirection',
           'ART_WestCorner', 'HK_Sign_Paired30', 'HK_Sign_Paired40', 'HK_Sign_NoParking',
           'ART_PavingDetails', 'ART_KeiBox', 'HK_ChainFence', 'ART_DisplayKiosk')
@@ -92,6 +92,108 @@ def lathe(b, x, z, profile, material):
         for i in range(16):
             j = (i + 1) % 16
             face(b, [low[j], low[i], high[i], high[j]], material)
+
+
+def leaf_card(b, center, length, width, angle, droop, pigment, material='HK_Leaf'):
+    """A folded diamond leaf: the painted shaders break these into small touches of colour."""
+    x, y, z = center
+    ux, uz = math.cos(angle), math.sin(angle)
+    tip = (x + ux * length, y - droop, z + uz * length)
+    mid = (x + ux * length * .45, y - droop * .3, z + uz * length * .45)
+    side = (-uz * width, 0, ux * width)
+    b.face([center, (mid[0] + side[0], mid[1], mid[2] + side[2]), tip, (mid[0] - side[0], mid[1], mid[2] - side[2])],
+           material, strokes=False, pigment=pigment)
+    b.smooth[-1] = True
+
+
+def street_willow(b):
+    # The moat-side weeping willow (0906): a dark leaning trunk, arching boughs and fine curtains
+    # of narrow leaves in yellow-green, not ribbons. Both levels keep the same curtain envelope.
+    import random
+    rng = random.Random(981)
+    bark = (.30, .25, .26)
+    trunk = [(0, -.4, 0), (.15, 2.2, .1), (.5, 4.4, .2), (.7, 5.6, .3)]
+    for (p, q, r0, r1) in zip(trunk, trunk[1:], (.42, .34, .27), (.34, .27, .2)):
+        cylinder(b, p, q, r0, 'ART_TreeBark', segments=9, end_radius=r1)
+    paint_from = len(b.faces)
+    tips = []
+    for i in range(9):
+        a = i * math.tau / 9 + rng.uniform(-.2, .2)
+        reach, rise = rng.uniform(3.2, 4.8), rng.uniform(2.4, 4.0)
+        mid = (.7 + math.cos(a) * reach * .5, 5.6 + rise, .3 + math.sin(a) * reach * .5)
+        end = (.7 + math.cos(a) * reach, 5.6 + rise * .92, .3 + math.sin(a) * reach)
+        cylinder(b, (.7, 5.5, .3), mid, .14, 'ART_TreeBark', segments=6, end_radius=.08)
+        cylinder(b, mid, end, .08, 'ART_TreeBark', segments=5, end_radius=.03)
+        tips.append((a, reach, end))
+    for i in range(paint_from, len(b.faces)):
+        b.pigments[i] = bark
+    tones = ((.62, .68, .36), (.52, .62, .34), (.70, .70, .40), (.42, .54, .34), (.60, .60, .30))
+    for i in range(380):
+        a, r = rng.uniform(0, math.tau), math.sqrt(rng.uniform(.03, 1)) * 5.2
+        x, z = .7 + r * math.cos(a), .3 + r * math.sin(a)
+        top = 10.4 - r * .5 + rng.uniform(-.5, .3)
+        # Curtains stop above body height: a walker passes under them, and collision stays clear.
+        low = max(2.4, top - (rng.uniform(5.5, 8.4) if r > 3 else rng.uniform(2.5, 5)))
+        y, sway, tone = top, rng.uniform(0, math.tau), tones[i % len(tones)]
+        # Each strand is a falling chain of long narrow leaves, overlapping so it reads as a line.
+        while y > low:
+            t = (top - y) / max(.1, top - low)
+            px = x + math.cos(a) * t * .45 + .04 * math.sin(sway + y * 2.4)
+            pz = z + math.sin(a) * t * .45 + .04 * math.cos(sway + y * 2.4)
+            leaf_card(b, (px, y, pz), .1, .055, sway + y * 2, .62, tone)
+            y -= .46
+
+
+def garden_pine(b):
+    # A trained Japanese black pine (0899, 0908): leaning red-brown trunk, level boughs and pads of
+    # needle fans over a dark core, so the crown is brushed rather than a stack of pillows.
+    import random
+    from vegetation import spray
+    rng = random.Random(970)
+    trunk = [(0, -.5, 0), (.3, 1.8, .15), (.15, 3.6, .4), (.6, 5.6, .35), (.35, 7.6, .55)]
+    first = len(b.faces)
+    for p, q, r0, r1 in zip(trunk, trunk[1:], (.3, .26, .21, .16), (.26, .21, .16, .09)):
+        cylinder(b, p, q, r0, 'ART_TreeBark', segments=8, end_radius=r1)
+    boughs = [(1, .1, 3.4), (1, 2.6, 3.0), (2, 4.4, 3.4), (2, .9, 2.6), (3, 3.0, 2.6), (3, 5.5, 2.2), (4, 1.8, 1.7), (4, 4.2, 1.5)]
+    pads = []
+    for level, a, reach in boughs:
+        s = trunk[level]
+        end = (s[0] + math.cos(a) * reach, s[1] + .5, s[2] + math.sin(a) * reach)
+        cylinder(b, s, end, .1, 'ART_TreeBark', segments=5, end_radius=.03)
+        pads.append((end, 1.25))
+        pads.append(((s[0] + math.cos(a) * reach * .55, s[1] + .42, s[2] + math.sin(a) * reach * .55), 1.0))
+    pads.append(((trunk[-1][0], trunk[-1][1] + .3, trunk[-1][2]), 1.5))
+    for i in range(first, len(b.faces)):
+        b.pigments[i] = (.46, .33, .31)
+    blades, fans = 9, 10
+    for k, ((x, y, z), r) in enumerate(pads):
+        spray(b, (x, y - .08, z), (r * .72, .26, r * .72), k, 'HK_LeafDark', 971 + k, fine=False)
+        for f in range(fans):
+            a, d = rng.uniform(0, math.tau), math.sqrt(rng.uniform(0, 1)) * r
+            cx, cz = x + d * math.cos(a), z + d * math.sin(a)
+            cy = y + .24 * (1 - (d / r) ** 2) + rng.uniform(-.04, .06)
+            tone = ((.26, .40, .34), (.33, .47, .36), (.42, .52, .36), (.20, .34, .34))[f % 4]
+            for n in range(blades):
+                leaf_card(b, (cx, cy, cz), rng.uniform(.34, .5), .022 if not b.distant else .05,
+                          n * math.tau / blades + f, rng.uniform(-.14, .1), tone, 'HK_LeafDark')
+
+
+def street_hedge(b):
+    # A clipped evergreen hedge (0899): dense small leaves over a shaded core, slightly uneven.
+    import random
+    rng = random.Random(990)
+    box(b, (0, .62, 0), (.74, 1.24, 3.1), 'HK_LeafDark', .08)
+    for i in range(len(b.faces)):
+        b.pigments[i] = (.20, .29, .26)
+    tones = ((.30, .44, .32), (.40, .52, .32), (.26, .40, .34), (.52, .58, .34), (.34, .48, .28))
+    for i in range(420):
+        face_pick = rng.random()
+        if face_pick < .36:
+            x, y, z = rng.uniform(-.42, .42), 1.26 + rng.uniform(-.04, .08), rng.uniform(-1.56, 1.56)
+        else:
+            x, y, z = (-.42 if face_pick < .68 else .42) + rng.uniform(-.05, .05), rng.uniform(.12, 1.26), rng.uniform(-1.56, 1.56)
+        size = .2 * rng.uniform(.8, 1.2)
+        leaf_card(b, (x, y, z), size, size * .42, rng.uniform(0, math.tau), rng.uniform(-.06, .1), tones[i % len(tones)])
 
 
 def bridge_posts(b):
@@ -485,6 +587,12 @@ def build(name, mesh_class, lod=False):
         clipped_hedge(b)
     elif name == 'HK_Sign_ParkingDirection':
         parking_direction(b)
+    elif name == 'ART_GardenPine':
+        garden_pine(b)
+    elif name == 'ART_StreetHedge':
+        street_hedge(b)
+    elif name == 'ART_StreetWillow':
+        street_willow(b)
     elif name == 'ART_IslandWood':
         # The school island's dense evergreen tabu/shii wood (owner image; Street View 2024).
         from vegetation import tree

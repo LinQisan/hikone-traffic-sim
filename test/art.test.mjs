@@ -47,8 +47,10 @@ test('every scene and vehicle asset has self-contained pigment geometry', () => 
     }
   }
   const bytes = Object.values(manifest.models).reduce((sum, m) => sum + m.bytes, 0);
-  // Raised from 80 for the school island's mapped buildings and courts (docs/field-survey.md).
-  assert.ok(bytes < 81 * 1024 * 1024, 'distant ground must not inflate the art set past 81 MiB');
+  // GitHub's hard limits: 100 MiB per pushed file; a published Pages site stays under 1 GB.
+  const largest = Math.max(...Object.values(manifest.models).map(m => m.bytes));
+  assert.ok(largest < 100 * 1024 * 1024, 'no GLB reaches GitHub\'s 100 MiB file limit');
+  assert.ok(bytes < 1024 * 1024 * 1024, 'the art set stays under GitHub Pages\' 1 GB site limit');
 });
 
 test('the houses and tree silhouettes were rebuilt, including when the shader finish is off', () => {

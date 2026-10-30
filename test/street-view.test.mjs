@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { StreetViewer, parseStreetPose } from '../src/three/camera/StreetViewer.ts';
+import { StreetViewer, describeStreetPose, parseStreetPose } from '../src/three/camera/StreetViewer.ts';
 
 const bounds = { xMin: -1060, zMin: -155, xMax: 420, zMax: 870 };
 
@@ -37,4 +37,12 @@ test('held keys walk along the heading over the ground and stop at the map edge'
     viewer.stop();
     assert.equal(viewer.update(1), false, 'a stopped viewer ignores held keys');
   } finally { globalThis.addEventListener = original; }
+});
+
+test('the copied view text reopens the same pose and names the real place', () => {
+  const text = describeStreetPose({ x: 264, z: 237.256, heading: 38.4, pitch: -12.2, eye: 1.6 }, 'https://example.test/index.html');
+  assert.match(text, /x=264, z=237\.26, 向き=38°/);
+  assert.match(text, /緯度経度: 35\.272\d+, 136\.255\d+（真北からの方位 70°）/);
+  const pose = parseStreetPose(text.split('?street=')[1], bounds);
+  assert.deepEqual(pose, { x: 264, z: 237.26, heading: 38, pitch: -12, eye: 1.6 });
 });

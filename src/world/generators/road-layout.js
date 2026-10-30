@@ -2,7 +2,7 @@
 // The practice junction remains (32,26); the rest of the imported tile grid is replaced.
 import { CASTLE_ITEMS } from './castle-layout.js';
 import { UNIVERSITY_ITEMS } from './university-layout.js';
-import { NORTH_APPROACH, INNER_MOAT_ROAD, distanceToPath, APPROACH_BUILDINGS, APPROACH_PATCHES, HIGASHI_ISLAND, HIGASHI_FRONTAGE } from './castle-approach.js';
+import { NORTH_APPROACH, INNER_MOAT_ROAD, distanceToPath, APPROACH_BUILDINGS, APPROACH_PATCHES, HIGASHI_ISLAND, HIGASHI_FRONTAGE, HIGASHI_STREET } from './castle-approach.js';
 import townStreets from '../../../world/town-streets.json' with { type: 'json' };
 import {eastLayout} from './east-layout.ts';
 export const TOWN_STREETS = townStreets.streets;
@@ -46,6 +46,7 @@ export function frontageShift(a, x, scale = 1) {
 export const castleX = z => townStreets.castleRoad.originX + Math.max(0, -z) * townStreets.castleRoad.southSlope;
 // The school island's mapped retaining wall; same rule as north_shore in tools/road_network.py.
 const ISLAND_FROM = 102, ISLAND_TO = 198;
+const ROAD_TREES = [[-1, 622.5], [-9.1, 632.1], [-30, 691.4]];
 const ISLAND_SHORE = [[ISLAND_FROM, 74 + 0.7 * moatBend(ISLAND_FROM)], ...HIGASHI_ISLAND.shore.points,
   [ISLAND_TO, 74 + 0.7 * moatBend(ISLAND_TO)]];
 export const northShore = x => {
@@ -232,8 +233,16 @@ export function roadLayout(layout) {
   // The East source's illustrative groves on the school island: clear of the mapped grounds
   // and buildings, and of the same evergreen wood as the rest of it.
   const courts = [...APPROACH_BUILDINGS, ...HIGASHI_ISLAND.grounds].map(f => f.footprint);
-  return { ...shown, items: shown.items.flatMap(item => {
+  const street = HIGASHI_STREET.trees.map(t => ({ g: 'WebStreet', ...t }));
+  return { ...shown, items: [...street, ...shown.items.flatMap(item => {
+    // Three mapped trees fall inside estimated road widths; a tree cannot stand in the lane.
+    if (item.a === 'ART_TownTree' && ROAD_TREES.some(([x, z]) => Math.hypot(item.p[0] - x, item.p[2] - z) < 1)) return [];
     if (item.a !== 'ART_CastleGrove' || item.p[0] < 100 || item.p[0] > 216 || item.p[2] < 90 || item.p[2] > 390) return [item];
-    return courts.some(f => inside(item.p[0], item.p[2], f)) ? [] : [{ ...item, a: 'ART_IslandWood' }];
-  }) };
+    if (courts.some(f => inside(item.p[0], item.p[2], f))) return [];
+    // These source groves predate the mapped rampart: seat them on its slope.
+    // The same fade as east_extension.bank_height, which meets the town datum at X=200.
+    const t = Math.max(0, Math.min(1, (200 - item.p[0]) / 16));
+    const y = 0.15 + (northBankHeight(item.p[0], item.p[2]) - 0.15) * t * t * (3 - 2 * t);
+    return [{ ...item, a: 'ART_IslandWood', p: [item.p[0], y, item.p[2]] }];
+  })] };
 }

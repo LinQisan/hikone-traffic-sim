@@ -6,6 +6,8 @@ import nishi from '../../../world/nishi-frontage.json' with {type:'json'};
 import island from '../../../world/higashi-island.json' with {type:'json'};
 const photoProfiles: {height:number;rise:number;maxHeight?:number;anchor:number[]}[] = Object.values(observations.buildings);
 export const EAST_GEOGRAPHY = source;
+// Mapped generic houses by region; tools/east_extension.py authors the same split.
+export const EAST_BUILDING_REGIONS = ['ART_EastHikoneWest', 'ART_EastHikoneSouth', 'ART_EastHikoneNorth'];
 // Each extruded building keeps its own camera bounds (eave height plus any gable rise).
 export const EAST_CAMERA_SOLIDS = source.buildings.flatMap(b => {
   // The compact transport omits source IDs. The reviewed frozen outline anchor ties the
@@ -53,7 +55,7 @@ export function deepInEastExtension(x: number, z: number, margin: number): boole
 const GENERIC_HOUSE = /^HK_(Machiya|Kura)/;
 /** Native meshes and body-height footprints use the same frozen source; no remote map at startup. */
 export function eastLayout(layout: SceneLayout): SceneLayout {
-  const assets = ['ART_EastHikoneSurface', 'ART_EastHikoneWater', 'ART_EastHikoneBuildings'];
+  const assets = ['ART_EastHikoneSurface', 'ART_EastHikoneWater', 'ART_EastHikoneBuildings', ...EAST_BUILDING_REGIONS];
   const items = layout.items.filter(i => i.g !== 'WebEast' && (i.p[0] === 0 && i.p[2] === 0 || !inEastExtension(i.p[0], i.p[2]))
     && !(GENERIC_HOUSE.test(i.a) && boundaryDistance(i.p[0], i.p[2]) < 12));
   for (const a of assets) items.push({a, p:[0,0,0], r:0, s:[1,1,1], g:'WebEast'});

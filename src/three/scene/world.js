@@ -8,17 +8,19 @@ import { packPigments, compactAttributes } from './geometry-budget.js';
 import { buildOverheadWires } from '../geometry/overhead-wires.js';
 import { CameraObstacles } from '../camera/camera-obstacles.js';
 import { APPROACH_CAMERA_SOLIDS } from '../../world/generators/castle-approach.js';
-import { EAST_CAMERA_SOLIDS } from '../../world/generators/east-layout.ts';
+import { EAST_BUILDING_REGIONS, EAST_CAMERA_SOLIDS } from '../../world/generators/east-layout.ts';
 import { UNIVERSITY_SOLIDS, WEST_BUILDINGS, WEST_SOLIDS } from '../../world/generators/university-layout.js';
 import { ambientMotion } from '../materials/ambient-motion.js';
 import { startupMark } from '../renderer/startup.ts';
 
 const NO_SHADOW = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/;
 // Broad composites need local LOD: a camera near one edge must not promote the entire hill/campus.
+const EAST_BUILDING_ASSETS = new Set(['ART_EastHikoneBuildings', ...EAST_BUILDING_REGIONS]);
 export const ENVIRONMENT_CELLS = Object.freeze({
   HK_Terrain_Hikone: 128, ART_ShigaCampus: 96, ART_WestMoat: 128, ART_HikoneCompound: 128,
   // The geographic district spans the whole world but is light (~50k triangles): one draw each.
   ART_EastHikoneSurface: 2048, ART_EastHikoneWater: 2048, ART_EastHikoneBuildings: 2048,
+  ART_EastHikoneWest: 2048, ART_EastHikoneSouth: 2048, ART_EastHikoneNorth: 2048,
 });
 // Dense foliage loses individual leaf detail long before a building loses its joinery.
 const TREE_ASSET = /^(HK_Tree_|ART_(TownTree$|MoatTree_|CastleGrove$))/;
@@ -150,7 +152,7 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
       lodFar: TREE_ASSET.test(asset) ? 24 : undefined,
       batched: ['ART_CastleApproach', 'ART_ShigaCampus', 'ART_WestMoat'].includes(asset),
       cameraSolids: asset === 'ART_CastleApproach' ? APPROACH_CAMERA_SOLIDS
-        : asset === 'ART_EastHikoneBuildings' ? EAST_CAMERA_SOLIDS
+        : EAST_BUILDING_ASSETS.has(asset) ? EAST_CAMERA_SOLIDS
         : asset === 'ART_ShigaCampus' ? UNIVERSITY_SOLIDS : asset === 'ART_WestMoat' ? [...WEST_BUILDINGS,...WEST_SOLIDS] : null };
   }));
   startupMark('environmentModelsReady');

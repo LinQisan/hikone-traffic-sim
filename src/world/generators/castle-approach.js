@@ -6,8 +6,10 @@ import { castlePaths } from './castle-paths.js';
 import { EAST_GEOGRAPHY } from './east-layout.ts';
 import higashi from '../../../world/higashi-frontage.json' with { type: 'json' };
 import island from '../../../world/higashi-island.json' with { type: 'json' };
+import street from '../../../world/east-street.json' with { type: 'json' };
 export const HIGASHI_FRONTAGE = higashi;
 export const HIGASHI_ISLAND = island;
+export const HIGASHI_STREET = street;
 
 export const APPROACH_REFERENCE = 'https://www.google.com/maps/@?api=1&map_action=map&center=35.2744,136.252&zoom=18&basemap=satellite';
 const latitude = 35.2744, longitude = 136.252;

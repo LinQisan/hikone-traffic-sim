@@ -81,12 +81,17 @@ def photographed_building(b,item):
     from university_photos import framed_window
     from abstract_props import cylinder
     kind=spec['kind'];first=len(b.faces);h=.15+spec['height'];rings=item.get('wallOutlines',item['outlines'])
+    if kind=='church':
+        from east_street import church
+        church(b)
+        return True
     edges=[(a,c) for p in item['outlines'] for a,c in zip(p,p[1:]+p[:1])]
-    if kind in ('cafe','church'):
+    if kind=='cafe':
         # A gable across the observed narrow axis, clipped to the actual footprint, even
         # where the original source has a small recessed corner. No bounding-box filler.
         roof_rect=item.get('roof',{}).get('rect')
-        if kind=='church':roof_rect=[[274.35666,281.08083],[305.2168,278.82361],[306.37479,291.9256],[275.27477,294.13794]]
+        # The cafe's big white gable faces the parking, not the street (0896).
+        if kind=='cafe':roof_rect=roof_rect[1:]+roof_rect[:1]
         a,c,_,e=roof_rect;length=math.dist(a,c);ux,uz=(c[0]-a[0])/length,(c[1]-a[1])/length;nx,nz=-uz,ux
         width=(e[0]-a[0])*nx+(e[1]-a[1])*nz
         origin,rx,rz=tuple(a),nx,nz
@@ -109,12 +114,12 @@ def photographed_building(b,item):
             # Segment gable ends/stepped hotel walls so the attic follows its real roof.
             cuts=[i/max(1,math.ceil(length/1.5)) for i in range(max(1,math.ceil(length/1.5))+1)]
             if kind=='hotel' and (a[0]-290)*(c[0]-290)<0:cuts=sorted(set(cuts+[(290-a[0])/(c[0]-a[0])]))
-            if kind in ('church','cafe') and ridge_side(a)*ridge_side(c)<0:
+            if kind=='cafe' and ridge_side(a)*ridge_side(c)<0:
                 cuts=sorted(set(cuts+[ridge_side(a)/(ridge_side(a)-ridge_side(c))]))
             for lo,hi in zip(cuts,cuts[1:]):
                 p,q=[(a[0]+(c[0]-a[0])*t,a[1]+(c[1]-a[1])*t) for t in (lo,hi)]
                 yy=5.1 if kind=='hotel' and (p[0]+q[0])/2<290 else 13.15 if kind=='hotel' else h
-                py,qy=(roof_y(*p),roof_y(*q)) if kind in ('church','cafe') else (yy,yy)
+                py,qy=(roof_y(*p),roof_y(*q)) if kind=='cafe' else (yy,yy)
                 if kind=='hotel' and yy<7:
                     py,qy=[5.1+1.5*max(0,1-abs((v[0]-285.5)/4.5)) for v in (p,q)]
                 if kind=='turret':
@@ -135,12 +140,9 @@ def photographed_building(b,item):
                         u=length*(i+.5)/max(1,int(length/3.1))
                         if y+1.3<wall_h:framed_window(b,at,u-.65,u+.65,y,y+1.3,columns=2,rows=1)
             elif kind=='crest-shops':
-                for i in range(max(1,int(length/3.0))):
-                    u=length*(i+.5)/max(1,int(length/3.0))
-                    framed_window(b,at,u-.7,u+.7,.45,2.6,columns=4,rows=1,frame='ART_Timber')
+                continue  # east_street.shops draws the photographed bays
             elif nx<-.8:
                 # Only the photographed street frontage receives the identifying glazing.
-                if kind=='church':continue
                 framed_window(b,at,length*.15,length*.85,.5,2.8,columns=4,rows=2)
     # Fit a gable/hipped roof to every existing source triangle; holes and clipped wings remain holes.
     if kind=='hotel':
@@ -164,27 +166,15 @@ def photographed_building(b,item):
                         face(b,[(x,13.15 if side else 5.1+1.5*max(0,1-abs((x-285.5)/4.5)),z) for x,z in q],'HK_RoofTile' if not side else 'HK_MetalLight',(sum(v[0] for v in q)/3,0,sum(v[1] for v in q)/3))
     else:
         triangles=item['triangles']
-        if kind in ('church','cafe'):
+        if kind=='cafe':
             triangles=[]
             for t in item['triangles']:
                 for side in (False,True):
                     p=clipped(t,ridge_side,side)
                     triangles.extend([[p[0],p[i],p[i+1]] for i in range(1,len(p)-1)])
         for t in split_triangles(triangles):face(b,[(x,roof_y(x,z),z) for x,z in t],'HK_RoofTile',(sum(v[0] for v in t)/3,0,sum(v[1] for v in t)/3))
-    if kind=='church':
-        round_window(b,(274.65,5.45,287.55),(-.998,.07),1.5)
-        at=lambda u,y,o:(274.65-.07*u-.998*o,y,287.55-.998*u+.07*o)
-        framed_window(b,at,-1.05,1.05,.15,2.5,columns=2,rows=2,frame='HK_MetalLight')
-        # Observed low entrance canopy and cross/finial; no invented interior.
-        canopy(b,(274.2,287.5),(-1,.07),4.8)
-        # Tapered sheet-metal spire and cross, rather than a plain utility pole (0902).
-        p=[(303+dx,7.8,285.5+dz) for dx,dz in [(-.6,-.6),(.6,-.6),(.6,.6),(-.6,.6)]]
-        for a,c in zip(p,p[1:]+p[:1]):face(b,[a,c,(303,11.0,285.5)],'HK_MetalLight',(303,8,285.5))
-        cylinder(b,(303,11.0,285.5),(303,12.25,285.5),.045,'HK_MetalLight',segments=6)
-        cylinder(b,(302.55,11.85,285.5),(303.45,11.85,285.5),.04,'HK_MetalLight',segments=6)
-    elif kind=='cafe':
-        canopy(b,(259.0,173.7),(-1,0),2.4,arched=True)
-        round_window(b,(259.1,5.0,174.25),(-1,.01),.47)
+    if kind=='cafe':
+        canopy(b,(263.9,170.8),(0,-1),2.6,arched=True)
     elif kind=='crest-shops':
         # The taller red end gable and round crest panel are visible in 0903–0905.
         center=(278.7,5.8,303.0);inside=(280,4,303)
@@ -195,11 +185,13 @@ def photographed_building(b,item):
         for j in range(3):
             a=j*math.tau/3;cy,cz=y+.19*math.sin(a),z+.19*math.cos(a)
             face(b,[(x-.04,cy+.18*math.sin(i*math.tau/16),cz+.18*math.cos(i*math.tau/16)) for i in range(16)],'HK_Gold',inside)
-    elif kind=='hotel':portal(b,(278,376),(-1,0),7.0,3.6,4.8)
+    elif kind=='hotel':portal(b,(275.2,376),(-1,0),8.6,3.6,4.9)
     elif kind=='turret' and item['id']=='way/363244220':
         # Museum's visible exterior stair is a closed exhibit access, not a new public route.
         stair(b,(62.4,466.5),(62.5,453.8),4.4)
     recolor(b,first)
+    from east_street import tint_building
+    tint_building(b,first,kind)
     return True
 
 
@@ -392,9 +384,10 @@ def furniture(b):
     # The retained practice shore already owns its original fence. Extend the mapped
     # chain only into the photographed eastern promenade, preserving event corridors.
     mapped=d['promenadeBarrier']['points'];line=[]
+    # West of X=200 the retained shore has its own fence, and the mapped line falls in its water.
     for a,c in zip(mapped,mapped[1:]):
-        if c[0]<110:continue
-        p=a if a[0]>=110 else [110,a[1]+(c[1]-a[1])*(110-a[0])/(c[0]-a[0])]
+        if c[0]<200:continue
+        p=a if a[0]>=200 else [200,a[1]+(c[1]-a[1])*(200-a[0])/(c[0]-a[0])]
         if not line:line.append(p)
         line.append(c)
     from east_extension import ownership

@@ -7,7 +7,9 @@ from functools import lru_cache
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 with open(os.path.join(ROOT, 'world', 'geographic-frame.json')) as f:
     FRAME = json.load(f)
-MODELS = ('ART_EastHikoneSurface', 'ART_EastHikoneWater', 'ART_EastHikoneBuildings')
+# Generic mapped houses are split by region; the reviewed street and photo work stay in Buildings.
+REGION_MODELS = ('ART_EastHikoneWest', 'ART_EastHikoneSouth', 'ART_EastHikoneNorth')
+MODELS = ('ART_EastHikoneSurface', 'ART_EastHikoneWater', 'ART_EastHikoneBuildings') + REGION_MODELS
 
 
 @lru_cache(maxsize=1)
@@ -303,6 +305,33 @@ def clip_finished_builder(b, origin):
     return b
 
 
+def building_region(building):
+    """The asset that authors a footprint: west of X=-250, south of Z=20, north of Z=480, or central."""
+    from field_photos import data as photos
+    from east_street import data as street
+    from higashi_school import east_replaced
+    from university_photos import ALLEY_PROFILES
+    reviewed = building['id'] in photos()['buildings'] or building['id'] in street()['houses'] or building['id'] in ALLEY_PROFILES
+    if reviewed or building['id'] in east_replaced():
+        return 'ART_EastHikoneBuildings'
+    ring = building['outlines'][0]
+    x, z = sum(p[0] for p in ring) / len(ring), sum(p[1] for p in ring) / len(ring)
+    return 'ART_EastHikoneWest' if x < -250 else 'ART_EastHikoneSouth' if z < 20 else 'ART_EastHikoneNorth' if z > 480 else 'ART_EastHikoneBuildings'
+
+
+def final_surfaces():
+    """Source partition with the school island's courts and the walked east street applied."""
+    from higashi_school import island_cut
+    from east_street import overlay
+    source = dict(data()['surfaces'])
+    land, grass, grounds = island_cut(source.get('land', []), source.get('grass', []))
+    # The rampart falls 4 m in 12 m: refine its long source triangles so the slope is real.
+    from field_photos import split_triangles
+    rampart = lambda t: 118 < sum(p[0] for p in t) / len(t) < 200 and min(p[1] for p in t) < 118 and max(p[1] for p in t) > 98
+    grass = [q for t in grass for q in (split_triangles([t], 3) if rampart(t) else [t])]
+    return overlay(dict(source, land=land, grass=grass)), grounds
+
+
 def bank_height(x, z):
     """Inherit the existing castle-bank profile at the seam; fade to town datum by X=200."""
     from road_network import north_bank_height, north_shore
@@ -479,12 +508,13 @@ def build(name, mesh_class, lod=False):
             from road_network import export_castle_paths
             export_castle_paths()
             export_plan()
-        from higashi_school import island_cut
+        surfaces, grounds = final_surfaces()
         for kind, height, material in [('road',.01,'HK_Asphalt'),('walk',.01,'HK_Sidewalk'),('lot',.01,'HK_Asphalt')]:
-            flat(b, d['surfaces'].get(kind, []), height, material)
-        land, grass, grounds = island_cut(d['surfaces'].get('land', []), d['surfaces'].get('grass', []))
-        flat(b, land, bank_height, 'HK_Sidewalk')
-        flat(b, grass, bank_height, 'HK_Grass')
+            flat(b, surfaces[kind], height, material)
+        flat(b, surfaces['land'], bank_height, 'HK_Sidewalk')
+        flat(b, surfaces['grass'], bank_height, 'HK_Grass')
+        for material, pieces in surfaces['extra'].items():
+            flat(b, pieces, .01, material)
         for material, pieces in grounds.items():
             flat(b, pieces, .15, material)
         flat(b, d['paint'], .022, 'HK_WhitePaint')
@@ -495,11 +525,16 @@ def build(name, mesh_class, lod=False):
                         (c[0],shore_height(*c),c[1]),(c[0],-1.35,c[1])], 'HK_Stone', strokes=False)
         for face in seam_faces():
             b.face(face,'HK_Sidewalk',strokes=False)
+    elif name in REGION_MODELS:
+        for building in d['buildings']:
+            if building_region(building) == name:
+                house(b, building)
     elif name == 'ART_EastHikoneWater':
         flat(b, d['surfaces']['water'], -1.35, 'HK_Water')
     else:
         for building in d['buildings']:
-            house(b, building)
+            if building_region(building) == 'ART_EastHikoneBuildings':
+                house(b, building)
         from university_photos import alley_street
         alley_street(b,d)
         from field_photos import furniture
@@ -508,6 +543,8 @@ def build(name, mesh_class, lod=False):
         for item in island()['buildings']:
             if east_owned(item):
                 school_building(b, item)
+        from east_street import furniture as street_furniture
+        street_furniture(b)
     return b
 
 
@@ -528,7 +565,8 @@ def house(b, building):
     """
     from field_photos import photographed_building
     from higashi_school import east_replaced
-    if building['id'] in east_replaced() or photographed_building(b,building):
+    from east_street import house as street_house
+    if building['id'] in east_replaced() or photographed_building(b,building) or street_house(b,building):
         return
     from university_photos import alley_wall
     eave = .15 + building['height']
@@ -601,9 +639,9 @@ def export_plan():
                     a,c,d = q[0],q[i],q[i+1]
                     if abs((c[0]-a[0])*(d[2]-a[2])-(c[2]-a[2])*(d[0]-a[0])) > AREA_EPS * 2:
                         groups[name].append(list(a) + list(c) + list(d))
-    from higashi_school import island_cut
-    land, grass, grounds = island_cut(data()['surfaces'].get('land', []), data()['surfaces'].get('grass', []))
-    surfaces = dict(data()['surfaces'], land=land, grass=grass + [t for pieces in grounds.values() for t in pieces])
+    surfaces, grounds = final_surfaces()
+    surfaces = dict(surfaces, grass=surfaces['grass'] + [t for pieces in grounds.values() for t in pieces],
+                    lot=surfaces['lot'] + [t for pieces in surfaces['extra'].values() for t in pieces])
     for kind, label, height in [('road','carriageway',.01),('walk','pavement',.01),('lot','parking',.01),('land','grounds',bank_height),('grass','green grounds',bank_height)]:
         groups['East Hikone ' + label] = [[v for x,z in t for v in (x,height(x,z) if callable(height) else height,z)] for t in surfaces.get(kind, [])]
     with open(path, 'w') as f:

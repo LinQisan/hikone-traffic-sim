@@ -26,7 +26,8 @@ const streetItem = (a, x, z, y = 0.15) => ({ a, p: [x, y, z], r: 0, s: [1, 1, 1]
 export const WEB_STREET_ITEMS = [
   ...[-90, -58, -26, 6, 55, 87].map(x => streetItem('ART_PathLamp', x, moatPathEdge(x) + 0.3)),
   // On the narrowed footway the poles stand at its kerb side, clear of the frontage eaves.
-  ...[53, 83, 113].map(x => streetItem('ART_UtilityPole', x, 21.45, 0.01)),
+  // The third pole stands west of the alley mouth, not on its carriageway.
+  ...[53, 83, 109].map(x => streetItem('ART_UtilityPole', x, 21.45, 0.01)),
   streetItem('ART_MoatUtilityPole', 70, moatPathEdge(70) + 0.8),
   // Nov 2022 / Oct 2024 Street View: the case stands close to the shop wall, behind the walking line.
   { a: 'ART_DisplayKiosk', p: [47.2, 0.15, 16.1], r: 0, s: [1, 1, 1], g: 'WebStreet' },
