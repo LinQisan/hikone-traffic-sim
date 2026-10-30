@@ -320,4 +320,9 @@ def build(name, mesh_class, lod=False):
         from castle_compound import compound
         compound(b)
     else: hill(b)
+    if name in ('HK_Terrain_Hikone','ART_HikoneCompound'):
+        from castle_approach import data
+        from east_extension import clip_finished_builder
+        site = data()['castle']
+        clip_finished_builder(b,(site['x'],0,site['z']))
     return b

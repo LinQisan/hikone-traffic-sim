@@ -25,6 +25,7 @@ import hikone_castle
 import castle_approach
 import vegetation
 import university
+import east_extension
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, 'data', 'models', 'impressionist')
@@ -559,13 +560,17 @@ def main():
     names.update(hikone_castle.MODELS)
     names.update(castle_approach.MODELS)
     names.update(university.MODELS)
+    names.update(east_extension.MODELS)
     if args.only and set(args.only) - names:
         parser.error('Unknown models: ' + ', '.join(sorted(set(args.only) - names)))
-    for name in sorted(names):
+    # Geographic seams sample the final retained road/path exports, so author them last.
+    for name in sorted(names, key=lambda name: (name in east_extension.MODELS, name)):
         if args.only and name not in args.only:
             continue
         if args.lod_only:
             b = None
+        elif name in east_extension.MODELS:
+            b = east_extension.build(name, BrushMesh)
         elif name in university.MODELS:
             b = university.build(name, BrushMesh)
         elif name in hikone_castle.MODELS:
@@ -634,11 +639,14 @@ def main():
         # next mesh's neutral vertex-colour material with an old Base Color map.
         for mat in list(bpy.data.materials):
             bpy.data.materials.remove(mat)
-    road_network.finish_exports()
     if not args.lod_only and (not args.only or any(name in args.only for name in (*university.MODELS, 'ART_KyobashiRoads', 'ART_HikoneCompound', 'HK_Terrain_Hikone'))):
         university.export_plan()
     if args.only and not args.lod_only and 'ART_KyobashiRoads' not in args.only and any(name in args.only for name in ('ART_HikoneCompound', 'HK_Terrain_Hikone')):
         road_network.export_castle_paths()
+    if not args.lod_only:
+        east_extension.export_plan()
+    road_network.finish_exports(refresh=not args.lod_only and bool(args.only)
+                                and any(name in east_extension.MODELS for name in args.only))
     with open(os.path.join(OUT, 'manifest.json'), 'w') as f:
         json.dump(manifest, f, indent=2)
     if args.save_library:

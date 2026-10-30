@@ -29,6 +29,7 @@ import road_network
 import hikone_castle
 import castle_approach
 import university
+import east_extension
 import vegetation
 
 OUT = os.path.join(ROOT, 'models')
@@ -95,6 +96,7 @@ def instrument(original, opcode):
             params['distant'] = getattr(b, 'distant', False)
         transform = transform_matrix(params.pop('transform', abstract_props.identity))
         first_face, first_vertex = len(b.faces), len(b.vertices)
+        clip_revision = getattr(b, 'clip_revision', 0)
         b.recording = True
         try:
             result = original(b, *args, **kwargs)
@@ -103,6 +105,10 @@ def instrument(original, opcode):
             random_tape = previous_tape
         if opcode in ('leaf_spray', 'tuft'):
             params['random'] = tape
+        # Cropped author primitives must retain their clipped faces; replaying the original
+        # box/cylinder command would silently restore geometry inside the geographic extension.
+        if getattr(b, 'clip_revision', 0) != clip_revision:
+            return result
         b.operations.append((opcode, params, transform, first_face, len(b.faces), first_vertex,
                              [unity(p) for p in b.vertices[first_vertex:]]))
         return result
@@ -131,7 +137,7 @@ HOUSES = {'HK_Machiya_A': (7.2, 9, 5.5, 'A'), 'HK_Machiya_A_Narrow': (5.4, 9, 5.
 
 
 def build(name, low):
-    for module in (university, hikone_castle, castle_approach, streetscape):
+    for module in (east_extension, university, hikone_castle, castle_approach, streetscape):
         if name in module.MODELS:
             return module.build(name, RecipeMesh, lod=low)
     if name in road_network.MODELS:

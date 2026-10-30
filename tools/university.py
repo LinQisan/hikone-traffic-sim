@@ -90,7 +90,7 @@ def plan():
     circle=lambda r:[(cx+r*math.cos(i*math.tau/24),cz+r*math.sin(i*math.tau/24)) for i in range(24)]
     island,court=circle(5),circle(12)
     roads = union([p for path, half in ((d['road'],4),(d['lane'],2.2),(d['frontLane'],1.8),(d['link'],3.0),
-                    *[(line,2.5) for line in d['schoolLanes']]) for p in strip(path, -half, half)]
+                    (d['schoolGateEntry'],3.2),*[(line,2.5) for line in d['schoolLanes']]) for p in strip(path, -half, half)]
                     +triangulate(ccw(d['schoolCourt'])))
     paths = union([p for path in [d['entrance'], *d['paths']] for p in strip(path, -2.4, 2.4)]
                   + strip(d['schoolLotEntry'],-1.7,1.7))
@@ -127,11 +127,18 @@ def plan():
     # Exclude buildings from paths only where their authored outlines actually intersect.
     buildings = [t for item in d['buildings'] + d['schoolBuildings'] + d['neighbors'] for t in triangulate(ccw(item['footprint']))]
     paths = difference(paths, buildings)
+    from school_moat import terrain, ground_polygons
+    rampart_cut,_=terrain()
+    rampart=ground_polygons(roads+paths+buildings)
+    # Replace the low ground under the raised bank, including its battered face.
+    # Keeping a hidden zero-height sheet here would cut a green lip through the stone.
+    lawns=difference(lawns,rampart_cut);base=difference(base,rampart_cut)
+    fields=difference(fields,rampart_cut)
     curbs=union([q for side in (-1,1) for q in strip(d['road'],side*4,side*4.2)])
     curbs=cut(curbs,strip(d['entrance'],-3,3)+strip(d['lane'],-2.2,2.2)+strip(d['frontLane'],-2.1,2.1)+strip(d['link'],-5,5))
     lot_paths=cut(paths,cut(paths,strip(d['schoolLotEntry'],-1.7,1.7)))
     return dict(roads=roads, paths=paths, water=water, lawns=lawns, base=base, fields=fields,lot=lot,lotPaths=lot_paths,
-                pool=pool,poolDeck=pool_deck,curbs=curbs,town=town)
+                pool=pool,poolDeck=pool_deck,curbs=curbs,town=town,rampart=rampart,rampartCut=rampart_cut)
 
 
 def land_cutters():
@@ -141,16 +148,19 @@ def land_cutters():
 
 def ground_groups():
     from road_network import triangles
+    from school_moat import height as rampart_height
     p = plan()
     # Walk surfaces use the same Float32 triangles as the exported model.
     return {'Shiga University streets': [t for q in p['roads'] for t in triangles(q, 0.01)],
             'Shiga University paths': [t for q in p['paths'] for t in triangles(q, 0.01)],
             'Shiga University kerbs': [t for q in p['curbs'] for t in triangles(q, 0.16)],
-            'Shiga University grounds': [t for q in p['lawns'] + p['fields'] + p['town'] + p['lot'] + p['poolDeck'] for t in triangles(q, 0.15)]}
+            'Shiga University grounds': [t for q in p['lawns'] + p['fields'] + p['town'] + p['lot'] + p['poolDeck'] for t in triangles(q, 0.15)],
+            'Shiga University rampart grounds': [t for q in p['rampart'] for t in triangles([(x,z) for x,y,z in q],rampart_height)]}
 
 
 def export_plan():
     """Refresh this extension only; retain editor image registration and unrelated ground groups."""
+    from road_network import surface_kind
     groups = ground_groups()
     path = os.path.join(ROOT, 'data', 'road_tiles.json')
     with open(path) as f:
@@ -169,9 +179,7 @@ def export_plan():
         if name == 'map.json':
             # The full editor overview has its own registration. Ground refreshes retain
             # that registration and the separate practice bounds.
-            meta['surfaces'] = [dict(kind=('carriageway' if k in ('Kyobashi carriageway', 'Shiga University streets')
-                                         else 'ground' if k.endswith('grounds') or k == 'Kyobashi raised bank'
-                                         else 'sidewalk'),
+            meta['surfaces'] = [dict(kind=surface_kind(k),
                                      triangles=[v for t in ts for i, v in enumerate(t) if i % 3 != 1])
                                 for k, ts in old.items()]
         with open(path, 'w') as f:
@@ -224,7 +232,8 @@ def historic_hall(b, item):
                         cylinder(b,f(uu,y-.05,wall_side),f(uu,y+2.25,wall_side),.055,'ART_Patina' if hall else 'ART_Timber',segments=4)
     for end in (0,1):
         outward_face(b,[f(end,top,0),f(end,top,1),f(end,top+item['rise'],.5)],'ART_Plaster',centre)
-    roof = 'ART_Patina' if hall else 'ART_RedRoof'
+    # The hall's roof is dark brown sheet; only lantern and dormers are patina (IMG_0852/0853).
+    roof = 'HK_RoofTile' if hall else 'ART_RedRoof'
     for side in (0,1):
         outward_face(b,[f(-.015,top,side),f(1.015,top,side),f(1.015,top+item['rise'],.5),f(-.015,top+item['rise'],.5)],roof,centre)
     # Entry on the short southeast end; the long facade retains its rhythm of tall windows.
@@ -252,7 +261,7 @@ def historic_hall(b, item):
                 cylinder(b,f(end,top,v),f(end,top+item['rise'],.5),.10,'ART_Patina',segments=6)
                 cylinder(b,f(end,.18,v),f(end,top,v),.14,'ART_Patina',segments=6)
         # Roof lantern and three curved dormers: the identifying silhouette in official photos.
-        at = f(.52,top+item['rise'],.5)
+        at = f(.8,top+item['rise'],.5)
         cylinder(b,at,(at[0],at[1]+2.1,at[2]),.82,'ART_Patina',segments=12)
         rings = [(2.1,.84),(2.45,.80),(2.72,.55),(2.9,.06)]
         for (y,r),(yy,rr) in zip(rings,rings[1:]):
@@ -261,11 +270,11 @@ def historic_hall(b, item):
                 outward_face(b,[(at[0]+r*math.cos(angle),at[1]+y,at[2]+r*math.sin(angle)),
                   (at[0]+r*math.cos(a2),at[1]+y,at[2]+r*math.sin(a2)),
                   (at[0]+rr*math.cos(a2),at[1]+yy,at[2]+rr*math.sin(a2)),
-                  (at[0]+rr*math.cos(angle),at[1]+yy,at[2]+rr*math.sin(angle))],roof,at)
+                  (at[0]+rr*math.cos(angle),at[1]+yy,at[2]+rr*math.sin(angle))],'ART_Patina',at)
         for u in (.24,.47,.72):
             pts=[f(u-.026,top+1.9,0.12),f(u+.026,top+1.9,.12)]
             pts += [f(u+.026*math.cos(a),top+1.9+1.05*math.sin(a),.12) for a in [i*math.pi/8 for i in range(9)]]
-            outward_face(b,pts,roof,centre)
+            outward_face(b,pts,'ART_Patina',centre)
     else:
         # Open central balcony and timber posts, rather than a solid decorative box.
         for u in (.35,.65):
@@ -276,9 +285,11 @@ def historic_hall(b, item):
         material=b.materials[b.slots[k]]
         if material=='ART_Plaster':
             b.pigments[k]=(.88,.91,.86) if hall else (.91,.86,.73)
+        elif material=='HK_RoofTile' and hall:
+            b.pigments[k]=(.34,.28,.25)
 
 
-def trees(b, points, seed, spacing=17, spread=3.2, setback=0, avoid_streets=False, silhouette=False):
+def trees(b, points, seed, spacing=17, spread=3.2, setback=0, avoid_streets=False, silhouette=False, placement=None):
     from vegetation import tree
     for n,(a,c) in enumerate(zip(points,points[1:])):
         length=math.dist(a,c)
@@ -298,7 +309,7 @@ def trees(b, points, seed, spacing=17, spread=3.2, setback=0, avoid_streets=Fals
             distant=b.distant
             try:
                 if silhouette:b.distant=True
-                tree(b,'cherry',base=(x,.15,z),height=7.4,spread=spread,
+                tree(b,'cherry',base=placement(x,z) if placement else (x,.15,z),height=7.4,spread=spread,
                      seed=seed+n*37+i*13,fine=False)
             finally:
                 b.distant=distant
@@ -309,7 +320,13 @@ def buildings(b, items):
     from castle_approach import building
     from abstract_props import cylinder
     for item in items:
-        if item['id'] in ('auditorium','ryosui'):
+        if item['id']=='auditorium':
+            from university_photos import auditorium
+            auditorium(b,item)
+        elif item['id']=='site-office':
+            from university_photos import site_office
+            site_office(b,item)
+        elif item['id']=='ryosui':
             historic_hall(b,item)
         elif item['id']=='moat-timber-house':
             from streetscape import outward_face
@@ -350,31 +367,6 @@ def buildings(b, items):
                                 cylinder(b,at(0,y),at(0,y+1.1),.025,'ART_Timber',segments=4)
 
 
-def gate_name(b, x, z, tangent, normal):
-    """Bake four Japanese characters into the gate pillar; no runtime canvas or font request."""
-    import bpy
-    font_path=next((p for p in (os.environ.get('HIKONE_JAPANESE_FONT',''),
-        '/System/Library/Fonts/Hiragino Sans GB.ttc',
-        '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc') if os.path.isfile(p)),None)
-    if font_path is None:
-        raise RuntimeError('Set up a Japanese-capable font for the campus gate before rebuilding.')
-    curve=bpy.data.curves.new('Campus gate inscription','FONT')
-    curve.body='滋\n賀\n大\n学'
-    curve.font=bpy.data.fonts.load(font_path)
-    curve.size=.32
-    curve.space_line=1.05
-    curve.align_x='CENTER'
-    curve.resolution_u=3
-    ob=bpy.data.objects.new('Campus gate inscription',curve)
-    bpy.context.collection.objects.link(ob)
-    mesh=bpy.data.meshes.new_from_object(ob.evaluated_get(bpy.context.evaluated_depsgraph_get()))
-    for face in mesh.polygons:
-        points=[mesh.vertices[i].co for i in face.vertices]
-        b.face([(x+tangent[0]*p.x+normal[0]*.405,1.8+p.y,z+tangent[1]*p.x+normal[1]*.405) for p in points],'ART_Timber',False)
-    bpy.data.meshes.remove(mesh)
-    bpy.data.objects.remove(ob,do_unlink=True)
-    bpy.data.curves.remove(curve)
-
 
 @lru_cache(maxsize=1)
 def water_edges():
@@ -389,7 +381,13 @@ def water_edges():
                 if (a[1]>z)!=(c[1]>z) and x<a[0]+(c[0]-a[0])*(z-a[1])/(c[1]-a[1]):hit=not hit
             if hit:return True
         return False
-    water=[(q,bounds(q)) for q in p['water']+triangulate(inner_moat())]
+    from road_network import moat_edge,north_shore,water_columns
+    # The adjoining native middle moat is also water. Treating the extension's
+    # X=-220 partition as an exposed shore produced a stone blade across that water.
+    xs=water_columns()
+    native_middle=[[(x,moat_edge(x)),(c,moat_edge(c)),(c,north_shore(c)),(x,north_shore(x))]
+                   for x,c in zip(xs,xs[1:])]
+    water=[(q,bounds(q)) for q in p['water']+triangulate(inner_moat())+native_middle]
     paved=[(q,bounds(q)) for q in p['roads']+p['paths']]
     raised=[(q,bounds(q)) for q in p['lawns']+p['fields']]
     points={tuple(v) for q in p['water'] for v in q}
@@ -434,26 +432,16 @@ def prism(b,a,c,lo,hi,width,material):
 
 
 def gatehouse(b,footprint):
-    from streetscape import outward_face
-    item=dict(footprint=footprint)
-    f=lambda u,y,v:frame_point(item,u,y,v)
-    centre=f(.5,1.5,.5)
-    for side in (0,1):
-        outward_face(b,[f(0,.15,side),f(1,.15,side),f(1,2.95,side),f(0,2.95,side)],'ART_Plaster',centre)
-        for u in (.15,.5,.85):
-            v=side+(side*2-1)*.001
-            outward_face(b,[f(u-.12,.95,v),f(u+.12,.95,v),f(u+.12,2.55,v),f(u-.12,2.55,v)],'ART_Window',centre)
-    for end in (0,1):
-        outward_face(b,[f(end,.15,0),f(end,.15,1),f(end,2.95,1),f(end,2.95,0)],'ART_Plaster',centre)
-    left,right=f(.16,4.0,.5),f(.84,4.0,.5)
-    a,c,d,e=[f(u,2.9,v) for u,v in ((-.04,-.07),(1.04,-.07),(1.04,1.07),(-.04,1.07))]
-    for face in ([a,c,right,left],[d,e,left,right],[e,a,left],[c,d,right]):
-        outward_face(b,face,'HK_RoofTile',centre)
+    from university_photos import gatehouse as observed_gatehouse
+    observed_gatehouse(b,footprint)
 
 
 def boundary_mesh(b,runs):
     from abstract_props import cylinder
     for run in runs:
+        if run['kind'] in ('balustrade','palisadeWall'):
+            street_boundary(b,run)
+            continue
         solid=run['kind']=='wall'
         for a,c in zip(run['points'],run['points'][1:]):
             length=math.dist(a,c)
@@ -475,6 +463,102 @@ def boundary_mesh(b,runs):
             for i in range(1,count):
                 x,z=at(i/count)
                 b.box((x,1.1,z),(.07,.85,.07),material,False)
+
+
+def street_boundary(b,run):
+    """The two frontage types at the moat-side street, from the owner's 2026-10-29 photos."""
+    from university_photos import recolor
+    first=len(b.faces)
+    for a,c in zip(run['points'],run['points'][1:]):
+        length=math.dist(a,c)
+        if length<.05:continue
+        at=lambda t:(a[0]+(c[0]-a[0])*t,a[1]+(c[1]-a[1])*t)
+        if run['kind']=='balustrade':
+            # Granite posts with a heavy top rail and a lower rail over a plinth.
+            prism(b,a,c,.15,.42,.34,'ART_StoneLight')
+            prism(b,a,c,1.02,1.16,.24,'ART_StoneLight')
+            prism(b,a,c,.68,.76,.14,'ART_StoneLight')
+            count=max(1,math.ceil(length/1.8))
+            for i in range(count+1):
+                x,z=at(i/count)
+                b.box((x,.7,z),(.26,1.1,.26),'ART_StoneLight',False)
+                b.box((x,1.27,z),(.3,.08,.3),'HK_Stone',False)
+        else:
+            # Weathered concrete wall with a dark timber palisade above it.
+            prism(b,a,c,.15,1.3,.34,'HK_StoneDark')
+            prism(b,a,c,1.3,1.38,.38,'HK_Stone')
+            for y in (1.5,1.92):prism(b,a,c,y,y+.06,.06,'ART_Timber')
+            count=max(1,math.ceil(length/.32))
+            for i in range(count+1):
+                x,z=at(i/count)
+                b.box((x,1.7,z),(.07,.62,.07),'ART_Timber',False)
+    recolor(b,first)
+
+
+def gate_frontage(b,d):
+    """Main-gate street details matched to IMG_0847–0854 (owner photos, 2026-10-29)."""
+    from abstract_props import cylinder
+    from road_network import face, strip
+    from university_photos import gate_trees, gate_boards, recolor
+    g=d['gateDetail']
+    # Clipped evergreen hedge just inside the granite balustrade, above head height.
+    a,c=g['hedge']
+    prism(b,a,c,.15,1.9,1.1,'HK_LeafDark')
+    # Individual folded bars are authored by gate_boards; no solid sheet at the opening.
+    # Old red cylinder post box on the footway outside the south gate post.
+    x,z=g['postbox']
+    cylinder(b,(x,.01,z),(x,.35,z),.17,'HK_StoneDark',segments=10)
+    red_start=len(b.faces)
+    # The historic post box is painted metal, not an emissive traffic-signal lens.
+    cylinder(b,(x,.35,z),(x,1.42,z),.22,'HK_SignRed',segments=16)
+    cylinder(b,(x,1.42,z),(x,1.56,z),.25,'HK_SignRed',segments=16,end_radius=.12)
+    for y in (.39,.48,1.37):
+        cylinder(b,(x,y,z),(x,y+.035,z),.235,'HK_SignRed',segments=16)
+    b.box((x+.23,1.12,z),(.02,.05,.24),'HK_StoneDark',False)
+    b.box((x+.224,.63,z),(.018,.25,.19),'HK_SignRed',False)
+    for k in range(red_start,len(b.faces)):
+        if b.materials[b.slots[k]]=='HK_SignRed':b.pigments[k]=(.72,.22,.12)
+    gate_trees(b,d)
+    gate_boards(b,d)
+    from school_moat import street_furniture
+    street_furniture(b)
+    # Moat promenade: square stone bollards with sagging chains along the water's edge,
+    # over OSM's bollard line (z range) but kept on this street's paved moat-side shoulder.
+    street=d['link'][:4]
+    def beside(z,offset):
+        for a,c in zip(street,street[1:]):
+            if min(a[1],c[1])<=z<=max(a[1],c[1]):
+                t=(z-a[1])/(c[1]-a[1]);length=math.dist(a,c)
+                nx,nz=-(c[1]-a[1])/length,(c[0]-a[0])/length
+                return (a[0]+(c[0]-a[0])*t+nx*offset,z+nz*offset)
+        raise ValueError(z)
+    z0,z1=g['bollards'][0][1],g['bollards'][-1][1]
+    n=round((z1-z0)/2.6)
+    posts=[beside(z0+(z1-z0)*i/n,-4.7) for i in range(n+1)]
+    rail_start=len(b.faces)
+    for x,z in posts:
+        b.box((x,.5,z),(.24,.98,.24),'ART_StoneLight',False)
+        b.box((x,1.02,z),(.28,.06,.28),'HK_Stone',False)
+    if not b.distant:
+        for p,q in zip(posts,posts[1:]):
+            pts=[(p[0]+(q[0]-p[0])*t,.82-.22*4*t*(1-t),p[1]+(q[1]-p[1])*t) for t in [i/6 for i in range(7)]]
+            for u,v in zip(pts,pts[1:]):cylinder(b,u,v,.012,'ART_Chain',segments=3)
+    # Backless timber benches on stone feet, and the promenade map board.
+    for x,z in [beside(z,-4.2) for _,z in g['benches']]:
+        for dz in (-.8,.8):b.box((x,.22,z+dz),(.36,.42,.3),'ART_StoneLight',False)
+        b.box((x,.47,z),(.42,.08,2.0),'ART_Timber',False)
+    x,z=beside(g['board'][1],-4.1)
+    for dz in (-.6,.6):cylinder(b,(x,.01,z+dz),(x,1.6,z+dz),.04,'HK_Metal',segments=4)
+    b.box((x,1.35,z),(.06,.8,1.4),'ART_Patina',False)
+    recolor(b,rail_start)
+    # The round grey back of the small roadside mirror is visible at the gate (0854).
+    x,z=beside(g['mirror'][1],-3.4)
+    cylinder(b,(x,.01,z),(x,2.9,z),.04,'HK_MetalLight',segments=6)
+    cylinder(b,(x-.2,2.55,z),(x-.25,2.55,z),.27,'HK_MetalLight',segments=16)
+    # Green cycle band between the western edge line and the kerb of the moat-side street.
+    line=d['link'][:4]
+    for q in strip(line,2.28,2.4):face(b,q,.022,'HK_WhitePaint',False)
+    for q in strip(line,2.42,2.92):face(b,q,.021,'ART_PathGreen',False)
 
 
 def bridge_edges(b,line):
@@ -558,6 +642,15 @@ def school_street_detail(b,d):
     from vegetation import tree, spray
     from streetscape import outward_face
     detail=d['schoolDetail']
+    # The photographed public street supersedes the old estimated lot edging. Clip
+    # masonry out of its full body corridor instead of leaving stones in the new lane.
+    clear=strip(d['link'],-3.7,3.7)
+    def stone_piece(a,c,lo,hi,width,material):
+        for q in cut(strip([a,c],-width/2,width/2),clear):
+            center=(sum(v[0] for v in q)/len(q),(lo+hi)/2,sum(v[1] for v in q)/len(q))
+            for p,r in zip(q,q[1:]+q[:1]):
+                outward_face(b,[(p[0],lo,p[1]),(r[0],lo,r[1]),(r[0],hi,r[1]),(p[0],hi,p[1])],material,center)
+            face(b,q,hi,material,False)
     rng=random.Random(413)
     for q in plan()['poolDeck']:face(b,q,.15,'ART_Concrete',False)
     for q in plan()['pool']:b.face([(x,.02,z) for x,z in reversed(q)],'HK_Water',False,pigment=(.36,.42,.25))
@@ -579,7 +672,7 @@ def school_street_detail(b,d):
     for line in detail['stone']:
         for a,c in zip(line,line[1:]):
             length=math.dist(a,c);ux,uz=(c[0]-a[0])/length,(c[1]-a[1])/length
-            prism(b,a,c,.01,.46,.42,'HK_StoneDark')
+            stone_piece(a,c,.01,.46,.42,'HK_StoneDark')
             if not b.distant:
                 for row in range(2):
                     n=max(1,math.ceil(length/.85))
@@ -587,7 +680,7 @@ def school_street_detail(b,d):
                         lo=max(0,(i-.45*row)/n);hi=min(1,(i+1-.45*row)/n)
                         p=(a[0]+ux*length*lo,a[1]+uz*length*lo)
                         q=(a[0]+ux*length*hi,a[1]+uz*length*hi)
-                        if math.dist(p,q)>.04:prism(b,p,q,.025+row*.21,.215+row*.21,.44+rng.uniform(-.035,.035),'HK_Stone')
+                        if math.dist(p,q)>.04:stone_piece(p,q,.025+row*.21,.215+row*.21,.44+rng.uniform(-.035,.035),'HK_Stone')
     # Timber posts and sagging rope leave a broad opening aligned with the lot path.
     for line in detail['rope']:
         for a,c in zip(line,line[1:]):
@@ -602,17 +695,7 @@ def school_street_detail(b,d):
     boundary_mesh(b,[dict(kind='fence',points=line) for line in detail['fence']])
     # Tall, narrow evergreen silhouettes alternate in height, with separate forked sprays.
     for i,(x,z) in enumerate(detail['conifers']):
-        height=12.6+(i%3)*1.1
-        cylinder(b,(x,.15,z),(x+.2,height,z-.1),.25,'HK_Bark',segments=7,end_radius=.06)
-        for level in range(6):
-            y=2.5+level*(height-3)/6
-            reach=1.65*(1-level/7)
-            for j in range(3):
-                angle=j*math.tau/3+level*1.9+i
-                tip=(x+math.cos(angle)*reach,y+.3,z+math.sin(angle)*reach)
-                if not b.distant:cylinder(b,(x,y-.5,z),tip,.07,'HK_Bark',segments=4,end_radius=.025)
-                spray(b,tip,(1.0-level*.11,1.6-level*.1,.85-level*.09),angle,'HK_LeafDark',6100+i*79+level*3+j,False)
-        spray(b,(x+.15,height-.6,z),(0.55,1.0,.5),i,'HK_LeafDark',6800+i,False)
+        tree(b,'cedar',base=(x,.15,z),height=12.6+(i%3)*1.1,spread=2.7,seed=6100+i,fine=False)
     for i,(x,z) in enumerate(detail['broadleaf']):
         tree(b,'cherry',base=(x,.15,z),height=8.3+(i%3)*.8,spread=4.8,seed=4900+i,fine=False,lean=(.4,-.2))
     # The photo's wooded backdrop starts at the opposite bank, rather than leaving
@@ -657,7 +740,8 @@ def build(name, mesh_class, lod=False):
     from road_network import face, strip, difference, triangulate, ccw
     from streetscape import outward_face
     from abstract_props import cylinder
-    b=mesh_class(name)
+    from east_extension import clip_existing_builder
+    b=clip_existing_builder(mesh_class(name))
     b.abstract,b.distant=True,lod
     d,p=data(),plan()
     if name=='ART_ShigaCampus':
@@ -669,14 +753,15 @@ def build(name, mesh_class, lod=False):
         tangent=(-inward[1],inward[0])
         for side in (-1,1):
             x,z=gx+tangent[0]*side*4.3,gz+tangent[1]*side*4.3
-            b.box((x,1.2,z),(.8,2.1,.8),'HK_Stone')
-            b.box((x,2.3,z),(.98,.16,.98),'ART_StoneLight')
-            if side==-1:gate_name(b,x,z,tangent,(-inward[0],-inward[1]))
+            # Stone faces follow the frontage, keeping the plaque outside the column.
+            from university_frontage import pillar
+            pillar(b,x,z,tangent,(-inward[0],-inward[1]),side==-1)
         # Low, windowed gatekeeper's room on the southwest side, as in Nov 2022 Street View.
         from castle_approach import building
         gatehouse(b,d['gatehouse']['footprint'])
         boundary_mesh(b,d['boundary'])
         campus_street_detail(b,d)
+        gate_frontage(b,d)
         # Broad pale apron in front of the hall is paving, rather than an isolated grass plot.
         trees(b,d['campusBank'],412,17,3.8)
         trees(b,d['axis'][1:],621,23,3.0,setback=6)
@@ -686,12 +771,15 @@ def build(name, mesh_class, lod=False):
             for q in (cut(p[key],p['lotPaths']) if key=='paths' else p[key]): face(b,q,y,material,False)
         for q in p['lotPaths']:face(b,q,.01,'HK_Stone',False)
         for field in d['fields']:
-            face(b,field['footprint'],.15,field['material'],False)
+            for q in cut(triangulate(ccw(field['footprint'])),p['rampartCut']):face(b,q,.15,field['material'],False)
         buildings(b,d['schoolBuildings'])
         school_street_detail(b,d)
         # Close the FINAL water partition, including road/entrance cuts. Closing only
         # the traced banks left sky-visible sides where swept ribbons met the apron.
+        from school_moat import rampart, follows_wall, tree_position
+        rampart(b,p['rampart'])
         for a,c,top,solid in water_edges():
+            if follows_wall(a,c):continue
             outward_face(b,[(a[0],-1.35,a[1]),(c[0],-1.35,c[1]),
                            (c[0],top,c[1]),(a[0],top,a[1])],'HK_StoneDark',solid)
         bridge_edges(b,d['link'][3:6])
@@ -707,7 +795,7 @@ def build(name, mesh_class, lod=False):
             for start in range(3,int(length)-3,10):
                 points=[(a[0]+(c[0]-a[0])*t/length,a[1]+(c[1]-a[1])*t/length) for t in (start,min(start+5,length))]
                 for q in strip(points,-.075,.075):face(b,q,.022,'HK_WhitePaint',False)
-        trees(b,d['schoolBank'],912,22,4.0,avoid_streets=True,silhouette=True)
+        trees(b,d['schoolBank'],912,22,4.0,avoid_streets=True,silhouette=True,placement=tree_position)
         # Low detached town frontages continue Route 25's existing fabric. These are contextual
         # masses, not attributed shop identities; their type and setbacks follow the satellite view.
         from castle_approach import building

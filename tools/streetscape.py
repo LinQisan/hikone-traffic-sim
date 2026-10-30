@@ -10,7 +10,7 @@ from abstract_props import beveled_box as box, cylinder, face, car_body, wheel, 
 from display_case import display_kiosk
 
 MODELS = ('ART_CornerShop', 'ART_WhiteStorehouse', 'ART_EavesStorehouse', 'ART_ThreeStorey',
-          'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_TownTree',
+          'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_IslandWood', 'ART_TownTree',
           'HK_Sign_ParkingDirection',
           'ART_WestCorner', 'HK_Sign_Paired30', 'HK_Sign_Paired40', 'HK_Sign_NoParking',
           'ART_PavingDetails', 'ART_KeiBox', 'HK_ChainFence', 'ART_DisplayKiosk')
@@ -405,6 +405,18 @@ def paving(b):
                         xx, zz = x + dx + off, z + dz
                         h = ground_height(xx, zz)
                         cylinder(b, (xx, h + 0.001, zz), (xx, h + 0.005, zz), 0.018, 'ART_TactileRidge', segments=6)
+    from road_network import TOWN_CROSSINGS, castle_x
+    for crossing in TOWN_CROSSINGS:
+        z = crossing['z']
+        for side in (-1, 1):
+            x = castle_x(z) + side * 4.8
+            for dz in (-0.45, -0.15, 0.15, 0.45):
+                rect(x, z + dz, 0.60, 0.296, 'ART_Tactile')
+                for dx in (-0.21, -0.07, 0.07, 0.21):
+                    for off in (-0.07, 0.07):
+                        xx, zz = x + dx, z + dz + off
+                        h = ground_height(xx, zz)
+                        cylinder(b, (xx, h + 0.001, zz), (xx, h + 0.005, zz), 0.018, 'ART_TactileRidge', segments=6)
     # The near corners use stone slabs, with fine joints rather than a photograph texture.
     for lo, hi in ((20.5, 26.5), (37.5, 44.0)):
         for x in range(math.ceil(lo), math.floor(hi)):
@@ -456,7 +468,9 @@ def build(name, mesh_class, lod=False):
     if name == 'HK_ChainFence':
         moat_chain(b, lod)
     elif name == 'ART_PavingDetails':
-        paving(b)
+        # Side streets outside the retained corridors come from the geographic source.
+        from east_extension import clip_existing_builder
+        paving(clip_existing_builder(b))
     elif name == 'ART_KeiBox':
         kei_box(b)
     elif name == 'ART_DisplayKiosk':
@@ -471,6 +485,12 @@ def build(name, mesh_class, lod=False):
         clipped_hedge(b)
     elif name == 'HK_Sign_ParkingDirection':
         parking_direction(b)
+    elif name == 'ART_IslandWood':
+        # The school island's dense evergreen tabu/shii wood (owner image; Street View 2024).
+        from vegetation import tree
+        b.dense_evergreen = True
+        tree(b, 'shii', base=(-2.6, 0, -1.2), height=12.5, spread=4.8, seed=950, fine=False, root_depth=1.5)
+        tree(b, 'tabu', base=(2.8, 0, 1.6), height=13.6, spread=5.0, seed=960, fine=False, root_depth=1.5)
     elif name in ('ART_CastleGrove', 'ART_TownTree'):
         planting(b, name == 'ART_TownTree')
     elif name.startswith('HK_Sign_'):

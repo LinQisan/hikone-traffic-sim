@@ -2,7 +2,11 @@
 // The practice junction remains (32,26); the rest of the imported tile grid is replaced.
 import { CASTLE_ITEMS } from './castle-layout.js';
 import { UNIVERSITY_ITEMS } from './university-layout.js';
-import { NORTH_APPROACH, INNER_MOAT_ROAD, distanceToPath, APPROACH_BUILDINGS, APPROACH_PATCHES } from './castle-approach.js';
+import { NORTH_APPROACH, INNER_MOAT_ROAD, distanceToPath, APPROACH_BUILDINGS, APPROACH_PATCHES, HIGASHI_ISLAND, HIGASHI_FRONTAGE } from './castle-approach.js';
+import townStreets from '../../../world/town-streets.json' with { type: 'json' };
+import {eastLayout} from './east-layout.ts';
+export const TOWN_STREETS = townStreets.streets;
+export const TOWN_CROSSINGS = townStreets.crossings;
 export function moatBend(x) {
   const t = Math.max(0, Math.min(1, (x - 110) / 130));
   return 30 * t * t * (3 - 2 * t);
@@ -39,13 +43,39 @@ export function frontageShift(a, x, scale = 1) {
   for (let u = -half; u <= half + 1e-9; u += half / 8) s = Math.min(s, townTaper(x + u));
   return TOWN_INSET * s;
 }
-export const castleX = z => 32 + Math.max(0, -z) * 0.065;
-export const northShore = x => 74 + 0.7 * moatBend(x) + Math.max(0, Math.min(1, (-x - 15) / 60)) * 10;
+export const castleX = z => townStreets.castleRoad.originX + Math.max(0, -z) * townStreets.castleRoad.southSlope;
+// The school island's mapped retaining wall; same rule as north_shore in tools/road_network.py.
+const ISLAND_FROM = 102, ISLAND_TO = 198;
+const ISLAND_SHORE = [[ISLAND_FROM, 74 + 0.7 * moatBend(ISLAND_FROM)], ...HIGASHI_ISLAND.shore.points,
+  [ISLAND_TO, 74 + 0.7 * moatBend(ISLAND_TO)]];
+export const northShore = x => {
+  if (x > ISLAND_FROM && x < ISLAND_TO) for (let i = 1; i < ISLAND_SHORE.length; i++) {
+    const [a, za] = ISLAND_SHORE[i - 1], [c, zc] = ISLAND_SHORE[i];
+    if (x <= c) return za + (zc - za) * (x - a) / (c - a);
+  }
+  return 74 + 0.7 * moatBend(x) + Math.max(0, Math.min(1, (-x - 15) / 60)) * 10;
+};
 // A simplified raised bank behind the visible stonework. Ground triangles use the same profile
 // in tools/road_network.py; planting/ground agreement is checked on the exported geometry.
 export function northBankHeight(x, z) {
-  const d = z - northShore(x);
-  return 0.15 + 4.2 * Math.max(0, Math.min(1, (32 - d) / 12));  // BANK_RISE in tools/road_network.py
+  const d = z - northShore(x), [foot, run] = x >= 104 ? [16, 12] : [32, 12];
+  return 0.15 + 4.2 * Math.max(0, Math.min(1, (foot - d) / run));  // BANK_RISE in tools/road_network.py
+}
+
+// The school island's mapped wood (OSM way/404612729), as canopy masses on a jittered grid.
+// Stops at the bank fade by the eastern extension seam, where that author owns the ground.
+function islandForest() {
+  const { outline, spacing, margin } = HIGASHI_ISLAND.forest, items = [];
+  const solids = [...APPROACH_BUILDINGS, ...HIGASHI_ISLAND.grounds].map(f => [...f.footprint, f.footprint[0]]);
+  for (let i = 0; i * spacing < 170; i++) for (let k = 0; k * spacing < 310; k++) {
+    const x = 42 + i * spacing + Math.sin(i * 2.3 + k) * 3, z = 78 + k * spacing + Math.cos(k * 1.9 + i) * 3;
+    if ((x > 183.5 && z < 118) || (x > 96 && x < 110 && z < 125) || z < northShore(x) + 7 || !inside(x, z, outline)) continue;
+    if (distanceToPath(x, z, NORTH_APPROACH) < 12 || distanceToPath(x, z, INNER_MOAT_ROAD) < 12) continue;
+    if (solids.some(ring => inside(x, z, ring) || distanceToPath(x, z, ring) < margin)) continue;
+    items.push({ a: 'ART_IslandWood', p: [x, northBankHeight(x, z), z], r: (i * 47 + k * 29) % 360,
+      s: [0.9 + (i + k) % 3 * 0.10, 0.9 + k % 4 * 0.08, 1], g: 'WebGrove' });
+  }
+  return items;
 }
 
 function inside(x, z, polygon) {
@@ -66,7 +96,7 @@ function coversStreet(item) {
     const pz = z - u * Math.sin(a) + v * Math.cos(a);
     if (Math.abs(pz + 64) < 5 || (pz < 16 && Math.abs(px - castleX(pz)) < 5.2)
       || (pz > -65 && pz < 22 && Math.abs(px + 28) < 4.2)
-      || (pz > -65 && pz < 30 && Math.abs(px - 134) < 4.2)) return true;
+      || TOWN_STREETS.some(street => distanceToPath(px, pz, street.points) < street.halfWidth + 0.8)) return true;
   }
   return false;
 }
@@ -100,6 +130,7 @@ export function roadLayout(layout) {
     // image, where the blocks are roofs with occasional broad garden trees.
     if (item.g === 'Trees' && (item.a === 'HK_Tree_Cedar' || item.a === 'HK_Tree_Pine')) continue;
     if (item.g === 'Trees' && (Math.abs(z + 64) < 7 || Math.abs(x - castleX(z)) < 11
+      || TOWN_STREETS.some(street => distanceToPath(x, z, street.points) < street.halfWidth + 2)
       || (x > -107 && x < -32 && z > -43 && z < 16))) continue;
     if (item.g === 'Signs') {
       // The imported school-warning diamonds and isolated speed discs are absent here.
@@ -136,6 +167,9 @@ export function roadLayout(layout) {
     ['HK_Sign_ParkingDirection', -79, 32.3, 90],
     // 30 km/h for northbound Castle Road traffic, beside the corner house (18 October 2026 photograph)
     ['HK_Sign_Speed30', 27.5, 1.5, 180],
+    // 30 km/h and no parking for southbound traffic, on the east lamp post at the bridge's
+    // castle end (OSM node 13429893168; 29 October 2026 photograph 0872)
+    ['HK_Sign_Paired30', 36.8, 75.0, 0],
   ]) items.push({ a, p: [x, 0.01, z], r, s: [1, 1, 1], g: 'Signs' });
   // A broad-leaf belt, interrupted by the north approach and the visible long-house frontage.
   // These represent canopy masses, not an invented inventory of individual surveyed trees.
@@ -144,10 +178,12 @@ export function roadLayout(layout) {
     const z = northShore(x) + 10 + row * 17 + Math.cos(i * 1.7 + row) * 2;
     if (distanceToPath(x, z, NORTH_APPROACH) < 14 || distanceToPath(x, z, INNER_MOAT_ROAD) < 14
       || [...APPROACH_BUILDINGS, ...APPROACH_PATCHES].some(f => inside(x, z, f.footprint))
-      || (x > 45 && z > northShore(x) + 30)) continue;
+      || [...HIGASHI_FRONTAGE.parking, HIGASHI_FRONTAGE.forecourt].some(f => inside(x, z, f.footprint))
+      || x > 45) continue;
     items.push({ a: 'ART_CastleGrove', p: [x, northBankHeight(x, z), z],
       r: (i * 47 + row * 29) % 360, s: [0.9 + i % 3 * 0.10, 0.88 + i % 4 * 0.07, 1], g: 'WebGrove' });
   }
+  items.push(...islandForest());
   // The northern longhouse is now part of the reviewed approach, at its actual footprint.
   items.push({ a: 'ART_CastleApproach', p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebApproach' });
   items.push({ a: 'ART_NorthLonghouse', p: [-7.2, 0.15, 15.6 + frontageShift('ART_NorthLonghouse', -7.2, 0.9)],
@@ -159,7 +195,8 @@ export function roadLayout(layout) {
   // from just south of the junction crossing, broken only by the Honmachi cross street.
   for (const [side, start] of [[-1, -1], [1, 0]]) {
     const zs = [];
-    for (let z = start; z > -114; z -= 9.5) if (Math.abs(z + 64) > 8.5) zs.push(z);
+    for (let z = start; z > -114; z -= 9.5) if (Math.abs(z + 64) > 8.5
+      && TOWN_CROSSINGS.every(crossing => Math.abs(z - crossing.z) > crossing.depth / 2 + 1.5)) zs.push(z);
     for (const [i, z] of zs.entries()) items.push({ a: 'ART_TownTree', p: [castleX(z) + side * 5.6, 0.01, z],
       r: side < 0 ? 180 : 0, s: [0.9 + i % 2 * 0.12, 0.94 + i % 3 * 0.05, 1], g: 'WebTownTrees' });
   }
@@ -173,7 +210,8 @@ export function roadLayout(layout) {
   const facades = ['HK_Machiya_A', 'HK_Kura', 'HK_Machiya_A_Narrow', 'HK_Machiya_B'];
   for (let i = 0; i < 13; i++) {
     const x = 88 + i * 7.2;
-    if (x > 126 && x < 141) continue; // actual narrow street east of the hotel
+    // Leave the reviewed alley mouth clear, including the eaves of the adjacent houses.
+    if (Math.abs(x - TOWN_STREETS[0].points[0][0]) < 8) continue;
     const t = Math.max(0, Math.min(1, (x - 110) / 130));
     items.push({ a: facades[i % facades.length], p: [x, 0.15, 15.4 + TOWN_INSET + moatBend(x)],
       r: -Math.atan(30 * 6 * t * (1 - t) / 130) * 180 / Math.PI,
@@ -190,5 +228,12 @@ export function roadLayout(layout) {
       at[2] + moatBend(at[0]) + offset * (Math.cos(angle) - 1)];
   };
   const overheadWires = (layout.overheadWires ?? []).map(w => ({ ...w, a: bendWire(w.a), b: bendWire(w.b) }));
-  return { ...layout, items, overheadWires, roadPlan: 'google-overhead-v1' };
+  const shown = eastLayout({ ...layout, items, overheadWires, roadPlan: 'kyobashi-reviewed-v2' });
+  // The East source's illustrative groves on the school island: clear of the mapped grounds
+  // and buildings, and of the same evergreen wood as the rest of it.
+  const courts = [...APPROACH_BUILDINGS, ...HIGASHI_ISLAND.grounds].map(f => f.footprint);
+  return { ...shown, items: shown.items.flatMap(item => {
+    if (item.a !== 'ART_CastleGrove' || item.p[0] < 100 || item.p[0] > 216 || item.p[2] < 90 || item.p[2] > 390) return [item];
+    return courts.some(f => inside(item.p[0], item.p[2], f)) ? [] : [{ ...item, a: 'ART_IslandWood' }];
+  }) };
 }

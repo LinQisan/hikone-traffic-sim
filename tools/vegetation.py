@@ -263,6 +263,8 @@ def _broadleaf(b, species, base, height, spread, seed, lean, fine, root_depth):
                      radius * 0.115, radius * 0.025, i + j)
             # Gold and copper belong to entire boughs; shaded/evergreen pockets stay green.
             season = (0.18 if evergreen else 0.43) + 0.22 * math.sin(a + seed * 0.017) + (i % 3) * 0.065
+            if getattr(b, 'dense_evergreen', False):
+                season = 0.0
             _leaf_spray(b, tip, (spread * 0.46, height * 0.115, spread * 0.40),
                         heading, seed + i * 137 + j * 31, season, fine)
     for i, (dx, dy, dz) in enumerate(((-0.18, 0.77, 0.12), (0.16, 0.88, -0.16), (-0.03, 0.92, 0.08))):

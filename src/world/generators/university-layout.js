@@ -3,6 +3,8 @@
 // Map images are references only and are not included in the shipped scene.
 import { geographicPoint, westernOutline, CASTLE_WEST_BANK } from './castle-layout.js';
 import { INNER_MOAT_OUTER, INNER_MOAT_INNER, INNER_MOAT_ROAD } from './castle-approach.js';
+import { inEastExtension } from './east-layout.ts';
+import FIELD_PHOTOS from '../../../world/field-observations.json' with {type:'json'};
 
 export const UNIVERSITY_REFERENCES = [
   'https://www.google.com/maps/@?api=1&map_action=map&center=35.27765,136.24650&zoom=18&basemap=satellite',
@@ -50,8 +52,9 @@ const b = (id, name, points, height, roof = 'flat', rise = 0) =>
 
 export const UNIVERSITY_BUILDINGS = [
   // Roof envelopes include eaves; the heritage register's 679 m² is building area.
-  building('auditorium', 'Shiga University auditorium', south([[938,364],[1133,494],[1105,537],[910,407]]),8.4,'copper',5.8),
-  building('auditorium-annex', 'Auditorium single-storey classroom', south([[921,352],[938,364],[910,407],[893,395]]),4,'metal',2.2),
+  // OSM way 380034661; its east gable faces the main gate in the owner's photos (2026-10-29).
+  building('auditorium', 'Shiga University auditorium', [[-670.9,216.8],[-623.2,212.2],[-624.6,196.8],[-672.5,201.3]],8.4,'copper',5.8),
+  building('auditorium-annex', 'Auditorium single-storey classroom', [[-675.9,217.3],[-670.9,216.8],[-672.5,201.3],[-677.5,201.8]],4,'metal',2.2),
   building('administration','University administration',south([[741,195],[650,322],[721,373],[812,246]]),9.6),
   building('archives','Faculty of Economics archives',westGateView([[1140,235],[1012,399],[1102,464],[1230,300]]),6.6,'tile',2.5),
   building('shikon','Shikon Shosai Kan',westGateView([[1320,-70],[1126,212],[1212,275],[1406,-7]]),10,'tile',2),
@@ -70,14 +73,25 @@ export const UNIVERSITY_BUILDINGS = [
   building('gym', 'FAS Arena gymnasium', north([[75,417],[174,488],[123,556],[24,485]]), 9.5, 'metal', 2.4),
   building('coop', 'University co-op and cafeteria', north([[171,493],[211,522],[174,572],[134,543]]), 6.8),
   building('clubs', 'Student activity facilities', north([[148,411],[246,482],[230,505],[132,434]]), 5.0, 'metal', 1.0),
+  // Two-storey prefabricated site office behind the north gate wall, photographed 2026-10-29.
+  // Photo-relative envelope: north of the hall's front sight line (0852/0853),
+  // inside the OSM campus corner. No surveyed dimensions for this temporary structure.
+  building('site-office', 'Temporary two-storey site office', [[-601,214.5],[-601,208.5],[-617,208.5],[-617,214.5]], 6.0),
 ];
 
-// The gate coordinate was read from Maps' visible location menu, not inferred from
-// the roof/apron. The public moat-side street is separate from the southern through road.
-export const UNIVERSITY_GATE = geographicPoint(35.276441,136.247332);
+// The main gate stands at the roadside where OSM driveway 380034677 crosses the campus
+// boundary (way 180830880). The owner's photos of 2026-10-29 (IMG_0852–0854) show no
+// forecourt between the moat-side street and the gate; the earlier Maps label pin lay 15 m inside.
+export const UNIVERSITY_GATE = [-596.6,178.0];
 const w = westernOutline;
-export const CAMPUS_BANK = w([[633,545],[617,522],[586,501],[587,480],[616,422],
-  [660,351],[698,288],[721,254],[733,233],[716,209],[690,190]]);
+// The southeast turn previously cut through the photographed office plot. Keep the
+// southern bank corner on OSM campus way 180830880 (reviewed 2026-10-29), then join
+// the existing aerial trace north of the local photo area.
+export const CAMPUS_BANK = [
+  ...[[35.2766649,136.2477023],[35.2771547,136.2469277],[35.2772126,136.2469392]]
+    .map(([lat,lon])=>geographicPoint(lat,lon)),
+  ...w([[616,422],[660,351],[698,288],[721,254],[733,233],[716,209],[690,190]]),
+];
 // One continuous school-side middle-moat bank, including the tennis peninsula.
 // The former polygon ended at the bridge and cut diagonally across the southern lots.
 export const SCHOOL_BANK = [[-220,84],...schoolView([[969,1065],[890,1005],[829,940],
@@ -94,7 +108,7 @@ export const UNIVERSITY_TOWN_BLOCK = w([[409,457],[480,511],[566,542],[612,570],
   [633,575],[608,620],[592,644],[470,550]]);
 export const UNIVERSITY_GATE_LANDING = w([[612,570],[633,575],[650,534],[633,545]]);
 export const UNIVERSITY_FORECOURT = w([[545,504]])[0];
-export const UNIVERSITY_AXIS = [UNIVERSITY_GATE,...w([[599,560],[562,540],[544,530],
+export const UNIVERSITY_AXIS = [UNIVERSITY_GATE,[-606.1,178.8],...w([[599,560],[562,540],[544,530],
   [534,521],[529,512],[529,503],[534,492],[546,488],[558,493]])];
 export const UNIVERSITY_PATHS = [
   UNIVERSITY_AXIS,
@@ -116,10 +130,20 @@ UNIVERSITY_PATHS.push(UNIVERSITY_WEST_ENTRY);
 // existing inner-moat road. Its centreline is also the bridge deck's authoritative cut.
 export const CASTLE_CAMPUS_LINK = [WEST_ROUTE[6],...w([[608,610],[633,575]]),
   ...schoolView([[583,571],[610,532],[640,505],[682,532],[736,565],[821,638],[908,712]]),INNER_MOAT_ROAD[0]];
+// 0855–0861 locate the actual stone-lined turn; OSM 121393441 supplies its vertices.
+// Retain the public road endpoints and shared school branch vertex ownership.
+const schoolRoad = FIELD_PHOTOS.schoolRoad.points;
+CASTLE_CAMPUS_LINK.splice(4,4,schoolRoad.at(-1),schoolRoad.at(-2),schoolRoad.at(-3),schoolRoad.at(-4));
+for (const i of [8,9]) {
+  const x=CASTLE_CAMPUS_LINK[i][0],a=schoolRoad.at(-4),b=schoolRoad.at(-5);
+  CASTLE_CAMPUS_LINK[i]=[x,a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0])];
+}
+export const SCHOOL_GATE_ENTRY = [schoolRoad.at(-2),[-587.0,263.2]];
 // The narrow frontage lane is separate from Route 25 and joins the moat-side street.
 // Share the exact junction vertex: independent viewport traces differed by 9 cm,
 // leaving a tiny unmatched cap in the exported walking-surface partition.
-export const UNIVERSITY_FRONT_LANE = [...westStreetView([[749,269],[901,374],[1047,510]]),...south([[473,386],[650,512],[836,643],[987,736],[1093,640]]),CASTLE_CAMPUS_LINK[2]];
+// It meets the moat-side street at the real lane mouth (OSM way 122757607), south of the campus corner.
+export const UNIVERSITY_FRONT_LANE = [...westStreetView([[749,269],[901,374],[1047,510]]),...south([[473,386],[650,512],[836,643]]),[-616.8,141.2],CASTLE_CAMPUS_LINK[1]];
 export const UNIVERSITY_ENTRANCE = [CASTLE_CAMPUS_LINK[2],UNIVERSITY_GATE,UNIVERSITY_AXIS[1]];
 // A low pierced concrete wall encloses the street frontage. The gate opening splits
 // it into two runs; the eastern edge changes to a slim timber/metal palisade by the moat.
@@ -132,17 +156,17 @@ const westTangent = (() => {
   return [(b[0]-a[0])/length,(b[1]-a[1])/length];
 })();
 const westEdge = side => UNIVERSITY_WEST_GATE.map((v,i)=>v+westTangent[i]*side*2.1);
-// The gatekeeper room uses the same footprint for baking and camera collision.
-export const UNIVERSITY_GATEHOUSE = (()=>{
-  const inward=[gateTangent[1],-gateTangent[0]];
-  const centre=UNIVERSITY_GATE.map((v,i)=>v+gateTangent[i]*8+inward[i]*6);
-  return {id:'gatehouse',name:'Main gatekeeper room',height:4,footprint:
-    [[-4,-2.4],[4,-2.4],[4,2.4],[-4,2.4]].map(([u,v])=>centre.map((p,i)=>p+gateTangent[i]*u+inward[i]*v))};
-})();
+// The gatekeeper room (OSM way 1409173495) stands just inside, south of the gate opening.
+// The same footprint is used for baking and camera collision.
+export const UNIVERSITY_GATEHOUSE = {id:'gatehouse',name:'Main gatekeeper room',height:4,
+  footprint:[[-601.6,173.4],[-602.4,164.6],[-609.6,164.4],[-608.9,173.6]]};
+// At the moat-side street (photos IMG_0849/0853): a granite post-and-rail balustrade with a
+// clipped hedge south of the gate, and a concrete wall topped by a palisade north of it.
 export const UNIVERSITY_BOUNDARY = [
   {kind:'wall',points:[...westStreetView([[784,264],[912,348]]),westEdge(-1)]},
-  {kind:'wall',points:[westEdge(1),...south([[570,398],[660,463],[778,548],[889,628],[993,697],[1036,680]]),gateEdge(1)]},
-  {kind:'wall',points:[gateEdge(-1),...w([[633,545]])]},
+  {kind:'wall',points:[westEdge(1),...south([[570,398],[660,463],[778,548],[889,628],[993,697]]),[-620.3,144.3],[-597.6,143.0]]},
+  {kind:'balustrade',points:[[-597.6,143.0],[-596.8,145.6],gateEdge(1)]},
+  {kind:'palisadeWall',points:[gateEdge(-1),CAMPUS_BANK[0]]},
   {kind:'palisade',points:CAMPUS_BANK},
   {kind:'fence',points:[...westStreetView([[784,264],[864,157],[962,23]]),...aerial([[535,229],[695,15],[970,-335]]),...w([[650,174],[690,190]])]},
 ];
@@ -159,7 +183,11 @@ export const UNIVERSITY_NEIGHBORS = [
   [[276,282],[344,331],[292,403],[224,354]],
   [[330,356],[397,405],[353,466],[286,417]],
 ].map((p,i)=>building('frontage-'+i,'Campus street frontage',westGateView(p),
-  i===5?5.7:5.2,'tile',1.4));
+  i===5?5.7:5.2,'tile',1.4)).filter(item=>{
+  // Mapped footprints replace these placeholders outside the retained campus (whole-map.md).
+  const [x,z]=item.footprint.reduce(([sx,sz],[px,pz])=>[sx+px/4,sz+pz/4],[0,0]);
+  return !inEastExtension(x,z);
+});
 export const UNIVERSITY_PAVING = [
   south([[574,347],[655,404],[1029,666],[996,713],[606,433],[563,400]]),
   aerial([[510,471],[658,272],[785,211],[830,247],[775,335],[674,376],[588,500]]),
@@ -168,6 +196,28 @@ export const UNIVERSITY_PAVING = [
 export const UNIVERSITY_PARKING = [
   south([[666,432],[985,659]]), aerial([[586,363],[741,154]]),
 ];
+// Main-gate frontage from the owner's photos (IMG_0847–0854, 2026-10-29) and OSM nodes:
+// the moat promenade's stone bollards (barrier way 1449647550), benches and map board,
+// the old cylinder post box outside the south gate post and the gate's tall conifers.
+export const UNIVERSITY_GATE_DETAIL = {
+  postbox:[-595.0,172.4],
+  hedge:[[-598.3,146.2],[-597.6,172.4]],
+  sliding:[[-597.4,174.2],[-601.4,174.6]],
+  // Photo-relative placement estimates: cypress by the southern wall and spreading
+  // conifers behind the gatekeeper. Keep the photographed view to the hall unobstructed.
+  trees:[
+    {point:[-600.2,160.5],height:13,spread:1.65,form:'columnar'},
+    {point:[-603.0,155.8],height:14.5,spread:1.8,form:'columnar'},
+    {point:[-612.6,166.0],height:15,spread:3.5,form:'spreading'},
+    {point:[-620.0,165.0],height:17,spread:4.0,form:'spreading'},
+    {point:[-628.0,167.0],height:16,spread:3.8,form:'spreading'},
+  ],
+  lamp:[-598.5,188.8],
+  bollards:[[-588.8,113.9],[-588.2,148.2],[-587.9,192.0]],
+  benches:[[-587.6,145.3],[-587.6,153.3],[-585.8,125.9]],
+  board:[-585.4,122.8],
+  mirror:[-589.0,183.6],
+};
 export const UNIVERSITY_STREET_DETAIL = {
   busStop:south([[616,395]])[0],
   poles:[geographicPoint(35.27707,136.24557),...south([[730,565],[1023,714]])],
@@ -260,4 +310,5 @@ export const UNIVERSITY_DATA = { apron:w([[618,566],[625,549],[611,541],[589,531
   lane:UNIVERSITY_WEST_LANE, entrance:UNIVERSITY_ENTRANCE, campusBank:CAMPUS_BANK, schoolBank:SCHOOL_BANK,
   northLand:UNIVERSITY_NORTH_LAND, townLand:UNIVERSITY_TOWN_BLOCK, gateLanding:UNIVERSITY_GATE_LANDING,
   moat:WEST_MOAT, townBank:MIDDLE_MOAT_TOWN_BANK, schoolLand:SCHOOL_LAND, innerWater:WEST_INNER_WATER,
-  schoolBuildings:WEST_BUILDINGS, fields:UNIVERSITY_FIELDS };
+  schoolBuildings:WEST_BUILDINGS, fields:UNIVERSITY_FIELDS, gateDetail:UNIVERSITY_GATE_DETAIL };
+UNIVERSITY_DATA.schoolGateEntry=SCHOOL_GATE_ENTRY;

@@ -24,10 +24,12 @@ import {signalRigs} from './src/three/scene/signal-layout.js';
 import {HIKONE_BOUNDS} from './src/simulation/core/scenario.ts';
 import {CASTLE_SITE} from './src/world/generators/castle-layout.js';
 import {UNIVERSITY_DATA} from './src/world/generators/university-layout.js';
+import {frame} from './src/world/geography/coordinates.ts';
+import {EAST_GEOGRAPHY} from './src/world/generators/east-layout.ts';
 console.log(JSON.stringify({items:webLayout(JSON.parse(fs.readFileSync('data/layout.json'))).items,
- practice:HIKONE_BOUNDS, signals:signalRigs().map((r,i)=>({name:'信号柱 '+(i+1),x:r.pole.x,z:r.pole.z,yaw:0})),
+ practice:HIKONE_BOUNDS, world:frame.world, signals:signalRigs().map((r,i)=>({name:'信号柱 '+(i+1),x:r.pole.x,z:r.pole.z,yaw:0})),
  places:[{name:'京橋',x:32,z:26},{name:'彦根城',x:CASTLE_SITE.x,z:CASTLE_SITE.z},
- {name:'滋賀大学',x:UNIVERSITY_DATA.forecourt[0],z:UNIVERSITY_DATA.forecourt[1]}]}));
+ {name:'滋賀大学',x:UNIVERSITY_DATA.forecourt[0],z:UNIVERSITY_DATA.forecourt[1]},...EAST_GEOGRAPHY.places]}));
 """
     return json.loads(subprocess.check_output(['node', '--input-type=module', '-e', script], cwd=ROOT))
 
@@ -94,11 +96,7 @@ def render_image(filename, world, ppm):
 def main():
     source = scene_sources()
     revision = load_scene(source)
-    with open(os.path.join(DATA, 'collision.json')) as f:
-        collision = json.load(f)
-    world = dict(xMin=collision['xMin'], zMin=collision['zMin'],
-                 xMax=collision['xMin'] + collision['width'] * collision['cell'],
-                 zMax=collision['zMin'] + collision['height'] * collision['cell'])
+    world = source['world']
     scene = bpy.context.scene
     scene.render.engine = 'BLENDER_WORKBENCH'
     scene.display.shading.color_type = 'VERTEX'

@@ -2,6 +2,7 @@
 // Widths and elevations are approximate. The graph records junctions and grade-separated
 // crossings explicitly: the two entrance slopes meet BELOW the Roka bridge.
 import { geographicPoint, CASTLE_BUILDINGS, CASTLE_SITE } from './castle-layout.js';
+import {EAST_GEOGRAPHY} from './east-layout.ts';
 
 export const CASTLE_PATH_REFERENCE = 'https://hikonecastle.com/img/about/castle-map.jpg';
 const bearing = 32 * Math.PI / 180, pixelScale = 0.3505;
@@ -60,6 +61,13 @@ export function castlePaths(otemonLanding, innerRoad, innerBank, outerBank) {
   const dx = next[0] - previous[0], dz = next[1] - previous[1], length = Math.hypot(dx, dz);
   const sign = (-dz * (outside[0] - road.p[0]) + dx * (outside[1] - road.p[1])) > 0 ? 1 : -1;
   nodes.omoteRoad = [road.p[0] - dz / length * sign * 4.6, 0.16, road.p[1] + dx / length * sign * 4.6];
+  const reviewedAccess = EAST_GEOGRAPHY.reviewedRoutes?.sawaguchiAccess.map(([x,z])=>[x,.01,z]);
+  if (reviewedAccess) {
+    nodes.sawaguchi = reviewedAccess[0];
+    nodes.omoteRoad = reviewedAccess.at(-1);
+    const landing = EAST_GEOGRAPHY.reviewedRoutes.omoteLanding;
+    nodes.omoteBank = [landing[0],.01,landing[1]];
+  }
   const routes = [];
   function route(id, from, to, kind, width, points = []) {
     const path = [nodes[from], ...points, nodes[to]].filter((p, i, ps) => !i || Math.hypot(p[0] - ps[i - 1][0], p[2] - ps[i - 1][2]) > 0.00001);
@@ -103,21 +111,27 @@ export function castlePaths(otemonLanding, innerRoad, innerBank, outerBank) {
     north(935, 306, 16), north(916, 281, 12), north(895, 252, 8),
     north(886, 219, 4), north(895, 202, 1.5),
   ]);
-  route('omote-bridge', 'omoteRoad', 'omoteBank', 'bridge', 3.8,
-    [[outside[0], 0.16, outside[1]], [inside[0], 0.16, inside[1]]]);
+  route('omote-bridge', 'omoteRoad', 'omoteBank', 'bridge', reviewedAccess ? 1.6 : 3.8,
+    reviewedAccess ? EAST_GEOGRAPHY.reviewedRoutes.omoteApproach.map(([x,z])=>[x,.01,z])
+      : [[outside[0], 0.16, outside[1]], [inside[0], 0.16, inside[1]]]);
   const frontCorner = nodes.forecourt;
   const firstBank = nearest(innerBank, target).index, lastBank = nearest(innerBank, [frontCorner[0], frontCorner[2]]).index;
   const bankWalk = innerBank.slice(firstBank, lastBank).map(([x, z]) => {
     const dx = CASTLE_SITE.x - x, dz = CASTLE_SITE.z - z, length = Math.hypot(dx, dz);
     return [x + dx / length * 4, 0.16, z + dz / length * 4];
   });
-  route('omote-frontcourt', 'omoteBank', 'forecourt', 'walk', 3.2, bankWalk);
+  const entry = EAST_GEOGRAPHY.reviewedRoutes?.museumEntry;
+  const entryJoin = entry ? nearest(entry,[nodes.omote[0],nodes.omote[2]]) : null;
+  route('omote-frontcourt', 'omoteBank', 'forecourt', 'walk', 3.2, reviewedAccess
+    ? [...entry.slice(0,entryJoin.index).concat([entryJoin.p]).map(([x,z])=>[x,.16,z]), nodes.omote,
+       local('omotegoten', -museumHalfWidth - 4, 0.16, -museumHalfDepth - 6)] : bankWalk);
   route('museum-frontage', 'forecourt', 'museum', 'walk', 3.2);
   route('museum-omote', 'forecourt', 'omote', 'walk', 3.2,
     [local('omotegoten', -museumHalfWidth - 4, 0.16, -museumHalfDepth - 6)]);
   const access = nearest(innerRoad, [nodes.sawaguchi[0], nodes.sawaguchi[2]]);
   const roadPoints = [access.p, ...innerRoad.slice(road.index, access.index).reverse(), road.p]
     .map(([x, z]) => [x - dz / length * sign * 4.6, 0.16, z + dx / length * sign * 4.6]);
-  route('ninomaru-access', 'sawaguchi', 'omoteRoad', 'street', 3.2, roadPoints);
+  route('ninomaru-access', 'sawaguchi', 'omoteRoad', 'street', reviewedAccess ? 1.6 : 3.2,
+    reviewedAccess ? reviewedAccess.slice(1,-1) : roadPoints);
   return { nodes, routes };
 }

@@ -10,6 +10,8 @@
 // height (eaves, tree crowns, the gatehouses' upper floors) does not block. Parked vehicles of a
 // scenario are added at run time (src/obstacles.js); the map's invisible walls stay in map.json.
 import fs from 'node:fs';
+import frame from '../world/geographic-frame.json' with {type:'json'};
+import east from '../world/east-hikone.json' with {type:'json'};
 
 const THREE = await import('three');
 const { buildNativeModel } = await import('../src/three/assets/models.js');
@@ -22,15 +24,13 @@ const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
 const layout = webLayout(read('layout.json')), map = read('map.json');   // as the browser shows it
 const ground = new Ground(read('road_tiles.json'));
-const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain)|ART_Kyobashi(Roads|Land|Water))/;
+const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|Kyobashi(Roads|Land|Water)))/;
 // These photo-corrected buildings have low real thresholds. Project their closed main
 // bodies too: a plinth below the body band must not turn a building's interior into free cells.
 const SOLID_BODY = new Map([['ART_CornerShop', 'ART_ShopPlaster'], ['ART_WhiteStorehouse', 'ART_DisplayInk']]);
 
-// Body coverage follows the practice frame and western extension, independently of image coverage.
-const practice = map.practiceWorld ?? map.world;
-const xMin = Math.min(practice.xMin, -1060), zMin = practice.zMin;
-const xMax = practice.xMax, zMax = Math.max(practice.zMax, 870);
+// The shared geographic frame owns both editor coverage and body-grid extents.
+const {xMin, zMin, xMax, zMax} = frame.world;
 const width = Math.ceil((xMax - xMin) / CELL), height = Math.ceil((zMax - zMin) / CELL);
 const bits = new Uint8Array(Math.ceil(width * height / 8));
 const mark = (x, z) => {
@@ -102,6 +102,14 @@ for (const item of layout.items) {
       }
     }
   }
+}
+
+// A mapped building footprint is solid at body height even when its roof elevation is unknown.
+// Keep the unknown height out of the visual model rather than inventing several storeys.
+for (const building of east.buildings) for (const t of building.solidTriangles ?? building.triangles) {
+  const x = t.reduce((s,p) => s+p[0]/3,0), z = t.reduce((s,p) => s+p[1]/3,0);
+  const y = ground.heightAt(x,z) + (BAND_LOW+BAND_HIGH)/2;
+  markTriangle(...t.map(([x,z]) => [x,y,z]));
 }
 
 let blocked = 0;

@@ -213,6 +213,13 @@ def hill_height(x, z):
 
 
 def building(b, item):
+    if item.get('profile'):
+        from higashi_school import building as school_building
+        school_building(b, item)
+        return
+    from field_photos import retained_building
+    if retained_building(b,item):
+        return
     from streetscape import outward_face
     p = item['footprint']
     top, base = item['height'] + 0.15, 0.15
@@ -257,10 +264,15 @@ def building(b, item):
 
 
 def build(name, mesh_class, lod=False):
-    b = mesh_class(name)
+    from east_extension import clip_existing_builder
+    b = clip_existing_builder(mesh_class(name))
     b.abstract, b.distant = True, lod
+    from higashi_school import east_owned
     for item in data()['buildings']:
-        building(b, item)
+        if not east_owned(item):
+            building(b, item)
+    from higashi_school import frontage
+    frontage(b)
     from road_network import distant_approach_mesh
     distant_approach_mesh(b)
     return b

@@ -1,13 +1,7 @@
 // Google satellite placement, registered approximately to the browser's rotated Kyobashi plan.
 // The hilltop stays beyond the practice map; castle-approach.js registers its surrounding roads.
-const anchor = { lat: 35.27246, lon: 136.2526297, x: 32, z: 56.8 };
-const bearing = 32 * Math.PI / 180;
-export function geographicPoint(lat, lon) {
-  const east = (lon - anchor.lon) * 111320 * Math.cos(anchor.lat * Math.PI / 180);
-  const north = (lat - anchor.lat) * 111320;
-  return [anchor.x + east * Math.cos(bearing) - north * Math.sin(bearing),
-    anchor.z + east * Math.sin(bearing) + north * Math.cos(bearing)];
-}
+import {geographicPoint} from '../geography/coordinates.ts';
+export {geographicPoint};
 const [x, z] = geographicPoint(35.276452, 136.251846);
 
 export const CASTLE_SITE = {
