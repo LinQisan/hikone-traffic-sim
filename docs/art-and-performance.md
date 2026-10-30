@@ -34,7 +34,7 @@ The town is painted, not photographic: shader dabs on vertex pigments, cached br
 - The sun's shadow map holds still things only, drawn from the light LOD. View LOD never touches it, and it redraws when the shadow box re-centres (4 m).
 - Dynamic resolution on desktop (DPR ≤1.25, ≤1.6 Mpx), no MSAA on phones; `?quality=high` fixes full resolution.
 - Exploration flows stop departing at `maxCars` (14); encounter cars are admitted on top.
-- Offline fixture set under 81 MiB (`test/art.test.mjs`).
+- GitHub's limits apply to deployment: each GLB under 100 MiB (file push limit) and the set under 1 GB (Pages site limit), checked in `test/art.test.mjs`. `dist/` itself must also stay under 1 GB.
 
 Recent reference points, desktop Chrome at 1280×800: practice junction about 110 draws and 1.6 M triangles; scene buffers about 78 MB before the school island. All samples are capped near 16.7 ms and show no phone result.
 

@@ -21,7 +21,7 @@ Registration is approximate: aerial and OSM features differ by several metres ne
 
 `world/geographic-frame.json` → `east.retained` is the hand-built core: Route 25 with its footways, the junction block, the event 07/08 car park, Castle Road, the castle hill and compound, Shiga University and its moat, the southern moat road and the castle approach. `tools/import_east_map.py` derives `east.coverage` (world minus core) and `east.pieces`; both are generated.
 
-Everything in coverage comes from the frozen OSM plan through `tools/east_extension.py`. Older authors clip against the same polygon (`east_extension.Ownership`), and ground exports, water blockers and the editor use it too. A clipped box or cylinder stays as explicit clipped faces, because replaying the primitive would restore the overlap. `inEastExtension()` tests the same polygon for layout items. Model names keep `EastHikone` for compatibility.
+Everything in coverage comes from the frozen OSM plan through `tools/east_extension.py`. Generic mapped houses are split by region into `ART_EastHikoneWest` (x<−250), `ART_EastHikoneSouth` (z<20) and `ART_EastHikoneNorth` (z>480); `ART_EastHikoneBuildings` keeps the centre, reviewed photo work and street furniture. `building_region()` and `EAST_BUILDING_REGIONS` must agree. Older authors clip against the same polygon (`east_extension.Ownership`), and ground exports, water blockers and the editor use it too. A clipped box or cylinder stays as explicit clipped faces, because replaying the primitive would restore the overlap. `inEastExtension()` tests the same polygon for layout items. Model names keep `EastHikone` for compatibility.
 
 Coverage rules:
 
