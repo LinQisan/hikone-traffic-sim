@@ -14,7 +14,7 @@ async function buildGeometry(detail) {
   const vertical = [], tops = [], caps = [];
   const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
   const normal = new THREE.Vector3(), edge = new THREE.Vector3(), secondEdge = new THREE.Vector3();
-  for (const asset of ['ART_KyobashiRoads', 'ART_KyobashiBanks', 'ART_CastleApproach']) {
+  for (const asset of ['ART_KyobashiRoads', 'ART_KyobashiBanks', 'ART_CastleApproach', 'ART_EastHikoneSurface']) {
     const bytes = await fs.readFile(new URL(`../data/models/impressionist/${asset}${detail}.glb`, import.meta.url));
     const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     gltf.scene.traverse(object => {
@@ -60,8 +60,9 @@ for (const detail of ['', '.lod']) {
     const meshes = await geometry(detail), ray = new THREE.Raycaster(), hits = [];
     const from = new THREE.Vector3(-32, 2.1, 53);
     // These formerly looked through the unclosed bank beside the eastern bridge end,
-    // including below the town ground level. The faces belong to the bank's true contour.
-    for (const [x, z] of [[40.9228715, 83.1222401], [38.660272, 75.5130717]]) {
+    // including below the town ground level: the battered corner and the masugata wall
+    // at the approach's east shoulder (x 38.5).
+    for (const [x, z] of [[38.55, 83.1222401], [38.55, 76.5]]) {
       ray.set(from, new THREE.Vector3(-x, 0.15, z).sub(from).normalize());
       ray.far = 50; hits.length = 0;
       ray.intersectObject(meshes.vertical, false, hits);
@@ -136,9 +137,13 @@ for (const detail of ['', '.lod']) {
     }
     assert.ok(meshes.caps.length > 100, 'audit caps along straights and bends');
     // A sub-millimetre corner fragment used to be discarded by the polygon area cutoff.
-    ray.set(new THREE.Vector3(-32.04618, 1, 84.969566667), new THREE.Vector3(0, -1, 0));
-    hits.length = 0;
-    ray.intersectObject(meshes.tops, false, hits);
-    assert.ok(hits.some(hit => Math.abs(hit.point.y - 0.16) < 0.00001), 'no pinhole at the northern bend join');
+    // Probe the kerb along the north approach's tight inner corner (7.5 m arc about 24.5, 88).
+    for (let i = 1; i < 6; i++) {
+      const angle = i * Math.PI / 12, r = 7.5 - 4.12;
+      ray.set(new THREE.Vector3(-(24.5 + r * Math.cos(angle)), 1, 88 + r * Math.sin(angle)), new THREE.Vector3(0, -1, 0));
+      hits.length = 0;
+      ray.intersectObject(meshes.tops, false, hits);
+      assert.ok(hits.some(hit => Math.abs(hit.point.y - 0.16) < 0.00001), 'no pinhole at the northern bend kerb');
+    }
   });
 }

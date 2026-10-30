@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { Ground } from '../src/simulation/collision/Ground.ts';
 import { Obstacles } from '../src/simulation/collision/Obstacles.ts';
 import { crossesWall } from '../src/simulation/core/scenario.ts';
+import { inEastExtension } from '../src/world/generators/east-layout.ts';
 import { INNER_MOAT_INNER, INNER_MOAT_OUTER } from '../src/world/generators/castle-approach.js';
 import { WEST_ROUTE, UNIVERSITY_ENTRANCE, UNIVERSITY_AXIS, UNIVERSITY_WEST_LANE,
   UNIVERSITY_BUILDINGS, CASTLE_CAMPUS_LINK, UNIVERSITY_BOUNDARY,
@@ -23,6 +24,8 @@ function inWater(x,z) {
     return hit;
   });
 }
+// Within a body width of the seam, the mapped footprints own the space.
+const replaced=(x,z)=>[[0,0],[1,0],[-1,0],[0,1],[0,-1]].some(([dx,dz])=>inEastExtension(x+dx,z+dz));
 function checkPath(path) {
   let previous = path[0];
   for (let k=1;k<path.length;k++) {
@@ -30,6 +33,8 @@ function checkPath(path) {
     for(let i=0;i<=steps;i++) {
       const p=a.map((v,j)=>v+(b[j]-v)*i/steps);
       const at=p.map(v=>v.toFixed(2)).join(',');
+      // The authored strip west of the campus is replaced by the mapped street and houses.
+      if(replaced(...p)){previous=p;continue;}
       assert.ok(ground.roadHeightAt(...p)!=null,'continuous exported walking surface at '+at);
       assert.ok(!town.blocked(...p,.25),'free body corridor at '+at);
       assert.ok(!crossesWall(walls,{x:previous[0],z:previous[1]},{x:p[0],z:p[1]}),'no water wall across access at '+at);
@@ -62,11 +67,12 @@ test('the street enclosure blocks bodies while the realigned main gate remains o
     const a=run.points[i-1],b=run.points[i];
     for(const t of [.2,.5,.8]){
       const x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;
+      if(inEastExtension(x,z))continue;
       assert.ok(town.blocked(x,z,.25),'solid campus boundary at '+x+','+z);
       checked++;
     }
   }
-  assert.ok(checked>=12);
+  assert.ok(checked>=8);
   checkPath(UNIVERSITY_ENTRANCE);
 });
 
@@ -78,7 +84,7 @@ test('the frontage lane connects the west gate to both public streets and the ca
   const length=Math.hypot(b[0]-a[0],b[1]-a[1]);
   const x=UNIVERSITY_WEST_GATE[0]+(b[0]-a[0])/length*3.5;
   const z=UNIVERSITY_WEST_GATE[1]+(b[1]-a[1])/length*3.5;
-  assert.ok(town.blocked(x,z,.25),'the wall beside the west gate remains solid');
+  if(!inEastExtension(x,z))assert.ok(town.blocked(x,z,.25),'the wall beside the west gate remains solid');
 });
 
 test('the school lane and open-lot entrance connect to the public moat street without crossing barriers',()=>{
@@ -154,6 +160,7 @@ for(const detail of ['', '.lod'])test('the campus filler leaves the existing inn
   for(const root of [extension,native])root.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});
 });
 for(const detail of ['', '.lod'])test('both banks present closed retaining faces to the water '+(detail||'high'),async()=>{
+  const rampartVertices=JSON.parse(fs.readFileSync(new URL('../world/school-moat.json',import.meta.url))).profile.coastVertices;
   const bytes=fs.readFileSync(new URL('../data/models/impressionist/ART_WestMoat'+detail+'.glb',import.meta.url));
   const root=(await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),'')).scene;
   root.updateMatrixWorld(true);
@@ -165,6 +172,8 @@ for(const detail of ['', '.lod'])test('both banks present closed retaining faces
       const a=line[i-1],b=line[i],length=Math.hypot(b[0]-a[0],b[1]-a[1]);
       const nx=(b[1]-a[1])/length*side,nz=-(b[0]-a[0])/length*side;
       const mx=(a[0]+b[0])/2,mz=(a[1]+b[1])/2;
+      // The mapped middle moat continues beyond the retained campus; its own shoreline is generated.
+      if(inEastExtension(mx,mz)||inEastExtension(mx+nx*.8,mz+nz*.8)||inEastExtension(mx-nx*.8,mz-nz*.8))continue;
       if(!inWater(mx+nx*.8,mz+nz*.8)&&!inWater(mx-nx*.8,mz-nz*.8)){
         assert.ok(Math.abs(ground.roadHeightAt(mx,mz)-.01)<.001,'only a paved bridge opening interrupts the bank');
         continue;
@@ -172,7 +181,9 @@ for(const detail of ['', '.lod'])test('both banks present closed retaining faces
       ray.set(new THREE.Vector3(-(a[0]+b[0])/2-nx*.8,-.7,(a[1]+b[1])/2+nz*.8),
         new THREE.Vector3(nx,0,-nz));
       const hits=ray.intersectObject(root,true);
-      assert.ok(hits.some(h=>Math.abs(h.distance-.8)<.003),key+' faces its adjoining water at segment '+i);
+      const battered=key==='schoolBank'&&i<rampartVertices;
+      assert.ok(hits.some(h=>battered ? h.distance>=.79&&h.distance<1.6 : Math.abs(h.distance-.8)<.003),
+        key+' faces its adjoining water at segment '+i);
       checked++;
     }
   }

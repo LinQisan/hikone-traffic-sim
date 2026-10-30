@@ -24,10 +24,39 @@ test('recording can reuse a head pose without mutating saved samples or retainin
     player.place(3, 4, 60, 170, 'walking');
     assert.equal(player.head(pose), pose);
     recorder.capture(0.1, pose, []);
-    assert.deepEqual(recorder.frames[0].head, { x: 1, z: 2, yaw: 30, rideYaw: 30 });
-    assert.deepEqual(recorder.frames[1].head, { x: 3, z: 4, yaw: 60 });
+    assert.equal(recorder.frames[0].head.x, 1);
+    assert.equal(recorder.frames[0].head.z, 2);
+    assert.equal(recorder.frames[0].head.yaw, 30);
+    assert.equal(recorder.frames[0].head.rideYaw, 30);
+    assert.equal(recorder.frames[1].head.x, 3);
+    assert.equal(recorder.frames[1].head.z, 4);
+    assert.equal(recorder.frames[1].head.yaw, 60);
+    assert.equal(recorder.frames[1].head.rideYaw, undefined);
     assert.deepEqual(snapshot, recorder.frames[0].head, 'the default API still returns an independent snapshot');
     assert.notEqual(player.head(), player.head());
+  } finally { player.bicycle.dispose(); }
+});
+
+test('recorded eyes reproduce live walking, riding and fallen cameras while body coordinates stay unchanged', () => {
+  const player = makePlayer();
+  try {
+    for (const mode of ['walking', 'bicycle']) {
+      player.place(5, 8, 60, 159, mode);
+      player.enabled = true;
+      player.look(50, 25);
+      player.update(1 / 60);
+      for (const fallen of [false, true]) {
+        if (fallen) { player.knockDown(90); player.update(0.7); }
+        const head = player.head(), eye = new THREE.Vector3();
+        player.camera.getWorldPosition(eye);
+        assert.ok(Math.abs(head.eyeX + eye.x) < 1e-9);
+        assert.ok(Math.abs(head.eyeZ - eye.z) < 1e-9);
+        assert.ok(Math.abs(head.y - eye.y) < 1e-9);
+        assert.ok(Math.abs(head.pitch - player.camera.rotation.x * 180 / Math.PI) < 1e-9);
+        assert.ok(Math.abs(head.roll - player.camera.rotation.z * 180 / Math.PI) < 1e-9);
+        assert.equal(head.x, 5); assert.equal(head.z, 8);
+      }
+    }
   } finally { player.bicycle.dispose(); }
 });
 

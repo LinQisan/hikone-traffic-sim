@@ -32,9 +32,18 @@ test('houses, storehouses and walls of the town are solid at body height', () =>
   const { xMin, xMax, zMin, zMax } = S.HIKONE_BOUNDS;
   const inside = ([x, , z]) => x > xMin + 5 && x < xMax - 5 && z > zMin + 5 && z < zMax - 5;
   const solid = layout.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a) && inside(i.p));
-  assert.ok(solid.length > 40, `${solid.length} buildings`);
   // a building's origin is on its street front: it is solid within a step of it
   for (const item of solid) assert.ok(town.blocked(item.p[0], item.p[2], 1), `${item.a} at ${item.p[0]}, ${item.p[2]}`);
+  // The town's blocks are the mapped footprints now (whole-map.md); each is solid inside.
+  const mapped = JSON.parse(fs.readFileSync(new URL('../world/east-hikone.json', import.meta.url))).buildings;
+  let checked = 0;
+  for (const b of mapped) for (const t of b.solidTriangles ?? []) {
+    const x = (t[0][0] + t[1][0] + t[2][0]) / 3, z = (t[0][1] + t[1][1] + t[2][1]) / 3;
+    const area = Math.abs((t[1][0] - t[0][0]) * (t[2][1] - t[0][1]) - (t[2][0] - t[0][0]) * (t[1][1] - t[0][1])) / 2;
+    if (area < 4 || !inside([x, 0, z])) continue;
+    assert.ok(town.blocked(x, z, .1), `${b.id} at ${x}, ${z}`); checked++;
+  }
+  assert.ok(checked > 100, `${checked} mapped town footprints`);
 });
 
 test('the photographed shop and boarded neighbor stay solid behind their low thresholds', () => {

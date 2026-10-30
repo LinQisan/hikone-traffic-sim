@@ -146,10 +146,14 @@ test('road height is known on the roads only (ground models are pressed under it
 
 test('the overhead road plan connects the long bridge and through streets without the old return roads', () => {
   const g = new Ground(data('road_tiles.json'));
-  for (const [x, z] of [[180, 42.73], [32, 65], [22, 88], [36.16, -64], [-100, -64], [-28, -20]])
+  // West of Castle Road the side streets are the mapped ones (OSM ways 122921530, 1446700829).
+  // North of the bridge the approach runs straight, then west inside the masugata (OSM way 1499485466).
+  for (const [x, z] of [[180, 42.73], [32, 65], [32, 85], [20, 95.6], [36.16, -64], [-100, -53.21], [-38, -29.1]])
     assert.ok(Math.abs(g.roadHeightAt(x, z) - 0.01) < 1e-4, `connected carriageway at ${x},${z}`);
+  // Mapped OSM streets may now pass here; only the old authored grid must not return.
+  const authored = new Ground({'Kyobashi carriageway': data('road_tiles.json')['Kyobashi carriageway']});
   for (const [x, z] of [[92, 4], [10, 11], [55, 62], [10, -6]])
-    assert.equal(g.roadHeightAt(x, z), null, `obsolete grid road at ${x},${z} is gone`);
+    assert.equal(authored.roadHeightAt(x, z), null, `obsolete grid road at ${x},${z} is gone`);
   const map = data('map.json');
   assert.ok(S.crossesWall(map, { x: 20, z: 38 }, { x: 20, z: 50 }), 'the moat cannot be walked across');
   assert.ok(!S.crossesWall(map, { x: 32, z: 38 }, { x: 32, z: 75 }), 'the longer bridge remains open');

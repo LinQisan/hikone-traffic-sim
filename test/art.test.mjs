@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import { signalPlacements, signalRigs, signalNamePlate, signalWalkPlate, POLE, ARM_ABOVE_HEAD } from '../src/three/scene/signal-layout.js';
 import { webLayout, WEB_HIDDEN, isHidden } from '../src/world/generators/web-layout.js';
 import { Ground } from '../src/simulation/collision/Ground.ts';
-import { moatBend, moatPathEdge } from '../src/world/generators/road-layout.js';
+import { moatBend, moatPathEdge, TOWN_CROSSINGS, castleX } from '../src/world/generators/road-layout.js';
 import { CASTLE_SITE } from '../src/world/generators/castle-layout.js';
 import { HIKONE_BOUNDS } from '../src/simulation/core/scenario.ts';
 
@@ -47,7 +47,8 @@ test('every scene and vehicle asset has self-contained pigment geometry', () => 
     }
   }
   const bytes = Object.values(manifest.models).reduce((sum, m) => sum + m.bytes, 0);
-  assert.ok(bytes < 80 * 1024 * 1024, 'distant ground must not inflate the art set past 80 MiB');
+  // Raised from 80 for the school island's mapped buildings and courts (docs/higashi-island.md).
+  assert.ok(bytes < 81 * 1024 * 1024, 'distant ground must not inflate the art set past 81 MiB');
 });
 
 test('the houses and tree silhouettes were rebuilt, including when the shader finish is off', () => {
@@ -579,6 +580,16 @@ test('the bridge entrance has its missing zebra, and the bridge itself has no ce
   for (const z of [46, 55, 64]) {
     assert.equal(rayDistance(paint, [-32, 2, z], [0, -1, 0]), Infinity, 'no invented centre dashes');
     assert.ok(rayDistance(paint, [-35.62, 2, z], [0, -1, 0]) < 2, 'continuous edge line');
+  }
+});
+
+test('southern zebras are exported as stripes with clear gaps, not covered by centre lines', () => {
+  const paint = triangles('ART_KyobashiRoads', 'HK_WhitePaint');
+  for (const crossing of TOWN_CROSSINGS) {
+    const x = castleX(crossing.z);
+    for (const dx of [-3.4, -1.7, 0, 1.7, 3.4])
+      assert.ok(rayDistance(paint, [-(x + dx), 2, crossing.z], [0, -1, 0]) < 2, `${crossing.id}: visible zebra`);
+    assert.equal(rayDistance(paint, [-(x + 0.5), 2, crossing.z], [0, -1, 0]), Infinity, `${crossing.id}: stripe gaps stay clear`);
   }
 });
 

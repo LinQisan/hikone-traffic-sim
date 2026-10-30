@@ -6,6 +6,9 @@ const THREE = await import('three');
 const { createReplayAnimal } = await import('../src/three/entities/replay-animal.js');
 const { Replay } = await import('../src/three/entities/replay.js');
 const { GroundContact } = await import('../src/three/scene/ground-contact.js');
+const {ParticipantReplayCamera} = await import('../src/three/camera/ParticipantReplayCamera.ts');
+const {Recorder} = await import('../src/simulation/metrics/analysis.ts');
+const {nearestReplayCar} = await import('../src/simulation/metrics/replay.ts');
 
 test('ground contact matches precise posed vertices under nested rotations and nonuniform scales', () => {
   const root = new THREE.Group(), pivot = new THREE.Group();
@@ -121,4 +124,68 @@ test('finished replay remains on its final frame until an explicit stop or resta
   assert.equal(replay.time, recording[0].t);
   replay.stop();
   assert.equal(scene.children.length, 0);
+});
+
+test('safe walking and cycling replay finish without contact, falling or slow motion and can restart', () => {
+  for (const mode of ['walking', 'bicycle']) {
+    const replay = new Replay(new THREE.Scene(), new Map(), {heightAt: () => 0.41});
+    replay.start(recording, null, null, 170, mode);
+    const start = replay.time;
+    replay.update(0.1);
+    assert.ok(Math.abs(replay.time - start - 0.1) < 1e-9);
+    for (let i = 0; i < 100; i++) {
+      assert.doesNotMatch(replay.update(0.1), /接触|Contact|Infinity|NaN/);
+      assert.equal(replay.contact.visible, false);
+    }
+    assert.equal(replay.time, recording.at(-1).t);
+    assert.equal(replay.atEnd, true);
+    assert.ok((replay.rideTrack ? replay.animal.rider : replay.animal.pivot).quaternion.angleTo(new THREE.Quaternion()) < 1e-6);
+    assert.equal(replay.playing, true);
+    replay.setView('participant');
+    assert.equal(replay.activeCamera, replay.participantCamera);
+    assert.equal(replay.figure.visible, false);
+    replay.setView('driver');
+    assert.equal(replay.view, 'overview', 'a clip without cars has no driver view');
+    assert.equal(replay.figure.visible, true);
+    replay.restart();
+    assert.equal(replay.time, recording[0].t);
+    assert.equal(replay.atEnd, false);
+    replay.stop();
+    assert.equal(replay.participantCamera.parent, null);
+  }
+});
+
+test('participant replay interpolates recorded eyes and look angles, falls and handles legacy head poses', () => {
+  const camera = new ParticipantReplayCamera(), ground = {heightAt: () => 0.4};
+  const track = [
+    {t: 0, x: 10, z: 20, yaw: 350, eyeX: 10.2, eyeZ: 19.8, y: 1.9, pitch: -20, roll: 0},
+    {t: 1, x: 10, z: 20, yaw: 10, eyeX: 11, eyeZ: 20.2, y: 0.6, pitch: 8, roll: -75},
+  ];
+  camera.place(track, 0.5, ground, 1.6);
+  assert.ok(camera.position.distanceTo(new THREE.Vector3(-10.6, 1.25, 20)) < 1e-9);
+  assert.ok(Math.abs(camera.rotation.x * 180 / Math.PI + 6) < 1e-9);
+  assert.ok(Math.abs(camera.rotation.z * 180 / Math.PI + 37.5) < 1e-9);
+  const forward = camera.getWorldDirection(new THREE.Vector3());
+  assert.ok(Math.abs(forward.x) < 1e-9 && forward.z > 0.99, 'yaw takes the short arc through zero');
+  camera.reducedMotion = true;
+  camera.place(track, 1, ground, 1.6);
+  assert.equal(camera.rotation.z, 0);
+  camera.place([{t: 0, x: 1, z: 2, yaw: 90}], 0, ground, 1.6);
+  assert.deepEqual(camera.position.toArray(), [-1, 2, 2]);
+  assert.equal(camera.rotation.x, 0);
+});
+
+test('the safe replay includes a goal between regular samples and chooses the closest recorded car', () => {
+  const recorder = new Recorder();
+  recorder.capture(0, {x: 0, z: 0, yaw: 0}, []);
+  recorder.capture(0.02, {x: 0, z: 0.05, yaw: 0}, [], true);
+  recorder.stop();
+  recorder.capture(0.03, {x: 0, z: 1, yaw: 0}, [], true);
+  assert.equal(recorder.frames.at(-1).t, 0.02);
+  assert.equal(recorder.frames.at(-1).head.z, 0.05);
+  assert.equal(nearestReplayCar(recorder.frames), null);
+  const frames = recording.map((f, i) => ({...f, cars: [
+    {id: 7, x: 30, z: 2}, {id: 2, x: i === 1 ? 13 : 50, z: 2},
+  ]}));
+  assert.equal(nearestReplayCar(frames), 2, 'the closest approach anywhere in the clip defines the driver view');
 });

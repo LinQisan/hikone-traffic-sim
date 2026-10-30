@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { APPROACH_DATA } from '../src/world/generators/castle-approach.js';
 import { Ground } from '../src/simulation/collision/Ground.ts';
+import {inEastExtension} from '../src/world/generators/east-layout.ts';
 
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
@@ -18,6 +19,8 @@ for (const detail of ['', '.lod']) {
     };
     const compound = await load('ART_HikoneCompound'), hill = await load('HK_Terrain_Hikone');
     const approach = await load('ART_CastleApproach');
+    const reviewed = await load('ART_EastHikoneSurface');
+    reviewed.updateMatrixWorld(true);
     approach.updateMatrixWorld(true);
     for (const root of [compound, hill]) {
       root.position.set(-APPROACH_DATA.castle.x, 0, APPROACH_DATA.castle.z);
@@ -26,12 +29,15 @@ for (const detail of ['', '.lod']) {
     }
     approach.traverse(o => { if (o.isMesh) o.material.side = THREE.DoubleSide; });
     const geometry = indexMeshRays(compound), terrain = indexMeshRays(hill), street = indexMeshRays(approach);
+    const sourceGround = indexMeshRays(reviewed);
     const ray = new THREE.Raycaster(), hits = [];
     let checked = 0;
     for (const route of APPROACH_DATA.paths.routes) {
       const triangles = tiles['Hikone castle path ' + route.id];
-      assert.ok(triangles?.length, `${route.id}: exported ground, including its own level under/over Roka`);
-      const ground = new Ground({ path: triangles, road: tiles['Kyobashi carriageway'] });
+      assert.ok(triangles?.length || route.points.every(([x,y,z])=>inEastExtension(x,z)),
+        `${route.id}: exported ground or fully replaced by reviewed geographic surfaces`);
+      const ground = new Ground({ path: triangles??[], road: tiles['Kyobashi carriageway'],
+        ...Object.fromEntries(Object.entries(tiles).filter(([name])=>name.startsWith('East Hikone '))) });
       for (let i = 1; i < route.points.length; i++) {
         const a = route.points[i - 1], b = route.points[i], length = Math.hypot(b[0] - a[0], b[2] - a[2]);
         const nx = -(b[2] - a[2]) / length, nz = (b[0] - a[0]) / length;
@@ -44,6 +50,7 @@ for (const detail of ['', '.lod']) {
           ray.set(new THREE.Vector3(-x, y + 0.025, z), new THREE.Vector3(0, -1, 0));
           ray.far = 0.05; hits.length = 0; ray.intersectObject(geometry, true, hits);
           ray.intersectObject(street, true, hits);
+          ray.intersectObject(sourceGround, true, hits);
           assert.ok(hits.some(h => Math.abs(h.point.y - y) < 0.0001), `${route.id}: rendered tread equals walking ground at ${x}, ${z}, ground ${y}, hits ${hits.map(h => h.point.y)}`);
           ray.set(new THREE.Vector3(-x, y + 0.32, z), new THREE.Vector3(0, 1, 0));
           ray.far = 1.45; hits.length = 0;
@@ -60,6 +67,6 @@ for (const detail of ['', '.lod']) {
       }
     }
     assert.ok(checked > 1000, 'inspect the complete network and both sides of the walking body');
-    for (const root of [compound, hill, approach]) root.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
+    for (const root of [compound, hill, approach, reviewed]) root.traverse(o => { if (o.isMesh) { o.geometry.dispose(); o.material.dispose(); } });
   });
 }

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { Ground } from '../src/simulation/collision/Ground.ts';
 import { APPROACH_DATA } from '../src/world/generators/castle-approach.js';
+import { inEastExtension } from '../src/world/generators/east-layout.ts';
 import { smoothRoute, carPose } from '../src/simulation/traffic/Traffic.ts';
 import { HIKONE_BOUNDS } from '../src/simulation/core/scenario.ts';
 
@@ -98,7 +99,8 @@ test('batching the distant surroundings does not make open northern roads solid 
   const road = new THREE.Vector3(-2.34729, 2, 138.86052);
   assert.equal(city.cameraClear(road), true, 'the open road between the longhouse and school is free');
   assert.equal(city.clear(road, new THREE.Vector3(9, 2, 138.86052)), false, 'the actual longhouse wall still blocks sight lines');
-  assert.ok(city.parts.length >= 10, 'each observed building keeps its own camera bounds');
+  const retained = APPROACH_DATA.buildings.filter(b => b.footprint.every(([x,z]) => !inEastExtension(x,z)));
+  assert.ok(city.parts.length >= retained.length, 'each retained building keeps its own camera bounds');
 });
 
 for (const detail of ['', '.lod']) {
@@ -148,6 +150,9 @@ for (const detail of ['', '.lod']) {
     }
     const ray = new THREE.Raycaster(), hits = [];
     for (const site of APPROACH_DATA.compound) {
+      // Source footprints in the reviewed district replace the older approximate roof mass.
+      // Their solid interiors and mapped passages are checked by north-correction.test.mjs.
+      if (inEastExtension(site.x,site.z)) continue;
       if (site.floor > 1 || site.id === 'omotegoten') {
         // The gate's centre is a passage, with path bedding below the floor. Inspect
         // a gate post instead of treating the newly open portal as a solid foundation.
@@ -181,7 +186,8 @@ for (const detail of ['', '.lod']) {
         for (const t of [0.25, 0.5, 0.75]) {
           const x = cx + (a[0] + (b[0] - a[0]) * t - cx) * scale;
           const z = cz + (a[1] + (b[1] - a[1]) * t - cz) * scale;
-          if (!onHill(x, z)) continue; // Expanded low-court samples may reach the moat.
+          // Expanded low-court samples may reach the moat, including the mapped inner moat.
+          if (!onHill(x, z) || inEastExtension(x, z)) continue;
           ray.set(new THREE.Vector3(-x, 100, z), new THREE.Vector3(0, -1, 0));
           hits.length = 0; ray.intersectObject(hill, true, hits);
           assert.ok(hits.length, `${terrace.id}: no back-face hole beside its court at ${x}, ${z}`);
