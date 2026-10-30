@@ -111,7 +111,8 @@ kbd { display: inline-block; min-width: 1.6em; padding: 0 5px; border: 1px solid
 #flash { position: fixed; inset: 0; z-index: 3; pointer-events: none; background: #ff1a1a; opacity: 0; transition: opacity 0.6s; }
 #flash.on { opacity: 0.55; transition: opacity 0.05s; }
 #fps { position: fixed; right: 10px; bottom: 8px; z-index: 4; font-size: 12px; color: var(--sub); }
-.street-help { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 4; margin: 0; max-width: calc(100vw - 32px); padding: 8px 14px; border-radius: 12px; background: rgba(11, 18, 32, 0.72); font-size: 13px; line-height: 1.9; text-align: center; pointer-events: none; }
+.street-help button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; margin-left: 12px; pointer-events: auto; }
+.street-help { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 0; position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 4; margin: 0; max-width: calc(100vw - 32px); padding: 8px 14px; border-radius: 12px; background: rgba(11, 18, 32, 0.72); font-size: 13px; line-height: 1.9; text-align: center; pointer-events: none; }
 
 /* phones and tablets (body.touch is set from the main pointer, not the screen size) */
 body:not(.touch) .touch-only, body.touch .desktop-only { display: none !important; }

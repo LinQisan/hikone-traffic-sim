@@ -2,6 +2,7 @@
 // (a copy of VRLearn's ScenarioModel/scenario.js, see tools/sync.mjs). Files go through the local
 // server (server/editor-api.mjs: the Unity project's Scenarios/, Unity play, Quest) when it runs,
 // otherwise through store.js (this browser's localStorage).
+import {describeStreetPose} from '../three/camera/StreetViewer.ts';
 import * as S from '../simulation/core/scenario.ts';
 import { Traffic } from '../simulation/traffic/Traffic.ts';
 import * as store from './store.ts';
@@ -267,7 +268,7 @@ function referencePoint(point: Point, centre = false) {
 }
 
 // ------------------------------------------------------------------ street view
-let streetPose: {x: number; z: number; heading: number} | null = null;
+let streetPose: {x: number; z: number; heading: number; pitch?: number; eye?: number} | null = null;
 /** Degrees clockwise from +Z (map up) toward +X (map right), as the simulator's street view uses. */
 function streetHeading(from: Point, to: Point) {
   return Math.round((Math.atan2(to.x - from.x, to.z - from.z) * 180 / Math.PI + 360) % 360);
@@ -291,6 +292,15 @@ function openStreet(point: Point, heading = 0) {
   renderStreetMarker();
   requestAnimationFrame(() => document.getElementById('streetFrame')?.focus());
 }
+async function copyStreet() {
+  if (!streetPose) return;
+  try {
+    await navigator.clipboard.writeText(describeStreetPose({pitch: 0, eye: 1.6, ...streetPose}, new URL('../index.html', location.href).href));
+    toast('視点をコピーしました。');
+  } catch {
+    toast('コピーできませんでした。ブラウザの権限を確認してください。', true);
+  }
+}
 function closeStreet() {
   if (!ui.streetOpen) return;
   ui.streetOpen = false;
@@ -310,10 +320,10 @@ function closeStreet() {
 function onStreetMessage(event: MessageEvent) {
   const frame = document.getElementById('streetFrame') as HTMLIFrameElement | null;
   if (event.origin !== location.origin || !frame || event.source !== frame.contentWindow) return;
-  const data = event.data as {type?: string; x?: number; z?: number; heading?: number} | null;
+  const data = event.data as {type?: string; x?: number; z?: number; heading?: number; pitch?: number; eye?: number} | null;
   if (data?.type === 'hikone:street-close') closeStreet();
   else if (data?.type === 'hikone:street-at' && [data.x, data.z, data.heading].every(Number.isFinite)) {
-    streetPose = {x: data.x!, z: data.z!, heading: data.heading!};
+    streetPose = {x: data.x!, z: data.z!, heading: data.heading!, pitch: data.pitch, eye: data.eye};
     ui.streetText = streetLabel(streetPose);
     publish();
     renderStreetMarker();
@@ -1230,7 +1240,7 @@ const actions = {
   newScenario, duplicate, save, undo, redo, removeFile, playInUnity, playInBrowser, downloadJson, importJson,
   openFile, focusTarget, copyCoordinates, openQuestDialog, questCheck, questSend,
   closeQuest: () => {ui.questOpen = false; publish();},
-  openStreet: () => {if (state.reference) openStreet(state.reference, streetPose?.heading ?? 0);}, closeStreet,
+  openStreet: () => {if (state.reference) openStreet(state.reference, streetPose?.heading ?? 0);}, closeStreet, copyStreet,
   tool: (tool: EditorTool) => {if (tool === 'draw' && state.selection?.kind === 'vehicle') startDrawing(state.selection.index); else setTool(tool); if (tool === 'coordinates' || tool === 'street') $('map').focus();},
   fitScenario, fitMap, zoom: (factor: number) => zoomAt(factor),
   layer: (key: keyof typeof ui.layers, value: boolean) => {ui.layers[key] = value; if (state.map) applyLayers(); publish();},

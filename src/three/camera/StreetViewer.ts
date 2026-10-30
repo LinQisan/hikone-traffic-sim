@@ -1,5 +1,6 @@
 // Free street-level inspection camera for development: look around a map location without a
 // scenario, as the editor's "3Dで見る" panel does. Map metres; heading is clockwise from +Z.
+import {frame, geographicLocation} from '../../world/geography/coordinates.ts';
 import * as THREE from 'three';
 import {toThree} from '../scene/coords.ts';
 
@@ -19,6 +20,18 @@ export function parseStreetPose(text: string | null, bounds: Bounds): StreetPose
   if (x! < bounds.xMin || x! > bounds.xMax || z! < bounds.zMin || z! > bounds.zMax) return null;
   return {x: x!, z: z!, heading: ((heading % 360) + 360) % 360, pitch: Math.max(-80, Math.min(80, pitch)),
     eye: Math.max(MIN_EYE, Math.min(MAX_EYE, eye))};
+}
+
+/** The current view as plain text to paste to a person or an AI; the URL reopens this exact pose. */
+export function describeStreetPose(pose: StreetPose, base: string): string {
+  const {lat, lon} = geographicLocation(pose.x, pose.z);
+  const round = (value: number, digits = 1) => +value.toFixed(digits);
+  const heading = round(pose.heading, 0), bearing = (heading + frame.bearingDegrees + 360) % 360;
+  return [
+    `彦根 3D 視点: x=${round(pose.x, 2)}, z=${round(pose.z, 2)}, 向き=${heading}°（地図の上=0°、時計回り）, 上下=${round(pose.pitch, 0)}°, 目の高さ=${round(pose.eye)} m`,
+    `緯度経度: ${lat.toFixed(6)}, ${lon.toFixed(6)}（真北からの方位 ${bearing}°）`,
+    `URL: ${base}?street=${round(pose.x, 2)},${round(pose.z, 2)},${heading},${round(pose.pitch, 0)},${round(pose.eye)}`,
+  ].join('\n');
 }
 
 export class StreetViewer {

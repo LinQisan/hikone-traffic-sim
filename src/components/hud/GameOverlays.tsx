@@ -23,11 +23,12 @@ export function Results({store, commands}: {store: SimulatorStore; commands: Sim
   return <section id="results" className="overlay card narrow" role="dialog" aria-labelledby="rtitle" hidden={!results.visible || inspection}><h2 id="rtitle" tabIndex={-1} className={results.tone}>{results.title}</h2><div id="rlines">{results.lines.map((line, index) => <p key={index}>{line}</p>)}{results.incidents.map(row => <p key={row.index} className="incident"><span>{row.text}</span>{row.replayable && <button type="button" onClick={() => commands?.replayIncident(row.index)}>リプレイ / Replay</button>}</p>)}</div><p id="rverdict" className="verdict">{results.verdict}</p><div className="buttons"><button id="export" type="button" hidden={!results.canExport} onClick={() => commands?.exportRecord()}>記録を保存 / Save record (JSON)</button><button id="retry" onClick={() => commands?.retry()}>{results.retry}</button><button id="totitle" className="primary" onClick={() => commands?.title()}>{results.titleAction}</button></div></section>;
 }
 /** Help for the development street view (editor "3Dで見る" or ?street=x,z,heading). */
-export function StreetHelp({store}: {store: SimulatorStore}) {
+export function StreetHelp({store, commands}: {store: SimulatorStore; commands: SimulatorCommands | null}) {
   const presentation = useSimulatorSlice(store, 'presentation');
-  return <p id="streethelp" className="street-help" role="note" hidden={!presentation.street}>
-    ドラッグで見回す ・ <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 矢印で移動 ・ <kbd>Q</kbd><kbd>E</kbd> で向き ・ <kbd>R</kbd><kbd>F</kbd> で高さ ・ <kbd>Shift</kbd> で速く ・ <kbd>Esc</kbd> {presentation.embedded ? 'で地図に戻る' : 'でメニュー'}
-  </p>;
+  return <div id="streethelp" className="street-help" role="note" hidden={!presentation.street}>
+    <span>ドラッグで見回す ・ <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 矢印で移動 ・ <kbd>Q</kbd><kbd>E</kbd> で向き ・ <kbd>R</kbd><kbd>F</kbd> で高さ ・ <kbd>Shift</kbd> で速く ・ <kbd>Esc</kbd> {presentation.embedded ? 'で地図に戻る' : 'でメニュー'}</span>
+    <button id="streetCopy" type="button" onClick={() => commands?.copyStreetView()}>視点をコピー <kbd>C</kbd></button>
+  </div>;
 }
 export function Presentation({store, touchRef, fpsRef}: {store: SimulatorStore; touchRef: React.RefObject<HTMLDivElement | null>; fpsRef: React.RefObject<HTMLDivElement | null>}) {
   const presentation = useSimulatorSlice(store, 'presentation'), toast = useSimulatorSlice(store, 'toast'), focus = useSimulatorSlice(store, 'focus'), announcement = useSimulatorSlice(store, 'announcement');

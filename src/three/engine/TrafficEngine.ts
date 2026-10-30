@@ -26,7 +26,7 @@ import { PerformanceProbe } from '../renderer/PerformanceProbe.ts';
 import { TouchControls, isTouchDevice } from '../controls/TouchControls.ts';
 import { AdaptiveResolution } from '../renderer/AdaptiveResolution.ts';
 import { Obstacles } from '../../simulation/collision/Obstacles.ts';
-import { StreetViewer, parseStreetPose } from '../camera/StreetViewer.ts';
+import { StreetViewer, describeStreetPose, parseStreetPose } from '../camera/StreetViewer.ts';
 import type { StreetPose } from '../camera/StreetViewer.ts';
 import { setSunDirection, alignBlobShadow } from '../materials/blob-shadow.js';
 import { webLayout } from '../../world/generators/web-layout.js';
@@ -750,6 +750,8 @@ let previewSignals: Awaited<ReturnType<typeof buildSignals>> | null = null, prev
 const embedded = window.parent !== window;
 const street = new StreetViewer(renderer.domElement, ground, S.HIKONE_WORLD_BOUNDS, scope.signal);
 let streetReported = 0;
+let streetToast: ReturnType<typeof setTimeout> | undefined;
+scope.own(() => clearTimeout(streetToast));
 function reportStreet(force = false) {
   const now = performance.now();
   if (!embedded || (!force && now - streetReported < 150)) return;
@@ -768,6 +770,20 @@ function enterStreetView(pose: StreetPose) {
   announce(`地点 x ${pose.x.toFixed(1)}、z ${pose.z.toFixed(1)} を表示しています。`);
   reportStreet(true);
 }
+async function copyStreetView() {
+  if (!street.active) return;
+  const page = new URL('index.html', location.href).href;
+  let copied = true;
+  try {
+    await navigator.clipboard.writeText(describeStreetPose(street.pose, page));
+  } catch {
+    copied = false;
+  }
+  ui.patch('toast', {text: copied ? '視点をコピーしました。' : 'コピーできませんでした。ブラウザの権限を確認してください。', tone: copied ? 'good' : 'warn', visible: true});
+  announce(copied ? '視点をコピーしました。' : 'コピーできませんでした。');
+  clearTimeout(streetToast);
+  streetToast = setTimeout(() => ui.patch('toast', {visible: false}), 2500);
+}
 function leaveStreetView() {
   street.stop();
   debugCamera = null;
@@ -782,6 +798,11 @@ addEventListener('message', event => {
   if (pose) enterStreetView(pose);
 }, {signal: scope.signal});
 addEventListener('keydown', event => {
+  if (street.active && event.code === 'KeyC' && !event.repeat && !event.metaKey && !event.ctrlKey) {
+    event.preventDefault();
+    void copyStreetView();
+    return;
+  }
   if (!street.active || !['Escape', 'KeyM'].includes(event.code)) return;
   // Inside the editor the map is the way back; on its own page the street view returns to the menu.
   if (embedded) window.parent.postMessage({type: 'hikone:street-close'}, location.origin);
@@ -1025,7 +1046,7 @@ scope.check();
 const commands: SimulatorCommands = {
   start, explore: startExplore, select: id => {debug.select(id); ui.focus({scenario: selected.id});}, importFile,
   next, retry: retryAction, title: titleAction, menu: leaveToMenu, replayAgain: () => {if (state === 'replay') replay.restart();},
-  setReplayView, exportRecord, replayIncident: index => {const incident = requireExploration().log.incidents[index]; if (incident?.frames) replayIncident(incident);},
+  setReplayView, exportRecord, copyStreetView: () => void copyStreetView(), replayIncident: index => {const incident = requireExploration().log.incidents[index]; if (incident?.frames) replayIncident(incident);},
 };
 return {commands, debug};
 }

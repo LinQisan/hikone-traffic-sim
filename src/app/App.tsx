@@ -29,5 +29,5 @@ export function App() {
     }).catch(fail);
     return () => {cancelled = true; engine?.dispose(); window.removeEventListener('error', onError); window.removeEventListener('unhandledrejection', onRejection);};
   }, [store]);
-  return <main><div id="view" ref={view} role="img" aria-label="彦根・京橋の街の 3D 表示 / 3D view of Hikone Kyobashi"/><LoadingScreen store={store}/><Menu store={store} commands={commands}/><Hud store={store} commands={commands}/><ReplayControls store={store} commands={commands} elementRef={replay}/><Results store={store} commands={commands}/><StreetHelp store={store}/><Presentation store={store} touchRef={touch} fpsRef={fps}/></main>;
+  return <main><div id="view" ref={view} role="img" aria-label="彦根・京橋の街の 3D 表示 / 3D view of Hikone Kyobashi"/><LoadingScreen store={store}/><Menu store={store} commands={commands}/><Hud store={store} commands={commands}/><ReplayControls store={store} commands={commands} elementRef={replay}/><Results store={store} commands={commands}/><StreetHelp store={store} commands={commands}/><Presentation store={store} touchRef={touch} fpsRef={fps}/></main>;
 }

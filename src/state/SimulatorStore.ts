@@ -18,7 +18,7 @@ export interface SimulatorSnapshot {
 export interface SimulatorCommands {
   start(again?: boolean): Promise<void>; explore(): void; select(id: string): void; importFile(file: File): Promise<void>;
   next(): void; retry(): void; title(): void; menu(): void; replayAgain(): void; setReplayView(view: ReplayView): void;
-  exportRecord(): void; replayIncident(index: number): void;
+  exportRecord(): void; replayIncident(index: number): void; copyStreetView(): void;
 }
 function initialSnapshot(): SimulatorSnapshot {return {
     screen: 'loading', loading: {text: 'ページを準備しています… / Getting ready…', progress: 0, done: false, error: null},
