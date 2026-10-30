@@ -13,7 +13,7 @@ const map = read('map.json'), tiles = read('road_tiles.json');
 const ground = new Ground(tiles), obstacles = new Obstacles(read('collision.json'));
 
 test('reviewed town streets carry full vehicle bodies where they remain in the retained corridor', () => {
-  // Side streets outside the event corridors are now the mapped OSM streets (whole-map.md).
+  // Side streets outside the event corridors are now the mapped OSM streets (docs/geography.md).
   for (const street of TOWN_STREETS) {
     const route = street.points.map(([x, z]) => ({x, z})).filter(p => !inEastExtension(p.x, p.z));
     if (route.length < 2) continue;

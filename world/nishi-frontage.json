@@ -3,7 +3,7 @@
   "frame": "geographic-frame.json, existing X/Z metres and heading retained",
   "photos": [
     {
-      "file": "10.29/IMG_0855.HEIC",
+      "file": "IMG_0855.HEIC",
       "xz": [
         -587.2739408540185,
         232.96643393301332
@@ -28,7 +28,7 @@
       "sha256": "2a9134bc0debcc2c4842842f7531f2d6e1c9fc1fa0b02520decfc2c2d1485e08"
     },
     {
-      "file": "10.29/IMG_0856.HEIC",
+      "file": "IMG_0856.HEIC",
       "xz": [
         -569.252094677764,
         243.57140257385936
@@ -53,7 +53,7 @@
       "sha256": "79320e0f41bd5940ae53eab7d5f6261eed3b4191497f91b98e7a39406af2a3f7"
     },
     {
-      "file": "10.29/IMG_0857.HEIC",
+      "file": "IMG_0857.HEIC",
       "xz": [
         -569.252094677764,
         243.57140257385936
@@ -78,7 +78,7 @@
       "sha256": "c8fafa8dc6ad9a39f7edd94b49700cce3d7c2dee80de78b0f6141a860bd19df9"
     },
     {
-      "file": "10.29/IMG_0858.HEIC",
+      "file": "IMG_0858.HEIC",
       "xz": [
         -546.0495491238845,
         245.5996788896158
@@ -103,7 +103,7 @@
       "sha256": "e11d083614ff4c1566058dae0abe13a896a19142fde2662241b53c4adc6cb7f2"
     },
     {
-      "file": "10.29/IMG_0859.HEIC",
+      "file": "IMG_0859.HEIC",
       "xz": [
         -523.2165637945274,
         245.64681314990787
@@ -128,7 +128,7 @@
       "sha256": "25ccecb49a900b230824acf47c4207a117139adf084aa1be648329f27798bfa8"
     },
     {
-      "file": "10.29/IMG_0860.HEIC",
+      "file": "IMG_0860.HEIC",
       "xz": [
         -524.1997406694674,
         247.220225051029
@@ -153,7 +153,7 @@
       "sha256": "39b7a74ac62ee107f7b0e3be8e91cf3d26f004d1a75f0363d934e90b3292d379"
     },
     {
-      "file": "10.29/IMG_0861.HEIC",
+      "file": "IMG_0861.HEIC",
       "xz": [
         -488.1076749318057,
         241.76960760678975

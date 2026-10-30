@@ -1,9 +1,9 @@
 {
   "reviewed": "2026-10-30",
   "source": {
-    "photo": "10.29/IMG_0848.HEIC",
+    "photo": "IMG_0848.HEIC",
     "photoSha256": "feaa552147f04ba176d796741bd669e5bf7528a49154e5a570e1265e6a0f8a1a",
-    "supportingPhoto": "10.29/IMG_0849.HEIC",
+    "supportingPhoto": "IMG_0849.HEIC",
     "osm": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2468,35.2712,136.2534,35.2777",
     "osmSha256": "cf1f05c9c0ea4a0e8a3d4a3adb366acd411a69246fd8b31e48d110ae73f4689d",
     "license": "OpenStreetMap contributors, ODbL-1.0; GSI elevation API (PDL-1.0), processed into an estimated relative profile; source: https://maps.gsi.go.jp/development/elevation_s.html; terms: https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html"

@@ -1,4 +1,4 @@
-// Optional macOS survey helper: swift tools/read_photo_metadata.swift 10.29 /tmp/photo-metadata
+// Optional macOS survey helper: swift tools/read_photo_metadata.swift field-photos/2026-10-29/<area> /tmp/photo-metadata
 // Uses ImageIO only. Originals remain unchanged; model building never invokes this tool.
 import Foundation
 import ImageIO

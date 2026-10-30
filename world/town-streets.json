@@ -1,5 +1,5 @@
 {
-  "reference": "../docs/geography-audit.md",
+  "reference": "../docs/geography.md",
   "attribution": "Road observations: Geospatial Information Authority of Japan. Connectivity and approximate positions: © OpenStreetMap contributors.",
   "license": "https://opendatacommons.org/licenses/odbl/1-0/",
   "sources": ["https://maps.gsi.go.jp/development/ichiran.html", "https://www.openstreetmap.org/copyright"],

@@ -34,7 +34,7 @@ test('houses, storehouses and walls of the town are solid at body height', () =>
   const solid = layout.items.filter(i => /^HK_(Machiya|Kura)/.test(i.a) && inside(i.p));
   // a building's origin is on its street front: it is solid within a step of it
   for (const item of solid) assert.ok(town.blocked(item.p[0], item.p[2], 1), `${item.a} at ${item.p[0]}, ${item.p[2]}`);
-  // The town's blocks are the mapped footprints now (whole-map.md); each is solid inside.
+  // The town's blocks are the mapped footprints now (docs/geography.md); each is solid inside.
   const mapped = JSON.parse(fs.readFileSync(new URL('../world/east-hikone.json', import.meta.url))).buildings;
   let checked = 0;
   for (const b of mapped) for (const t of b.solidTriangles ?? []) {

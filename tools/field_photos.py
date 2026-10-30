@@ -1,4 +1,4 @@
-"""Static details matched to the 78 owner photographs in 10.29/.
+"""Static details matched to the 78 owner photographs in field-photos/.
 
 world/field-observations.json owns the reviewed OSM registration and explicit photo
 estimates. Original source footprints remain frozen. No photograph, transient person,

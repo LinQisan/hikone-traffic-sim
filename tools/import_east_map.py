@@ -1,7 +1,7 @@
 """Import an OSM snapshot into the existing local frame and a clipped, disjoint surface plan.
 
 Optional offline author dependency: Python 3 with Shapely >= 2.1. Neither Blender authors nor
-browser startup need Shapely or network access. See docs/east-extension.md for provenance.
+browser startup need Shapely or network access. See docs/geography.md for provenance.
 """
 import argparse
 import hashlib

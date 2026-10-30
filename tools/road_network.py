@@ -1041,7 +1041,7 @@ def export_plan(markings=()):
         water_walls.append(dict(name='Inner moat ' + str(i), polygon=[round(v, 5) for point in p for v in point]))
     meta.update(world=WORLD, imageWidth=(WORLD['xMax'] - WORLD['xMin']) * ppm,
                 imageHeight=(WORLD['zMax'] - WORLD['zMin']) * ppm, pixelsPerMeter=ppm,
-                exportedFrom='tools/road_network.py; local visual plan, town streets reviewed against GSI aerials and OSM; see docs/geography-audit.md',
+                exportedFrom='tools/road_network.py; local visual plan, town streets reviewed against GSI aerials and OSM; see docs/geography.md',
                 surfaces=[dict(kind=surface_kind(name),
                                triangles=[v for t in ts for i, v in enumerate(t) if i % 3 != 1])
                           for name, ts in groups.items()],

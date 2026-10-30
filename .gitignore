@@ -5,3 +5,6 @@ models/packed/
 *.log
 __pycache__/
 *.pyc
+
+# Field photographs carry GPS: local reference only, never uploaded.
+field-photos/

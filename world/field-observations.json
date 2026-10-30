@@ -1,7 +1,7 @@
 {
   "version": 1,
   "date": "2026-10-29",
-  "basis": "Owner photographs in 10.29, with OSM footprint registration. All untaged dimensions are photo estimates.",
+  "basis": "Owner photographs of 2026-10-29, with OSM footprint registration. All untaged dimensions are photo estimates.",
   "source": {
     "url": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2468,35.2701,136.2577,35.2773",
     "sha256": "dc747618915e00132bc664fd73b43d9a8568df5e7d5e654a00a3f3c98cd64f1b",

@@ -47,7 +47,7 @@ test('every scene and vehicle asset has self-contained pigment geometry', () => 
     }
   }
   const bytes = Object.values(manifest.models).reduce((sum, m) => sum + m.bytes, 0);
-  // Raised from 80 for the school island's mapped buildings and courts (docs/higashi-island.md).
+  // Raised from 80 for the school island's mapped buildings and courts (docs/field-survey.md).
   assert.ok(bytes < 81 * 1024 * 1024, 'distant ground must not inflate the art set past 81 MiB');
 });
 

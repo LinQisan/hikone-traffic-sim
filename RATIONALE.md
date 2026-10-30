@@ -107,7 +107,7 @@ not a required event: waiting, crossing time, driver reaction and visibility can
 - Editor playback uses the same traffic controller with a fixed seed, without a moving participant
   or scene occlusion. Its free-road timing hints are approximate; Unity ignores browser driver settings.
 - Route checks sample the authored line, the editor's car rectangle and all runtime body sizes along the full route. Only the bounded parking exits in 07/08 may cross the pavement; vehicles on bends must keep their complete bodies on the carriageway.
-- Cars turn like cars: corners become arcs, both axles follow the path, the front wheels steer before the body turns. Before rounding, the browser removes polyline deviations of at most 30 cm from its computed path, keeping the source control points and endpoints unchanged; tiny lane corrections must not become full-lock turns. The [event review](docs/event-review.md) records the route and timing checks.
+- Cars turn like cars: corners become arcs, both axles follow the path, the front wheels steer before the body turns. Before rounding, the browser removes polyline deviations of at most 30 cm from its computed path, keeping the source control points and endpoints unchanged; tiny lane corrections must not become full-lock turns. The [event review](docs/reviews.md) records the route and timing checks.
 
 ## The body
 

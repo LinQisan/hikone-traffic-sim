@@ -184,7 +184,7 @@ export const UNIVERSITY_NEIGHBORS = [
   [[330,356],[397,405],[353,466],[286,417]],
 ].map((p,i)=>building('frontage-'+i,'Campus street frontage',westGateView(p),
   i===5?5.7:5.2,'tile',1.4)).filter(item=>{
-  // Mapped footprints replace these placeholders outside the retained campus (whole-map.md).
+  // Mapped footprints replace these placeholders outside the retained campus (docs/geography.md).
   const [x,z]=item.footprint.reduce(([sx,sz],[px,pz])=>[sx+px/4,sz+pz/4],[0,0]);
   return !inEastExtension(x,z);
 });
