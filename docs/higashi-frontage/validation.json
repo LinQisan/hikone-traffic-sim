@@ -1,0 +1,243 @@
+{
+  "checks": {
+    "npmRunCheck": {
+      "tests": 318,
+      "passed": 318,
+      "failed": 0,
+      "skipped": 0
+    },
+    "vehicleRoutes": {
+      "checked": 46,
+      "failed": 0
+    },
+    "focused": {
+      "tests": 23,
+      "passed": 23
+    }
+  },
+  "browser": {
+    "traversals": [
+      {
+        "mode": "walking",
+        "name": "branch",
+        "frames": 1418,
+        "end": [
+          9.059121966856603,
+          160.02673784847212
+        ],
+        "ground": 0.010000000000000002
+      },
+      {
+        "mode": "walking",
+        "name": "schoolRoad",
+        "frames": 914,
+        "end": [
+          17.397451183995756,
+          206.51354895847527
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "moatRoad",
+        "frames": 2090,
+        "end": [
+          18.498165748854603,
+          215.14667831031528
+        ],
+        "ground": 0.009999999999999998
+      },
+      {
+        "mode": "walking",
+        "name": "gate",
+        "frames": 1211,
+        "end": [
+          52.32836282100942,
+          146.9656702240237
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "parking",
+        "frames": 507,
+        "end": [
+          -12.471303658590276,
+          181.68167670016615
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "rearCourt",
+        "frames": 920,
+        "end": [
+          92.79539115936633,
+          176.46403013370724
+        ],
+        "ground": 0.15
+      },
+      {
+        "mode": "bicycle",
+        "name": "branch",
+        "frames": 1447,
+        "end": [
+          9.08597006315722,
+          160.0176618857091
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "schoolRoad",
+        "frames": 943,
+        "end": [
+          17.402259823098593,
+          206.5410483633376
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "moatRoad",
+        "frames": 2119,
+        "end": [
+          18.456992248546506,
+          215.1945389182109
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "gate",
+        "frames": 1242,
+        "end": [
+          52.39172054562678,
+          147.00194058307994
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "parking",
+        "frames": 538,
+        "end": [
+          -12.51807885596877,
+          181.7442537974631
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "rearCourt",
+        "frames": 948,
+        "end": [
+          92.72727308914767,
+          176.4687876451841
+        ],
+        "ground": 0.15
+      }
+    ],
+    "events": [
+      {
+        "id": "builtin-01",
+        "keyboardLook": true,
+        "moved": {
+          "x": 39.80036715632353,
+          "z": 15.068226139967603
+        },
+        "participantReplay": true,
+        "replayEnded": true,
+        "resultsAndMenu": true
+      },
+      {
+        "id": "builtin-07",
+        "keyboardLook": true,
+        "moved": {
+          "x": -68.80295894900361,
+          "z": 22.774565259531308
+        },
+        "participantReplay": true,
+        "replayEnded": true,
+        "resultsAndMenu": true
+      }
+    ],
+    "editor": {
+      "viewport": 390,
+      "width": 390,
+      "coordinateX": 18.2,
+      "coordinateZ": 169.7
+    },
+    "errors": []
+  },
+  "production": {
+    "viewport": 390,
+    "width": 390,
+    "state": "title",
+    "heights": [
+      {
+        "x": -23,
+        "z": 168.5,
+        "height": 0.009999999999999998
+      },
+      {
+        "x": 14.4,
+        "z": 169.1,
+        "height": 0.01
+      },
+      {
+        "x": -12,
+        "z": 182,
+        "height": 0.009999999999999998
+      },
+      {
+        "x": 16,
+        "z": 200,
+        "height": 0.01
+      }
+    ],
+    "errors": [],
+    "failed": [],
+    "glbRequests": [],
+    "realPhone": false
+  },
+  "preservation": {
+    "originalPhotosUnchanged": 86,
+    "geographicFrameUnchanged": true,
+    "encounterManifestUnchanged": true,
+    "simulationSourceUnchanged": true,
+    "universityStreetPathKerbGroupsUnchanged": true
+  },
+  "changedStartingFiles": [
+    "src/three/scene/world.js",
+    "src/world/generators/castle-approach.js",
+    "src/world/generators/road-layout.js",
+    "tools/road_network.py",
+    "tools/east_extension.py",
+    "tools/castle_approach.py",
+    "models/ART_KyobashiLand.lod.json",
+    "models/runtime.json",
+    "models/ART_KyobashiBanks.json",
+    "models/ART_CastleApproach.json",
+    "models/ART_KyobashiRoads.json",
+    "models/ART_KyobashiBanks.lod.json",
+    "models/ART_CastleApproach.lod.json",
+    "models/ART_KyobashiRoads.lod.json",
+    "models/ART_KyobashiLand.json",
+    "data/map-detail.png",
+    "data/road_tiles.json",
+    "data/map.png",
+    "data/collision.json",
+    "data/map.json",
+    "data/models/impressionist/ART_KyobashiBanks.glb",
+    "data/models/impressionist/ART_KyobashiBanks.lod.glb",
+    "data/models/impressionist/ART_CastleApproach.glb",
+    "data/models/impressionist/ART_KyobashiLand.lod.glb",
+    "data/models/impressionist/ART_CastleApproach.lod.glb",
+    "data/models/impressionist/ART_KyobashiRoads.glb",
+    "data/models/impressionist/manifest.json",
+    "data/models/impressionist/ART_KyobashiLand.glb",
+    "data/models/impressionist/ART_KyobashiRoads.lod.glb",
+    "docs/art-and-performance.md"
+  ]
+}

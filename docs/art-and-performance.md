@@ -2,6 +2,35 @@
 
 How the web-authored models are built and checked, and what the scene costs to render. Why: [../RATIONALE.md](../RATIONALE.md). Raw benchmark samples: [performance/](performance/).
 
+The [29 October 2026 geographic audit](geography-audit.md) records the accessible GSI/OSM evidence,
+its age and accuracy limits, and the local town-road/crossing corrections. It supersedes the
+historical southern-road drift and east-alley placements described below. `world/town-streets.json`
+is the shared source for those corrections; the audit gives the ordered regeneration commands.
+
+The [eastern extension](east-extension.md) adds the requested X=200–400, Z=0–600 m area from
+frozen OSM features, using the same geographic registration and native model pipeline. That
+report owns the extent, source licensing, clipping/rebuild commands, rendering comparison and
+limits on building heights, street widths, signal controls and surveyed terrain.
+The [north-district correction](north-correction.md) continues the same source partition through
+X=0–200, Z=400–600, with local castle-road and pedestrian-graph connections. It records the
+current combined snapshot and supersedes the older approximate Sawaguchi volume there.
+The [whole-map coverage](whole-map.md) extends that partition to everything outside the retained
+authored core, with estimated building heights and roofs; it owns the current coverage rule.
+
+The [October field-photo refinement](field-photo-modeling.md) records all 78 supplied GPS-tagged
+photographs, source/profile registration, locally corrected school geometry, native facades and
+furniture, and the retained-core shore mismatch. It owns the photo index, uncertainty register,
+generation commands and rendering comparison. OSM source positions and estimated visual
+dimensions remain distinct; registered core benches are explicitly not survey control points.
+
+The [painted-reference university gate](university-gate-painting.md) refines the existing campus
+asset with readable mesh lettering, illustrated panels and static climbing foliage. It records
+the local visibility fix and final rendering comparison without changing global paint shaders.
+
+The [IMG_0848 middle-moat repair](school-moat-photo-0848.md) adds the photographed raised stone
+bank and utility furniture, shares its soil triangles with Ground, and removes an incorrect
+retaining face across the water partition. It owns the source-height/datum limits and checks.
+
 ## Native three.js runtime
 
 The current runtime uses `src/models.js`, `src/model-builder.js` and `src/model-vegetation.js`.
@@ -700,3 +729,15 @@ Each implementation step passed its focused checks before the next. Final **`npm
 ## React and TypeScript migration (2026-10-26)
 
 Current source locations, baseline fingerprints, rendering comparisons and lifecycle checks are recorded in [the migration record](react-typescript-migration.md). Earlier sections retain the paths and measurements used at their original checkpoints. The migration moves source modules without regenerating native recipes, scene placements, events or collision data. Rendering algorithms, quality defaults and simulation parameters are preserved.
+
+## University gate photo refinement (2026-10-29)
+
+The [Nishi school frontage record](nishi-frontage-0855-0857.md) covers the later local correction
+of the brown school gate, stone corner, vegetation, crossing and roadside utilities from
+owner photos 0855–0861, with the original road and school footprints preserved.
+
+The later [Higashi/Otemae frontage record](higashi-frontage-0864-0866.md) covers the separate
+high-school gate, central parking triangle and local three-road connection reconstructed from
+owner photos 0864–0866, OSM outlines and GSI aerial photography.
+
+The eight owner-supplied HEIC photographs guide a local refinement of the existing campus composite and three mapped alley facades. [The photo modeling record](university-photo-modeling.md) is the current source for observations, OSM corner registration, geometry authors, reproduction commands, comparison images, validation and rendering cost. It distinguishes visually observed architecture from estimated dimensions and uncertain house correspondence. The originals remain untouched and no photograph is used as a scene texture. Existing practice routes and simulation parameters are preserved.

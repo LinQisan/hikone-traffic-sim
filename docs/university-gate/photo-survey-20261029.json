@@ -1,0 +1,164 @@
+{
+  "reviewed": "2026-10-29",
+  "basis": "Owner supplied HEIC photographs inspected at 1600px, EXIF from Apple ImageIO; files remain untouched.",
+  "photos": [
+    {
+      "altitudeAboveSeaLevelMetres": 89.6145336963921,
+      "capturedLocal": "2026:10:29 16:01:04",
+      "file": "IMG_0847.HEIC",
+      "headingTrueDegrees": 103.94961921499707,
+      "horizontalErrorMetres": 26.88806324110672,
+      "lat": 35.27652,
+      "lon": 136.246825,
+      "timeZone": "+09:00",
+      "sha256": "04fcb0423ea59a47b3fce34619e9dee9856c2060e3a7ced8842a88a9011be3f8",
+      "mapGps": [
+        -654.8901322162584,
+        160.52393608933562
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 90.49031396125585,
+      "capturedLocal": "2026:10:29 16:01:38",
+      "file": "IMG_0848.HEIC",
+      "headingTrueDegrees": 89.4483032347688,
+      "horizontalErrorMetres": 6.817462221156153,
+      "lat": 35.27615333333333,
+      "lon": 136.24719166666668,
+      "timeZone": "+09:00",
+      "sha256": "feaa552147f04ba176d796741bd669e5bf7528a49154e5a570e1265e6a0f8a1a",
+      "mapGps": [
+        -604.9999765818312,
+        143.56784735804473
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 89.93636092022707,
+      "capturedLocal": "2026:10:29 16:01:52",
+      "file": "IMG_0849.HEIC",
+      "headingTrueDegrees": 53.114166264672775,
+      "horizontalErrorMetres": 5.291205000202931,
+      "lat": 35.27614666666667,
+      "lon": 136.24728333333334,
+      "timeZone": "+09:00",
+      "sha256": "69d92e6c41f5d0ea8c523032801bc341c10d6422f799bbef9b47f53c515a1b19",
+      "mapGps": [
+        -597.541639735924,
+        147.35322587053042
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 90.58952431854622,
+      "capturedLocal": "2026:10:29 16:02:19",
+      "file": "IMG_0850.HEIC",
+      "headingTrueDegrees": 72.77212522576761,
+      "horizontalErrorMetres": 4.9595265036121505,
+      "lat": 35.276245,
+      "lon": 136.24748333333332,
+      "timeZone": "+09:00",
+      "sha256": "d83341f2fa2e311b88623baa706e20fd5932bfb74d094b6ca4740ab7c79ba450",
+      "mapGps": [
+        -587.9276936346823,
+        166.26852322661637
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 90.11510353227771,
+      "capturedLocal": "2026:10:29 16:02:24",
+      "file": "IMG_0851.HEIC",
+      "headingTrueDegrees": 172.4420166015625,
+      "horizontalErrorMetres": 4.706083170472256,
+      "lat": 35.27625333333334,
+      "lon": 136.24748333333332,
+      "timeZone": "+09:00",
+      "sha256": "a248e7b9f73529ea2df4795efa1fd1295562b87c897e07fcb39442fdb9a6610e",
+      "mapGps": [
+        -588.4192820721523,
+        167.05522917717695
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 90.10362836723475,
+      "capturedLocal": "2026:10:29 16:02:33",
+      "file": "IMG_0852.HEIC",
+      "headingTrueDegrees": 5.02593994140625,
+      "horizontalErrorMetres": 4.843041871921182,
+      "lat": 35.27626333333333,
+      "lon": 136.24749666666668,
+      "timeZone": "+09:00",
+      "sha256": "e1234450332e35943a87ba77abb8575d0303fc08b193158150ca40259f3c60f1",
+      "mapGps": [
+        -587.9815422174183,
+        168.64142079461607
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 90.10362836723475,
+      "capturedLocal": "2026:10:29 16:02:35",
+      "file": "IMG_0853.HEIC",
+      "headingTrueDegrees": 339.7097777777778,
+      "horizontalErrorMetres": 4.658470660040108,
+      "lat": 35.27626333333333,
+      "lon": 136.24749666666668,
+      "timeZone": "+09:00",
+      "sha256": "533e1bf1542b1a6457c9bfe2d73c00b113d988db1bebf1f725782482437f0f14",
+      "mapGps": [
+        -587.9815422174183,
+        168.64142079461607
+      ]
+    },
+    {
+      "altitudeAboveSeaLevelMetres": 90.46147919876734,
+      "capturedLocal": "2026:10:29 16:02:58",
+      "file": "IMG_0854.HEIC",
+      "headingTrueDegrees": 293.70146180770024,
+      "horizontalErrorMetres": 4.362151350150016,
+      "lat": 35.27642,
+      "lon": 136.24762,
+      "timeZone": "+09:00",
+      "sha256": "d6324e9e10f0c7bcac133a9d11e00e07d419dd9ce46a3bc10b1674c1317dbc5b",
+      "mapGps": [
+        -587.7176795482358,
+        189.371329068433
+      ]
+    }
+  ],
+  "limitations": [
+    "EXIF GPS horizontal errors are approximately 4.4–26.9m, not surveyed control points.",
+    "EXIF altitude is above sea level and is never used as local model height.",
+    "Photo-relative furniture, facade, temporary office and tree dimensions are estimates.",
+    "No photos, people, private notices or imagery textures are shipped in scene assets."
+  ],
+  "sources": [
+    {
+      "url": "https://api.openstreetmap.org/api/0.6/way/380034661/full",
+      "use": "Existing auditorium footprint checked.",
+      "downloadSha256": "61323cb6dffadfd3453fa36d17f33de58f3678f451a41b3f86eebb65278d8339",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "url": "https://api.openstreetmap.org/api/0.6/way/180830880/full",
+      "use": "Three campus shoreline corner nodes and campus enclosure; unchanged farther aerial outline.",
+      "downloadSha256": "d8802f9c5ef4493dccadc0f321d8daf6041a112856840242d33da2d38d1b9df6",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "url": "https://api.openstreetmap.org/api/0.6/way/1409173495/full",
+      "use": "Gatekeeper footprint review; retained envelope.",
+      "downloadSha256": "f8a7ed2e2eb8256c525a268d79fbc020c2b820fc5d7d7d1b7339d0d4c24045b3",
+      "retrieved": "2026-10-29"
+    },
+    {
+      "url": "https://www.shiga-u.ac.jp/information/campus-access/campusmap/",
+      "use": "Building identity, official front photograph and campus layout."
+    }
+  ],
+  "alleyFacadeCorrespondence": {
+    "basis": "Estimated sequence along the north side of the mapped lane; house addresses and precise heights unconfirmed.",
+    "osmIds": [
+      "way/1409173491",
+      "way/1409173492",
+      "way/1409173493"
+    ]
+  }
+}

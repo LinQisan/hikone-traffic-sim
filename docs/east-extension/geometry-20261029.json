@@ -1,0 +1,24 @@
+{
+  "coverageAreaM2": 169360.0,
+  "partitionAreaM2": 169360.00032533423,
+  "uncoveredAreaM2": 0.0011540397221137338,
+  "pairwiseOverlapAreaM2": {
+    "road/walk": 0.00013490928391938692,
+    "road/water": 0.0,
+    "road/grass": 8.226969445687684e-06,
+    "road/land": 0.001330127523683829,
+    "walk/water": 0.0,
+    "walk/grass": 0.0,
+    "walk/land": 0.0,
+    "water/grass": 0.0,
+    "water/land": 6.1101475595541285e-06,
+    "grass/land": 0.0
+  },
+  "carriagewayBuildingOverlapM2": 2.3510400471110622e-05,
+  "roadCentrelineBuildingIntersections": [],
+  "inheritedBankSeams": {
+    "maxLandSeamDifferenceMetres": 0.14,
+    "samplesAbove4cm": 22
+  },
+  "bankNote": "Inherits the existing bank profile; remaining 0.14 m plot/footway margins follow the existing height convention. No surveyed DEM was used."
+}

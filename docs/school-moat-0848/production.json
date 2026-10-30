@@ -1,0 +1,14 @@
+{
+  "build": "production preview",
+  "layout": {
+    "viewport": 390,
+    "width": 390,
+    "canvas": true
+  },
+  "heights": {
+    "crest": 3.665520359114579,
+    "inner": 0.15000001
+  },
+  "errors": [],
+  "realPhoneTested": false
+}

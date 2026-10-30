@@ -1,0 +1,74 @@
+{
+  "dateJST": "2026-10-30",
+  "reference": {
+    "ownerSuppliedIllustration": "codex-clipboard-b6a290ea-4c85-4b03-8f94-c6b4e3150fad.png",
+    "sha256": "f65add3687a7fa9907c2f06bdc4797a72a1e6c63508da41163d035c8f0d59057",
+    "photogrammetricDimensions": false
+  },
+  "checks": {
+    "npm run check": {
+      "exitCode": 0,
+      "tests": 310,
+      "passed": 310,
+      "failed": 0,
+      "skipped": 0,
+      "typecheck": true,
+      "docs": true,
+      "productionBuild": true
+    },
+    "git diff --check": {
+      "exitCode": 0
+    },
+    "modelGeneration": {
+      "asset": "ART_ShigaCampus",
+      "highAndLow": true,
+      "collisionRegenerated": true,
+      "atlasRegenerated": true
+    }
+  },
+  "browser": {
+    "walkingCyclingGateAndLane": true,
+    "keyboardReplayResultsMenuSmoke": true,
+    "consoleAndPageErrors": 0,
+    "productionPreview": "production.json",
+    "realPhoneOrVRTested": false
+  },
+  "preservation": {
+    "startingFiles": 849,
+    "changedExistingFiles": [
+      "README.md",
+      "data/collision.json",
+      "data/map-detail.png",
+      "data/map.json",
+      "data/map.png",
+      "data/models/impressionist/ART_ShigaCampus.glb",
+      "data/models/impressionist/ART_ShigaCampus.lod.glb",
+      "data/models/impressionist/manifest.json",
+      "docs/art-and-performance.md",
+      "docs/university-photo-modeling.md",
+      "models/ART_ShigaCampus.json",
+      "models/ART_ShigaCampus.lod.json",
+      "models/runtime.json",
+      "test/university-photos.test.mjs",
+      "tools/university.py",
+      "tools/university_photos.py"
+    ],
+    "missingFiles": [],
+    "unexpectedChanges": [],
+    "geographicFrameRoadAndWaterGeometryScenariosAndUnrelatedStartingChangesPreserved": true,
+    "unchangedOriginalPhotographs": 86
+  },
+  "generatedOutputHashes": {
+    "data/collision.json": "fe6b2aea774d3bee6f2d5a70fc13ad2bd24348aae7c29713f1d68e6bf2aab35a",
+    "data/map-detail.png": "4c864768ea9611c4654e90f08d73d21ae361787dbbf00e531acf97da3edb637d",
+    "data/map.json": "a5702660b0cb63f2c810d3d0782d27caf369e6c07189fb63c1e4d4c504b60d9b",
+    "data/map.png": "881420e98b6281f04e6489a47660ffbff8739f3247cfab696d8e5d47300b68e2",
+    "data/models/impressionist/ART_ShigaCampus.glb": "c14d237f92ea3ef08bc21df0be0035ed07d187a09839d9ff080fcd4270ba4224",
+    "data/models/impressionist/ART_ShigaCampus.lod.glb": "c84e668dfed73b9155500bc9a6e3b84620e45b7e0127be6ff816b76329db3b6c",
+    "data/models/impressionist/manifest.json": "ccb2d0380716f6a89f7df051c9952ddef28de5542c1fe5e927129f1336985581",
+    "models/ART_ShigaCampus.json": "9910b2d3837675b2b5716476180eeb01074949165e5ea719a256365a34918cb1",
+    "models/ART_ShigaCampus.lod.json": "7814e0bfd0c7dc02b2bb5358186d76e5362873f4d1a6933338c9e9ea5f96b869",
+    "models/runtime.json": "46982e31d14ecfbe93447d3c6115cb0b445cd4b5b9be1a8da01fb4b6bc1850ba"
+  },
+  "commitPushOrDeployment": false
+}

@@ -1,0 +1,74 @@
+{
+  "traversals": [
+    {
+      "mode": "walking",
+      "name": "gate",
+      "frames": 909,
+      "end": [
+        -625.7502135039629,
+        176.95247206411057
+      ],
+      "ground": 0.009999999999999998
+    },
+    {
+      "mode": "walking",
+      "name": "alley",
+      "frames": 1814,
+      "end": [
+        -599.5924439889031,
+        141.77547363619396
+      ],
+      "ground": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "gate",
+      "frames": 938,
+      "end": [
+        -625.7780689075586,
+        177.0231310029899
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "alley",
+      "frames": 1843,
+      "end": [
+        -599.5645859733941,
+        141.77366497656195
+      ],
+      "ground": 0.01
+    }
+  ],
+  "events": [
+    {
+      "id": "builtin-01",
+      "keyboardLook": true,
+      "moved": {
+        "x": 39.82381163773044,
+        "z": 15.064558585803761
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "keyboardLook": true,
+      "moved": {
+        "x": -68.82746573100395,
+        "z": 22.774990724496597
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "editor": {
+    "viewport": 390,
+    "width": 390,
+    "coordinateText": true
+  },
+  "errors": []
+}

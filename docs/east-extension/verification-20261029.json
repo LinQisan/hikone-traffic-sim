@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-29",
+  "requested": {
+    "x": [
+      200,
+      400
+    ],
+    "z": [
+      0,
+      600
+    ]
+  },
+  "coverage": [
+    [
+      184,
+      0
+    ],
+    [
+      420,
+      0
+    ],
+    [
+      420,
+      620
+    ],
+    [
+      184,
+      620
+    ],
+    [
+      184,
+      460
+    ],
+    [
+      120,
+      460
+    ],
+    [
+      120,
+      100
+    ],
+    [
+      184,
+      100
+    ]
+  ],
+  "summary": {
+    "roads": 89,
+    "walks": 82,
+    "buildings": 240,
+    "buildingsWithHeight": 3,
+    "waterFeatures": 1,
+    "greenAreas": 9,
+    "mappedTrees": 14,
+    "crossings": 17,
+    "coverageArea": 169360.0,
+    "surfaceArea": 169360.0003677475
+  },
+  "checks": {
+    "dependencyInstall": "npm ci completed before development",
+    "baseline": {
+      "tests": 283,
+      "passed": 283,
+      "failed": 0,
+      "skipped": 0
+    },
+    "npm run check": {
+      "typecheck": true,
+      "generatedDocs": true,
+      "tests": 292,
+      "passed": 292,
+      "failed": 0,
+      "skipped": 0,
+      "productionBuild": true,
+      "warning": "Existing Three.js chunk remains larger than 500 kB; no new dependency added."
+    },
+    "node tools/check_routes.mjs": {
+      "routes": 46,
+      "failed": 0
+    },
+    "git diff --check": true,
+    "nativeAndReferenceGeometry": "All native model parity, clipped ownership and art/collision tests pass. No original asset vertices remain inside the eastern crop.",
+    "bankStitch": "Existing bank profile retained and blended to the town datum before X=200; focused height regression passes. Not a new terrain survey."
+  },
+  "collision": {
+    "objects": 431,
+    "cellMetres": 0.2,
+    "cells": [
+      7400,
+      5125
+    ],
+    "blockedCells": 1221445
+  },
+  "browser": "browser-20261029.json",
+  "production": "production-20261029.json",
+  "geometry": "geometry-20261029.json",
+  "rendering": "rendering-20261029.json",
+  "preservedPreexistingEdits": {
+    "RATIONALE.md": true,
+    "src/components/hud/GameOverlays.tsx": true,
+    "src/simulation/metrics/analysis.ts": true,
+    "src/state/SimulatorStore.ts": true,
+    "src/three/controls/Player.ts": true,
+    "src/three/engine/TrafficEngine.ts": true,
+    "src/three/entities/replay.js": true,
+    "src/types/simulation.ts": true,
+    "style.css": true,
+    "test/controls.test.mjs": true,
+    "test/replay.test.mjs": true,
+    "src/simulation/metrics/replay.ts": true,
+    "src/three/camera/ParticipantReplayCamera.ts": true,
+    "events/builtin-02.json": true,
+    "events/builtin-05.json": true,
+    "tools/streetscape.py": true,
+    "world/town-streets.json": true
+  },
+  "limits": [
+    "OSM footprint positions are source-derived, not a survey. Registration uses the retained local approximation.",
+    "Street widths are estimates constrained by mapped buildings. Exact kerbs, ramps and lane controls remain unverified.",
+    "Three heights use OSM storeys multiplied by an estimated 3 m; 237 unknown heights remain footprint pads.",
+    "GSI aerial capture is September-October 2011; no new Google satellite or Street View inspection succeeded.",
+    "No measured terrain elevations, new signal pole inventory/phase schedule, new accident event or new ambient traffic was added.",
+    "Geometry rounding leaves less than 0.003 square metres of cumulative gaps/overlaps across 169360 square metres; maximum source coordinate quantization is 5 micrometres per axis.",
+    "Desktop and emulated touch checks do not prove real phone, Unity, Quest or deployed-site behavior."
+  ],
+  "files": {
+    "world/geographic-frame.json": "50088555ccfea3339f30b83e607c779f1a9da02052bafb029caf86ae4e5d2d24",
+    "world/east-hikone.json": "999084e2d8f346662067b80e566b593a73f33419c268137c499626a204316428",
+    "world/east-hikone-source.geojson": "915f9290415709fc9559f2ef2edbaf50c9ea6e917b35c45c1a11d2a53114e849",
+    "world/east-hikone-layout.json": "4ad2b5a48cf80c8e22c95090b5a5e8ae1e12d8e7f5cf68eef19c5e4a32135f02",
+    "data/map.json": "87ee9f903ae025e4eebc5468a18a3fa48acbbcecc3353c5a49dca03298ed3399",
+    "data/road_tiles.json": "4acc364e8e31226c77939ce78ac99be26e2156f3a71105032d223092f077b01a",
+    "data/walls.json": "cbdc8d371e1498702ae066183b3d8725e10ad73b8cee21c8c51ee563781c5e2b",
+    "data/collision.json": "b13a824644cd18340a501be1d723e902fff41ca5e3495ebd81bed9bc55f6b310"
+  }
+}

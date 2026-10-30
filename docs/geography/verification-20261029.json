@@ -1,0 +1,249 @@
+{
+  "date": "2026-10-29",
+  "automated": {
+    "command": "npm run check",
+    "tests": 279,
+    "passed": 279,
+    "failed": 0,
+    "skipped": 0,
+    "includes": [
+      "strict typecheck",
+      "generated reference verification",
+      "all event checks",
+      "all regression tests",
+      "production build"
+    ],
+    "routeCheck": {
+      "command": "node tools/check_routes.mjs",
+      "routes": 46,
+      "failed": 0
+    },
+    "targetedEvents": {
+      "command": "node tools/check_events.mjs builtin-02 builtin-05",
+      "events": 2,
+      "result": "Both cautious and lawful-reference traversals reach the goal; initial traffic is hidden/far as reported by the checker."
+    },
+    "newRegressions": [
+      "Generated street/body/collision continuity and removal of the displaced alley",
+      "Flush crossing approaches through both kerbs",
+      "Exported zebra stripes retain their gaps"
+    ],
+    "routeSettings": {
+      "changedEvents": [
+        "builtin-02",
+        "builtin-05"
+      ],
+      "changedRoutePoints": [
+        11,
+        10
+      ],
+      "allNonRouteFieldsIdentical": true,
+      "ordinaryTrafficLifetimeAndCrossingPhase": "Existing unmodified regression passes, including speeds and delays."
+    }
+  },
+  "collision": {
+    "objects": 427,
+    "cellMetres": 0.2,
+    "width": 6300,
+    "height": 5125,
+    "blockedBefore": 338426,
+    "blockedAfter": 329263
+  },
+  "browser": {
+    "flows": [
+      {
+        "id": "builtin-01",
+        "start": {
+          "x": 40,
+          "z": 14,
+          "yaw": 13.435523362319215,
+          "mode": "walking"
+        },
+        "moved": {
+          "x": 39.4072480683474,
+          "z": 15.312343380187542,
+          "yaw": -24.307476636607902
+        },
+        "replayAtEnd": true,
+        "result": "事故が起きました / What happened"
+      },
+      {
+        "id": "builtin-02",
+        "start": {
+          "x": 40,
+          "z": 14,
+          "yaw": 13.435523362319215,
+          "mode": "walking"
+        },
+        "moved": {
+          "x": 39.374048507322215,
+          "z": 15.296836431017617,
+          "yaw": -25.765476635535016
+        },
+        "replayAtEnd": true,
+        "result": "事故が起きました / What happened"
+      },
+      {
+        "id": "builtin-05",
+        "start": {
+          "x": 45.3,
+          "z": 35.4,
+          "yaw": -176.6531813582598,
+          "mode": "walking"
+        },
+        "moved": {
+          "x": 46.138853302453484,
+          "z": 34.229561989269506,
+          "yaw": -215.62918135611403
+        },
+        "replayAtEnd": true,
+        "result": "事故が起きました / What happened"
+      },
+      {
+        "id": "builtin-07",
+        "start": {
+          "x": -68.54,
+          "z": 22.77,
+          "yaw": 270.99461847364057,
+          "mode": "bicycle"
+        },
+        "moved": {
+          "x": -69.0024303151109,
+          "z": 22.778028304081786,
+          "yaw": 233.08061847149486
+        },
+        "replayAtEnd": true,
+        "result": "事故が起きました / What happened"
+      }
+    ],
+    "traversals": [
+      {
+        "mode": "walking",
+        "frames": 10285,
+        "visited": [
+          {
+            "x": 115.98013533793312,
+            "z": -27.38419547592649,
+            "ground": 0.010000000000000002
+          },
+          {
+            "x": 115.9996659132807,
+            "z": -63.38419017810274,
+            "ground": 0.01
+          },
+          {
+            "x": 116.99210418005046,
+            "z": -141.57789239436437,
+            "ground": 0.01
+          },
+          {
+            "x": 33.86792407809631,
+            "z": -138.0267401338828,
+            "ground": 0.01
+          },
+          {
+            "x": -149.3785513009322,
+            "z": -126.63862083518052,
+            "ground": 0.01
+          }
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "frames": 10343,
+        "visited": [
+          {
+            "x": 115.96412486794455,
+            "z": -27.372158465747006,
+            "ground": 0.01
+          },
+          {
+            "x": 116.01574123546027,
+            "z": -63.37140334603327,
+            "ground": 0.01
+          },
+          {
+            "x": 116.97255666091418,
+            "z": -141.56424684122598,
+            "ground": 0.01
+          },
+          {
+            "x": 33.855156392010535,
+            "z": -138.06063890545602,
+            "ground": 0.010000000000000002
+          },
+          {
+            "x": -149.38433083935695,
+            "z": -126.61617371898981,
+            "ground": 0.01
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "text": "国土地理院",
+        "height": 44
+      },
+      {
+        "text": "© OpenStreetMap contributors（ODbL）",
+        "height": 44
+      }
+    ],
+    "editor": {
+      "coordinatePicking": true,
+      "scenarioUnchanged": true,
+      "images": [
+        "http://127.0.0.1:8770/api/map/image?v=b426e5924ab6f051",
+        "http://127.0.0.1:8770/data/map-detail.png?v=b426e5924ab6f051"
+      ],
+      "mobileWidth": 390,
+      "horizontalOverflow": false,
+      "forcedColors": true
+    },
+    "errors": [],
+    "failed": []
+  },
+  "productionBrowser": {
+    "production": true,
+    "viewport": [
+      390,
+      844
+    ],
+    "touch": true,
+    "reducedMotion": true,
+    "credits": [
+      {
+        "text": "国土地理院",
+        "height": 44
+      },
+      {
+        "text": "© OpenStreetMap contributors（ODbL）",
+        "height": 44
+      }
+    ],
+    "editorCoordinates": true,
+    "publicCorrectionDataset": true,
+    "errors": []
+  },
+  "browserMethod": "Desktop headless Chrome. Actual keyboard controls and Player controller; bicycle steering input follows the reviewed street path at 1/60 s. Debug knock supplies contact only for checking replay/results UI; this does not measure accident probability. Mobile viewport/touch emulation is not real hardware.",
+  "rendering": "rendering-20261029.json",
+  "screenshots": [
+    "editor-20261029.jpg",
+    "runtime-south-20261029.jpg"
+  ],
+  "untested": [
+    "Fresh Google satellite/Street View (not accessible)",
+    "On-site survey and current precise dimensions",
+    "Real phone, Unity or Quest",
+    "Hosted deployment"
+  ],
+  "invariants": {
+    "world/hikone.json": "unchanged",
+    "data/layout.json": "unchanged",
+    "src/simulation/": "unchanged",
+    "signalLayoutAndTiming": "unchanged",
+    "unrelatedEightEvents": "unchanged",
+    "commitPushDeployment": false
+  }
+}

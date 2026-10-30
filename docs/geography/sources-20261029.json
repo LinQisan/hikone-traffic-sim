@@ -1,0 +1,299 @@
+{
+  "reviewDate": "2026-10-29",
+  "coverage": "Kyobashi practice rectangle; castle/university registration inspected but not re-surveyed",
+  "imagery": {
+    "source": "Geospatial Information Authority of Japan",
+    "layer": "seamlessphoto",
+    "zoom": 18,
+    "groundMetresPerPixelAtAnchor": 0.4875340283350581,
+    "capturePeriod": "2011-09 to 2011-10",
+    "captureMetadataURL": "https://maps.gsi.go.jp/xyz/seamlessphoto_spec/11/1799/809.geojson",
+    "tiles": [
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230286/103590.jpg",
+        "sha256": "f2d1c077abdcb9dfb5e03b790db825a123a486833da7d241e3e67725af4b7a71"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230286/103591.jpg",
+        "sha256": "f6cf40e41ab478964860398f0ad8615fb3f8b3943fb998fe795ea3cdd45ec169"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230286/103592.jpg",
+        "sha256": "e74fa108fd391fce0acb6a1e9c0af0e861a28e612e563ad24540aee1a919fccb"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230286/103593.jpg",
+        "sha256": "f2009d66473dd747cac470fa68a44d00d98e37d25040bfa27d213cbbee02353d"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230286/103594.jpg",
+        "sha256": "6187d184e742cb5678ab192455952b64938ede14a57e1ca593d6a2b594896954"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230287/103590.jpg",
+        "sha256": "c3c5620f36c6fd5479f40420dde15ac3822fbe99ddbcaf2ab0f62374ad35714c"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230287/103591.jpg",
+        "sha256": "290de5b953b9c2a3b28ce6349c743283957cb9d2ef07fb50d7b71a267dd85ae2"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230287/103592.jpg",
+        "sha256": "bc0c5fe8b151fed218f1c38c04ce79c31297547f74775e573b3a5998877b6263"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230287/103593.jpg",
+        "sha256": "64a4d180d1fd0704006760041b4d5ee64dbb45a87be403d767dab6b9e9842b5b"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230287/103594.jpg",
+        "sha256": "daada1ee2339b73235289a3b7712d86979f26379255c7061766593cf08106f39"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230288/103590.jpg",
+        "sha256": "40045009ad3f1bad7f244da7acf02b508cb9fba91d61b9f0d3e6e461c0b41238"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230288/103591.jpg",
+        "sha256": "66370dd0a727a44e8e7c49480083be9e948155cf984d89e127770f575ed75bea"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230288/103592.jpg",
+        "sha256": "610ebf0f99d8d3a5e5e5838c3a8c1e4e334baa7619c44b70a3c32df74c02a33c"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230288/103593.jpg",
+        "sha256": "54d22e1e2981498c1c5249e7e6635c8c17dda55036079ffdfd759581df241f72"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230288/103594.jpg",
+        "sha256": "adca651b6e6bee1cc48b0c17303e1e0efeb636880b2cfca1e0905fd4d7c4f4bb"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230289/103590.jpg",
+        "sha256": "d99cdadb119bd663dd19ae235e1283f17fb7e8f43e743bda425b41b0ae72f94c"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230289/103591.jpg",
+        "sha256": "f61e3fb6554a88255d9f51a493c648849069411ef38d6f8770def36e8a3cf614"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230289/103592.jpg",
+        "sha256": "a77a885843edfb6a8d2f8eca68fe6fe8fa0ae2eb4b6ace9cb7ea99611b6951c6"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230289/103593.jpg",
+        "sha256": "4375e03e83a20805ff635b49d1abeeafda613612eff439e94e76960e582dcdd8"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230289/103594.jpg",
+        "sha256": "0e280dd1ed598ecebb18e1a0d713a8307183f75e1b37945cf3dd9b8848bc3a6a"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230290/103590.jpg",
+        "sha256": "a18d614b1b7d76dce5f3099f989d7726fbed738501aaa3d21681180e0a418e93"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230290/103591.jpg",
+        "sha256": "21feebd7e8a6272de6ca0959eceb6aa2683b5c5f4f3b126c55b68bf8bf9cb197"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230290/103592.jpg",
+        "sha256": "fc750997976ccf1c29a34960f4a539023bdd634fd7302fac044c49cb1ad70eb2"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230290/103593.jpg",
+        "sha256": "c021bbcce303a23ddfff8f3cc00f7207be4cf8847d1904258d263f3f9fc32806"
+      },
+      {
+        "url": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/18/230290/103594.jpg",
+        "sha256": "b04f89a71a0459719e1a4a966bc2b34e56acad83741ad27c1c9833e57f7fe5e1"
+      }
+    ]
+  },
+  "osm": {
+    "downloadURL": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2495,35.2700,136.2550,35.2742",
+    "sha256": "0e2b959e7e35283035afcac1abb5f721f7ac2daa957a8f6c03cefa2d846d0caf",
+    "attribution": "© OpenStreetMap contributors",
+    "license": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "ways": [
+      {
+        "id": "122921566",
+        "version": "9",
+        "timestamp": "2026-01-20T07:44:45Z",
+        "tags": {
+          "highway": "residential",
+          "lanes": "1",
+          "oneway": "no",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "122921949",
+        "version": "7",
+        "timestamp": "2026-01-20T07:44:45Z",
+        "tags": {
+          "highway": "residential",
+          "lanes": "1",
+          "oneway": "no",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "122921963",
+        "version": "2",
+        "timestamp": "2025-04-15T09:38:28Z",
+        "tags": {
+          "highway": "residential",
+          "lanes": "1",
+          "oneway": "no",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "122921965",
+        "version": "3",
+        "timestamp": "2026-02-02T10:23:15Z",
+        "tags": {
+          "highway": "residential",
+          "lanes": "1",
+          "oneway": "no",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "122922003",
+        "version": "4",
+        "timestamp": "2025-04-15T09:38:28Z",
+        "tags": {
+          "highway": "residential",
+          "lanes": "1",
+          "oneway": "no",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "122922017",
+        "version": "4",
+        "timestamp": "2025-11-18T06:41:43Z",
+        "tags": {
+          "highway": "residential",
+          "lanes": "1",
+          "oneway": "no",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "1374090727",
+        "version": "5",
+        "timestamp": "2026-01-20T07:34:18Z",
+        "tags": {
+          "bicycle": "yes",
+          "crossing": "uncontrolled",
+          "crossing:island": "no",
+          "crossing:markings": "zebra",
+          "foot": "yes",
+          "footway": "crossing",
+          "highway": "footway",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "1374090728",
+        "version": "5",
+        "timestamp": "2026-01-20T07:34:18Z",
+        "tags": {
+          "bicycle": "yes",
+          "crossing": "uncontrolled",
+          "crossing:island": "no",
+          "crossing:markings": "zebra",
+          "foot": "yes",
+          "footway": "crossing",
+          "highway": "footway",
+          "surface": "asphalt"
+        }
+      },
+      {
+        "id": "180831396",
+        "version": "17",
+        "timestamp": "2025-12-20T00:10:28Z",
+        "tags": {
+          "highway": "tertiary",
+          "lanes": "2",
+          "maxspeed": "30",
+          "name": "夢京橋キャッスルロード",
+          "name:en": "Yume Kyobashi Castle Road",
+          "name:fr": "Route du château de Yume Kyobashi",
+          "name:ja-Hira": "ゆめ きょうばし きゃっするろーど",
+          "name:ja-Latn": "Yumekyōbashi kyassururōdo",
+          "source": "YahooJapan/ALPSMAP",
+          "surface": "asphalt"
+        }
+      }
+    ],
+    "nodes": [
+      {
+        "id": "443613692",
+        "latitude": 35.2722307,
+        "longitude": 136.2524455,
+        "version": "7",
+        "timestamp": "2025-08-07T11:23:55Z",
+        "tags": {
+          "highway": "traffic_signals",
+          "name": "京橋",
+          "name:ja": "京橋",
+          "name:ja-Latn": "Kyobashi",
+          "phases": "3",
+          "source": "Bing 2010",
+          "traffic_signals": "traffic_lights",
+          "traffic_signals:direction": "both"
+        }
+      },
+      {
+        "id": "12722683977",
+        "latitude": 35.2715033,
+        "longitude": 136.2519,
+        "version": "2",
+        "timestamp": "2026-01-20T07:42:26Z",
+        "tags": {
+          "crossing": "uncontrolled",
+          "crossing:island": "no",
+          "crossing:markings": "zebra",
+          "highway": "crossing",
+          "tactile_paving": "yes"
+        }
+      },
+      {
+        "id": "12722683974",
+        "latitude": 35.270913,
+        "longitude": 136.2514604,
+        "version": "4",
+        "timestamp": "2026-01-20T07:42:26Z",
+        "tags": {
+          "crossing": "uncontrolled",
+          "crossing:island": "no",
+          "crossing:markings": "zebra",
+          "highway": "crossing",
+          "tactile_paving": "yes"
+        }
+      }
+    ]
+  },
+  "registration": {
+    "anchor": {
+      "lat": 35.27246,
+      "lon": 136.2526297,
+      "x": 32,
+      "z": 56.8
+    },
+    "rotationDegrees": 32,
+    "method": "Existing approximate castle-layout.js registration retained. New minor streets fitted locally to the retained junction and first southern intersection; no claim of survey accuracy.",
+    "limits": "Aerial and OSM centre lines differ by several metres near the junction. Road topology is better supported than exact widths, pole locations or facade positions."
+  }
+}

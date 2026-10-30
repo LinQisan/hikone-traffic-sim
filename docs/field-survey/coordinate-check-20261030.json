@@ -1,0 +1,6 @@
+{
+  "checked": 78,
+  "maxLocalConversionErrorMetres": 0,
+  "maxInverseErrorDegrees": 0,
+  "scope": "Numerical transform consistency only; GPS uncertainty and retained-core registration limits remain."
+}

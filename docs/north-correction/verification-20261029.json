@@ -1,0 +1,183 @@
+{
+  "date": "2026-10-29",
+  "requested": {
+    "x": [
+      0,
+      200
+    ],
+    "z": [
+      400,
+      600
+    ]
+  },
+  "connectionCollar": {
+    "x": [
+      -8,
+      70
+    ],
+    "z": [
+      348,
+      400
+    ]
+  },
+  "castleEntryConnection": "Mapped entry continues to about X=-51,Z=343, then joins the retained museum approach.",
+  "combinedCoverage": [
+    [
+      184,
+      0
+    ],
+    [
+      420,
+      0
+    ],
+    [
+      420,
+      620
+    ],
+    [
+      184,
+      620
+    ],
+    [
+      184,
+      600
+    ],
+    [
+      0,
+      600
+    ],
+    [
+      0,
+      400
+    ],
+    [
+      -8,
+      400
+    ],
+    [
+      -8,
+      348
+    ],
+    [
+      70,
+      348
+    ],
+    [
+      70,
+      400
+    ],
+    [
+      120,
+      400
+    ],
+    [
+      120,
+      100
+    ],
+    [
+      184,
+      100
+    ]
+  ],
+  "combinedSourceSummary": {
+    "roads": 100,
+    "walks": 105,
+    "buildings": 261,
+    "buildingsWithHeight": 3,
+    "waterFeatures": 3,
+    "greenAreas": 11,
+    "mappedTrees": 18,
+    "crossings": 19,
+    "coverageArea": 206376.0,
+    "surfaceArea": 206375.99979541995
+  },
+  "selectedAreaSummary": {
+    "requested": {
+      "x": [
+        0,
+        200
+      ],
+      "z": [
+        400,
+        600
+      ]
+    },
+    "roadWays": 9,
+    "footwayWays": 22,
+    "buildingFootprints": 33,
+    "withHeight": 1,
+    "greenAreas": 3,
+    "individualTrees": 4,
+    "markedCrossings": 2
+  },
+  "checks": {
+    "npm ci": true,
+    "startingCheckout": {
+      "tests": 292,
+      "passed": 292,
+      "failed": 0,
+      "skipped": 0
+    },
+    "npm run check": {
+      "types": true,
+      "generatedDocs": true,
+      "tests": 296,
+      "passed": 296,
+      "failed": 0,
+      "skipped": 0,
+      "productionBuild": true
+    },
+    "node tools/check_routes.mjs": {
+      "routes": 46,
+      "failed": 0
+    },
+    "git diff --check": true
+  },
+  "collision": {
+    "objects": 435,
+    "cellMetres": 0.2,
+    "cells": [
+      7400,
+      5125
+    ],
+    "blocked": 1318535
+  },
+  "browser": "browser-20261029.json",
+  "production": "production-20261029.json",
+  "geometry": "geometry-20261029.json",
+  "rendering": "rendering-20261029.json",
+  "references": "references-20261029.json",
+  "preservedOwnerChanges": {
+    "RATIONALE.md": true,
+    "events/builtin-02.json": true,
+    "events/builtin-05.json": true,
+    "src/components/hud/GameOverlays.tsx": true,
+    "src/three/engine/TrafficEngine.ts": true,
+    "src/three/controls/Player.ts": true,
+    "src/three/camera/ParticipantReplayCamera.ts": true,
+    "src/simulation/metrics/replay.ts": true,
+    "src/three/entities/replay.js": true,
+    "src/state/SimulatorStore.ts": true,
+    "style.css": true,
+    "world/town-streets.json": true,
+    "package.json": true,
+    "package-lock.json": true
+  },
+  "limits": [
+    "GSI photograph capture is September-October 2011. Google satellite was viewed, but its capture date is unconfirmed and Street View was not inspected.",
+    "Building outlines and mapped paths use OSM. Heights without source metrics remain footprint markers; tagged storeys use an explicit 3 m/storey estimate.",
+    "Road widths, kerbs, ramps, signal head inventories, timing and surveyed terrain remain unconfirmed. Legacy castle handoffs outside the reviewed paths remain approximate.",
+    "No new accident event, traffic clock changes, real phone/Quest test, commit, push or deployment."
+  ],
+  "files": {
+    "world/geographic-frame.json": "22e6268f6613415918f0bf9639af9534d67a9f9eb93e1d694cda92a084c9a3cf",
+    "world/east-hikone.json": "83716338470e4531e7f019c615c074418ffe08ec15d6a2924250cb61c0b5ebf3",
+    "world/east-hikone-layout.json": "904dbcad30cc0071d399aafcb5c60a5ee812b13773c172174f0bf8102b7bc8e3",
+    "world/east-hikone-source.geojson": "3b6698fd73e84ffb04df1efa2502735b8737acf4bd764aaed6ab3e309e9c817a",
+    "data/map.json": "aa901d2037642330e6f2d9c54329b2ede8bf65d76fead681046206d91d5aca3f",
+    "data/road_tiles.json": "bd19d872c9c254c6f43bc2ddb62969b75b281024b9a9bcde655bdb6e083e4876",
+    "data/walls.json": "5e50901c002dfbfdfa6d091ea67522869aac286d8e0603e0f01095e7dae64ee3",
+    "data/collision.json": "b7ed5d0985b38366d0a554c0fced152c22746efebd722156f89517a3507ca56f",
+    "models/ART_EastHikoneSurface.json": "47f393f30f383d7aae6af2b412ee7968a47abc56dad39aaa62aeabd315bcc3b7"
+  }
+}

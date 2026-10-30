@@ -1,0 +1,22 @@
+{
+  "production": true,
+  "viewport": [
+    390,
+    844
+  ],
+  "touch": true,
+  "reducedMotion": true,
+  "credits": [
+    {
+      "text": "国土地理院",
+      "height": 44
+    },
+    {
+      "text": "© OpenStreetMap contributors（ODbL）",
+      "height": 44
+    }
+  ],
+  "editorCoordinates": true,
+  "publicCorrectionDataset": true,
+  "errors": []
+}

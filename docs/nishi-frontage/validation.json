@@ -1,0 +1,194 @@
+{
+  "checks": {
+    "tests": 321,
+    "passed": 321,
+    "failed": 0,
+    "skipped": 0,
+    "vehicleRoutes": 46
+  },
+  "browser": {
+    "traversals": [
+      {
+        "mode": "walking",
+        "name": "approach",
+        "frames": 1763,
+        "end": [
+          -587.6597908292797,
+          252.41957338860146
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "turn",
+        "frames": 1954,
+        "end": [
+          -527.3020544057512,
+          246.73114807625828
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "gateApron",
+        "frames": 161,
+        "end": [
+          -587.1859973246225,
+          259.4273152900941
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "schoolLane",
+        "frames": 1778,
+        "end": [
+          -527.830091225571,
+          317.67538818664553
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "walking",
+        "name": "lotEntry",
+        "frames": 599,
+        "end": [
+          -485.23267228459196,
+          265.7547923286353
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "approach",
+        "frames": 1792,
+        "end": [
+          -587.7282823629683,
+          252.44111632989316
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "turn",
+        "frames": 2008,
+        "end": [
+          -527.30224937423,
+          246.66597974274944
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "gateApron",
+        "frames": 189,
+        "end": [
+          -587.1867553524111,
+          259.41525575700547
+        ],
+        "ground": 0.01
+      },
+      {
+        "mode": "bicycle",
+        "name": "schoolLane",
+        "frames": 1808,
+        "end": [
+          -527.7534011236037,
+          317.7111163150432
+        ],
+        "ground": 0.009999999999999998
+      },
+      {
+        "mode": "bicycle",
+        "name": "lotEntry",
+        "frames": 628,
+        "end": [
+          -485.28825216629167,
+          265.79909415522775
+        ],
+        "ground": 0.01
+      }
+    ],
+    "events": [
+      {
+        "id": "builtin-01",
+        "keyboardLook": true,
+        "moved": {
+          "x": 39.801900550834034,
+          "z": 15.060943884781642
+        },
+        "participantReplay": true,
+        "replayEnded": true,
+        "resultsAndMenu": true
+      },
+      {
+        "id": "builtin-07",
+        "keyboardLook": true,
+        "moved": {
+          "x": -68.802464948439,
+          "z": 22.774556683132612
+        },
+        "participantReplay": true,
+        "replayEnded": true,
+        "resultsAndMenu": true
+      }
+    ],
+    "editor": {
+      "viewport": 390,
+      "width": 390,
+      "coordinateX": -587,
+      "coordinateZ": 253
+    },
+    "errors": []
+  },
+  "production": {
+    "viewport": 390,
+    "width": 390,
+    "state": "title",
+    "heights": [
+      {
+        "x": -589,
+        "z": 225,
+        "height": 0.01
+      },
+      {
+        "x": -587.5942,
+        "z": 253.00755,
+        "height": 0.009999999999999998
+      },
+      {
+        "x": -560,
+        "z": 250.3833,
+        "height": 0.01
+      }
+    ],
+    "errors": [],
+    "failed": [],
+    "glbRequests": [],
+    "realPhone": false
+  },
+  "preservation": {
+    "changedStartingFiles": [
+      "src/three/camera/camera-obstacles.js",
+      "src/world/generators/east-layout.ts",
+      "tools/university.py",
+      "tools/field_photos.py",
+      "models/runtime.json",
+      "models/ART_WestMoat.json",
+      "models/ART_EastHikoneBuildings.json",
+      "models/ART_WestMoat.lod.json",
+      "models/ART_EastHikoneBuildings.lod.json",
+      "data/map-detail.png",
+      "data/map.png",
+      "data/collision.json",
+      "data/map.json",
+      "data/models/impressionist/ART_EastHikoneBuildings.lod.glb",
+      "data/models/impressionist/ART_WestMoat.glb",
+      "data/models/impressionist/ART_EastHikoneBuildings.glb",
+      "data/models/impressionist/manifest.json",
+      "data/models/impressionist/ART_WestMoat.lod.glb",
+      "docs/art-and-performance.md"
+    ],
+    "unchangedOriginalPhotos": 86
+  }
+}

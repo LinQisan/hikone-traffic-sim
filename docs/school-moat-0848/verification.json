@@ -1,0 +1,114 @@
+{
+  "dateJST": "2026-10-30",
+  "checks": {
+    "npm run check": {
+      "exitCode": 0,
+      "tests": 314,
+      "passed": 314,
+      "failed": 0,
+      "skipped": 0,
+      "strictTypes": true,
+      "generatedDocs": true,
+      "productionBuild": true
+    },
+    "focused bank university and obstacles": {
+      "tests": 38,
+      "passed": 38,
+      "failed": 0
+    },
+    "node tools/check_routes.mjs": {
+      "routes": 46,
+      "failed": 0
+    },
+    "git diff --check": {
+      "exitCode": 0
+    }
+  },
+  "browser": {
+    "development": "browser.json",
+    "production": "production.json",
+    "continuousWalkingCyclingTraversals": 6,
+    "eventReplaySmokeFlows": 2,
+    "pageAndConsoleErrors": 0,
+    "realPhoneOrVRTested": false
+  },
+  "generation": {
+    "assets": [
+      "ART_ShigaCampus",
+      "ART_WestMoat",
+      "ART_EastHikoneBuildings"
+    ],
+    "highAndLowNativeAndGLB": true,
+    "collisionRegenerated": true,
+    "atlasRegenerated": true,
+    "collisionCellMetres": 0.2,
+    "blockedCells": 6586269
+  },
+  "preservation": {
+    "startingFiles": 864,
+    "expectedChangedExistingFiles": [
+      "README.md",
+      "data/collision.json",
+      "data/map-detail.png",
+      "data/map.json",
+      "data/map.png",
+      "data/models/impressionist/ART_EastHikoneBuildings.glb",
+      "data/models/impressionist/ART_EastHikoneBuildings.lod.glb",
+      "data/models/impressionist/ART_ShigaCampus.glb",
+      "data/models/impressionist/ART_ShigaCampus.lod.glb",
+      "data/models/impressionist/ART_WestMoat.glb",
+      "data/models/impressionist/ART_WestMoat.lod.glb",
+      "data/models/impressionist/manifest.json",
+      "data/road_tiles.json",
+      "docs/art-and-performance.md",
+      "models/ART_EastHikoneBuildings.json",
+      "models/ART_EastHikoneBuildings.lod.json",
+      "models/ART_ShigaCampus.json",
+      "models/ART_ShigaCampus.lod.json",
+      "models/ART_WestMoat.json",
+      "models/ART_WestMoat.lod.json",
+      "models/runtime.json",
+      "test/university.test.mjs",
+      "tools/field_photos.py",
+      "tools/university.py",
+      "world/field-observations.json"
+    ],
+    "missingFiles": [],
+    "unexpectedChanges": [],
+    "originalPhotographs": 86,
+    "originalPhotographsUnchanged": true,
+    "exactStreetPathKerbTrianglesUnchanged": [
+      "Shiga University streets",
+      "Shiga University paths",
+      "Shiga University kerbs"
+    ],
+    "frameSourceScenariosSignalsOtherStartingChangesPreserved": true
+  },
+  "outputHashes": {
+    "data/collision.json": "0e7d0b48c5366f83e012cc4dc55609452c1983679cf463f70fdaa2a38f67e129",
+    "data/map-detail.png": "d6077aefa0a40fbdd0b95b1c68f9d6097b180ffee2a4a8159b719263d9afee5c",
+    "data/map.json": "504a292c27cb240813f2c4e1836ab2f3ddca5aab5653eb425f2fe62b6547a760",
+    "data/map.png": "f486918461043d542024ea7a96a4a01db4b642d1c5449a3866bb9e2bb3216d4d",
+    "data/models/impressionist/ART_EastHikoneBuildings.glb": "bea880220c575fcae410cda46ff18a52359179c8a816d30668e23cef49fabf5d",
+    "data/models/impressionist/ART_EastHikoneBuildings.lod.glb": "3307fb5101b9b7201412909ab845b46a38d121a49404e80a4dd67d4e832b4af6",
+    "data/models/impressionist/ART_ShigaCampus.glb": "a34ef7de13fee023c4c072a9997172691ae2b3c1ff0adaf0f0ca77655b2e3335",
+    "data/models/impressionist/ART_ShigaCampus.lod.glb": "7bf365dfee388b1b09b468d4bb707df11418887bb595466eaa19a878288f48cb",
+    "data/models/impressionist/ART_WestMoat.glb": "d84d72b3e430b0e72e8d4ea6b25a239993f4bd5c33286489b11db0eb13a2862f",
+    "data/models/impressionist/ART_WestMoat.lod.glb": "e83705eae40a04bec9868c0f1d8a365a43aaf66f8c4bb2f5f946814035b5b670",
+    "data/models/impressionist/manifest.json": "e06d3381a247b0480aed34396610fb43a79a2bf5f4b73176234a256168ea19cd",
+    "data/road_tiles.json": "19e5b799cfb21040d838e9b4d93a6d9aac1ecdbb12ccb6d2bc359c91a208f41f",
+    "models/ART_EastHikoneBuildings.json": "93e692d1311a1b724be10607a3b2d37616afbb3ee86710cb55e48ee5e761152d",
+    "models/ART_EastHikoneBuildings.lod.json": "0849756f59973c5619f35532e4b2bb05864a3ec0af53f8b3b06758b8ef08576d",
+    "models/ART_ShigaCampus.json": "8dde692f40dde7dec04dc2d6eba2a46d473468055ce13583eea0e4b9242ba5d3",
+    "models/ART_ShigaCampus.lod.json": "c71df69d15cbb54763f55256a2bf2b0648abd045f1ed31733a565936dc8d69fa",
+    "models/ART_WestMoat.json": "f886f713d33e404fa38fec62c338cf64c76225b4a75bf1fb39d4d72fa431274a",
+    "models/ART_WestMoat.lod.json": "5e1a1fca47f7f654738cc734c6a44cdc8b246e3002bb1b5431fb896052fd4e4f",
+    "models/runtime.json": "6df8ed58a06cb3ddcaa52c0db410ceab591772ab2b77ad0a5322135c55b67c29"
+  },
+  "limitations": [
+    "The retained registered shoreline is not replaced with every source wall corner.",
+    "Nominal 5.5 m total stone height uses the retained local water datum; absolute terrain is not a survey.",
+    "Slope widths, pole and cabinet placements and individual wires are photo estimates."
+  ],
+  "commitPushOrDeployment": false
+}

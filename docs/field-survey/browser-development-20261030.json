@@ -1,0 +1,114 @@
+{
+  "traversals": [
+    {
+      "mode": "walking",
+      "name": "school",
+      "frames": 5416,
+      "end": [
+        -418.7934208995432,
+        229.15991538517503
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "shore",
+      "frames": 3096,
+      "end": [
+        166.43518389138717,
+        31.300000000000026
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "east",
+      "frames": 9495,
+      "end": [
+        264.9842169893871,
+        427.2501216229846
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "sawaguchi",
+      "frames": 1622,
+      "end": [
+        23.90276902556549,
+        444.2032075710002
+      ],
+      "ground": 0.010000000000000002
+    },
+    {
+      "mode": "bicycle",
+      "name": "school",
+      "frames": 5471,
+      "end": [
+        -418.7801888458634,
+        229.06500240928156
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "shore",
+      "frames": 3125,
+      "end": [
+        166.4392894919383,
+        31.32591641190074
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "east",
+      "frames": 9529,
+      "end": [
+        264.9346574948168,
+        427.27032781010837
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "sawaguchi",
+      "frames": 1658,
+      "end": [
+        23.938398409377356,
+        444.20242760543925
+      ],
+      "ground": 0.010000000000000002
+    }
+  ],
+  "events": [
+    {
+      "id": "builtin-01",
+      "keyboardLook": true,
+      "moved": {
+        "x": 39.69345362505241,
+        "z": 15.035581633675722
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "keyboardLook": true,
+      "moved": {
+        "x": -68.80225250544909,
+        "z": 22.774552994886275
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "editor": {
+    "viewport": 390,
+    "width": 390,
+    "coordinateText": true
+  },
+  "errors": []
+}

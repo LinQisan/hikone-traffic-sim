@@ -1,0 +1,152 @@
+{
+  "date": "2026-10-29",
+  "task": "Photo-based Shiga University gate and south-alley refinement",
+  "references": "photo-survey-20261029.json",
+  "fullCheck": {
+    "tests": 302,
+    "pass": 302,
+    "fail": 0,
+    "skipped": 0
+  },
+  "fullCheckIncludes": [
+    "strict typecheck",
+    "generated documentation consistency",
+    "all regressions and event-purpose checks",
+    "production build"
+  ],
+  "finalFocusedCheck": {
+    "tests": 78,
+    "pass": 78,
+    "fail": 0,
+    "skip": 0,
+    "files": [
+      "art",
+      "obstacles",
+      "performance",
+      "university",
+      "university-photos"
+    ]
+  },
+  "vehicleRoutes": {
+    "checked": 46,
+    "failed": 0
+  },
+  "collision": {
+    "objects": 1314,
+    "width": 7400,
+    "height": 5125,
+    "cellMetres": 0.2,
+    "blockedCells": 6558883
+  },
+  "modelTriangleCounts": {
+    "ART_ShigaCampus": {
+      "before": {
+        "high": 107711,
+        "low": 52638
+      },
+      "after": {
+        "high": 169532,
+        "low": 61460
+      }
+    },
+    "ART_WestMoat": {
+      "before": {
+        "high": 92789,
+        "low": 70193
+      },
+      "after": {
+        "high": 92894,
+        "low": 70298
+      }
+    },
+    "ART_EastHikoneBuildings": {
+      "before": {
+        "high": 67671,
+        "low": 67671
+      },
+      "after": {
+        "high": 69509,
+        "low": 69509
+      }
+    }
+  },
+  "browserChecks": "browser-20261029.json",
+  "samePageRendering": "rendering-20261029.json",
+  "preservation": {
+    "baselineFiles": 729,
+    "preservedFiles": 704,
+    "changedExistingFiles": [
+      "README.md",
+      "data/collision.json",
+      "data/map-detail.png",
+      "data/map.json",
+      "data/map.png",
+      "data/models/impressionist/ART_EastHikoneBuildings.glb",
+      "data/models/impressionist/ART_EastHikoneBuildings.lod.glb",
+      "data/models/impressionist/ART_ShigaCampus.glb",
+      "data/models/impressionist/ART_ShigaCampus.lod.glb",
+      "data/models/impressionist/ART_WestMoat.glb",
+      "data/models/impressionist/ART_WestMoat.lod.glb",
+      "data/models/impressionist/manifest.json",
+      "data/road_tiles.json",
+      "data/walls.json",
+      "docs/art-and-performance.md",
+      "models/ART_EastHikoneBuildings.json",
+      "models/ART_EastHikoneBuildings.lod.json",
+      "models/ART_ShigaCampus.json",
+      "models/ART_ShigaCampus.lod.json",
+      "models/ART_WestMoat.json",
+      "models/ART_WestMoat.lod.json",
+      "models/runtime.json",
+      "src/world/generators/university-layout.js",
+      "tools/east_extension.py",
+      "tools/university.py"
+    ],
+    "unexpectedChanges": [],
+    "missingFiles": [],
+    "allEightOriginalPhotosUnmodified": true,
+    "geographicFrameUnmodified": true,
+    "eventsAndReplaySourceUnmodified": true
+  },
+  "changedGroundGroups": [
+    "Shiga University paths",
+    "Shiga University grounds"
+  ],
+  "sourceAndOutputSha256": {
+    "world/geographic-frame.json": "7d0ab290e70b24b9c36b912efefc3f3bc0d969260f001b1ff4b0274121f9b051",
+    "world/east-hikone.json": "2bf2e195ac67bb8a0446d6621e4852c746378b4a399e1afa407d2022d3614013",
+    "src/world/generators/university-layout.js": "8aadcae812d707a9afb5197b508b27066093553ffedac333e1b92bbcae02a7be",
+    "tools/university.py": "b2b032c3ff413df22383cec802886ba3aa592ac3a816c2a81f82b0c542ff3eb5",
+    "tools/university_photos.py": "0cca96cbdfbe5b8ba3c99e12881416afd8768f1cc997e644feda6d858946dc74",
+    "tools/east_extension.py": "e1ddcae1656900efdd1570b98610cf263b725798b19aabf512a2d2f864f203f5",
+    "test/university-photos.test.mjs": "e4755f41910e1b1279d4fddc1621bc37637fea88dac3de7bcc64a497a14937a3",
+    "data/collision.json": "2ac46ab1ef9d2ebc6092bb73b73e5829e4ad958f1e92d2f5d4220515102a33ab",
+    "data/road_tiles.json": "3b78b992a77e1ed8976a444eafc629b2f33ad3c39e3db92a47df310d9e52d9f3",
+    "data/walls.json": "af467e3fceecdf84d49ede684b625216aaecfe04f66d48eeafc36e2f3cea6941",
+    "data/map.json": "79f9c65a856af3b00b3b0c91bc1119d5c172625d04fb383e0457c61ae321abed",
+    "data/map.png": "1783a9ee26124a9546c74048a9b8abda46abc2fda4a1316951f43bc50117f90e",
+    "data/map-detail.png": "a6ea83f67b9314a7166827a55d06208a80878174fdfb9faa041114e48c24cd11",
+    "models/runtime.json": "471de40a8b194315e9198ac7d1621f70991dbc42ad502e4d4281733e2f32789a",
+    "models/ART_ShigaCampus.json": "6d92f228d5dc3157d1d662f316abfd5724e3d0f210d34943916265508244a418",
+    "data/models/impressionist/ART_ShigaCampus.glb": "815b6a2e992c7d0059e56cb56c95a011b0442d71d3431565ab82d3eb9d93f990",
+    "models/ART_ShigaCampus.lod.json": "42ca78371c4d9332fd86a601c192b57e7ddfec2cd416b2c24812a0bf2c219ab8",
+    "data/models/impressionist/ART_ShigaCampus.lod.glb": "2c72b01636f40571ece941c6a217cccb26f460493efb079e4faac2639a6eab86",
+    "models/ART_WestMoat.json": "487be45aa8596d7e631442a0b37641a8de0f8b4216e290c938569ac323a771ba",
+    "data/models/impressionist/ART_WestMoat.glb": "dff0072c0ac75beec7b39bb3e3b11c4a0ed05e87aa72554686a46ba45300d2d8",
+    "models/ART_WestMoat.lod.json": "3818a6a1817cf4a8a2de3fda1bbfef34fd350414a4cacaeba5a69907bf2cfc73",
+    "data/models/impressionist/ART_WestMoat.lod.glb": "99ae329071cf60bae4806cd086203e09def6ba312d0e9c7dde5e8eb5fe3e66c4",
+    "models/ART_EastHikoneBuildings.json": "8884407b93a068bbabb6f87779ed3a61cd23e5e73de30cb75b90dffaee965118",
+    "data/models/impressionist/ART_EastHikoneBuildings.glb": "e048c7556bb45115b4f5f2aaa556c579aac62661644d84249714d7c875289216",
+    "models/ART_EastHikoneBuildings.lod.json": "6356878a0228585735322c1315a1e79be8e2da3293d778c956104d4cd88de36c",
+    "data/models/impressionist/ART_EastHikoneBuildings.lod.glb": "2b8635f0a54a0aa8b63d1491723c7f6468eb87ffe93f79346e697ec8b823dcad"
+  },
+  "limitations": [
+    "No calibrated photogrammetry or surveyed heights.",
+    "Photo GPS has 4.36\u201326.89m reported horizontal error.",
+    "Temporary office, furniture, foliage and facade dimensions are estimates.",
+    "Alley facade-to-address correspondence remains uncertain.",
+    "Campus enclosure corner is a shoreline proxy, not a surveyed waterline.",
+    "No real phone or VR headset tested.",
+    "No commit, push or deployment performed."
+  ]
+}

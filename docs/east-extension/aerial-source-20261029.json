@@ -1,0 +1,85 @@
+{
+  "attribution": "Source: Geospatial Information Authority of Japan (GSI). Reprojected and grid-annotated by this project.",
+  "tileTemplate": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
+  "grid": {
+    "z": 18,
+    "x": 230290,
+    "y": 103591,
+    "n": 3
+  },
+  "captureMetadataURL": "https://maps.gsi.go.jp/xyz/seamlessphoto_spec/11/1799/809.geojson",
+  "reviewedPoints": [
+    {
+      "x": 32,
+      "z": 56.8,
+      "lat": 35.27246,
+      "lon": 136.2526297,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 200,
+      "z": 0,
+      "lat": 35.27122755687879,
+      "lon": 136.25386614948405,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 300,
+      "z": 300,
+      "lat": 35.273036957727015,
+      "lon": 136.25654849559388,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 400,
+      "z": 600,
+      "lat": 35.27484635857523,
+      "lon": 136.25923084170373,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    }
+  ],
+  "registration": "../../world/geographic-frame.json",
+  "imageExtent": {
+    "xMin": 160,
+    "xMax": 440,
+    "zMin": -20,
+    "zMax": 640
+  },
+  "note": "Reference imagery only, not a shipped map background. Capture age is not the download date."
+}

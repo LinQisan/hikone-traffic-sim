@@ -1,0 +1,10 @@
+{
+  "build": "production preview",
+  "layout": {
+    "viewport": 390,
+    "width": 390,
+    "canvas": true
+  },
+  "errors": [],
+  "realPhoneTested": false
+}

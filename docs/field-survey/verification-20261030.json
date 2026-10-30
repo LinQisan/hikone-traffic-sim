@@ -1,0 +1,104 @@
+{
+  "reviewDateJST": "2026-10-30",
+  "photographDate": "2026-10-29",
+  "checks": {
+    "npm run check": {
+      "exitCode": 0,
+      "tests": 306,
+      "passed": 306,
+      "failed": 0,
+      "skipped": 0,
+      "productionBuild": true
+    },
+    "node tools/check_routes.mjs": {
+      "exitCode": 0,
+      "routes": 46,
+      "failed": 0
+    },
+    "node --test test/field-photos.test.mjs": {
+      "exitCode": 0,
+      "passed": 4,
+      "failed": 0
+    },
+    "git diff --check": {
+      "exitCode": 0
+    }
+  },
+  "browser": {
+    "development": "browser-development-20261030.json",
+    "production": "browser-production-20261030.json",
+    "walkingCyclingTraversalsPerBuild": 8,
+    "eventReplaySmokeFlowsPerBuild": 2,
+    "consoleAndPageErrors": 0,
+    "phoneWidthEditorEmulation": 390,
+    "realPhoneOrVRTested": false
+  },
+  "preservation": {
+    "baselineExistingFiles": 821,
+    "missingFiles": [],
+    "changedExistingFiles": [
+      "README.md",
+      "data/collision.json",
+      "data/map-detail.png",
+      "data/map.json",
+      "data/map.png",
+      "data/models/impressionist/ART_CastleApproach.glb",
+      "data/models/impressionist/ART_CastleApproach.lod.glb",
+      "data/models/impressionist/ART_EastHikoneBuildings.glb",
+      "data/models/impressionist/ART_EastHikoneBuildings.lod.glb",
+      "data/models/impressionist/ART_WestMoat.glb",
+      "data/models/impressionist/ART_WestMoat.lod.glb",
+      "data/models/impressionist/manifest.json",
+      "data/road_tiles.json",
+      "data/walls.json",
+      "docs/art-and-performance.md",
+      "models/ART_CastleApproach.json",
+      "models/ART_CastleApproach.lod.json",
+      "models/ART_EastHikoneBuildings.json",
+      "models/ART_EastHikoneBuildings.lod.json",
+      "models/ART_WestMoat.json",
+      "models/ART_WestMoat.lod.json",
+      "models/runtime.json",
+      "src/world/generators/castle-approach.js",
+      "src/world/generators/east-layout.ts",
+      "src/world/generators/university-layout.js",
+      "tools/castle_approach.py",
+      "tools/east_extension.py",
+      "tools/university.py"
+    ],
+    "unexpectedChanges": [],
+    "originalFolderPhotographs": 78,
+    "originalFolderPhotographsUnchanged": true,
+    "frameSourceScenariosAndUnrelatedStartingChangesPreserved": true
+  },
+  "finalOutputHashes": {
+    "data/collision.json": "f930ce3a884619ba3d6fc470a44b64520de3e030c03834fc4fe7f38721317034",
+    "data/map-detail.png": "6f688b4e65e0e0a981fd6e1b25933eb595e397e1d55e2d696aec6694eed25160",
+    "data/map.json": "42f3f79347897be5766a8b02249ad0cceef6a8de9713c19cf1a3bbcb96a03a9c",
+    "data/map.png": "f00b6c1fed64bee212058bddb2157f95313b9a56c6670dfd471c28c06e6bcdae",
+    "data/models/impressionist/ART_CastleApproach.glb": "311c1b6dad5b9096abc7b0acbbd6bf693e2435c4c9d481cb382db98af497465e",
+    "data/models/impressionist/ART_CastleApproach.lod.glb": "5f3cc670499f4990281cc6cf9e918ba3eb946f5a912c232973c15c0c08365780",
+    "data/models/impressionist/ART_EastHikoneBuildings.glb": "bd921d8a645931c936c3da22576f94c5ed0c12bda05048ee5baf29b63014b8fb",
+    "data/models/impressionist/ART_EastHikoneBuildings.lod.glb": "6c898227ddb351abe3c516a69528bba17d4ccd3e6860fa852662737002c647ca",
+    "data/models/impressionist/ART_WestMoat.glb": "7d461570d6bf52361298a04be0e19b8688ddf5947599989a9e1caeae57d455db",
+    "data/models/impressionist/ART_WestMoat.lod.glb": "3a490653986b9b7f6ac3266cece245c4427b3aa23841b9e9444999969734301d",
+    "data/models/impressionist/manifest.json": "d22f34682befb20481f0f2abf7d681613202e29922b47d75a121950427c4f232",
+    "data/road_tiles.json": "08daec123384a9853d0700984ba4be8720de46eca0866309b614df903744bfcc",
+    "data/walls.json": "eef9a2d06a6460789a0a9e13c4b19988b7ff05e3c17a5cce70ee2476b35ff4bb",
+    "models/ART_CastleApproach.json": "36628717f619cd7f4c73c4e9a0d6de917a95879b5e6bf9269492372fe1425ece",
+    "models/ART_CastleApproach.lod.json": "1ef20afd96dc5a6bef2d85463aad85178109326909666bf5cba228e5b534d0f9",
+    "models/ART_EastHikoneBuildings.json": "50282185eef07dcf5ec4e5dabb773e06a7bd36c66dee1976487bd6b72f04b825",
+    "models/ART_EastHikoneBuildings.lod.json": "5c768f86ae05ed5ebf9df806f3e1002961ab862768453de55370270904e2d4c0",
+    "models/ART_WestMoat.json": "15f5857c6eb5bba5fc5a071722acd74c8d1a67a04fe94e244a83c00151b8b444",
+    "models/ART_WestMoat.lod.json": "584368363e534fc22fef4151962ee51740a42bfc0afdf3a2897b65486bc24eba",
+    "models/runtime.json": "c4957a495a78e5676def9c471c1ed17ee4a8b33cb5968c1d3504e448f9d2b3f3"
+  },
+  "limitations": [
+    "Photo GPS is not survey control. Low-accuracy and repeated fixes are indexed.",
+    "Five benches have 10.1-17.1 m explicit registration offsets onto the retained schematic shore.",
+    "Building dimensions/heights are photo estimates unless an OSM height tag is recorded.",
+    "No newly accessed satellite or Street View comparison claimed.",
+    "No museum interior/upper public route, real-phone or VR validation."
+  ],
+  "commitPushOrDeployment": false
+}

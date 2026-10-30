@@ -1,0 +1,93 @@
+{
+  "reviewDate": "2026-10-29",
+  "googleOriginal": "https://www.google.com/maps/@35.2703644,136.2612564,831a,35y,300h,44.71t/data=!3m1!1e3",
+  "googleTarget": "https://www.google.com/maps/@?api=1&map_action=map&center=35.2755126447,136.2558484139&zoom=19&basemap=satellite",
+  "googleAccess": "Opened in Chrome, viewed original 3D perspective and target-centred 2D satellite. No Street View inspection. Copyright year does not establish capture date.",
+  "gsi": "https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg",
+  "gsiAttribution": "Source: Geospatial Information Authority of Japan; reprojected by this project for comparison.",
+  "gsiCaptureMetadata": "https://maps.gsi.go.jp/xyz/seamlessphoto_spec/11/1799/809.geojson",
+  "points": [
+    {
+      "x": 0,
+      "z": 400,
+      "lat": 35.27522686599943,
+      "lon": 136.25433222042497,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 0,
+      "z": 600,
+      "lat": 35.27675048816285,
+      "lon": 136.2554983730571,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 200,
+      "z": 400,
+      "lat": 35.27427480120562,
+      "lon": 136.2561984547483,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 200,
+      "z": 600,
+      "lat": 35.27579842336904,
+      "lon": 136.2573646073804,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    },
+    {
+      "x": 100,
+      "z": 500,
+      "lat": 35.275512644684234,
+      "lon": 136.2558484139027,
+      "capture": [
+        {
+          "データソース": "電子国土基本図（オルソ画像）",
+          "撮影年月": "2011年9月～10月",
+          "_color": "#ffff00",
+          "_opacity": 0,
+          "_fillColor": "#ffff00",
+          "_fillOpacity": 0.5
+        }
+      ]
+    }
+  ],
+  "osm": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2530,35.2700,136.2600,35.2776",
+  "snapshotSHA256": "aa95fa343c8ed6103c950a636ef361b164ee8fddd8e12c34a959022add3d7f48"
+}

@@ -119,7 +119,9 @@ not a required event: waiting, crossing time, driver reaction and visibility can
 
 ## Replay and results
 
-Unity's window (8 s before to 1.6 s after contact). Bird's-eye for the situation; the accident car's driver seat to ask "could the driver see me?". The fall depends on where and how fast the car hit — educational, not reconstruction. The replay waits on its last frame and restarts cleanly.
+Contact uses Unity's window (8 s before to 1.6 s after contact); a safe arrival reviews the recorder's last 12 s before showing the successful crossing feedback. Both use the same replay controls and wait on their last frame until an explicit restart, results or menu action. A safe arrival has no contact marker, fall or contact slow motion.
+
+Bird's-eye explains the situation; the participant view restores recorded eye position, yaw, pitch and roll, including independent bicycle head turns and the live fall. Body coordinates stay unchanged for traffic analysis. Eye fields are optional additions to version-one recordings; older clips use their body position and participant eye height. Reduced motion suppresses replay camera roll. The driver's seat asks "could the driver see me?": it follows the accident car for contact, or the nearest recorded car for a safe arrival; that view is unavailable when no car was recorded. V cycles the available views. The third-person fall depends on where and how fast the car hit — educational, not reconstruction.
 
 The overview plans against the recorded approach, car and posed landing before playback. CPU-only
 copies of the town's low-detail silhouettes retain roofs, trees and signal poles independently of
