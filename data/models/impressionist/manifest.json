@@ -979,25 +979,25 @@
       }
     },
     "ART_EastHikoneBuildings": {
-      "triangles": 134164,
+      "triangles": 95547,
       "strokes": 1008,
-      "bytes": 6789416,
+      "bytes": 4769156,
       "remodeled": false,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 134164,
-        "bytes": 6789420
+        "triangles": 95547,
+        "bytes": 4769160
       }
     },
     "ART_EastHikoneSurface": {
-      "triangles": 22681,
+      "triangles": 25307,
       "strokes": 0,
-      "bytes": 1414552,
+      "bytes": 1548316,
       "remodeled": false,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 22681,
-        "bytes": 1414556
+        "triangles": 25307,
+        "bytes": 1548320
       }
     },
     "ART_EastHikoneWater": {
@@ -1020,6 +1020,72 @@
       "lod": {
         "triangles": 1856,
         "bytes": 53180
+      }
+    },
+    "ART_GardenPine": {
+      "triangles": 6972,
+      "strokes": 0,
+      "bytes": 213928,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 4320,
+        "bytes": 171500
+      }
+    },
+    "ART_StreetWillow": {
+      "triangles": 9292,
+      "strokes": 0,
+      "bytes": 428052,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 9292,
+        "bytes": 428056
+      }
+    },
+    "ART_StreetHedge": {
+      "triangles": 900,
+      "strokes": 0,
+      "bytes": 43528,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 900,
+        "bytes": 43532
+      }
+    },
+    "ART_EastHikoneNorth": {
+      "triangles": 9144,
+      "strokes": 0,
+      "bytes": 445920,
+      "remodeled": false,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 9144,
+        "bytes": 445924
+      }
+    },
+    "ART_EastHikoneSouth": {
+      "triangles": 14899,
+      "strokes": 0,
+      "bytes": 724748,
+      "remodeled": false,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 14899,
+        "bytes": 724752
+      }
+    },
+    "ART_EastHikoneWest": {
+      "triangles": 36120,
+      "strokes": 0,
+      "bytes": 1749340,
+      "remodeled": false,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 36120,
+        "bytes": 1749344
       }
     }
   }
