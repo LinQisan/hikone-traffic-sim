@@ -1,0 +1,16 @@
+.map-credits {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 .5em;
+  margin: .5em 0 0;
+  font-size: .72rem;
+  line-height: 1.5;
+}
+.map-credits a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}

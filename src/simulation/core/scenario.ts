@@ -2,13 +2,15 @@ import type {Point, Area, VehicleSpec, Scenario, ScenarioDraft, VehicleDraft, Sc
 import {errorMessage} from '../../utils/errors.ts';
 // Browser-owned scenario model shared by both editor backends, the simulator and tests.
 // Retains the Unity-compatible fields and serialization order; browser map bounds are local.
+import frame from '../../../world/geographic-frame.json' with {type:'json'};
 import { DRIVER_LIMITS, DRIVER_BEHAVIORS, DRIVER_BEHAVIOR_LABELS } from '../traffic/driver.ts';
 export { DRIVER_LIMITS, DRIVER_BEHAVIORS, DRIVER_BEHAVIOR_LABELS };
 
 export const FORMAT = 'vrlearn-scenario';
 export const VERSION = 1;
 export const HIKONE_MAP = 'hikone-kyobashi';
-export const HIKONE_BOUNDS = { xMin: -220, zMin: -155, xMax: 200, zMax: 165 };
+export const HIKONE_BOUNDS = frame.practice;
+export const HIKONE_WORLD_BOUNDS = frame.world;
 export const PLAYER_MODES: PlayerMode[] = ['walking', 'bicycle'];
 export const SETTINGS: Setting[] = ['crossing', 'midblock', 'bicycle'];
 export const START_BEGIN = 'begin';
@@ -152,7 +154,7 @@ export const vehicleLabel = (v: Partial<VehicleSpec>, i: number) => `vehicles[${
 // problem = { level: 'error' | 'warning', message, target?: { kind, index?, point? } }
 
 function inside(x: number, z: number) {
-  return x >= HIKONE_BOUNDS.xMin && x <= HIKONE_BOUNDS.xMax && z >= HIKONE_BOUNDS.zMin && z <= HIKONE_BOUNDS.zMax;
+  return x >= HIKONE_WORLD_BOUNDS.xMin && x <= HIKONE_WORLD_BOUNDS.xMax && z >= HIKONE_WORLD_BOUNDS.zMin && z <= HIKONE_WORLD_BOUNDS.zMax;
 }
 
 /** Structural checks; browser map bounds are owned locally. */

@@ -5,7 +5,7 @@ import { placement } from '../scene/coords.ts';
 import { indexMeshRays } from './mesh-ray-index.js';
 
 const probeMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
-const FLOOR = /^(HK_(Road|Ground|Water|Terrain)|ART_(PavingDetails|MoatRoad|MoatBankPatch|Kyobashi(Roads|Land|Water)))/;
+const FLOOR = /^(HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|MoatBankPatch|Kyobashi(Roads|Land|Water)))/;
 
 export class CameraObstacles {
   constructor(definitions = []) {
@@ -35,30 +35,44 @@ export class CameraObstacles {
       box.expandByScalar(0.05);
       const contains = p => {
         if (!box.containsPoint(p)) return false;
-        let sign = 0;
+        let inside = false;
+        const x = -p.x, z = p.z;
         for (let i = 0; i < s.footprint.length; i++) {
           const [ax, az] = s.footprint[i], [bx, bz] = s.footprint[(i + 1) % s.footprint.length];
-          const cross = (bx - ax) * (p.z - az) - (bz - az) * (-p.x - ax);
-          if (Math.abs(cross) <= 0.05 * Math.hypot(bx - ax, bz - az)) continue;
-          if (sign && Math.sign(cross) !== sign) return false;
-          sign = Math.sign(cross);
+          const dx = bx-ax, dz = bz-az, length = Math.hypot(dx,dz);
+          const along = (x-ax)*dx+(z-az)*dz;
+          if (length && along >= -.05*length && along <= length*length+.05*length
+            && Math.abs(dx*(z-az)-dz*(x-ax)) <= .05*length) return true;
+          // OSM outlines can be concave. A convex-only half-plane test drops their roofs.
+          if ((az>z)!==(bz>z) && x < ax+(z-az)*dx/dz) inside = !inside;
         }
-        return true;
+        return inside;
       };
-      return { contains, positions: [] };
+      return { contains, box, positions: [] };
     });
+    // Bucket solids by 16 m cells so a district of buildings is not tested against every triangle.
+    const CELL = 16, buckets = new Map();
+    for (const group of groups) {
+      for (let i = Math.floor(group.box.min.x / CELL); i <= Math.floor(group.box.max.x / CELL); i++)
+        for (let j = Math.floor(group.box.min.z / CELL); j <= Math.floor(group.box.max.z / CELL); j++) {
+          const key = i * 100003 + j;
+          if (!buckets.has(key)) buckets.set(key, []);
+          buckets.get(key).push(group);
+        }
+    }
     const points = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
     for (const part of parts) {
       // These are the authored building pigments. Roads, moat banks, water and field
       // surfaces in the same draw are ground, not roof/wall obstacles.
-      if (!/^(ART_(Plaster|Timber|Concrete|Window|Tile|RedRoof)|HK_RoofTile)$/.test(part.material.name)) continue;
+      if (!/^(ART_(Plaster|Timber|Concrete|Window|Tile|RedRoof)|HK_(RoofTile|Plaster|Stone|MetalLight))$/.test(part.material.name)) continue;
       const geometry = part.geometry, position = geometry.attributes.position;
       const count = geometry.index?.count ?? position.count;
       for (let i = 0; i < count; i += 3) {
         for (let k = 0; k < 3; k++) {
           points[k].fromBufferAttribute(position, geometry.index ? geometry.index.getX(i + k) : i + k).applyMatrix4(part.matrix);
         }
-        for (const group of groups) if (points.every(p => group.contains(p)))
+        const candidates = buckets.get(Math.floor(points[0].x / CELL) * 100003 + Math.floor(points[0].z / CELL)) ?? [];
+        for (const group of candidates) if (points.every(p => group.contains(p)))
           for (const p of points) group.positions.push(p.x, p.y, p.z);
       }
     }

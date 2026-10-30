@@ -262,6 +262,12 @@ export class Player {
   /** Head pose in Unity coordinates. Recorder copies accepted samples before reusing `out`. */
   head<T extends Partial<HeadFrame>>(out: T = {} as T): T & HeadFrame {
     out.x = this.x; out.z = this.z; out.yaw = this.yaw;
+    // Keep body coordinates for traffic analysis; eye coordinates also retain riding/fall offsets.
+    out.eyeX = -(this.rig.position.x + this.camera.position.x);
+    out.eyeZ = this.rig.position.z + this.camera.position.z;
+    out.y = this.rig.position.y + this.camera.position.y;
+    out.pitch = this.camera.rotation.x * 180 / Math.PI;
+    out.roll = this.camera.rotation.z * 180 / Math.PI;
     if (this.mode === 'bicycle') out.rideYaw = this.rideYaw;
     else delete out.rideYaw;
     return out as T & HeadFrame;

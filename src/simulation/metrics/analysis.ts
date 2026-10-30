@@ -21,9 +21,10 @@ export class Recorder {
   declare frames: ReplayFrame[];
   constructor() { this.frames = []; this.next = 0; this.recording = true; }
 
-  /** head: { x, z, yaw }; cars: [{ id, x, z, yaw, body, accident }] */
-  capture(time: number, head: HeadFrame, cars: RecordableCar[]) {
-    if (!this.recording || time < this.next) return;
+  /** Force a terminal pose between regular samples so an arrival clip includes the goal. */
+  capture(time: number, head: HeadFrame, cars: RecordableCar[], force = false) {
+    if (!this.recording || (!force && time < this.next)) return;
+    if (force && this.frames.at(-1)?.t === time) return;
     this.next = time + SAMPLE_INTERVAL;
     this.frames.push({ t: time, head: { ...head }, cars: cars.map(c => ({ id: c.id, x: c.x, z: c.z, yaw: c.yaw, steer: c.steer ?? 0, body: c.body, accident: c.accident,
       driverBehavior: c.driver?.behavior ?? 'lawful', violation: c.violation ?? null })) });

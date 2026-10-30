@@ -1,4 +1,4 @@
-// The accident replay: the recorded window (8 s before to 1.6 s after contact), seen from above at an
+// Replay of a safe arrival or contact (8 s before to 1.6 s after contact), seen from above at an
 // angle across the car's path, slow motion around contact (like AccidentReplayPresenter). The live
 // cars stay frozen and hidden; render-only copies are driven from the recording. It stops on its
 // last frame and waits for the participant (Next), as in the Unity app.
@@ -14,6 +14,8 @@ import { BODY_SIZE } from '../../simulation/traffic/Traffic.ts';
 import { buildCockpit } from './cockpit.js';
 import { ReplayCamera, replaySampleTimes } from '../camera/replay-camera.js';
 import { GroundContact } from '../scene/ground-contact.js';
+import { ParticipantReplayCamera } from '../camera/ParticipantReplayCamera.ts';
+import { EYE_RATIO } from '../controls/Player.ts';
 
 const SLOW_FROM = 0.8, SLOW_UNTIL = 0.4, SLOW_RATE = 0.45;
 const LIME = 0x7dff33, CONTACT = 0xff4033;
@@ -45,6 +47,8 @@ export class Replay {
     this.reducedMotion = false;
     // the driver's view: from the accident car's driver seat (right-hand drive), along its travel
     this.driverCamera = new THREE.PerspectiveCamera(50, 16 / 9, 0.05, 900);
+    this.participantCamera = new ParticipantReplayCamera();
+    /** @type {import('../../state/SimulatorStore.ts').ReplayView} */
     this.view = 'overview';
 
     this.root = null;
@@ -52,11 +56,15 @@ export class Replay {
     this.atEnd = false;
   }
 
-  /** @param {import('three').Group | null} parked */
+  /**
+   * @param {number | null} impactTime Null for a safe arrival.
+   * @param {number | null} carId
+   * @param {import('three').Group | null} parked
+   */
   start(frames, impactTime, carId, heightCm, playerMode = 'walking', weightKg = 60, parked = null) {
     this.stop();
     this.frames = frames;
-    this.impact = impactTime;
+    this.impact = impactTime ?? Infinity;
     this.start_ = frames[0].t;
     this.end = frames[frames.length - 1].t;
     this.time = this.start_;
@@ -66,6 +74,7 @@ export class Replay {
     this.root = new THREE.Group();
     this.scene.add(this.root);
     this.root.add(this.driverCamera);
+    this.root.add(this.participantCamera);
     this.overlays = [];
     const owned = object => { this.overlays.push(object); return object; };
     // copies of every car seen in the window
@@ -75,7 +84,7 @@ export class Replay {
         if (!this.cars.has(c.id)) {
           // the same paint as on the street (app.js syncCars), front wheels that steer
           const mesh = instance(BODY_MODEL[c.body] ?? BODY_MODEL.sedan, this.materials, { paint: paintFor(c.id * 7 + 3), steerable: true, moving: true });
-          if (c.id === carId) {
+          if (impactTime != null && c.id === carId) {
             const pin = owned(new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 8), new THREE.MeshBasicMaterial({ color: 0xffb826 })));
             pin.name = 'ReplayContactPin';
             pin.position.y = 2.6;
@@ -85,11 +94,12 @@ export class Replay {
           this.cars.set(c.id, { mesh, track: frames.flatMap(g => g.cars.filter(k => k.id === c.id).map(k => ({ t: g.t, ...k }))) });
         }
     this.headTrack = frames.map(f => ({ t: f.t, ...f.head }));
-    this.rideTrack = playerMode === 'bicycle' ? ridingTrack(this.headTrack, impactTime) : null;
+    this.rideTrack = playerMode === 'bicycle' ? ridingTrack(this.headTrack, this.impact) : null;
     // A simple cream bear follows the participant; the ring/fan remain data overlays.
     const h = Math.max(0.9, Math.min(2.1, heightCm / 100));
     this.figure = new THREE.Group();
     this.animal = this.rideTrack ? createReplayCyclist(heightCm, { weightKg }) : createReplayAnimal(heightCm, { weightKg });
+    this.eyeHeight = h * (this.rideTrack ? this.animal.eyeHeight : EYE_RATIO);
     this.grounding = this.rideTrack
       ? { rider: new GroundContact(this.animal.rider), bike: new GroundContact(this.animal.bike) }
       : { body: new GroundContact(this.animal.pivot) };
@@ -105,19 +115,22 @@ export class Replay {
     this.root.add(this.figure);
     // the recorded travel path and the contact point
     const path = this.headTrack.map(p => toThree(p.x, this.ground.heightAt(p.x, p.z) + 0.08, p.z));
-    this.root.add(owned(new THREE.Line(new THREE.BufferGeometry().setFromPoints(path), new THREE.LineBasicMaterial({ color: LIME }))));
-    const at = sample(this.headTrack, impactTime) ?? this.headTrack[this.headTrack.length - 1];
+    this.path = owned(new THREE.Line(new THREE.BufferGeometry().setFromPoints(path), new THREE.LineBasicMaterial({ color: LIME })));
+    this.root.add(this.path);
+    const referenceTime = impactTime ?? this.end;
+    const at = sample(this.headTrack, referenceTime) ?? this.headTrack[this.headTrack.length - 1];
     // how the participant is thrown follows from where and how fast the car hit (crash.js)
     const carTrack = this.cars.get(carId)?.track ?? [];
-    const carNow = sample(carTrack, impactTime), carBefore = sample(carTrack, impactTime - 0.15);
-    const meBefore = sample(this.headTrack, impactTime - 0.15) ?? at;
-    const span = Math.max(0.05, impactTime - (carBefore?.t ?? impactTime - 0.15));
+    const carNow = sample(carTrack, referenceTime), carBefore = sample(carTrack, referenceTime - 0.15);
+    const meBefore = sample(this.headTrack, referenceTime - 0.15) ?? at;
+    const span = Math.max(0.05, referenceTime - (carBefore?.t ?? referenceTime - 0.15));
     const recorded = carTrack.find(c => c.id === carId) ?? carTrack[0];
     this.driverTrack = carTrack;
     this.driverCarId = carId;
     this.driverSize = BODY_SIZE[recorded?.body] ?? BODY_SIZE.sedan;
-    this.cockpit = buildCockpit(recorded?.body ?? 'sedan', this.driverSize, paintFor(carId));
-    this.root.add(this.cockpit.root);              // drawn only in the driver view
+    this.cockpit = recorded ? buildCockpit(recorded.body, this.driverSize, paintFor(carId)) : null;
+    if (this.cockpit) this.root.add(this.cockpit.root); // drawn only in the driver view
+    if (this.view === 'driver' && !carTrack.length) this.view = 'overview';
     this.crash = carNow ? classifyCrash({
       person: at,
       personVelocity: { x: (at.x - meBefore.x) / 0.15, z: (at.z - meBefore.z) / 0.15 },
@@ -135,7 +148,7 @@ export class Replay {
     // Prefer a three-quarter angle across the car's path, from the participant's approach side.
     // The director may lift or move this angle after checking the complete recorded movement.
     const car = this.cars.get(carId)?.track ?? [];
-    const c1 = sample(car, impactTime) ?? at, c0 = sample(car, impactTime - 1) ?? c1;
+    const c1 = sample(car, referenceTime) ?? at, c0 = sample(car, referenceTime - 1) ?? c1;
     let vx = c1.x - c0.x, vz = c1.z - c0.z;
     if (Math.hypot(vx, vz) < 0.1) { vx = 1; vz = 0; }
     const len = Math.hypot(vx, vz);
@@ -144,7 +157,7 @@ export class Replay {
     if ((s0.x - at.x) * sideX + (s0.z - at.z) * sideZ < 0) { sideX = -sideX; sideZ = -sideZ; }
     const angle = Math.atan2(-(sideX + vx / len * 0.45), sideZ + vz / len * 0.45);
     const samples = [];
-    for (const t of replaySampleTimes(this.start_, this.end, impactTime)) {
+    for (const t of replaySampleTimes(this.start_, this.end, referenceTime)) {
       this.frame(t);
       this.root.updateWorldMatrix(true, true);
       // Actual posed bounds include the thrown body and the bicycle after they separate.
@@ -172,7 +185,7 @@ export class Replay {
       }
       samples.push({ t, bounds, targets, blockers });
     }
-    this.overview.start(samples, impactTime, angle, this.reducedMotion);
+    this.overview.start(samples, referenceTime, angle, this.reducedMotion);
     this.frame(this.start_);
   }
 
@@ -210,17 +223,21 @@ export class Replay {
   }
 
   /** The camera the replay is seen through. */
-  get activeCamera() { return this.view === 'driver' && this.driverTrack?.length ? this.driverCamera : this.camera; }
+  get activeCamera() {
+    if (this.view === 'participant') return this.participantCamera;
+    return this.view === 'driver' && this.driverTrack?.length ? this.driverCamera : this.camera;
+  }
 
-  /** 'overview' (from above, across the car's path) or 'driver' (from the car's driver seat). */
+  /** @param {import('../../state/SimulatorStore.ts').ReplayView} view */
   setView(view) {
-    this.view = view === 'driver' ? 'driver' : 'overview';
+    this.view = view === 'driver' && this.playing && !this.driverTrack?.length ? 'overview' : view;
     if (this.playing) this.frame(this.time);
   }
 
   setReducedMotion(value) {
     if (this.reducedMotion === value) return;
     this.reducedMotion = value;
+    this.participantCamera.reducedMotion = value;
     if (this.playing) {
       this.overview.reducedMotion = value;
       this.overview.plan();
@@ -290,7 +307,9 @@ export class Replay {
     const driving = this.view === 'driver' && this.driverTrack?.length;
     const own = this.cars.get(this.driverCarId);
     if (own && driving) own.mesh.visible = false;
-    this.cockpit.root.visible = !!driving;
+    if (this.cockpit) this.cockpit.root.visible = !!driving;
+    this.figure.visible = this.view !== 'participant';
+    this.path.visible = this.view !== 'participant';
     const h = sample(this.headTrack, t);
     if (h) {
       toThree(h.x, this.ground.heightAt(h.x, h.z), h.z, this.figure.position);
@@ -307,13 +326,14 @@ export class Replay {
       const motion = crashMotion(this.crash, s_);
       if (this.rideTrack) this.animal.pose(t, speed, motion.flail, ride?.distance ?? 0, lookYaw, s_ > 0);
       else this.animal.pose(t, speed, motion.flail);
-      this.gaze.visible = s_ <= 0 && this.view !== 'driver';   // the gaze fan is clutter through the windscreen
+      this.gaze.visible = s_ <= 0 && this.view === 'overview';
       if (this.rideTrack) {
         this.applyCrash(this.animal.rider, this.animal.riderCentre, motion, h, 'rider');
         this.applyCrash(this.animal.bike, this.animal.bikeCentre, bicycleMotion(this.crash, s_), h, 'bike');
       } else this.applyCrash(this.animal.pivot, this.animal.centre, motion, h, 'body');
     }
-    this.contact.visible = t >= this.impact;
+    this.contact.visible = t >= this.impact && this.view !== 'participant';
+    this.participantCamera.place(this.headTrack, t, this.ground, this.eyeHeight);
     this.placeDriver(t);
     this.overview.frame(t);
   }
@@ -325,6 +345,7 @@ export class Replay {
     this.time = Math.min(this.end, this.time + Math.min(dt, 0.1) * (slow ? SLOW_RATE : 1));
     if (!this.atEnd) this.frame(this.time);
     if (this.time >= this.end) this.atEnd = true;
+    if (!Number.isFinite(this.impact)) return `再生 ${(this.time - this.start_).toFixed(1)} / ${(this.end - this.start_).toFixed(1)} 秒`;
     const toContact = this.impact - this.time;
     return toContact > 0.05 ? `接触まで ${toContact.toFixed(1)} 秒` : toContact > -0.35 ? '接触 / Contact' : `接触後 ${(-toContact).toFixed(1)} 秒`;
   }
@@ -343,6 +364,7 @@ export class Replay {
     }
     if (this.root) {
       this.driverCamera.removeFromParent();
+      this.participantCamera.removeFromParent();
       // Vehicle buffers/materials are shared with live traffic. Dispose only replay-owned parts.
       this.animal?.dispose();
       for (const overlay of this.overlays) {
@@ -356,7 +378,7 @@ export class Replay {
     }
     this.cars?.clear();
     this.frames = this.headTrack = this.rideTrack = this.driverTrack = null;
-    this.figure = this.gaze = this.contact = this.grounding = null;
+    this.figure = this.gaze = this.contact = this.grounding = this.path = null;
     this.crash = null;
   }
 }

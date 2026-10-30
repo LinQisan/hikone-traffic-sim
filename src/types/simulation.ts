@@ -28,7 +28,7 @@ export interface TrafficCar extends Pose {
 export type TrafficScenario = Pick<Scenario, 'id' | 'map' | 'playerMode' | 'vehicles'> & {
   environment?: Environment | null; hazardPolicy?: HazardPolicy | null; spawn?: Point; goal?: Point;
 };
-export interface HeadFrame extends Pose { y?: number; pitch?: number; roll?: number; rideYaw?: number; distance?: number; mode?: string }
+export interface HeadFrame extends Pose { eyeX?: number; eyeZ?: number; y?: number; pitch?: number; roll?: number; rideYaw?: number; distance?: number; mode?: string }
 export interface RecordableCar extends Pose {id: number; body: string; accident: boolean; steer?: number; driver?: DriverState; violation?: string | null}
 export interface RecordedCar extends Pose { id: number; body: string; accident: boolean; steer: number; driverBehavior?: string; violation?: string | null }
 export interface ReplayFrame { t: number; head: HeadFrame; cars: RecordedCar[] }

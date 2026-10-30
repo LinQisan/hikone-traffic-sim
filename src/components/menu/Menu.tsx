@@ -2,6 +2,7 @@ import type {SimulatorCommands, SimulatorStore} from '../../state/SimulatorStore
 import {useSimulatorSlice, useSimulatorValue} from '../../hooks/useSimulatorSlice.ts';
 import {SETTINGS, SETTING_LABELS, MODE_LABELS} from '../../simulation/core/scenario.ts';
 import type {ScenarioEntry} from '../../types/scenario.ts';
+import {MapCredits} from '../MapCredits.tsx';
 type BodyField = 'height' | 'weight';
 // Same limits and defaults as profile() in TrafficEngine, which clamps the values when a run starts.
 const BODY: Record<BodyField, {label: string; unit: string; min: number; max: number; fallback: number}> = {
@@ -69,6 +70,7 @@ export function Menu({store, commands}: {store: SimulatorStore; commands: Simula
       <p className="keys desktop-only"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動</span><span><kbd>Q</kbd><kbd>E</kbd> 見回す</span><span>クリックでマウス操作・<kbd>Esc</kbd> 解除</span><span><kbd>R</kbd> やり直す</span><span><kbd>M</kbd> メニュー</span></p>
       <p className="keys touch-only"><span>左下のスティックで移動</span><span>画面をドラッグして見回す</span></p>
       <p className="tip">交通ルールを守っていても危険な車は現れます。青信号でも左右と車の停止を確かめましょう。</p>
+      <MapCredits/>
     </footer>
   </section>;
 }

@@ -1,5 +1,6 @@
 import type {PlayerMode, ScenarioEntry} from '../types/scenario.ts';
 export type Screen = 'loading' | 'title' | 'playing' | 'impact' | 'replay' | 'results';
+export type ReplayView = 'overview' | 'participant' | 'driver';
 export type FocusTarget = 'start' | 'file' | 'explore' | 'next' | 'rtitle' | {scenario: string};
 export interface SimulatorSnapshot {
   screen: Screen;
@@ -7,16 +8,16 @@ export interface SimulatorSnapshot {
   menu: {entries: ScenarioEntry[]; selectedId: string | null; selectedName: string; customName: string | null; status: string; error: boolean; busy: boolean};
   profile: {height: string; weight: string; mode: PlayerMode};
   hud: {name: string; help: string; signal: string; visible: boolean; retry: boolean};
-  replay: {visible: boolean; title: string; time: string; next: string; hint: string; view: 'overview' | 'driver'};
+  replay: {visible: boolean; title: string; time: string; next: string; hint: string; view: ReplayView; canViewDriver: boolean};
   results: {visible: boolean; title: string; tone: string; lines: string[]; verdict: string; incidents: {index: number; text: string; replayable: boolean}[]; retry: string; titleAction: string; canExport: boolean};
-  presentation: {touch: boolean; touchActive: boolean; flash: boolean; inspection: boolean; fps: string};
+  presentation: {touch: boolean; touchActive: boolean; flash: boolean; inspection: boolean; street: boolean; embedded: boolean; fps: string};
   toast: {text: string; tone: string; visible: boolean};
   focus: {sequence: number; target: FocusTarget | null; preventScroll: boolean};
   announcement: {sequence: number; text: string};
 }
 export interface SimulatorCommands {
   start(again?: boolean): Promise<void>; explore(): void; select(id: string): void; importFile(file: File): Promise<void>;
-  next(): void; retry(): void; title(): void; menu(): void; replayAgain(): void; setReplayView(view: 'overview' | 'driver'): void;
+  next(): void; retry(): void; title(): void; menu(): void; replayAgain(): void; setReplayView(view: ReplayView): void;
   exportRecord(): void; replayIncident(index: number): void;
 }
 function initialSnapshot(): SimulatorSnapshot {return {
@@ -24,9 +25,9 @@ function initialSnapshot(): SimulatorSnapshot {return {
     menu: {entries: [], selectedId: null, selectedName: '', customName: null, status: '', error: false, busy: false},
     profile: {height: '170', weight: '60', mode: 'walking'},
     hud: {name: '', help: '', signal: '', visible: false, retry: true},
-    replay: {visible: false, title: '事故のリプレイ / Accident replay', time: '', next: 'スキップ / Skip', hint: '', view: 'overview'},
+    replay: {visible: false, title: '事故のリプレイ / Accident replay', time: '', next: 'スキップ / Skip', hint: '', view: 'overview', canViewDriver: false},
     results: {visible: false, title: '', tone: '', lines: [], verdict: '', incidents: [], retry: 'もう一度体験 / Try again (R)', titleAction: 'タイトルへ / Title (Enter)', canExport: false},
-    presentation: {touch: false, touchActive: false, flash: false, inspection: false, fps: ''},
+    presentation: {touch: false, touchActive: false, flash: false, inspection: false, street: false, embedded: false, fps: ''},
     toast: {text: '', tone: '', visible: false}, focus: {sequence: 0, target: null, preventScroll: false}, announcement: {sequence: 0, text: ''},
   };}
 

@@ -7,11 +7,27 @@ export function Hud({store, commands}: {store: SimulatorStore; commands: Simulat
 }
 export function ReplayControls({store, commands, elementRef}: {store: SimulatorStore; commands: SimulatorCommands | null; elementRef: React.RefObject<HTMLElement | null>}) {
   const replay = useSimulatorSlice(store, 'replay'), inspection = useSimulatorValue(store, snapshot => snapshot.presentation.inspection);
-  return <section ref={elementRef} id="replayui" className="overlay bar" role="region" aria-labelledby="replayname" hidden={!replay.visible || inspection}><b id="replayname">{replay.title}</b><span id="rtime" className="time">{replay.time}</span><span className="views" role="group" aria-label="視点 / View"><button id="viewover" className={replay.view === 'overview' ? 'on' : ''} aria-pressed={replay.view === 'overview'} onClick={() => commands?.setReplayView('overview')}>俯瞰 / Overview</button><button id="viewdriver" className={replay.view === 'driver' ? 'on' : ''} aria-pressed={replay.view === 'driver'} onClick={() => commands?.setReplayView('driver')}>運転者 / Driver (V)</button></span><button id="again" type="button" onClick={() => commands?.replayAgain()}>もう一度再生 / Replay (B)</button><button id="next" className="primary" type="button" onClick={() => commands?.next()}>{replay.next}</button><button id="replaymenu" type="button" onClick={() => commands?.menu()}>メニュー / Menu (M)</button><span id="rhint" className="visually-hidden" aria-live="polite">{replay.hint}</span></section>;
+  return <section ref={elementRef} id="replayui" className="overlay bar" role="region" aria-labelledby="replayname" hidden={!replay.visible || inspection}>
+    <b id="replayname">{replay.title}</b><span id="rtime" className="time">{replay.time}</span>
+    <span className="views" role="group" aria-label="視点 / View (V)">
+      <button id="viewover" aria-keyshortcuts="V" className={replay.view === 'overview' ? 'on' : ''} aria-pressed={replay.view === 'overview'} onClick={() => commands?.setReplayView('overview')}>俯瞰 / Overview</button>
+      <button id="viewparticipant" aria-keyshortcuts="V" className={replay.view === 'participant' ? 'on' : ''} aria-pressed={replay.view === 'participant'} onClick={() => commands?.setReplayView('participant')}>体験者 / Participant</button>
+      <button id="viewdriver" aria-keyshortcuts="V" hidden={!replay.canViewDriver} className={replay.view === 'driver' ? 'on' : ''} aria-pressed={replay.view === 'driver'} onClick={() => commands?.setReplayView('driver')}>運転者 / Driver</button>
+    </span>
+    <span className="viewshortcut">視点切替 / View (V)</span>
+    <button id="again" type="button" onClick={() => commands?.replayAgain()}>もう一度再生 / Replay (B)</button><button id="next" className="primary" type="button" onClick={() => commands?.next()}>{replay.next}</button><button id="replaymenu" type="button" onClick={() => commands?.menu()}>メニュー / Menu (M)</button><span id="rhint" className="visually-hidden" aria-live="polite">{replay.hint}</span>
+  </section>;
 }
 export function Results({store, commands}: {store: SimulatorStore; commands: SimulatorCommands | null}) {
   const results = useSimulatorSlice(store, 'results'), inspection = useSimulatorValue(store, snapshot => snapshot.presentation.inspection);
   return <section id="results" className="overlay card narrow" role="dialog" aria-labelledby="rtitle" hidden={!results.visible || inspection}><h2 id="rtitle" tabIndex={-1} className={results.tone}>{results.title}</h2><div id="rlines">{results.lines.map((line, index) => <p key={index}>{line}</p>)}{results.incidents.map(row => <p key={row.index} className="incident"><span>{row.text}</span>{row.replayable && <button type="button" onClick={() => commands?.replayIncident(row.index)}>リプレイ / Replay</button>}</p>)}</div><p id="rverdict" className="verdict">{results.verdict}</p><div className="buttons"><button id="export" type="button" hidden={!results.canExport} onClick={() => commands?.exportRecord()}>記録を保存 / Save record (JSON)</button><button id="retry" onClick={() => commands?.retry()}>{results.retry}</button><button id="totitle" className="primary" onClick={() => commands?.title()}>{results.titleAction}</button></div></section>;
+}
+/** Help for the development street view (editor "3Dで見る" or ?street=x,z,heading). */
+export function StreetHelp({store}: {store: SimulatorStore}) {
+  const presentation = useSimulatorSlice(store, 'presentation');
+  return <p id="streethelp" className="street-help" role="note" hidden={!presentation.street}>
+    ドラッグで見回す ・ <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / 矢印で移動 ・ <kbd>Q</kbd><kbd>E</kbd> で向き ・ <kbd>R</kbd><kbd>F</kbd> で高さ ・ <kbd>Shift</kbd> で速く ・ <kbd>Esc</kbd> {presentation.embedded ? 'で地図に戻る' : 'でメニュー'}
+  </p>;
 }
 export function Presentation({store, touchRef, fpsRef}: {store: SimulatorStore; touchRef: React.RefObject<HTMLDivElement | null>; fpsRef: React.RefObject<HTMLDivElement | null>}) {
   const presentation = useSimulatorSlice(store, 'presentation'), toast = useSimulatorSlice(store, 'toast'), focus = useSimulatorSlice(store, 'focus'), announcement = useSimulatorSlice(store, 'announcement');

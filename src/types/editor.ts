@@ -13,7 +13,7 @@ export interface EditorMap extends ScenarioMap, MapCoordinates {
 export interface EditorFile {path: string; template: boolean}
 export interface EditorEntry extends EditorFile {id: string; name: string; playerMode?: PlayerMode; errors: number; warnings: number; unreadable?: string}
 export type Selection = {kind: 'spawn' | 'goal' | 'trigger'; index?: never; point?: never} | {kind: 'vehicle'; index: number; point?: number};
-export type EditorTool = 'select' | 'draw' | 'coordinates';
+export type EditorTool = 'select' | 'draw' | 'coordinates' | 'street';
 export interface EditorState {
   map: EditorMap | null; list: EditorEntry[]; file: EditorFile | null; scenario: Scenario;
   saved: string; selection: Selection | null; tab: string; tool: EditorTool; drawing: number | null;

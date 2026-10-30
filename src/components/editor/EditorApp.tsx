@@ -5,6 +5,7 @@ import type {QuestReport} from '../../types/editor.ts';
 import {hasTrigger, MODE_LABELS} from '../../simulation/core/scenario.ts';
 import {coordinateText} from '../../editor/map-coordinates.ts';
 import {Inspector} from './Inspector.tsx';
+import {MapCredits} from '../MapCredits.tsx';
 export function EditorApp() {
   const [controller] = useState(createEditorController);
   useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
@@ -68,6 +69,7 @@ export function EditorApp() {
         <button id="btnDelete" disabled={!state.file || state.file.template} onClick={() => void a.removeFile()} type="button" className="danger wide" title="この場面を削除（ひな形は削除できません）">この場面を削除</button>
       </section>
       <section className="steps">
+        <MapCredits/>
         <details className="guide">
           <summary>操作ガイド</summary>
           <ol>
@@ -99,6 +101,7 @@ export function EditorApp() {
           <button id="toolSelect" onClick={() => a.tool('select')} aria-pressed={state.tool === 'select'} type="button" className={'tool' + (state.tool === 'select' ? ' active' : '')} title="選択・移動 (V)"><span className="i">↖</span> 選択 <kbd>V</kbd></button>
           <button id="toolDraw" onClick={() => a.tool('draw')} aria-pressed={state.tool === 'draw'} type="button" className={'tool' + (state.tool === 'draw' ? ' active' : '')} title="車のルートを描く (C)"><span className="i">✎</span> 車を描く <kbd>C</kbd></button>
           <button id="toolCoordinates" onClick={() => a.tool('coordinates')} aria-pressed={state.tool === 'coordinates'} type="button" className={'tool' + (state.tool === 'coordinates' ? ' active' : '')} aria-keyshortcuts="P" title="地図上の地点の座標を指定 (P)"><span className="i">⌖</span> 座標 <kbd>P</kbd></button>
+          <button id="toolStreet" onClick={() => a.tool('street')} aria-pressed={state.tool === 'street'} type="button" className={'tool' + (state.tool === 'street' ? ' active' : '')} aria-keyshortcuts="L" title="地点をクリックして 3D で見る。ドラッグで向きを指定 (L)"><span className="i">👁</span> 3Dで見る <kbd>L</kbd></button>
         </div>
       </div>
       <div className="view-tools" role="toolbar" aria-label="表示">
@@ -130,6 +133,14 @@ export function EditorApp() {
         <li><i className="sw wall"></i>見えない壁</li>
       </ul>
       <div id="coords" className="coords">{ui.coords}</div>
+      <section id="streetView" className="street-view" aria-label="選んだ地点の 3D 表示" hidden={!ui.streetOpen}>
+        <div className="street-bar">
+          <button id="btnStreetClose" onClick={() => a.closeStreet()} type="button" className="tool">← 地図に戻る <kbd>Esc</kbd></button>
+          <span id="streetPosition" className="street-position" aria-live="polite">{ui.streetText}</span>
+          {ui.streetSrc && <a id="streetTab" className="tool" href={ui.streetSrc} target="_blank" rel="noopener">新しいタブで開く ↗</a>}
+        </div>
+        {ui.streetSrc && <iframe id="streetFrame" title="選んだ地点の 3D 表示（ドラッグで見回す・WASD で移動）" src={ui.streetSrc}/>}
+      </section>
       <div id="loading" className="loading" hidden={ui.loaded}>{ui.loading}</div>
     </section>
 
@@ -145,6 +156,7 @@ export function EditorApp() {
         <div className="coordinate-copy">
           <input id="coordinateValue" value={state.reference ? coordinateText(state.reference) : ''} type="text" readOnly aria-label="共有する座標" placeholder="地点を指定してください"/>
           <button id="btnCopyCoordinates" onClick={() => void a.copyCoordinates()} type="button" className="small" disabled={!state.reference}>コピー</button>
+          <button id="btnStreetOpen" onClick={() => a.openStreet()} type="button" className="small" disabled={!state.reference} title="この地点を 3D で見る">3Dで見る</button>
         </div>
       </details>
       <div id="inspector" className="inspector">{ui.loaded && <Inspector controller={controller} revision={controller.inspectorRevision}/>}</div>

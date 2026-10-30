@@ -22,6 +22,8 @@ const $ = <T extends Element = HTMLElement>(id: string): T => {const element = d
 const ui = {
   loading: '地図を読み込み中…', loaded: false, coords: '', toast: {text: '', error: false, visible: false},
   coordinateOpen: false, coordinateX: '', coordinateZ: '',
+  // Street view: the simulator page in an iframe, loaded once and then moved by messages.
+  streetOpen: false, streetSrc: '', streetText: '',
   layers: {layerGrid: true, layerSurfaces: false, layerLanes: true, layerWalls: false, layerSignals: true, snapLanes: true},
   triggerOn: true, triggerAuto: true, triggerTime: '', horizon: 40, timelineInfo: '',
   questOpen: false, questBusy: false, questStatus: null as QuestStatus | null, questError: '', questResult: null as QuestReport | null, questMessage: '',
@@ -193,6 +195,7 @@ function buildMapLayers() {
   el('g', { id: 'overlay' }, viewport);
   el('g', { id: 'cars' }, viewport);
   el('g', { id: 'referencePoint', 'aria-hidden': 'true' }, viewport);
+  el('g', { id: 'streetMarker', 'aria-hidden': 'true' }, viewport);
   el('g', { id: 'coordinateGrid', class: 'coordinate-grid', 'aria-hidden': 'true' }, svg);
   applyLayers();
 }
@@ -263,6 +266,74 @@ function referencePoint(point: Point, centre = false) {
   toast('地点を指定しました：' + coordinateText(state.reference));
 }
 
+// ------------------------------------------------------------------ street view
+let streetPose: {x: number; z: number; heading: number} | null = null;
+/** Degrees clockwise from +Z (map up) toward +X (map right), as the simulator's street view uses. */
+function streetHeading(from: Point, to: Point) {
+  return Math.round((Math.atan2(to.x - from.x, to.z - from.z) * 180 / Math.PI + 360) % 360);
+}
+function streetLabel(pose: {x: number; z: number; heading: number}) {
+  return `x ${fmt(pose.x, 1)}　z ${fmt(pose.z, 1)}　向き ${Math.round(pose.heading)}°`;
+}
+function openStreet(point: Point, heading = 0) {
+  if (!state.map || !containsPoint(state.map, point)) {
+    toast('地図の範囲内の地点を選んでください。', true);
+    return;
+  }
+  streetPose = {x: +point.x.toFixed(2), z: +point.z.toFixed(2), heading};
+  ui.streetText = streetLabel(streetPose);
+  const frame = document.getElementById('streetFrame') as HTMLIFrameElement | null;
+  // The first view loads the simulator (relative URL for the Pages sub-path); later views move it.
+  if (!ui.streetSrc || !frame?.contentWindow) ui.streetSrc = `../index.html?street=${streetPose.x},${streetPose.z},${heading}`;
+  else frame.contentWindow.postMessage({type: 'hikone:street', ...streetPose}, location.origin);
+  ui.streetOpen = true;
+  publish();
+  renderStreetMarker();
+  requestAnimationFrame(() => document.getElementById('streetFrame')?.focus());
+}
+function closeStreet() {
+  if (!ui.streetOpen) return;
+  ui.streetOpen = false;
+  publish();
+  // Return to the map where the view ended, keeping the figure for the next look.
+  if (streetPose) {
+    const rect = $('map').getBoundingClientRect(), [x, y] = toPx(streetPose.x, streetPose.z);
+    const sx = x * state.view.scale + state.view.tx, sy = y * state.view.scale + state.view.ty;
+    if (sx < 40 || sy < 40 || sx > rect.width - 40 || sy > rect.height - 40) {
+      state.view.tx = rect.width / 2 - x * state.view.scale;
+      state.view.ty = rect.height / 2 - y * state.view.scale;
+      applyView();
+    } else renderStreetMarker();
+  }
+  $('map').focus();
+}
+function onStreetMessage(event: MessageEvent) {
+  const frame = document.getElementById('streetFrame') as HTMLIFrameElement | null;
+  if (event.origin !== location.origin || !frame || event.source !== frame.contentWindow) return;
+  const data = event.data as {type?: string; x?: number; z?: number; heading?: number} | null;
+  if (data?.type === 'hikone:street-close') closeStreet();
+  else if (data?.type === 'hikone:street-at' && [data.x, data.z, data.heading].every(Number.isFinite)) {
+    streetPose = {x: data.x!, z: data.z!, heading: data.heading!};
+    ui.streetText = streetLabel(streetPose);
+    publish();
+    renderStreetMarker();
+  }
+}
+/** The standing figure and its view cone; while aiming, `heading` may still be unknown. */
+function renderStreetMarker(at: Point | null = streetPose, heading: number | null = streetPose?.heading ?? null) {
+  const g = $('streetMarker');
+  g.replaceChildren();
+  if (!at) return;
+  const [x, y] = toPx(at.x, at.z);
+  if (heading != null) {
+    const h = heading * Math.PI / 180, r = k(34), half = 35 * Math.PI / 180;
+    // Screen y grows downward while map z grows upward.
+    const point = (a: number) => `${x + Math.sin(a) * r},${y - Math.cos(a) * r}`;
+    el('path', { d: `M${x},${y}L${point(h - half)}A${r},${r} 0 0 1 ${point(h + half)}Z`, class: 'street-cone' }, g);
+  }
+  el('circle', { cx: x, cy: y, r: k(7), class: 'street-figure', 'stroke-width': k(2) }, g);
+}
+
 async function copyCoordinates() {
   if (!state.reference) return;
   try {
@@ -303,6 +374,7 @@ function applyView() {
   renderCars();
   renderCoordinateGrid();
   renderReference();
+  renderStreetMarker();
   renderPlaces();
 }
 
@@ -450,7 +522,9 @@ function renderCars() {
 }
 
 // ------------------------------------------------------------------ pointer interaction
-let drag: ({type: 'pan'; sx: number; sy: number; view: EditorState['view']; reference: boolean; point: Point; moved: boolean} | {type: string; start: Point; orig: Scenario; moved: boolean}) | null = null;
+let drag: ({type: 'pan'; sx: number; sy: number; view: EditorState['view']; reference: boolean; point: Point; moved: boolean}
+  | {type: 'street'; start: Point; heading: number | null; moved: boolean}
+  | {type: string; start: Point; orig: Scenario; moved: boolean}) | null = null;
 let lastUITime = -1;
 
 function snapped(p: Point, event: Pick<MouseEvent, 'altKey'> | null = null) {
@@ -466,6 +540,13 @@ function onPointerDown(event: PointerEvent) {
   const p = screenToWorld(event);
   const target = (event.target as Element | null)?.closest<SVGElement>('[data-drag]');
 
+  if (state.tool === 'street') {
+    // Click to stand here; drag to aim, as when dropping Google Maps' Street View figure.
+    drag = { type: 'street', start: p, heading: null, moved: false };
+    svg.setPointerCapture(event.pointerId);
+    renderStreetMarker(p, null);
+    return;
+  }
   if (state.tool === 'coordinates' || (!target && state.tool !== 'draw')) {
     drag = { type: 'pan', sx: event.clientX, sy: event.clientY, view: { ...state.view },
       reference: state.tool === 'coordinates', point: p, moved: false };
@@ -498,6 +579,15 @@ function onPointerMove(event: PointerEvent) {
   publish();
   if (!drag) {
     if (state.drawing != null) renderOverlay();
+    return;
+  }
+  if ('heading' in drag) {
+    // Aim once the pointer has left the figure by more than its own size on screen.
+    if (Math.hypot(p.x - drag.start.x, p.z - drag.start.z) * state.view.scale * ppm() > 10) {
+      drag.moved = true;
+      drag.heading = streetHeading(drag.start, p);
+    }
+    renderStreetMarker(drag.start, drag.heading);
     return;
   }
   if ('sx' in drag) {
@@ -544,6 +634,13 @@ function onPointerMove(event: PointerEvent) {
 }
 
 function onPointerUp(event: PointerEvent) {
+  if (drag && drag.type === 'street' && 'heading' in drag) {
+    const {start, heading} = drag;
+    drag = null;
+    if (event.type !== 'pointercancel') openStreet(start, heading ?? streetPose?.heading ?? 0);
+    else renderStreetMarker();
+    return;
+  }
   if (drag?.type === 'pan') $('map').classList.remove('panning');
   if (drag && 'reference' in drag && drag.reference && !drag.moved && event.type !== 'pointercancel') referencePoint(drag.point);
   if (drag?.moved && drag.type !== 'pan') onScenarioChanged();
@@ -697,7 +794,7 @@ function setTool(tool: EditorTool) {
   if (tool === 'coordinates') ui.coordinateOpen = true;
   publish();
   $('map').classList.toggle('drawing', tool === 'draw');
-  $('map').classList.toggle('locating', tool === 'coordinates');
+  $('map').classList.toggle('locating', tool === 'coordinates' || tool === 'street');
 }
 
 /** Central change hook. inspector: 'values' (sync inputs), 'full' (rebuild), 'none'. */
@@ -1022,6 +1119,15 @@ function onKey(event: KeyboardEvent) {
   if (typing) return;
   if (mod && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? redo() : undo(); return; }
   if (mod && event.key.toLowerCase() === 'y') { event.preventDefault(); redo(); return; }
+  if (event.key === 'Escape' && ui.streetOpen) { event.preventDefault(); closeStreet(); return; }
+  if (ui.streetOpen) return;
+  if (event.key === 'Enter' && state.tool === 'street' && document.activeElement === $('map') && state.map) {
+    event.preventDefault();
+    const rect = $('map').getBoundingClientRect();
+    openStreet(fromPx((rect.width / 2 - state.view.tx) / state.view.scale,
+      (rect.height / 2 - state.view.ty) / state.view.scale), streetPose?.heading ?? 0);
+    return;
+  }
   if (event.key === 'Enter' && state.tool === 'coordinates' && document.activeElement === $('map') && state.map) {
     event.preventDefault();
     const rect = $('map').getBoundingClientRect();
@@ -1038,6 +1144,7 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'v' || event.key === 'V') setTool('select');
   if (event.key === 'c' || event.key === 'C') setTool('draw');
   if (event.key === 'p' || event.key === 'P') { setTool('coordinates'); $('map').focus(); }
+  if (event.key === 'l' || event.key === 'L') { setTool('street'); $('map').focus(); }
   if (event.key === 'f' || event.key === 'F') fitScenario();
   if (event.key === 'g' || event.key === 'G') fitMap();
   if (event.key === 'Delete' || event.key === 'Backspace') {
@@ -1058,6 +1165,7 @@ function wire() {
   svg.addEventListener('wheel', onWheel, {...options, passive: false});
   svg.addEventListener('dblclick', onDoubleClick, options);
   svg.addEventListener('contextmenu', onContextMenu, options);
+  addEventListener('message', onStreetMessage, options);
   document.addEventListener('keydown', onKey, options);
   document.addEventListener('pointerdown', event => {const menu = document.querySelector<HTMLDetailsElement>('.layers'); if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;}, options);
   let lastSize: {width: number; height: number} = svg.getBoundingClientRect();
@@ -1122,7 +1230,8 @@ const actions = {
   newScenario, duplicate, save, undo, redo, removeFile, playInUnity, playInBrowser, downloadJson, importJson,
   openFile, focusTarget, copyCoordinates, openQuestDialog, questCheck, questSend,
   closeQuest: () => {ui.questOpen = false; publish();},
-  tool: (tool: EditorTool) => {if (tool === 'draw' && state.selection?.kind === 'vehicle') startDrawing(state.selection.index); else setTool(tool); if (tool === 'coordinates') $('map').focus();},
+  openStreet: () => {if (state.reference) openStreet(state.reference, streetPose?.heading ?? 0);}, closeStreet,
+  tool: (tool: EditorTool) => {if (tool === 'draw' && state.selection?.kind === 'vehicle') startDrawing(state.selection.index); else setTool(tool); if (tool === 'coordinates' || tool === 'street') $('map').focus();},
   fitScenario, fitMap, zoom: (factor: number) => zoomAt(factor),
   layer: (key: keyof typeof ui.layers, value: boolean) => {ui.layers[key] = value; if (state.map) applyLayers(); publish();},
   coordinate: (axis: 'coordinateX' | 'coordinateZ', value: string) => {ui[axis] = value; publish();},

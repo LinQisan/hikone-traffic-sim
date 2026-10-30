@@ -1,7 +1,7 @@
 // VRLearn web port. Open exploration: one continuous session in the shared corridor, where the ten
 // events occur as encounters (scenario-manager.js); contact → replay → feedback → continue.
-// Practice: title → walk/ride one scenario → contact (flash, freeze) → replay → feedback, or goal →
-// success feedback. Desktop browsers (pointer lock + WASD) and phones/tablets (touch stick + drag).
+// Practice: title → walk/ride one scenario → contact (flash, freeze) or goal → replay → feedback.
+// Desktop browsers (pointer lock + WASD) and phones/tablets (touch stick + drag).
 import * as THREE from 'three';
 import * as S from '../../simulation/core/scenario.ts';
 import { toThree, yawToThree } from '../scene/coords.ts';
@@ -15,6 +15,7 @@ import { SessionLog } from '../../simulation/metrics/SessionLog.ts';
 import { DRIVER_BEHAVIOR_LABELS } from '../../simulation/traffic/driver.ts';
 import { Recorder, accidentAnalysis, crossingAnalysis, accidentVerdict, successVerdict, yawTo,
   SECONDS_BEFORE_IMPACT, SECONDS_AFTER_IMPACT, BUFFER_SECONDS } from '../../simulation/metrics/analysis.ts';
+import {nearestReplayCar} from '../../simulation/metrics/replay.ts';
 import { instance, BODY_MODEL, paintFor, resetVehicleCache } from '../entities/vehicles.js';
 import { Replay } from '../entities/replay.js';
 import { paint, PaintRenderer } from '../materials/style.js';
@@ -25,6 +26,8 @@ import { PerformanceProbe } from '../renderer/PerformanceProbe.ts';
 import { TouchControls, isTouchDevice } from '../controls/TouchControls.ts';
 import { AdaptiveResolution } from '../renderer/AdaptiveResolution.ts';
 import { Obstacles } from '../../simulation/collision/Obstacles.ts';
+import { StreetViewer, parseStreetPose } from '../camera/StreetViewer.ts';
+import type { StreetPose } from '../camera/StreetViewer.ts';
 import { setSunDirection, alignBlobShadow } from '../materials/blob-shadow.js';
 import { webLayout } from '../../world/generators/web-layout.js';
 import { parkedFor } from '../../world/generators/parked-layout.js';
@@ -38,7 +41,7 @@ import type {Scenario, ScenarioEntry, ScenarioMap, PlayerMode, Point, Pose} from
 import type {CollisionGrid, RoadTiles, TrafficCar, HeadFrame, Participant, Footprint, ReplayFrame} from '../../types/simulation.ts';
 import type {Binding, EncounterRecord, ParkedPlacement} from '../../types/world.ts';
 import type {IncidentRecord, SessionIncident} from '../../types/session.ts';
-import type {SimulatorCommands, SimulatorStore, Screen} from '../../state/SimulatorStore.ts';
+import type {SimulatorCommands, SimulatorStore, Screen, ReplayView} from '../../state/SimulatorStore.ts';
 import {ResourceDisposer} from './resources.ts';
 import {ResourceScope} from '../../utils/ResourceScope.ts';
 import {resetBrushTexture} from '../materials/paint-texture.js';
@@ -56,7 +59,7 @@ interface RunBase {
   recordingHead: Partial<HeadFrame>; participant: Participant; cars: Map<number, THREE.Group>;
   carFrame: number; parked: THREE.Group; lastX: number; lastZ: number;
   impact: {time: number; car: TrafficCar; kmh: number; x?: number; z?: number; binding?: Binding | null} | null;
-  impactUntil: number; frames: ReplayFrame[]; replaySource: 'impact' | 'summary';
+  impactUntil: number; frames: ReplayFrame[]; replaySource: 'impact' | 'success' | 'summary';
 }
 interface PracticeRun extends RunBase {kind: 'practice'; scenario: Scenario}
 interface ExplorationRun extends RunBase {
@@ -601,12 +604,24 @@ function beginReplay() {
   run.frames = run.recorder.window(t - SECONDS_BEFORE_IMPACT, t + SECONDS_AFTER_IMPACT, t);
   if (run.kind === 'explore') run.log.incident(run.incident!, run.frames);
   run.replaySource = 'impact';
-  for (const mesh of run.cars.values()) mesh.visible = false;
-  player.bicycle.root.visible = false;
   ui.patch('replay', {visible: true, title: run.scenario.playerMode === 'bicycle'
     ? '自転車のリプレイ / Bicycle replay' : '事故のリプレイ / Accident replay', next: 'スキップ / Skip',
     hint: '最後まで再生して停止します。スキップをクリックすると結果へ進みます。'});
   playReplay(run.frames, t, run.impact!.car.id);
+}
+
+function beginSuccessReplay() {
+  const run = requireRun();
+  player.enabled = false;
+  document.exitPointerLock?.();
+  touch.setActive(false);
+  run.recorder.capture(run.time, player.head(run.recordingHead), run.traffic.cars, true);
+  run.recorder.stop();
+  run.frames = run.recorder.window(run.time - BUFFER_SECONDS, run.time);
+  run.replaySource = 'success';
+  ui.patch('replay', {visible: true, title: 'ゴールまでのリプレイ / Goal replay', next: 'スキップ / Skip',
+    hint: 'ゴールまでの動きを振り返ります。スキップをクリックすると結果へ進みます。'});
+  playReplay(run.frames, null, nearestReplayCar(run.frames));
 }
 
 /** A kept contact clip of this session, from the session record. */
@@ -614,19 +629,20 @@ function replayIncident(incident: SessionIncident) {
   const run = requireRun();
   ui.patch('results', {visible: false});
   run.replaySource = 'summary';
-  for (const mesh of run.cars.values()) mesh.visible = false;
-  player.bicycle.root.visible = false;
   ui.patch('replay', {visible: true, title: '接触のリプレイ / Contact replay', next: 'スキップ / Skip'});
   playReplay(incident.frames!, incident.time, incident.car);
 }
 
-function playReplay(frames: ReplayFrame[], t: number, carId: number) {
+function playReplay(frames: ReplayFrame[], t: number | null, carId: number | null) {
   const run = requireRun();
+  for (const mesh of run.cars.values()) mesh.visible = false;
+  player.bicycle.root.visible = false;
   ui.flush(); replayViewport();
   replay.start(frames, t, carId, run.heightCm, run.scenario.playerMode, run.weightKg, run.parked);
+  ui.patch('replay', {view: replay.view, canViewDriver: !!replay.driverTrack?.length});
   light.invalidate();
   setState('replay');
-  announce('リプレイです。俯瞰か運転者の視点で見られます。 / Replay.');
+  announce(`${t == null ? 'ゴールしました。' : ''}リプレイです。俯瞰・体験者${carId == null ? '' : '・運転者'}の視点で見られます。 / Replay.`);
   ui.focus('next', true);
   ui.patch('hud', {visible: false});
 }
@@ -680,7 +696,8 @@ function showResults(success: boolean) {
 
 function next() {
   if (state !== 'replay') return;
-  if (requireRun().replaySource === 'summary') showSummary(); else showResults(false);
+  const source = requireRun().replaySource;
+  if (source === 'summary') showSummary(); else showResults(source === 'success');
 }
 function setResultButtons() {
   const explore = requireRun().kind === 'explore';
@@ -690,7 +707,7 @@ function setResultButtons() {
 }
 const retryAction = () => {if (activeRun?.kind === 'explore') resumeExplore(); else void start(true);};
 const titleAction = () => {if (activeRun?.kind === 'explore' && resultsKind === 'incident') showSummary(); else toTitle();};
-function setReplayView(view: 'overview' | 'driver') {replay.setView(view); ui.patch('replay', {view});}
+function setReplayView(view: ReplayView) {replay.setView(view); ui.patch('replay', {view: replay.view});}
 // back to the menu at any time: during the run, the fall and the replay
 let lockReleased = 0;
 document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) lockReleased = performance.now(); }, {signal: scope.signal});
@@ -710,7 +727,10 @@ addEventListener('keydown', e => {
   // Esc while the mouse is free (the first Esc only releases pointer lock)
   else if (e.code === 'Escape' && !document.pointerLockElement && !mouseLockedRecently()) leaveToMenu();
   else if (state === 'replay' && e.code === 'KeyB') replay.restart();
-  else if (state === 'replay' && e.code === 'KeyV') setReplayView(replay.view === 'driver' ? 'overview' : 'driver');
+  else if (state === 'replay' && e.code === 'KeyV') {
+    const views: ReplayView[] = ui.getSnapshot().replay.canViewDriver ? ['overview', 'participant', 'driver'] : ['overview', 'participant'];
+    setReplayView(views[(views.indexOf(replay.view) + 1) % views.length]);
+  }
   else if (state === 'results' && e.code === 'KeyR') retryAction();
   else if (state === 'results' && e.code === 'Enter') titleAction();
   else if (state === 'playing' && e.code === 'KeyR' && activeRun?.kind !== 'explore') start(true);      // operator abort: restart
@@ -725,6 +745,48 @@ const probe = new PerformanceProbe(fpsRoot, renderer, new URLSearchParams(locati
 const lightPosition = new THREE.Vector3();
 let debugCamera: (THREE.PerspectiveCamera | THREE.OrthographicCamera) & {aspect?: number} | null = null;
 let previewSignals: Awaited<ReturnType<typeof buildSignals>> | null = null, previewSignalTime = 0;
+// Development street view: the editor's "3Dで見る" panel embeds this page and moves the camera
+// by same-origin messages; ?street=x,z,heading opens it directly. It is never a scenario run.
+const embedded = window.parent !== window;
+const street = new StreetViewer(renderer.domElement, ground, S.HIKONE_WORLD_BOUNDS, scope.signal);
+let streetReported = 0;
+function reportStreet(force = false) {
+  const now = performance.now();
+  if (!embedded || (!force && now - streetReported < 150)) return;
+  streetReported = now;
+  const {x, z, heading, pitch, eye} = street.pose;
+  window.parent.postMessage({type: 'hikone:street-at', x: +x.toFixed(2), z: +z.toFixed(2),
+    heading: Math.round(heading), pitch: Math.round(pitch), eye: +eye.toFixed(1)}, location.origin);
+}
+function enterStreetView(pose: StreetPose) {
+  if (state !== 'title') return;
+  street.place(pose);
+  debugCamera = street.camera;
+  ui.patch('presentation', {inspection: true, street: true, embedded});
+  renderer.domElement.tabIndex = 0;
+  renderer.domElement.focus({preventScroll: true});
+  announce(`地点 x ${pose.x.toFixed(1)}、z ${pose.z.toFixed(1)} を表示しています。`);
+  reportStreet(true);
+}
+function leaveStreetView() {
+  street.stop();
+  debugCamera = null;
+  ui.patch('presentation', {inspection: false, street: false});
+  toTitle();
+}
+addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== window.parent || !embedded) return;
+  const data = event.data as {type?: string; x?: number; z?: number; heading?: number} | null;
+  if (data?.type !== 'hikone:street') return;
+  const pose = parseStreetPose([data.x, data.z, data.heading ?? 0].join(','), S.HIKONE_WORLD_BOUNDS);
+  if (pose) enterStreetView(pose);
+}, {signal: scope.signal});
+addEventListener('keydown', event => {
+  if (!street.active || !['Escape', 'KeyM'].includes(event.code)) return;
+  // Inside the editor the map is the way back; on its own page the street view returns to the menu.
+  if (embedded) window.parent.postMessage({type: 'hikone:street-close'}, location.origin);
+  else leaveStreetView();
+}, {signal: scope.signal});
 let fpsTime = 0, fpsFrames = 0;
 function tick(dt: number) {
   const run = activeRun!;
@@ -755,7 +817,7 @@ function tick(dt: number) {
     run.recorder.capture(run.time, player.head(run.recordingHead), run.traffic.cars);
     const hit = run.traffic.hit(player.x, player.z);
     if (hit) onImpact(hit);
-    else if (S.pointInArea([player.x, player.z], s.goal)) { player.enabled = false; document.exitPointerLock?.(); showResults(true); }
+    else if (S.pointInArea([player.x, player.z], s.goal)) beginSuccessReplay();
   } else if (state === 'impact') {
     run.time += dt;
     // practice: only a car that does not stop (noStop) still moves; exploration: drivers see the fall
@@ -792,6 +854,7 @@ renderer.setAnimationLoop(() => {
   if (resolution.frame(elapsed, performance.now(), document.hidden)) sizeRenderer();
   const updateStart = performance.now();
   tick(dt);
+  if (street.active && street.update(dt)) reportStreet();
   light.animate(document.hidden ? 0 : dt);
   wildlife.update(ambientMotion.time.value);
   if (debugCamera) lightPosition.copy(debugCamera.position).setY(0);
@@ -845,7 +908,8 @@ const debug = {
   },
   /** Look from (x, y, z) at (tx, ty, tz) in Unity coordinates (comparisons with Unity screenshots); null to stop. */
   debugView(x: number | null, y = 0, z = 0, tx = 0, ty = 0, tz = 0, fov = 60) {
-    if (x == null) {debugCamera = null; ui.patch('presentation', {inspection: false}); return;}
+    street.stop();
+    if (x == null) {debugCamera = null; ui.patch('presentation', {inspection: false, street: false}); return;}
     if (!(debugCamera instanceof THREE.PerspectiveCamera)) debugCamera = new THREE.PerspectiveCamera(fov, innerWidth / innerHeight, 0.1, 900);
     debugCamera.fov = fov;
     debugCamera.updateProjectionMatrix();
@@ -931,6 +995,13 @@ if (propCamera) {
 }
 // Ad hoc comparison with a photograph: ?cam=x,y,z,tx,ty,tz[,fov] in map metres.
 else if (review.get('cam')) debug.debugView(...(review.get('cam')!.split(',').map(Number) as [number, number, number, number, number, number, number?]));
+// Free street view: ?street=x,z[,heading[,pitch[,eye]]] in map metres and degrees.
+else if (review.has('street')) {
+  const pose = parseStreetPose(review.get('street'), S.HIKONE_WORLD_BOUNDS);
+  if (pose) enterStreetView(pose);
+  else ui.patch('toast', {text: '?street= には地図の範囲内の x,z[,向き] を指定してください。', tone: 'warn', visible: true});
+}
+if (embedded) window.parent.postMessage({type: 'hikone:street-ready'}, location.origin);
 if (review.get('finish') === 'off') setPainted(false);
 if (review.get('view') === 'ride') {
   selected = scenarioIndex.find(e => e.id === 'builtin-07') ?? selected;

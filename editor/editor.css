@@ -191,6 +191,16 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
 .reference-pin { fill: #fde68a; stroke: #111a2e; }
 .reference-cross { fill: none; stroke: #111a2e; }
 .label.reference-label { fill: #fde68a; }
+#streetMarker { pointer-events: none; }
+.street-figure { fill: #fb923c; stroke: #111a2e; }
+.street-cone { fill: rgba(251, 146, 60, .32); stroke: none; }
+/* street view: the simulator page over the map, like Maps' switch to Street View */
+.street-view { position: absolute; inset: 0; z-index: 6; display: flex; flex-direction: column; background: var(--bg); }
+.street-view[hidden] { display: none; }
+.street-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px; border-bottom: 1px solid var(--edge, #2b3a52); }
+.street-bar .tool { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.street-position { flex: 1; font: 13px ui-monospace, monospace; color: var(--text); }
+.street-view iframe { flex: 1; width: 100%; border: 0; background: #0b1220; }
 /* map layers (SVG) */
 .surface-carriageway { fill: rgba(56, 140, 255, .28); }
 .surface-sidewalk { fill: rgba(253, 230, 138, .26); }
@@ -366,4 +376,5 @@ input[type=checkbox], input[type=range] { accent-color: var(--accent); }
   .coordinate-ruler { fill: Canvas; }
   .coordinate-grid text, .reference-label { fill: CanvasText; }
   .reference-pin { fill: Highlight; }
+  .street-figure { fill: Highlight; stroke: CanvasText; } .street-cone { fill: none; stroke: Highlight; }
 }
