@@ -1,0 +1,63 @@
+{
+  "reviewed": "2026-10-31",
+  "frame": "geographic-frame.json; existing anchor, metres and bearing unchanged",
+  "photos": "Owner photographs IMG_0855-0866, 29 October 2026, inspected locally. None is shipped or used as a texture.",
+  "basis": "Everything here is a visual estimate read from those photographs, placed against the existing mapped lanes and outlines. Nothing was surveyed.",
+  "apron": {
+    "footprint": [[-590, 246], [-525, 243], [-524, 250], [-540, 254.6], [-552, 257.6], [-566, 258], [-583.5, 259.5], [-583.9, 262.5], [-590, 262.6]],
+    "basis": "0855-0857: the junction in front of the Nishi gate is asphalt from wall to planting bed, with no lawn or sand footway."
+  },
+  "asphaltLane": {"boxes": [[-625, 225, -520, 266], [-604, 150, -582, 266]], "basis": "0855-0858: flush asphalt with gravel verges; the inherited sand shoulders are retiled, not resized."},
+  "nishiCypress": {
+    "line": [[-581.5, 261.4], [-566, 259.8], [-552, 259.3], [-540, 256.4]], "height": 8.2, "spacing": 2.1,
+    "basis": "0990, 0997: a tall leaning cypress row behind the low stone wall, with bare trunks at its foot. Height estimated."
+  },
+  "diamonds": {
+    "points": [[-590.9, 226, 0], [-552, 250.7, 95]],
+    "basis": "0980, 1004: teal crossing-ahead diamond with a white frame, in the left lane. Size estimated."
+  },
+  "cypress": {
+    "line": [[-521, 237.6], [-497, 235.8], [-478, 234.8]],
+    "height": 10.5,
+    "basis": "0857-0860: a tall dark clipped cypress screen behind a rusted white fence on a concrete block footing."
+  },
+  "junctionBed": {
+    "outline": [[-524.2, 251], [-514, 250.2], [-506.5, 252], [-512.5, 256.5], [-521, 259.5], [-525, 256]],
+    "cherry": [-517.5, 254.6],
+    "sign": [-523.2, 252.2],
+    "pole": [-511.5, 253.8],
+    "basis": "0858: a log-edged raised bed with a cut-back cherry, a no-parking sign reading 区域内, and a thin rusted pole."
+  },
+  "villa": {
+    "center": [-447, 298], "width": 10, "depth": 8.5, "height": 6.2, "rise": 2.6, "heading": 2,
+    "basis": "0858-0860: grey two-storey building with a hipped slate roof, chimney and arched door beyond the open lot. Distance estimated from its apparent size, so its position is uncertain by about 15 m."
+  },
+  "samuraiWall": {
+    "line": [[-104, 160.5], [-80, 162.5], [-60, 165.5]],
+    "base": 1.0, "height": 2.75,
+    "basis": "0863: mortared stone base, grey plaster, tile coping and a white end wall, on the right of the road east of the bend."
+  },
+  "rampart": {
+    "range": [-130, -62], "height": 3.2, "base": -0.9,
+    "basis": "0866: continuous stone rampart at the foot of the wooded bank. Height estimated; the retained bank line is not re-registered."
+  },
+  "schoolPlanting": {
+    "shrubs": [[12.7, 149.6], [13.3, 152.6], [13.9, 155.6], [14.5, 158.6], [15.1, 161.6]],
+    "leftShrubs": [[17.2, 177.4], [18.1, 180.3]],
+    "steles": [[30.5, 171.2], [33.1, 170.1]],
+    "palms": [[46.5, 158.5], [49.5, 156.5], [44.5, 152.2]],
+    "hedge": [[12.6, 143.4], [9.6, 126]],
+    "directions": [4.8, 177.2],
+    "basis": "0864-0865: clipped azaleas in a kerbed bed with chain posts, paired steles, fan palms, a tall hedge and a dark direction post."
+  },
+  "instances": [
+    {"a": "ART_GardenPine", "p": [-74, 0.01, 157], "r": 40, "s": [1.8, 1.7, 1.8]},
+    {"a": "ART_GardenPine", "p": [31, 0.01, 151.5], "r": 110, "s": [1.5, 1.45, 1.5]},
+    {"a": "ART_StreetWillow", "p": [37.5, 0.01, 168.5], "r": 200, "s": [0.72, 0.72, 0.72]}
+  ],
+  "limits": [
+    "The moat, inner road and bank here are the retained satellite trace. OSM way/121393441, which fits 0862's GPS, runs about 20 m south of it, so 0862 cannot be matched from its recorded position; the road was not moved.",
+    "Species are silhouette recipes, not botanical identification.",
+    "Signs and notices are simplified readable graphics of what the photographs show, not verified regulations; unreadable text is not transcribed."
+  ]
+}

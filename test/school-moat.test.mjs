@@ -36,7 +36,7 @@ for(const lod of ['','.lod'])test(`the stone batter and raised ground survive na
   const top=(x,z)=>{ray.set(new THREE.Vector3(-x,20,z),new THREE.Vector3(0,-1,0));return ray.intersectObject(group,true)[0];};
   const wall=top(-542,183);
   assert.ok(wall?.point.y>1.5,'a tall stone face replaces the low water-edge strip');
-  assert.ok(['HK_StoneDark','HK_Stone','ART_StoneLight'].includes(wall.object.material.name),'the batter is masonry');
+  assert.ok(['HK_StoneDark','HK_Stone','ART_StoneLight','ART_Boulder','ART_Joint'].includes(wall.object.material.name),'the batter is masonry');
   const soil=top(-540,183);
   assert.ok(Math.abs(soil.point.y-ground.heightAt(-540,183))<.03,'the visible slope is the same height as exported Ground');
   for(const z of [55,65,75]){

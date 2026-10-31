@@ -54,6 +54,10 @@ const PIGMENTS = {
   HK_StoneDark: [[0.80, 0.72, 0.59], [0.50, 0.60, 0.78]],
   HK_Leaf: [[0.78, 0.78, 0.46], [0.35, 0.53, 0.48]],
   HK_LeafDark: [[0.69, 0.73, 0.44], [0.32, 0.49, 0.46]],
+  HK_LeafDeep: [[0.42, 0.52, 0.34], [0.20, 0.33, 0.34]],
+  ART_Boulder: [[0.74, 0.70, 0.56], [0.42, 0.47, 0.52]],
+  ART_Facade: [[0.76, 0.70, 0.60], [0.52, 0.52, 0.57]],
+  ART_Gravel: [[0.82, 0.77, 0.66], [0.55, 0.59, 0.66]],
   HK_Sakura: [[1.0, 0.85, 0.76], [0.83, 0.55, 0.72]],
   HK_Grass: [[0.79, 0.78, 0.43], [0.39, 0.57, 0.57]],
   HK_Water: [[0.86, 0.84, 0.63], [0.42, 0.61, 0.83]],
@@ -69,10 +73,12 @@ const PIGMENTS = {
   ART_SignalHood: [[0.68, 0.63, 0.53], [0.43, 0.49, 0.58]],
   ART_SignalHousingDark: [[0.42, 0.39, 0.36], [0.31, 0.34, 0.43]],
   ART_SignalHoodDark: [[0.39, 0.37, 0.34], [0.28, 0.31, 0.40]],
-  ART_PathGreen: [[0.69, 0.75, 0.48], [0.40, 0.65, 0.70]],
+  ART_PathGreen: [[0.34, 0.56, 0.38], [0.20, 0.42, 0.42]],
 };
 
-const LEAVES = new Set(['HK_Leaf', 'HK_LeafDark']);
+const LEAVES = new Set(['HK_Leaf', 'HK_LeafDark', 'HK_LeafDeep']);
+// Pavement and masonry keep broken colour, but the form underneath must stay readable on foot.
+const SOFT_DABS = {HK_Asphalt: 0.3, HK_Sidewalk: 0.32, HK_Curb: 0.36, ART_Boulder: 0.28, ART_Gravel: 0.34, ART_Facade: 0.26};
 const STREET_METAL = new Set(['HK_MetalLight', 'ART_SignalPole', 'ART_SignalHousing',
   'ART_SignalHood', 'ART_SignalHousingDark', 'ART_SignalHoodDark']);
 
@@ -81,7 +87,7 @@ export function pigmentOf(name) {
   const pigments = PIGMENTS[name];
   const surface = LEAVES.has(name) ? 1 : STREET_METAL.has(name) ? 2 : 0;
   const dab = surface === 1 ? 0.43 : surface === 2 ? 0.60
-    : (name.startsWith('ART_') && !pigments) || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12;
+    : SOFT_DABS[name] ?? ((name.startsWith('ART_') && !pigments) || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12);
   return {
     surface,
     warm: pigments?.[0] ?? [0.76, 0.64, 0.49], cool: pigments?.[1] ?? [0.45, 0.55, 0.72],

@@ -162,12 +162,18 @@ export const UNIVERSITY_GATEHOUSE = {id:'gatehouse',name:'Main gatekeeper room',
   footprint:[[-601.6,173.4],[-602.4,164.6],[-609.6,164.4],[-608.9,173.6]]};
 // At the moat-side street (photos IMG_0849/0853): a granite post-and-rail balustrade with a
 // clipped hedge south of the gate, and a concrete wall topped by a palisade north of it.
+const streetWallChange = (([ax,az],[cx,cz]) => {
+  const t = (196 - az) / (cz - az);
+  return [ax + (cx - ax) * t, 196];
+})(gateEdge(-1), CAMPUS_BANK[0]);
 export const UNIVERSITY_BOUNDARY = [
   {kind:'wall',points:[...westStreetView([[784,264],[912,348]]),westEdge(-1)]},
   {kind:'wall',points:[westEdge(1),...south([[570,398],[660,463],[778,548],[889,628],[993,697]]),[-620.3,144.3],[-597.6,143.0]]},
   {kind:'balustrade',points:[[-597.6,143.0],[-596.8,145.6],gateEdge(1)]},
-  {kind:'palisadeWall',points:[gateEdge(-1),CAMPUS_BANK[0]]},
-  {kind:'palisade',points:CAMPUS_BANK},
+  // The timber palisade stops short of the hall: stone posts and rail carry on north (0971, 0977).
+  {kind:'palisadeWall',points:[gateEdge(-1),streetWallChange]},
+  {kind:'wall',points:[streetWallChange,CAMPUS_BANK[0]]},
+  {kind:'wall',points:CAMPUS_BANK},
   {kind:'fence',points:[...westStreetView([[784,264],[864,157],[962,23]]),...aerial([[535,229],[695,15],[970,-335]]),...w([[650,174],[690,190]])]},
 ];
 // Visible roof envelopes in the small block between the two public streets.
@@ -261,7 +267,6 @@ export const WEST_BUILDINGS = [
   building('moat-timber-house', 'Observed two-storey timber house beside the inner moat', schoolView([[841,456],[871,477],[845,514],[815,493]]), 5.4, 'tile', 2.1),
   building('moat-store', 'Observed low tiled store', schoolView([[869,472],[895,490],[872,523],[846,505]]), 3.2, 'tile', 1.5),
   building('school-lane-shed', 'Observed gabled shed by the school lane', schoolView([[794,473],[822,493],[807,514],[779,494]]), 3.4, 'metal', 1.3),
-  building('lot-east-house', 'Observed low tiled frontage east of the open lot', schoolView([[899,625],[952,662],[935,687],[882,650]]), 4.4, 'tile', 1.6),
 ];
 export const SCHOOL_LANES = [[CASTLE_CAMPUS_LINK[7],...schoolView([[750,539],[780,488],[811,443]])]];
 export const SCHOOL_LOT = schoolView([[790,531],[887,600],[850,650],[751,580]]);

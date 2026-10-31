@@ -1046,11 +1046,11 @@
     238.5
    ],
    [
-    54.5,
+    57,
     261.7
    ],
    [
-    67.2,
+    68.8,
     309
    ]
   ],
@@ -1066,6 +1066,6 @@
   ],
   "base": 0.7,
   "height": 2.6,
-  "basis": "OSM school boundary way/180832530; Street View Nov 2022"
+  "basis": "OSM school boundary way/180832530; Street View Nov 2022; moved off the footway when the road returned to its OSM line, 2026-10-31"
  }
 }

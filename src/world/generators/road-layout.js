@@ -4,7 +4,14 @@ import { CASTLE_ITEMS } from './castle-layout.js';
 import { UNIVERSITY_ITEMS } from './university-layout.js';
 import { NORTH_APPROACH, INNER_MOAT_ROAD, distanceToPath, APPROACH_BUILDINGS, APPROACH_PATCHES, HIGASHI_ISLAND, HIGASHI_FRONTAGE, HIGASHI_STREET } from './castle-approach.js';
 import townStreets from '../../../world/town-streets.json' with { type: 'json' };
+import schoolRoad from '../../../world/school-road.json' with { type: 'json' };
+import innerMoatStreet from '../../../world/inner-moat-street.json' with { type: 'json' };
 import {eastLayout} from './east-layout.ts';
+const pathZ = (path, x) => {
+  const i = path.findIndex((p, k) => k && (path[k - 1][0] - x) * (p[0] - x) <= 0);
+  const a = path[i - 1], c = path[i];
+  return a[1] + (c[1] - a[1]) * (x - a[0]) / (c[0] - a[0]);
+};
 export const TOWN_STREETS = townStreets.streets;
 export const TOWN_CROSSINGS = townStreets.crossings;
 export function moatBend(x) {
@@ -185,6 +192,17 @@ export function roadLayout(layout) {
       r: (i * 47 + row * 29) % 360, s: [0.9 + i % 3 * 0.10, 0.88 + i % 4 * 0.07, 1], g: 'WebGrove' });
   }
   items.push(...islandForest());
+  // The castle-hill canopy and the 0862-0866 frontage planting; see tools/school_road.py.
+  items.push({ a: 'ART_HillWood', p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebHillWood' });
+  for (const item of schoolRoad.instances) items.push({ g: 'WebGrove', ...item });
+  // The photographed inner moat street; see tools/moat_street.py.
+  items.push({ a: 'ART_InnerMoatStreet', p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebInnerMoat' });
+  for (const item of innerMoatStreet.instances) items.push({ g: 'WebInnerMoat', ...item });
+  // Thin, cut-back cherries on the moat side of the inner road (0862).
+  for (let x = -366, i = 0; x < -118; x += 23, i++) {
+    const z = pathZ(INNER_MOAT_ROAD, x) + 6.8;
+    items.push({ a: 'ART_PromenadeCherry', p: [x, 0.15, z], r: i * 67 % 360, s: [0.8, 0.85, 0.8], g: 'WebGrove' });
+  }
   // The northern longhouse is now part of the reviewed approach, at its actual footprint.
   items.push({ a: 'ART_CastleApproach', p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebApproach' });
   items.push({ a: 'ART_NorthLonghouse', p: [-7.2, 0.15, 15.6 + frontageShift('ART_NorthLonghouse', -7.2, 0.9)],

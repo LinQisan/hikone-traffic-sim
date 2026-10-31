@@ -374,8 +374,8 @@ def furniture(b):
     for item in d['schoolWalls']:
         if item['osm'] != 'way/1449647547':
             continue  # The gate-corner walls are now authored by nishi_school.
-        base=item.get('baseHeight',.01)
-        solid(b,item['outline'],base,base+item['height'] if 'baseHeight' in item else item['height'],'HK_Stone')
+        from nishi_school import wall as boulder_wall
+        boulder_wall(b,item)
     # The photo's diagonal zebra and blue cycle crossing share the corrected road axis.
     line=d['schoolRoad']['points'];a,c=line[-2],line[-3];length=math.dist(a,c);ux,uz=(c[0]-a[0])/length,(c[1]-a[1])/length;nx,nz=-uz,ux
     x,z=-574.7,a[1]+(c[1]-a[1])*(-574.7-a[0])/(c[0]-a[0])
@@ -396,6 +396,8 @@ def furniture(b):
     north_furniture(b)
     from south_promenade import furniture as south_furniture
     south_furniture(b)
+    from school_road import furniture as school_road_furniture
+    school_road_furniture(b)
 
 
 def road_details(b):

@@ -28,13 +28,13 @@ export function leafSpray({ center, size, angle, season, fine, distant, random: 
     const phase = rng.uniform(0, Math.PI * 2);
     const heat = Math.max(0, Math.min(0.999, season + rng.uniform(-0.13, 0.13))) * (palette.length - 1);
     const tone = mix(palette[Math.floor(heat)], palette[Math.floor(heat) + 1], heat % 1), blades = [];
-    const count = fine ? 24 : 4;
+    const count = fine ? 24 : 10;
     for (let i = 0; i < count; i++) {
       const a = phase + i * 2.39996, y = 1 - 2 * (i + 0.5) / count, r = Math.sqrt(1 - y * y);
       const at = new Vector3(Math.cos(a) * radii.x * r, y * radii.y, Math.sin(a) * radii.z * r)
         .multiplyScalar(rng.uniform(0.50, 0.96));
       const heading = a + rng.uniform(-0.8, 0.8), tilt = rng.uniform(-0.85, 0.85);
-      const length = Math.min(radii.x, radii.z) * (fine ? 0.62 : 1.30) * rng.uniform(0.75, 1.2);
+      const length = Math.min(radii.x, radii.z) * (fine ? 0.62 : 0.42) * rng.uniform(0.75, 1.2);
       const u = new Vector3(Math.cos(heading), tilt, Math.sin(heading)).normalize().multiplyScalar(length);
       const v = new Vector3(-Math.sin(heading), rng.uniform(-0.30, 0.30), Math.cos(heading)).normalize().multiplyScalar(length * 0.34);
       const normal = u.clone().cross(v).normalize();
@@ -94,7 +94,7 @@ export function tuft({ center, size: [rx, ry, rz], angle, material, seed, fine, 
   const tones = points.map(p => {
     const q = p.clone().sub(vector(center));
     const light = Math.max(0, Math.min(1, 0.50 + q.y / ry * 0.30 - q.x / rx * 0.13 + q.z / rz * 0.10));
-    const drift = 0.018 * Math.sin(q.x * 2.1 + q.y * 1.8 + phase) - (material === 'HK_LeafDark' ? 0.025 : 0);
+    const drift = 0.018 * Math.sin(q.x * 2.1 + q.y * 1.8 + phase) - ({HK_LeafDark: 0.025, HK_LeafDeep: 0.17}[material] ?? 0);
     return mix([0.32, 0.45, 0.37], [0.62, 0.68, 0.37], light).map(c => c + drift);
   });
   const hull = [];

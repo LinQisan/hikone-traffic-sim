@@ -8,9 +8,11 @@ import higashi from '../../../world/higashi-frontage.json' with { type: 'json' }
 import island from '../../../world/higashi-island.json' with { type: 'json' };
 import street from '../../../world/east-street.json' with { type: 'json' };
 import south from '../../../world/south-promenade.json' with { type: 'json' };
+import moat from '../../../world/castle-moat.json' with { type: 'json' };
 export const HIGASHI_FRONTAGE = higashi;
 export const HIGASHI_ISLAND = island;
 export const HIGASHI_STREET = street;
+export const CASTLE_MOAT = moat;
 
 export const APPROACH_REFERENCE = 'https://www.google.com/maps/@?api=1&map_action=map&center=35.2744,136.252&zoom=18&basemap=satellite';
 const latitude = 35.2744, longitude = 136.252;
@@ -54,6 +56,13 @@ const outerPixels = [
 export const INNER_MOAT_OUTER = outline(outerPixels);
 // Follow the reviewed bank at a consistent road/shoulder setback. Independent tracing of
 // both lines would let the road cut through the water at the south bend.
+/** Replaces the stretch of a line lying between two mapped ends with the reviewed points. */
+function reviewed(line, points) {
+  const nearest = ([x, z]) => line.reduce((best, p, i) => Math.hypot(p[0] - x, p[1] - z) < Math.hypot(line[best][0] - x, line[best][1] - z) ? i : best, 0);
+  const first = nearest(points[0]), last = nearest(points.at(-1));
+  line.splice(first, last - first + 1, ...points);
+}
+reviewed(INNER_MOAT_OUTER, moat.outerBank);
 export const INNER_MOAT_ROAD = outline(outerPixels.map(([x, y], i, ps) => {
   const a = ps[Math.max(0, i - 1)], b = ps[Math.min(ps.length - 1, i + 1)];
   const dx = b[0] - a[0], dy = b[1] - a[1], length = Math.hypot(dx, dy);
@@ -75,6 +84,7 @@ if (EAST_GEOGRAPHY.reviewedRoutes) {
   const first = INNER_MOAT_ROAD.findIndex(([,z])=>z>=348);
   INNER_MOAT_ROAD.splice(first,INNER_MOAT_ROAD.length-first,...EAST_GEOGRAPHY.reviewedRoutes.innerRoad);
 }
+reviewed(INNER_MOAT_ROAD, moat.road);
 export const INNER_MOAT_INNER = outline([
   [354, 182], [438, 260], [520, 330], [596, 391], [649, 428], [663, 450],
   [686, 457], [697, 479], [715, 531], [743, 569], [756, 613], [807, 647],
@@ -82,6 +92,7 @@ export const INNER_MOAT_INNER = outline([
   [1119, 588], [1136, 541], [1140, 489], [1123, 444], [1118, 403],
   [1101, 371], [1099, 328], [1126, 278],
 ]);
+reviewed(INNER_MOAT_INNER, moat.innerBank);
 
 function building(name, pixels, height, roof = 'flat', rise = 0) {
   return { name, footprint: outline(pixels), height, roof, rise };

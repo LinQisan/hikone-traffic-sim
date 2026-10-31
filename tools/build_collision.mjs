@@ -24,7 +24,7 @@ const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
 const layout = webLayout(read('layout.json')), map = read('map.json');   // as the browser shows it
 const ground = new Ground(read('road_tiles.json'));
-const NOT_SOLID = /^(HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|Kyobashi(Roads|Land|Water)))/;
+const NOT_SOLID = /^(ART_HillWood|HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|Kyobashi(Roads|Land|Water)))/;
 // These photo-corrected buildings have low real thresholds. Project their closed main
 // bodies too: a plinth below the body band must not turn a building's interior into free cells.
 const SOLID_BODY = new Map([['ART_CornerShop', 'ART_ShopPlaster'], ['ART_WhiteStorehouse', 'ART_DisplayInk']]);

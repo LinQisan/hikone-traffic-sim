@@ -10,9 +10,9 @@ import math
 
 # Consistent, restrained vertex pigments make the small architectural profiles legible.
 PALETTE = {'ART_Plaster':(.88,.90,.85), 'ART_Patina':(.45,.63,.55),
-           'ART_Window':(.22,.29,.29), 'ART_StoneLight':(.81,.82,.77),
+           'ART_Window':(.42,.48,.49), 'ART_Joint':(.92,.93,.89), 'ART_StoneLight':(.81,.82,.77),
            'ART_Timber':(.25,.26,.24), 'HK_RoofTile':(.28,.29,.27),
-           'HK_StoneDark':(.40,.42,.39), 'HK_MetalLight':(.65,.68,.66)}
+           'HK_StoneDark':(.56,.56,.52), 'HK_MetalLight':(.65,.68,.66)}
 
 
 def recolor(b, start):
@@ -51,7 +51,7 @@ def auditorium(b,item):
     for side in (0,1):
         sign=side*2-1
         at=lambda u,y,o: f(u/length,y,side+sign*o/depth)
-        face([f(0,.15,side),f(1,.15,side),f(1,top,side),f(0,top,side)],'ART_Plaster')
+        face([f(0,.15,side),f(1,.15,side),f(1,top,side),f(0,top,side)],'ART_Joint')
         # Horizontal white clapboard and the mint corner/bay pilasters visible in 0853/0854.
         if not b.distant:
             for k in range(1,38):
@@ -66,8 +66,8 @@ def auditorium(b,item):
         for y in (2.65,top-.12):
             face([at(0,y,.06),at(length,y,.06),at(length,y+.11,.06),at(0,y+.11,.06)],'ART_Patina')
     for end in (0,1):
-        face([f(end,.15,0),f(end,.15,1),f(end,top,1),f(end,top,0)],'ART_Plaster')
-        face([f(end,top,0),f(end,top,1),f(end,top+rise,.5)],'ART_Plaster')
+        face([f(end,.15,0),f(end,.15,1),f(end,top,1),f(end,top,0)],'ART_Joint')
+        face([f(end,top,0),f(end,top,1),f(end,top+rise,.5)],'ART_Joint')
     # The observed front has two tall edge windows and a central row of three upper windows.
     # Its long glazed strips are divided by the horizontal sill band, not four full-height bays.
     at=lambda u,y,o:f(1+o/length,y,u/depth)
@@ -163,9 +163,9 @@ def site_office(b,item):
     first=len(b.faces);f=lambda u,y,v:frame_point(item,u,y,v);center=f(.5,3,.5)
     length=math.dist(item['footprint'][0],item['footprint'][1]);depth=math.dist(item['footprint'][0],item['footprint'][3])
     for side in (0,1):
-        outward_face(b,[f(0,.15,side),f(1,.15,side),f(1,6.15,side),f(0,6.15,side)],'ART_Plaster',center)
+        outward_face(b,[f(0,.15,side),f(1,.15,side),f(1,6.15,side),f(0,6.15,side)],'ART_Joint',center)
     for end in (0,1):
-        outward_face(b,[f(end,.15,0),f(end,.15,1),f(end,6.15,1),f(end,6.15,0)],'ART_Plaster',center)
+        outward_face(b,[f(end,.15,0),f(end,.15,1),f(end,6.15,1),f(end,6.15,0)],'ART_Joint',center)
         at=lambda u,y,o:f(end+(end*2-1)*o/length,y,u/depth)
         for i in range(5):
             u=depth*(i+.5)/5
@@ -180,6 +180,16 @@ def site_office(b,item):
         prism(b,(a[0],a[2]),(c[0],c[2]),a[1],a[1]+.1,.38,'HK_MetalLight')
     for v in (1.01,1.11):
         cylinder(b,f(.9,1.1,v),f(0,4.0,v),.04,'HK_MetalLight',segments=4)
+    # Galvanized gallery along the upper windows, reached by the stair (0976, 0977).
+    at=lambda u,y,o:f(-o/length,y,u/depth)
+    for lo,hi in ((3.12,3.2),):
+        outward_face(b,[at(0,hi,0),at(depth,hi,0),at(depth,hi,1.05),at(0,hi,1.05)],'HK_MetalLight',at(depth/2,0,.5))
+    for y in (4.2,3.7):
+        cylinder(b,at(0,y,1.05),at(depth,y,1.05),.03,'HK_MetalLight',segments=4)
+    for i in range(6):
+        u=depth*i/5
+        cylinder(b,at(u,.15,1.05),at(u,6.2,1.05),.04,'HK_MetalLight',segments=4)
+    outward_face(b,[at(0,6.22,-.05),at(depth,6.22,-.05),at(depth,6.22,1.2),at(0,6.22,1.2)],'HK_MetalLight',at(depth/2,0,.5))
     recolor(b,first)
 
 

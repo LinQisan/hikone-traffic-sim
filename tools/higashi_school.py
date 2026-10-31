@@ -9,7 +9,7 @@ import os
 from functools import lru_cache
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BROWN = (.51, .44, .37)
+BROWN = (.49, .43, .36)
 STONE = (.64, .65, .61)
 CREAM = (.83, .82, .74)
 DARK = (.23, .28, .28)
@@ -153,7 +153,7 @@ def building(b, item):
     wall = BROWN if kind in ('main', 'classroom') else (.86, .86, .81) if kind in ('barrel', 'arena', 'block') else (.78, .78, .71)
     if kind == 'shed':
         # Open-sided cycle and playground sheds on regular posts.
-        solid(b, p, top - .16, top, 'ART_Concrete', tuple(item['roofColor']) if 'roofColor' in item else CREAM)
+        solid(b, p, top - .16, top, 'ART_Joint', tuple(item['roofColor']) if 'roofColor' in item else (.64, .67, .64))
         for a, c in zip(p, p[1:] + p[:1]):
             n = max(1, round(math.dist(a, c) / 6))
             for i in range(n):
@@ -168,7 +168,7 @@ def building(b, item):
         for x, z in p:
             cylinder(b, (x, .01, z), (x, top - .22, z), .11, 'ART_StoneLight', segments=6)
         return
-    solid(b, p, .15, top, 'ART_Concrete', wall)
+    solid(b, p, .15, top, 'ART_Facade' if kind in ('main', 'classroom') else 'ART_Concrete', wall)
     for a, c in zip(p, p[1:] + p[:1]):
         length, at = frame(a, c, center)
         if length < 4:
@@ -346,12 +346,8 @@ def parking(b):
         for a, c in zip(path, path[1:]):
             length = math.dist(a, c)
             if length < .1:continue
-            n = max(1, math.ceil(length / 1.6))
-            for i in range(n + 1):
-                x, z = a[0] + (c[0] - a[0]) * i / n, a[1] + (c[1] - a[1]) * i / n
-                cylinder(b, (x, .01, z), (x, 1.04, z), .046, 'ART_StoneLight', segments=5)
-            for y in (.43, .83):
-                cylinder(b, (a[0], y, a[1]), (c[0], y, c[1]), .04, 'ART_StoneLight', segments=5)
+            from school_road import bamboo_fence
+            bamboo_fence(b, a, c)
     q = data()['kiosk']
     x, z = q['center']
     at = lambda u, y, o: (x + u, y, z + o)
@@ -426,7 +422,15 @@ def boundary(b):
     for run in runs:
         for a, c in zip(run, run[1:]):
             prism(b, a, c, .15, .15 + d['base'], .7, 'HK_StoneDark')
-            prism(b, a, c, .15 + d['base'], .15 + d['height'], .9, 'HK_LeafDark')
+            prism(b, a, c, .15 + d['base'], .15 + d['height'] - .35, .7, 'HK_LeafDeep')
+            # Clipped, but leafy: an uneven crown over a dark core, never a smooth teal bar.
+            from vegetation import _tuft
+            n = max(1, round(math.dist(a, c) / (2.6 if b.distant else 1.1)))
+            for i in range(n + 1):
+                t = i / n
+                x, z = a[0] + (c[0] - a[0]) * t, a[1] + (c[1] - a[1]) * t
+                for y in (1.45, 2.3):
+                    _tuft(b, (x, y, z), (.82, .6, .82), i * 1.7 + y, 'HK_LeafDark', 8760 + i * 7 + int(y * 3), False)
 
 
 def frontage(b):
@@ -454,7 +458,7 @@ def markings(b):
     road = data()['roads']['schoolSide']
     crossings = strip(north_sample(), -3.05, 3.05) + strip(sample(approach_data()['innerRoad']), -3.55, 3.55)
     for side in (-1, 1):
-        for lo, hi, material in ((2.68, 3, 'ART_PathGreen'), (2.5, 2.63, 'HK_WhitePaint')):
+        for lo, hi, material in ((2.55, 3, 'ART_PathGreen'), (2.37, 2.5, 'HK_WhitePaint')):
             for p in strip(road, side * lo, side * hi):
                 for q in difference([p], crossings):
                     ground_face(b, q, .024, material, False)

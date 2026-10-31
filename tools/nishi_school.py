@@ -6,7 +6,8 @@ import random
 from functools import lru_cache
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BROWN = (.46, .34, .28)
+BROWN = (.50, .37, .29)
+SALMON = (.74, .53, .45)
 METAL = (.56, .58, .54)
 STONE = (.49, .52, .47)
 INK = (.88, .85, .71)
@@ -22,36 +23,16 @@ def wall(b, item):
     from higashi_school import solid
     from east_extension import outward
     p = item['outline']
-    top = item['height']
+    base = item.get('baseHeight', .01)
+    top = base + item['height'] if 'baseHeight' in item else item['height']
     center = (sum(x for x, z in p) / len(p), top / 2, sum(z for x, z in p) / len(p))
-    solid(b, p, .01, top, 'HK_Stone', (.36, .39, .37))
     seed = int(item['osm'].split('/')[-1])
-    rng = random.Random(seed)
-    # The registered outline and height remain unchanged. Shallow irregular stone
-    # faces express the photographed masonry without an invented wider wall batter.
-    for a, c in zip(p, p[1:] + p[:1]):
-        length = math.dist(a, c)
-        if length < .2:
-            continue
-        ux, uz = (c[0] - a[0]) / length, (c[1] - a[1]) / length
-        nx, nz = -uz, ux
-        if nx * ((a[0]+c[0])/2-center[0]) + nz * ((a[1]+c[1])/2-center[2]) < 0:
-            nx, nz = -nx, -nz
-        rows = 4 if b.distant else 5
-        for row in range(rows):
-            y0, y1 = .03 + row * top / rows, (row + 1) * top / rows - .025
-            count = max(1, round(length / (1.55 if b.distant else 1.15)))
-            for i in range(count + 1):
-                lo, hi = max(0, (i - .45*(row%2))/count), min(1, (i+1-.45*(row%2))/count)
-                if hi-lo < .008:
-                    continue
-                l, r = lo*length+.016, hi*length-.016
-                depth = .018 + rng.random() * .025
-                at = lambda u,y,o: (a[0]+ux*u+nx*o,y,a[1]+uz*u+nz*o)
-                points = [at(l,y0+.04,depth),at(r-.06,y0,depth),at(r,y0+.12,depth),
-                          at(r-.04,y1-.07,depth),at(r-.15,y1,depth),at(l+.06,y1-.015,depth)]
-                shade = rng.uniform(-.055,.055)
-                outward(b, points, 'HK_Stone', center, tuple(v+shade for v in STONE))
+    from school_road import masonry
+    # Above the plot height, so the camera envelope keeps this core; the masonry closes the base.
+    solid(b, p, max(base, .16) if base > 0 else base, top, 'ART_Joint', (.20, .21, .24))
+    for i, (a, c) in enumerate(zip(p, p[1:] + p[:1])):
+        masonry(b, a, c, base, top, (center[0], center[2]), seed % 100000 + i, batter=.12, scale=1.15)
+    return
 
 
 def gate(b):
@@ -63,25 +44,34 @@ def gate(b):
     at = lambda u,y,o: (x+u,y,z-o)
     def block(u,width,lo,hi):
         solid(b,[(x-u-width/2,z-d/2),(x-u+width/2,z-d/2),
-                 (x-u+width/2,z+d/2),(x-u-width/2,z+d/2)],lo,hi,'ART_Timber',BROWN)
+                 (x-u+width/2,z+d/2),(x-u-width/2,z+d/2)],lo,hi,'ART_Joint',SALMON)
     for side in (-1,1):
         block(side*(w-p)/2,p,.01,h)
     block(0,w,h-q['lintel'],h)
     # Closed return surfaces and a thin coping make the portal credible from behind.
     solid(b,[(x-w/2-.025,z-d/2-.025),(x+w/2+.025,z-d/2-.025),
-             (x+w/2+.025,z+d/2+.025),(x-w/2-.025,z+d/2+.025)],h,h+.055,'ART_Timber',(.36,.30,.26))
+             (x+w/2+.025,z+d/2+.025),(x-w/2-.025,z+d/2+.025)],h,h+.055,'ART_Joint',(.66,.47,.40))
     label(b,at,q['name'],-1.8,h-.37,3.6,.24,INK,d/2+.012)
+    # Gravel yard behind the closed grille (0989), and the two posted boards at its side.
+    from road_network import face as ground
+    ground(b,[tuple(p) for p in data()['gateGravel']],.16,'ART_Gravel',False)
+    px,pz=x-w/2-.9,z-.3
+    poster=lambda u,y,o:(px+u,y,pz-o)
+    solid(b,[(px-.34,pz-.03),(px+.34,pz-.03),(px+.34,pz+.03),(px-.34,pz+.03)],.5,2.5,'ART_Joint',(.94,.93,.88))
+    rect(b,poster,-.32,2.1,.64,.38,(.95,.84,.28),.04)
+    for i,word in enumerate('ダメ。'):label(b,poster,word,-.14,1.76-i*.33,.28,.28,(.82,.14,.12),.045)
+    label(b,poster,'ゼッタイ',.0,.74,.3,.15,(.82,.14,.12),.045)
     opening = w-2*p-.12
     for y in (.18,q['grilleHeight']):
-        cylinder(b,at(-opening/2,y,.03),at(opening/2,y,.03),.035,'HK_MetalLight',segments=5)
+        cylinder(b,at(-opening/2,y,.03),at(opening/2,y,.03),.035,'ART_Sand',segments=5)
     count = 17
     for i in range(count+1):
         u = -opening/2 + opening*i/count
-        cylinder(b,at(u,.12,.03),at(u,q['grilleHeight'],.03),.018,'HK_MetalLight',segments=4)
+        cylinder(b,at(u,.12,.03),at(u,q['grilleHeight'],.03),.018,'ART_Sand',segments=4)
         if i<count:
             v=u+opening/count
-            cylinder(b,at(u,.25,.045),at(v,1.55,.045),.019,'HK_MetalLight',segments=4)
-            cylinder(b,at(v,.25,.045),at(u,1.55,.045),.019,'HK_MetalLight',segments=4)
+            cylinder(b,at(u,.25,.045),at(v,1.55,.045),.019,'ART_Sand',segments=4)
+            cylinder(b,at(v,.25,.045),at(u,1.55,.045),.019,'ART_Sand',segments=4)
     for u in (-opening/2,0,opening/2):
         cylinder(b,at(u,.045,.015),at(u,.13,.015),.06,'ART_Timber',segments=6)
     # Side notice case: original diagram and linework, not unreadable real notices.
@@ -109,7 +99,7 @@ def vegetation(b):
         tree(b,q['species'],(x,.15,z),q['height'],q['spread'],seed=8550+i,fine=False)
     q=data()['palm'];palm(b,*q['point'],q['height'])
     for i,(x,z) in enumerate([(-581,264.7),(-578,265.2),(-574,266.8),(-592,265.7)]):
-        spray(b,(x,1.2,z),(2.2,2.2,2.1),i,'HK_LeafDark',8570+i,fine=False)
+        spray(b,(x,.75,z),(1.1,.95,1.1),i,'HK_LeafDark',8570+i,fine=False)
 
 
 def fixtures(b):

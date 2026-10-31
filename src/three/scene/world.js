@@ -17,7 +17,7 @@ const NO_SHADOW = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainF
 // Broad composites need local LOD: a camera near one edge must not promote the entire hill/campus.
 const EAST_BUILDING_ASSETS = new Set(['ART_EastHikoneBuildings', ...EAST_BUILDING_REGIONS]);
 export const ENVIRONMENT_CELLS = Object.freeze({
-  HK_Terrain_Hikone: 128, ART_ShigaCampus: 96, ART_WestMoat: 128, ART_HikoneCompound: 128,
+  HK_Terrain_Hikone: 128, ART_HillWood: 128, ART_InnerMoatStreet: 96, ART_ShigaCampus: 96, ART_WestMoat: 128, ART_HikoneCompound: 128,
   // The geographic district spans the whole world but is light (~50k triangles): one draw each.
   ART_EastHikoneSurface: 2048, ART_EastHikoneWater: 2048, ART_EastHikoneBuildings: 2048,
   ART_EastHikoneWest: 2048, ART_EastHikoneSouth: 2048, ART_EastHikoneNorth: 2048,

@@ -226,8 +226,8 @@
           233.55735
         ]
       ],
-      "height": 3.2,
-      "heightBasis": "photo estimate",
+      "height": 4.8,
+      "heightBasis": "photo estimate, 0855-0856: rises well above the 2.8 m sign",
       "photos": [
         855,
         856,
@@ -254,8 +254,8 @@
           245.17453
         ]
       ],
-      "height": 3.2,
-      "heightBasis": "photo estimate",
+      "height": 4.8,
+      "heightBasis": "photo estimate, 0855-0856: rises well above the 2.8 m sign",
       "photos": [
         855,
         856,
@@ -282,7 +282,7 @@
           259.13708
         ]
       ],
-      "height": 3.2,
+      "height": 3.0,
       "heightBasis": "photo estimate",
       "photos": [
         855,
@@ -314,7 +314,7 @@
           236.06937
         ]
       ],
-      "height": 3.2,
+      "height": 3.0,
       "heightBasis": "photo estimate",
       "photos": [
         855,
@@ -342,7 +342,7 @@
           235.83827
         ]
       ],
-      "height": 3.2,
+      "height": 3.0,
       "heightBasis": "photo estimate",
       "photos": [
         855,
@@ -370,7 +370,7 @@
           263.00743
         ]
       ],
-      "height": 3.2,
+      "height": 3.0,
       "heightBasis": "photo estimate",
       "photos": [
         855,
@@ -401,8 +401,8 @@
         270
       ],
       "species": "zelkova",
-      "height": 12,
-      "spread": 7.3
+      "height": 17,
+      "spread": 9
     },
     {
       "point": [
@@ -410,8 +410,8 @@
         252
       ],
       "species": "zelkova",
-      "height": 11.5,
-      "spread": 6.2
+      "height": 16,
+      "spread": 8.5
     },
     {
       "point": [
@@ -419,7 +419,7 @@
         281
       ],
       "species": "tabu",
-      "height": 11.8,
+      "height": 12,
       "spread": 6.4
     },
     {
@@ -518,6 +518,32 @@
     [
       -566,
       258
+    ],
+    [
+      -552,
+      257.6
+    ],
+    [
+      -540,
+      254.6
+    ]
+  ],
+  "gateGravel": [
+    [
+      -590.2,
+      263.7
+    ],
+    [
+      -583.8,
+      263.7
+    ],
+    [
+      -583.2,
+      276
+    ],
+    [
+      -590.6,
+      276
     ]
   ]
 }

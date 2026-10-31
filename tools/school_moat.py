@@ -110,8 +110,6 @@ def tree_position(x,z):
 
 def rampart(b,ground):
     from streetscape import outward_face
-    from university_photos import recolor
-    first=len(b.faces);rng=random.Random(848)
     for polygon in ground:
         # Height is authored here and exported verbatim to Ground, without renderer offsets.
         outward_face(b,polygon,'HK_Grass',(polygon[0][0],-2,polygon[0][2]))
@@ -121,29 +119,16 @@ def rampart(b,ground):
         outward_face(b,[toe0,toe1,top1,top0],'HK_StoneDark',inside)
         dx,dz=toe1[0]-toe0[0],toe1[2]-toe0[2];length=math.hypot(dx,dz)
         if length<.05:continue
-        # Stone cells are a surface treatment, not randomly placed geographic objects.
-        rows=8 if not b.distant else 5;columns=max(1,round(length/(1.0 if not b.distant else 1.8)))
-        def point(u,v):
-            lo=[toe0[k]+(toe1[k]-toe0[k])*u for k in range(3)]
-            hi=[top0[k]+(top1[k]-top0[k])*u for k in range(3)]
-            p=[lo[k]+(hi[k]-lo[k])*v for k in range(3)]
-            p[0]-=dz/length*.014;p[2]+=dx/length*.014
-            return p
-        for row in range(rows):
-            cuts=[0]+[j/columns+rng.uniform(-.22,.22)/columns for j in range(1,columns)]+[1]
-            for column in range(columns):
-                u0=cuts[column]+.025/columns;u1=cuts[column+1]-.025/columns
-                v0=(row+.04)/rows;v1=(row+.96)/rows;jitter=rng.uniform(-.018,.018)
-                polygon=[point(u0,v0),point(u1,v0),point(u1,v1+jitter),point((u0+u1)/2,v1),point(u0,v1-jitter)]
-                start=len(b.faces)
-                outward_face(b,polygon,'HK_Stone',inside)
-                tone=rng.uniform(-.065,.065)
-                for k in range(start,len(b.faces)):b.pigments[k]=(.56+tone,.57+tone,.52+tone)
+        # The same individual boulders as the school walls, not a tiled surface (0980, 0985).
+        from school_road import masonry,ivy
+        run=math.dist((toe0[0],toe0[2]),(top0[0],top0[2]));high=max(top0[1],top1[1]);low=min(toe0[1],toe1[1])
+        masonry(b,(top0[0],top0[2]),(top1[0],top1[2]),low,high,(inside[0]+(top0[0]-toe0[0])*3,inside[2]+(top0[2]-toe0[2])*3),
+                8900+i,batter=run/max(.5,high-low),scale=1.15)
+        ivy(b,(top0[0],top0[2]),(top1[0],top1[2]),high,(inside[0]+(top0[0]-toe0[0])*3,inside[2]+(top0[2]-toe0[2])*3),8950+i)
     # A closed earthen end is hidden inside the already mapped school-gate stone return.
     end=sections()[-1]
     outward_face(b,[end[0],end[1],end[2],end[3],(end[3][0],.15,end[3][2]),
                     (end[0][0],.15,end[0][2])],'HK_Stone',end[1])
-    recolor(b,first)
 
 
 def beside(z,offset):

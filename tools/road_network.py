@@ -729,12 +729,12 @@ def roads_mesh(b):
     for pts in (BRIDGE, north_sample()[:-1]):
         for side in (-1, 1):
             at = lambda offset: (lambda x, z: side * (north_half(x, z) + offset)) if pts is not BRIDGE else side * (4 + offset)
-            for q in strip(pts, at(-0.45), at(-0.30)):
+            for q in strip(pts, at(-0.45 if pts is BRIDGE else -0.65), at(-0.30 if pts is BRIDGE else -0.50)):
                 q = approach_part(q, False)
                 if q:
                     for p in ([q] if pts is BRIDGE else difference([q], approach_paint_crossings())):
                         face(b, p, 0.022, 'HK_WhitePaint')
-            for q in strip(pts, at(-0.26), at(0)):
+            for q in strip(pts, at(-0.26 if pts is BRIDGE else -0.46), at(0)):
                 q = approach_part(q, False)
                 if q:
                     for p in ([q] if pts is BRIDGE else difference([q], approach_paint_crossings())):
@@ -947,8 +947,8 @@ def distant_approach_mesh(b):
     otemon_bridge_mesh(b)
     for side in (-1, 1):
         pts = north_sample()[:-1]
-        for lo, hi, height, material in ((-0.45, -0.30, 0.022, 'HK_WhitePaint'),
-                                         (-0.26, 0, 0.023, 'ART_PathGreen')):
+        for lo, hi, height, material in ((-0.65, -0.50, 0.022, 'HK_WhitePaint'),
+                                         (-0.46, 0, 0.023, 'ART_PathGreen')):
             at = lambda offset: lambda x, z: side * (north_half(x, z) + offset)
             for q in strip(pts, at(lo), at(hi)):
                 q = approach_part(q, True)

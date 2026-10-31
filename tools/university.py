@@ -81,9 +81,15 @@ def union(polygons):
     return result
 
 
+def school_road_box():
+    from school_road import data as school_road
+    return school_road()['asphaltLane']['boxes']
+
+
 @lru_cache(maxsize=1)
 def plan():
     from road_network import strip, triangulate, ccw, inner_moat
+    from school_road import data as school_road
     difference = cut
     d = data()
     cx,cz=d['forecourt']
@@ -91,11 +97,13 @@ def plan():
     island,court=circle(5),circle(12)
     roads = union([p for path, half in ((d['road'],4),(d['lane'],2.2),(d['frontLane'],1.8),(d['link'],3.0),
                     (d['schoolGateEntry'],3.2),*[(line,2.5) for line in d['schoolLanes']]) for p in strip(path, -half, half)]
-                    +triangulate(ccw(d['schoolCourt'])))
+                    +triangulate(ccw(d['schoolCourt']))+triangulate(ccw(school_road()['apron']['footprint'])))
     paths = union([p for path in [d['entrance'], *d['paths']] for p in strip(path, -2.4, 2.4)]
                   + strip(d['schoolLotEntry'],-1.7,1.7))
     shoulders = union([p for path, half in ((d['road'],6.5),(d['lane'],2.6),(d['frontLane'],2.1),
-                       (d['link'][:6],5.0),(d['link'][5:],3.3)) for p in strip(path, -half, half)])
+                       (d['link'][:6],5.0),(d['link'][5:],3.3)) for p in strip(path, -half, half)]
+                      # The west footway reaches the campus wall, with no verge (0976, 0977).
+                      +strip(d['link'][1:4],4.9,8.2))
     paths = union(paths + difference(shoulders, roads) + triangulate(ccw(court)))
     apron=[t for t in triangulate(ccw(d['apron']))]
     paths = union(paths + apron + [t for q in d['paving'] for t in triangulate(ccw(q))])
@@ -320,6 +328,8 @@ def buildings(b, items):
     from castle_approach import building
     from abstract_props import cylinder
     for item in items:
+        from school_road import building as school_road_building
+        if school_road_building(b,item):continue
         if item['id']=='auditorium':
             from university_photos import auditorium
             auditorium(b,item)
@@ -446,10 +456,11 @@ def boundary_mesh(b,runs):
         for a,c in zip(run['points'],run['points'][1:]):
             length=math.dist(a,c)
             def at(t):return (a[0]+(c[0]-a[0])*t,a[1]+(c[1]-a[1])*t)
-            material='HK_StoneDark' if solid else 'ART_Timber' if run['kind']=='palisade' else 'HK_Metal'
+            material='ART_Joint' if solid else 'ART_Timber' if run['kind']=='palisade' else 'HK_Metal'
+            first=len(b.faces)
             if solid:
                 prism(b,a,c,.15,.87,.3,material)
-                prism(b,a,c,1.35,1.49,.28,'HK_Stone')
+                prism(b,a,c,1.35,1.49,.28,'ART_Joint')
             else:
                 prism(b,a,c,.15,.38,.22,'HK_StoneDark')
                 for y in (.65,1.45):prism(b,a,c,y,y+.065,.065,material)
@@ -457,12 +468,15 @@ def boundary_mesh(b,runs):
             for i in range(count+1):
                 x,z=at(i/count)
                 b.box((x,.91,z),(.4 if solid else .12,1.52,.4 if solid else .12),material,False)
-                if solid:b.box((x,1.72,z),(.46,.12,.46),'HK_Stone',False)
+                if solid:b.box((x,1.72,z),(.46,.12,.46),'ART_Joint',False)
             spacing=(.9 if b.distant else .3) if run['kind']=='palisade' else 1.2 if solid else 1.5
             count=max(1,math.ceil(length/spacing))
             for i in range(1,count):
                 x,z=at(i/count)
                 b.box((x,1.1,z),(.07,.85,.07),material,False)
+            # Weathered, lichened concrete; the dark default reads as painted steel (0977).
+            if solid:
+                for k in range(first,len(b.faces)):b.pigments[k]=(.60,.60,.55)
 
 
 def street_boundary(b,run):
@@ -556,8 +570,10 @@ def gate_frontage(b,d):
     cylinder(b,(x,.01,z),(x,2.9,z),.04,'HK_MetalLight',segments=6)
     cylinder(b,(x-.2,2.55,z),(x-.25,2.55,z),.27,'HK_MetalLight',segments=16)
     # Green cycle band between the western edge line and the kerb of the moat-side street.
-    line=d['link'][:4]
+    # It follows the left edge through the bend to the junction (0980, 0985, 0990).
+    line=d['link'][:8]
     for q in strip(line,2.28,2.4):face(b,q,.022,'HK_WhitePaint',False)
+    for q in strip(line,-2.4,-2.28):face(b,q,.022,'HK_WhitePaint',False)
     for q in strip(line,2.42,2.92):face(b,q,.021,'ART_PathGreen',False)
 
 
@@ -666,7 +682,7 @@ def school_street_detail(b,d):
                              z+math.sin(j*math.tau/7)*rz*rng.uniform(.75,1.2)) for j in range(7)]))
     grass=cut(plan()['lot'],cut(plan()['lot'],patches))
     gravel=cut(plan()['lot'],patches)
-    for material,polys in (('HK_Grass',grass),('HK_Stone',gravel)):
+    for material,polys in (('HK_Grass',grass),('ART_Gravel',gravel)):
         for q in polys:face(b,q,.15,material,False)
     # Irregular masonry courses stay below knee height; the road remains flush.
     for line in detail['stone']:
@@ -687,15 +703,16 @@ def school_street_detail(b,d):
             n=max(1,math.ceil(math.dist(a,c)/3.2))
             for i in range(n+1):
                 t=i/n;x,z=a[0]+(c[0]-a[0])*t,a[1]+(c[1]-a[1])*t
-                b.box((x,.22,z),(.4,.14,.4),'HK_Stone',False)
-                cylinder(b,(x,.15,z),(x,.95,z),.085,'HK_WoodDark',segments=6)
+                b.box((x,.22,z),(.46,.14,.46),'ART_Concrete',False)
+                cylinder(b,(x,.15,z),(x,.98,z),.075,'ART_TreeBark',segments=6)
                 if i==n:continue
                 pts=[(a[0]+(c[0]-a[0])*(i+s)/n,.8-.13*4*s*(1-s),a[1]+(c[1]-a[1])*(i+s)/n) for s in (0,.25,.5,.75,1)]
                 for p,q in zip(pts,pts[1:]):cylinder(b,p,q,.022,'ART_Chain',segments=3)
     boundary_mesh(b,[dict(kind='fence',points=line) for line in detail['fence']])
     # Tall, narrow evergreen silhouettes alternate in height, with separate forked sprays.
     for i,(x,z) in enumerate(detail['conifers']):
-        tree(b,'cedar',base=(x,.15,z),height=12.6+(i%3)*1.1,spread=2.7,seed=6100+i,fine=False)
+        from school_road import cypress
+        cypress(b,x,z,10.8+(i%3)*.8,6100+i)
     for i,(x,z) in enumerate(detail['broadleaf']):
         tree(b,'cherry',base=(x,.15,z),height=8.3+(i%3)*.8,spread=4.8,seed=4900+i,fine=False,lean=(.4,-.2))
     # The photo's wooded backdrop starts at the opposite bank, rather than leaving
@@ -766,9 +783,11 @@ def build(name, mesh_class, lod=False):
         trees(b,d['campusBank'],412,17,3.8)
         trees(b,d['axis'][1:],621,23,3.0,setback=6)
     else:
+        lane=lambda q:any(all(x0<=x<=x1 and z0<=z<=z1 for x,z in q) for x0,z0,x1,z1 in school_road_box())
         for key,y,material in (('base',0,'HK_Grass'),('lawns',.15,'HK_Grass'),('town',.15,'HK_Sidewalk'),
                                ('roads',.01,'HK_Asphalt'),('paths',.01,'HK_Sidewalk'),('water',-1.35,'HK_Water')):
-            for q in (cut(p[key],p['lotPaths']) if key=='paths' else p[key]): face(b,q,y,material,False)
+            for q in (cut(p[key],p['lotPaths']) if key=='paths' else p[key]):
+                face(b,q,y,'HK_Asphalt' if key=='paths' and lane(q) else material,False)
         for q in p['lotPaths']:face(b,q,.01,'HK_Stone',False)
         for field in d['fields']:
             for q in cut(triangulate(ccw(field['footprint'])),p['rampartCut']):face(b,q,.15,field['material'],False)
@@ -795,7 +814,10 @@ def build(name, mesh_class, lod=False):
             for start in range(3,int(length)-3,10):
                 points=[(a[0]+(c[0]-a[0])*t/length,a[1]+(c[1]-a[1])*t/length) for t in (start,min(start+5,length))]
                 for q in strip(points,-.075,.075):face(b,q,.022,'HK_WhitePaint',False)
+        # The moat cherries were turning red and copper on 31 October (0979, 0980).
+        b.autumn=.5
         trees(b,d['schoolBank'],912,22,4.0,avoid_streets=True,silhouette=True,placement=tree_position)
+        b.autumn=0
         # Low detached town frontages continue Route 25's existing fabric. These are contextual
         # masses, not attributed shop identities; their type and setbacks follow the satellite view.
         from castle_approach import building

@@ -1724,7 +1724,7 @@
           177.10192
         ]
       ],
-      "material": "ART_Sand",
+      "material": "ART_Gravel",
       "height": 0.01,
       "fenceEntrance": [
         [
@@ -2187,7 +2187,7 @@
         ]
       ],
       "height": 0.01,
-      "material": "ART_Sand",
+      "material": "ART_Gravel",
       "basis": "Estimated entry bedding between the mapped lot opening and the existing road; necessary for the photographed continuous access."
     }
   ]

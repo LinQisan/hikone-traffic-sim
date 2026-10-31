@@ -56,7 +56,7 @@ def _tuft(b, center, size, angle, material, seed, fine=True):
         light = max(0, min(1, 0.50 + q.y / ry * 0.30 - q.x / rx * 0.13 + q.z / rz * 0.10))
         shadow, sun = (0.32, 0.45, 0.37), (0.62, 0.68, 0.37)
         drift = 0.018 * math.sin(q.x * 2.1 + q.y * 1.8 + phase)
-        tones.append(tuple(a + (c - a) * light + drift - (0.025 if material == 'HK_LeafDark' else 0)
+        tones.append(tuple(a + (c - a) * light + drift - {'HK_LeafDark': 0.025, 'HK_LeafDeep': 0.17}.get(material, 0)
                            for a, c in zip(shadow, sun)))
     faces = []
     def face(indices):
@@ -137,7 +137,7 @@ def _leaf_spray(b, center, size, angle, seed, season, fine):
         heat = max(0, min(0.999, season + rng.uniform(-0.13, 0.13))) * (len(palette) - 1)
         tone = _mix(palette[int(heat)], palette[int(heat) + 1], heat % 1)
         blades = []
-        count = 24 if fine else 4
+        count = 24 if fine else 10
         for i in range(count):
             a = phase + i * 2.39996
             y = 1 - 2 * (i + 0.5) / count
@@ -147,7 +147,7 @@ def _leaf_spray(b, center, size, angle, seed, season, fine):
             at *= rng.uniform(0.50, 0.96)
             heading = a + rng.uniform(-0.8, 0.8)
             tilt = rng.uniform(-0.85, 0.85)
-            length = min(radii.x, radii.z) * (0.62 if fine else 1.30) * rng.uniform(0.75, 1.2)
+            length = min(radii.x, radii.z) * (0.62 if fine else 0.42) * rng.uniform(0.75, 1.2)
             u = Vector((math.cos(heading), tilt, math.sin(heading))).normalized() * length
             v = Vector((-math.sin(heading), rng.uniform(-0.30, 0.30), math.cos(heading))).normalized() * length * 0.34
             normal = u.cross(v).normalized()
@@ -262,15 +262,22 @@ def _broadleaf(b, species, base, height, spread, seed, lean, fine, root_depth):
                 wood([fork, fork.lerp(tip, 0.52) + Vector((0, height * 0.015, 0)), tip],
                      radius * 0.115, radius * 0.025, i + j)
             # Gold and copper belong to entire boughs; shaded/evergreen pockets stay green.
-            season = (0.18 if evergreen else 0.43) + 0.22 * math.sin(a + seed * 0.017) + (i % 3) * 0.065
+            season = (0.06 if evergreen else 0.14) + 0.10 * math.sin(a + seed * 0.017) + (i % 3) * 0.035
             if getattr(b, 'dense_evergreen', False):
                 season = 0.0
+            season += getattr(b, 'autumn', 0)
             _leaf_spray(b, tip, (spread * 0.46, height * 0.115, spread * 0.40),
                         heading, seed + i * 137 + j * 31, season, fine)
+            if j == 1:
+                # A shaded mass inside the leaves: real crowns are opaque, not a few flat cards.
+                _tuft(b, tip, (spread * 0.34, height * 0.085, spread * 0.31), heading,
+                      'HK_LeafDeep' if evergreen else 'HK_LeafDark', seed + i * 19, False)
     for i, (dx, dy, dz) in enumerate(((-0.18, 0.77, 0.12), (0.16, 0.88, -0.16), (-0.03, 0.92, 0.08))):
         _leaf_spray(b, p(spread * dx, height * dy, spread * dz),
                     (spread * 0.54, height * 0.09, spread * 0.47), i * 2.1,
-                    seed + 907 + i * 31, (0.32 if evergreen else 0.62) + i * 0.055, fine)
+                    seed + 907 + i * 31, (0.10 if evergreen else 0.20) + i * 0.03, fine)
+        _tuft(b, p(spread * dx, height * dy, spread * dz), (spread * 0.40, height * 0.08, spread * 0.36),
+              i * 2.1, 'HK_LeafDeep' if evergreen else 'HK_LeafDark', seed + 53 + i, False)
 
 
 def tree(b, species, base=(0, 0, 0), height=10, spread=4, seed=1, lean=(0, 0), fine=True, root_depth=0):

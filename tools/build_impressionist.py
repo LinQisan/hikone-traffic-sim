@@ -39,11 +39,13 @@ COLORS = {
     'HK_WoodLight': (0.76, 0.59, 0.39), 'HK_RoofTile': (0.41, 0.46, 0.57),
     'HK_RoofRidge': (0.34, 0.37, 0.48), 'HK_Stone': (0.61, 0.64, 0.66),
     'HK_StoneDark': (0.48, 0.50, 0.60), 'HK_Namako': (0.47, 0.53, 0.65),
-    'HK_Asphalt': (0.56, 0.59, 0.69), 'HK_Sidewalk': (0.85, 0.77, 0.61),
+    'HK_Asphalt': (0.52, 0.53, 0.56), 'HK_Sidewalk': (0.85, 0.77, 0.61),
     'HK_Curb': (0.77, 0.75, 0.68), 'HK_WhitePaint': (0.98, 0.93, 0.77),
     'HK_Water': (0.42, 0.63, 0.73), 'HK_Grass': (0.58, 0.64, 0.40),
     'HK_Soil': (0.61, 0.48, 0.36), 'HK_Leaf': (0.45, 0.61, 0.36),
-    'HK_LeafDark': (0.28, 0.46, 0.40), 'HK_Sakura': (0.94, 0.68, 0.73),
+    'HK_LeafDark': (0.28, 0.46, 0.40), 'HK_LeafDeep': (0.17, 0.31, 0.27),
+    'ART_Boulder': (0.47, 0.47, 0.43), 'ART_Gravel': (0.67, 0.64, 0.58), 'ART_Facade': (0.60, 0.55, 0.50),
+    'HK_Sakura': (0.94, 0.68, 0.73),
     'HK_Bark': (0.47, 0.35, 0.29), 'HK_Metal': (0.29, 0.39, 0.46),
     'ART_TreeBark': (0.54, 0.48, 0.38),
     'HK_MetalLight': (0.66, 0.70, 0.77), 'HK_Glass': (0.32, 0.47, 0.59),
@@ -76,7 +78,7 @@ COLORS = {
     'ART_Menu': (0.21, 0.27, 0.25), 'ART_Tactile': (0.77, 0.70, 0.48),
     'ART_TactileRidge': (0.85, 0.79, 0.57), 'ART_Joint': (0.55, 0.53, 0.47),
     'ART_Drain': (0.18, 0.20, 0.20),
-    'ART_PathGreen': (0.45, 0.65, 0.57),
+    'ART_PathGreen': (0.17, 0.50, 0.37),
     'ART_Sand': (0.76, 0.68, 0.52), 'ART_RedRoof': (0.53, 0.31, 0.29),
 }
 EMISSION = {
@@ -218,7 +220,8 @@ class BrushMesh:
                  (0.52, 0.14), (0.28, 0.5), (-0.32, 0.42)]
         pts = [p + u * x + v * y for x, y in shape]
         mid = p + n * 0.002
-        pigment = self.pigment(material, strength)
+        # Paving stays one surface on foot; only masonry and facades carry the full broken colour.
+        pigment = self.pigment(material, 0.16 if material in ('HK_Asphalt', 'HK_Sidewalk', 'HK_Curb') else strength)
         self.polygon([pts[0], pts[1], pts[2], pts[3], mid], material, pigment, detail=self.strokes + 1)
         self.polygon([pts[3], pts[4], pts[5], pts[0], mid], material,
                      blend(pigment, COLORS.get(material, pigment), 0.22), detail=self.strokes + 1)

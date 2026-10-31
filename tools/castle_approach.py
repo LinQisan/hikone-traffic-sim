@@ -11,7 +11,7 @@ import random
 from functools import lru_cache
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODELS = ('ART_CastleApproach',)
+MODELS = ('ART_CastleApproach', 'ART_HillWood', 'ART_InnerMoatStreet')
 _data = None
 
 
@@ -264,6 +264,14 @@ def building(b, item):
 
 
 def build(name, mesh_class, lod=False):
+    if name == 'ART_InnerMoatStreet':
+        from moat_street import build as moat_street
+        return moat_street(name, mesh_class, lod)
+    if name == 'ART_HillWood':
+        from school_road import hill_wood
+        b = mesh_class(name)
+        b.distant = lod
+        return hill_wood(b)
     from east_extension import clip_existing_builder
     b = clip_existing_builder(mesh_class(name))
     b.abstract, b.distant = True, lod
