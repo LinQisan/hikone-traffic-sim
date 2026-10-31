@@ -5,6 +5,9 @@ import { placement } from '../scene/coords.ts';
 import { indexMeshRays } from './mesh-ray-index.js';
 
 const probeMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+// Plan-view cell of the bounds grid. Replay planning asks for hundreds of thousands of rays,
+// each of which is short compared with a town of thousands of parts.
+const CELL = 16;
 const FLOOR = /^(HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|MoatBankPatch|Kyobashi(Roads|Land|Water)))/;
 
 export class CameraObstacles {
@@ -15,6 +18,11 @@ export class CameraObstacles {
     this.hit = new THREE.Vector3();
     this.hits = [];
     this.probes = new WeakMap();
+    this.grid = new Map();
+    this.gridParts = 0;
+    this.found = [];
+    this.seen = new Uint32Array(0);
+    this.stamp = 0;
     for (const { asset, items, low, cameraSolids } of definitions) {
       if (FLOOR.test(asset)) continue;
       for (const item of items) {
@@ -51,7 +59,7 @@ export class CameraObstacles {
       return { contains, box, positions: [] };
     });
     // Bucket solids by 16 m cells so a district of buildings is not tested against every triangle.
-    const CELL = 16, buckets = new Map();
+    const buckets = new Map();
     for (const group of groups) {
       for (let i = Math.floor(group.box.min.x / CELL); i <= Math.floor(group.box.max.x / CELL); i++)
         for (let j = Math.floor(group.box.min.z / CELL); j <= Math.floor(group.box.max.z / CELL); j++) {
@@ -64,7 +72,7 @@ export class CameraObstacles {
     for (const part of parts) {
       // These are the authored building pigments. Roads, moat banks, water and field
       // surfaces in the same draw are ground, not roof/wall obstacles.
-      if (!/^(ART_(Plaster|Timber|Concrete|Window|Tile|RedRoof)|HK_(RoofTile|Plaster|Stone|MetalLight))$/.test(part.material.name)) continue;
+      if (!/^(ART_(Plaster|Timber|Concrete|Window|Tile|RedRoof|Boulder|Facade|Joint)|HK_(RoofTile|Plaster|Stone|MetalLight))$/.test(part.material.name)) continue;
       const geometry = part.geometry, position = geometry.attributes.position;
       const count = geometry.index?.count ?? position.count;
       for (let i = 0; i < count; i += 3) {
@@ -127,13 +135,44 @@ export class CameraObstacles {
     return copy;
   }
 
+  /** The parts whose plan bounds share a cell with a rectangle. Reuses one array: it runs per ray. */
+  within(minX, minZ, maxX, maxZ) {
+    if (this.gridParts !== this.parts.length) {
+      this.grid = new Map();
+      this.gridParts = this.parts.length;
+      this.seen = new Uint32Array(this.parts.length);
+      this.stamp = 0;
+      this.parts.forEach(({ bounds }, index) => {
+        if (bounds.isEmpty()) return;
+        for (let i = Math.floor(bounds.min.x / CELL); i <= Math.floor(bounds.max.x / CELL); i++)
+          for (let j = Math.floor(bounds.min.z / CELL); j <= Math.floor(bounds.max.z / CELL); j++) {
+            const key = i * 100003 + j, cell = this.grid.get(key);
+            if (cell) cell.push(index); else this.grid.set(key, [index]);
+          }
+      });
+    }
+    this.found.length = 0;
+    this.stamp++;
+    for (let i = Math.floor(minX / CELL); i <= Math.floor(maxX / CELL); i++)
+      for (let j = Math.floor(minZ / CELL); j <= Math.floor(maxZ / CELL); j++) {
+        const cell = this.grid.get(i * 100003 + j);
+        if (!cell) continue;
+        for (const index of cell) if (this.seen[index] !== this.stamp) {
+          this.seen[index] = this.stamp;
+          this.found.push(this.parts[index]);
+        }
+      }
+    return this.found;
+  }
+
   cameraClear(position) {
-    return this.parts.every(part => part.bounds.distanceToPoint(position) > 0.35);
+    return this.within(position.x - 0.35, position.z - 0.35, position.x + 0.35, position.z + 0.35)
+      .every(part => part.bounds.distanceToPoint(position) > 0.35);
   }
 
   liftOut(position) {
     // A custom subject can be under cover. Even then, the fallback camera must stay outside it.
-    for (const { bounds } of this.parts) {
+    for (const { bounds } of this.within(position.x - 0.35, position.z - 0.35, position.x + 0.35, position.z + 0.35)) {
       if (position.x >= bounds.min.x - 0.35 && position.x <= bounds.max.x + 0.35
         && position.z >= bounds.min.z - 0.35 && position.z <= bounds.max.z + 0.35)
         position.y = Math.max(position.y, bounds.max.y + 0.5);
@@ -147,7 +186,7 @@ export class CameraObstacles {
     this.ray.set(from, this.direction.divideScalar(distance));
     this.ray.near = 0.02;
     this.ray.far = distance - 0.02;
-    for (const { mesh, bounds } of this.parts) {
+    for (const { mesh, bounds } of this.within(Math.min(from.x, to.x), Math.min(from.z, to.z), Math.max(from.x, to.x), Math.max(from.z, to.z))) {
       const hit = this.ray.ray.intersectBox(bounds, this.hit);
       if (!bounds.containsPoint(from) && (!hit || from.distanceToSquared(hit) > distance * distance)) continue;
       this.hits.length = 0;

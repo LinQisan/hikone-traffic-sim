@@ -13,6 +13,8 @@ npm run build                      # dist/ for GitHub Pages; npm run preview to 
 node --test test/<file>.test.mjs   # targeted check
 npm run check                      # typecheck + generated docs + full regression + build (also CI)
 npm run check:docs                 # generated reference tables against source
+npm run test:geometry              # generated data, art, collision, routes, photographed streets
+node tools/rebuild_models.mjs <model>…  # every stage for named models; stops on the first failure
 node tools/check_events.mjs [id]   # event purposes, with real sight lines
 node tools/check_routes.mjs        # cars and bodies stay on roads
 node tools/check_red_crossings.mjs [n] [walking|bicycle] [gaze°]  # open-world red-crossing contact rate
@@ -57,7 +59,7 @@ Use the smallest checks that cover the change. Do not add tests for prose, forma
 | CSS, copy, cosmetic values | Inspect the view, keyboard/touch reach and console |
 | Isolated logic | The affected test file |
 | Vehicles, steering | `test/turning.test.mjs`, plus logic, crash or bicycle tests if affected |
-| Art, models, layout, collision | Regenerate outputs; `test/art.test.mjs`, `test/obstacles.test.mjs`; inspect the view. Roads also need `test/routes.test.mjs` and `check_routes.mjs`. Rendering workload needs `test/performance.test.mjs` and a benchmark |
+| Art, models, layout, collision | `tools/rebuild_models.mjs`; `npm run test:geometry`; inspect the view. Roads also need `check_routes.mjs`. Rendering workload needs `test/performance.test.mjs` and a benchmark |
 | Editor storage, server, Quest | `test/editor-store`, `editor-server`, `editor-quest` |
 | Open world | `test/world.test.mjs`, `test/scenario-manager.test.mjs`; explore the area. Flows also need `test/routes.test.mjs` |
 | One event | `check_events.mjs <id>` and play it; route changes also need `check_routes.mjs` and `test/routes.test.mjs` |

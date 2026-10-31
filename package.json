@@ -15,6 +15,7 @@
     "check": "npm run typecheck && npm run check:docs && npm test && npm run build",
     "sync": "node tools/sync.mjs",
     "test": "node --test test/*.test.mjs",
+    "test:geometry": "node --test test/generated-data.test.mjs test/art.test.mjs test/obstacles.test.mjs test/routes.test.mjs test/*-frontage.test.mjs test/north-*.test.mjs test/university-photos.test.mjs test/east-extension.test.mjs test/castle-approach.test.mjs test/school-moat.test.mjs test/south-promenade.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

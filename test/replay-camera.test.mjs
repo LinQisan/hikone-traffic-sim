@@ -55,6 +55,28 @@ const { Ground } = await import('../src/simulation/collision/Ground.ts');
 
 const flat = { heightAt: () => 0.01 };
 const vector = (x, y, z) => new THREE.Vector3(x, y, z);
+test('camera bounds grid answers exactly like testing every part, including parts added later', () => {
+  const obstacles = new CameraObstacles(), geometry = new THREE.BoxGeometry(3, 6, 3);
+  const place = i => new THREE.Matrix4().makeTranslation(Math.sin(i * 12.9) * 90, 3, Math.cos(i * 7.3) * 90);
+  for (let i = 0; i < 40; i++) obstacles.add(geometry, place(i));
+  obstacles.add(new THREE.BoxGeometry(70, 8, 2), new THREE.Matrix4().makeTranslation(0, 4, -5));
+  obstacles.cameraClear(vector(0, 2, 0));
+  obstacles.add(geometry, place(41));
+  const ray = new THREE.Raycaster(), direction = new THREE.Vector3(), meshes = obstacles.parts.map(p => p.mesh);
+  let blocked = 0;
+  for (let i = 0; i < 400; i++) {
+    const from = vector(Math.sin(i * 3.1) * 100, 1 + i % 5, Math.cos(i * 1.7) * 100);
+    const to = vector(Math.sin(i * 0.9) * 100, 2, Math.cos(i * 2.3) * 100);
+    const distance = direction.subVectors(to, from).length();
+    ray.set(from, direction.divideScalar(distance)); ray.near = 0.02; ray.far = distance - 0.02;
+    const hits = [];
+    for (const mesh of meshes) mesh.raycast(ray, hits);
+    assert.equal(obstacles.clear(from, to), hits.length === 0, `ray ${i}`);
+    assert.equal(obstacles.cameraClear(from), obstacles.parts.every(p => p.bounds.distanceToPoint(from) > 0.35), `camera ${i}`);
+    if (hits.length) blocked++;
+  }
+  assert.ok(blocked > 20 && blocked < 380, 'rays exercise both outcomes');
+});
 test('fractional recording timestamps do not create near-duplicate camera keys', () => {
   const start = 1.6333333333333, impact = start + 2, end = impact + 1.6;
   const times = replaySampleTimes(start, end, impact);
