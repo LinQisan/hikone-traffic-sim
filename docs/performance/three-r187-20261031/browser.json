@@ -1,0 +1,172 @@
+{
+  "browser": "156.0.8078.74",
+  "events": [
+    {
+      "id": "builtin-01",
+      "mode": "walking",
+      "carCount": 1,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-02",
+      "mode": "walking",
+      "carCount": 1,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-03",
+      "mode": "walking",
+      "carCount": 2,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-04",
+      "mode": "walking",
+      "carCount": 1,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-05",
+      "mode": "walking",
+      "carCount": 1,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-06",
+      "mode": "walking",
+      "carCount": 1,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "mode": "bicycle",
+      "carCount": 3,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-08",
+      "mode": "bicycle",
+      "carCount": 3,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-09",
+      "mode": "walking",
+      "carCount": 2,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-10",
+      "mode": "bicycle",
+      "carCount": 1,
+      "moving": true,
+      "signal": "歩行者信号：全方向 赤",
+      "forcedImpact": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "exploration": [
+    {
+      "mode": "walking",
+      "movement": true,
+      "look": true,
+      "summaryAndMenu": true
+    },
+    {
+      "mode": "bicycle",
+      "movement": true,
+      "look": true,
+      "summaryAndMenu": true
+    }
+  ],
+  "success": [
+    {
+      "id": "builtin-01",
+      "placedAtGoal": true,
+      "successReplay": true
+    },
+    {
+      "id": "builtin-07",
+      "placedAtGoal": true,
+      "successReplay": true
+    }
+  ],
+  "exported": {
+    "packageFormat": "hikone-scene-package",
+    "glbBytes": 122484
+  },
+  "editor": {
+    "builtins": 10,
+    "jsonExport": true,
+    "jsonImport": true,
+    "localSaveAndReload": true
+  },
+  "rendering": {
+    "instanced": 97,
+    "geometries": 315,
+    "textures": 10,
+    "shadow": true,
+    "adaptive": true
+  },
+  "mobile": [
+    {
+      "mode": "walking",
+      "touchMovement": true,
+      "touchLook": true,
+      "menu": true
+    },
+    {
+      "mode": "bicycle",
+      "touchMovement": true,
+      "touchLook": true,
+      "menu": true
+    }
+  ],
+  "subpath": "/hikone-traffic-sim/",
+  "errors": [],
+  "warnings": [],
+  "failures": [],
+  "limits": [
+    "Headless desktop and mobile emulation, no physical phone.",
+    "Impact replay is forced through debug.knock(); physical collision logic is covered by regression tests.",
+    "Goal completion is triggered by placement; ordinary-driver cautious traversal is covered by check_events.",
+    "Local editor server and Quest use automated fixtures; no Unity/Quest hardware session."
+  ]
+}
