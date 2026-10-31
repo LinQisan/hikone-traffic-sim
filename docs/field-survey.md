@@ -4,9 +4,9 @@ Local refinements from the owner's 86 photographs of 29 October 2026, with what 
 
 ## Photographs
 
-Originals are in `field-photos/2026-10-29/<area>/`, sorted by GPS and content, with `field-photos/INDEX.md` giving position, heading and scene. The folder is git-ignored and must never be uploaded or copied into docs: the files carry GPS. No photograph is used as a scene texture. `IMG_0911` and `IMG_0932` never existed.
+Originals are in `field-photos/<date>/<area>/` (2026-10-29 and 2026-10-31; the second fills the inner moat street, x −488 to −232), sorted by GPS and content, with `field-photos/INDEX.md` giving position, heading and scene. The folder is git-ignored and must never be uploaded or copied into docs: the files carry GPS. No photograph is used as a scene texture. `IMG_0911` and `IMG_0932` never existed.
 
-Headings are evidence, not calibrated poses; EXIF altitude is never used as terrain height. Fixes are usually 3–7 m. Weak ones: `IMG_0929` (53.7 m), `IMG_0934` (21.4 m), and `IMG_0930/0931/0933`, which repeat one held fix.
+Headings are evidence, not calibrated poses; EXIF altitude is never used as terrain height. Fixes are usually 3–7 m. Weak ones: `IMG_0965` (26.0 m), `IMG_0929` (53.7 m), `IMG_0934` (21.4 m), and `IMG_0930/0931/0933`, which repeat one held fix.
 
 Reference `IMG_xxxx` by name. `swift tools/read_photo_metadata.swift <folder> <out>` re-reads EXIF.
 
@@ -19,6 +19,8 @@ Keep sources separate from estimates. Reviewed data lives in `world/`; authors r
 | `world/field-observations.json` | `tools/field_photos.py` | Route-wide facades, boards, benches, lamps, school road |
 | `world/higashi-frontage.json`, `world/higashi-island.json` | `tools/higashi_school.py` | Higashi school and island |
 | `world/nishi-frontage.json` | `tools/nishi_school.py` | Nishi school frontage |
+| `world/inner-moat-street.json` | `tools/moat_street.py` | Inner moat street houses, frontage, car-park entrance and lot details (1005–1050) |
+| `world/school-road.json` | `tools/school_road.py` | Lot, villa, cypress screen, inner road planting, rampart and castle-hill canopy (0855–0866) |
 | `world/school-moat.json` | `tools/school_moat.py` | University-facing rampart |
 | `src/world/generators/university-layout.js` | `tools/university_photos.py`, `tools/university_frontage.py` | Campus and gate |
 | `world/east-street.json` | `tools/east_street.py` | East street on foot |
@@ -32,6 +34,10 @@ Facilities keep the OSM position in `point` and any move in `placement`, with `p
 **Shiga University (0847–0854, 0934).** Gate moved 15 m east to the roadside per OSM. Granite posts, 滋賀大学 plaque with mesh lettering, folded gate, gatekeeper's room, red post box, frontage balustrade and hedge, auditorium footprint, lantern and dormers, temporary office, moat-side bollards and benches. Notice boards are original illustrations, with the cigarette panel following the owner's painted reference; unreadable text is not transcribed. Scene graphics do not verify current rules.
 
 **University-facing rampart (0848–0849).** Inclined masonry and earthen bank over about 419 m (X −557.5 to −220), backed by twelve OSM retaining walls of 5.5 m and GSI elevation samples. Pole, transformer, red 城町2丁目自治会 cabinet and mirrors are photo-relative estimates.
+
+**Inner moat street (1005–1050).** `ART_InnerMoatStreet` places OSM outlines (ODbL, queried 2026-10-31; mostly Microsoft footprint imports) as minimum rectangles, keeping the source nodes beside each `ring`, with kinds and heights estimated from the photographs. The GPS track agrees with the retained road to within about 3 m west of x −320, but east of it the road stays up to 20 m north of OSM way/121393441, so street frontage is placed relative to the road and `sourceShift` records the offset. Fee signs are the photographed text, not a verified tariff. Unseen house sides, car positions and unsimulated lanes are estimates; the dated closure notice and boats are omitted. `lot-east-house` was replaced by the OSM barn.
+
+**School road on foot (0855–0866).** `world/school-road.json` records each observation and its uncertainty. Boulder walls use separately outlined stones on an `ART_Joint` core, because a brushed core shows through the joints as stripes; fine boards and corrugated sheet also use clean per-piece colour. The hill canopy (`ART_HillWood`) has no collision and sits in `WebHillWood`, so root-height audits skip it. Signs stay flat graphics by design. Blade counts are recorded on the `leaf_spray` random tape: change them only with a rebuild of every model holding foliage. The inner road is still the satellite trace, about 20 m from OSM way/121393441 near 0862.
 
 **Nishi school (0855–0861).** Closed brown portal at (−587, 263.2) with mesh lettering, accordion grille, irregular stone walls, tree screen, lamp, pole and bicycle crossing. One wall tip that crossed the doorway is trimmed, with the source outline kept as `sourceOutline`. The timed-restriction plate is a static photo-date graphic, not a rule.
 
@@ -52,6 +58,10 @@ The footway narrows to about 1 m beside mapped buildings near z≈110, z≈147 a
 **Real-world audit, 30 October.** Layout items were checked against carriageways, water and Ground, and walked against the photographs. Fixed: a utility pole and three mapped trees on carriageways, the mapped chain line in the moat west of X=200 (the retained shore has its own fence), and East source groves sunk into the mapped rampart, whose long ground triangles are now refined. The South promenade's retained shore and the Sawaguchi facades remain simplified.
 
 **North (0912–0933).** See [the pedestrian reconstruction](north-streetscape.md). The two Sawaguchi wings retain their registered concave footprints, with tiered end turrets, curved tiled eaves, barred windows, irregular stone faces and closed returns. The museum's stair rises toward z=466 with a supported slab and open space below. Eight estimated old pines use needle fans rather than enlarged foliage pillows; the regular grove in the museum forecourt is replaced with the photographed fence and a tree screen behind it. Irohamatsu, poem, museum, bridge-direction and town-map boards have readable mesh labels and original OSM-based schematics. The Omotemon bridge has timber members and metal finials on its existing walk axis; the kiosk has shutters, a green awning, brown vending machines and recycling bins. The weak/held fixes in 0929–0933 do not locate the unique gate in 0930.
+
+**Nishi and university street, inner moat (31 October; 0971–0997).** Compared at each photo's position and bearing. The street's verges become asphalt to the walls, the green cycle band and edge lines run through the bend to the junction, and the crossing diamonds are painted. Boulder masonry replaces the tiled rampart and the plain school wall, and the Nishi gate is its plain salmon concrete with a yard of gravel, a pale folding grille and the posted board. A cypress row stands behind the low wall. Moat cherries carry their autumn colour. All sizes are estimates, and the poster is a simplified graphic.
+
+**East inner moat (31 October).** The owner's view at x 55, z 246 showed the moat too narrow and the road on the hedge line. OSM relation 3548105, way 121393434 and the stone retaining ways 1449640342–49 now set the banks, road and rampart; see `world/castle-moat.json` for sources and limits. The school hedge stays just east of the footway, 2.5 m off its OSM boundary at the north end, because the model keeps a footway the map shows only on the moat side.
 
 ## Verification habits
 
