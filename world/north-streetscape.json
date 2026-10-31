@@ -1,0 +1,755 @@
+{
+  "format": "hikone-north-streetscape",
+  "version": 1,
+  "reviewed": "2026-10-30",
+  "sources": [
+    {
+      "type": "owner photographs",
+      "captureDate": "2026-10-29",
+      "files": [
+        "IMG_0912",
+        "IMG_0913",
+        "IMG_0914",
+        "IMG_0915",
+        "IMG_0916",
+        "IMG_0917",
+        "IMG_0918",
+        "IMG_0919",
+        "IMG_0920",
+        "IMG_0921",
+        "IMG_0922",
+        "IMG_0923",
+        "IMG_0924",
+        "IMG_0925",
+        "IMG_0926",
+        "IMG_0927",
+        "IMG_0928",
+        "IMG_0929",
+        "IMG_0930",
+        "IMG_0931",
+        "IMG_0933"
+      ],
+      "licence": "Owner-provided local reference only; originals and inspection derivatives stay outside tracked files. No photo textures.",
+      "gpsErrorMetres": "3.3-5.7 except 0929 (53.7); 0930/0931/0933 repeat a held fix. EXIF altitude is not a terrain datum."
+    },
+    {
+      "type": "OpenStreetMap",
+      "url": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2410,35.2688,136.2612,35.2840",
+      "licence": "ODbL 1.0; attribution remains in docs/geography.md and the application.",
+      "snapshotDate": "2026-10-29",
+      "sha256": "3b5f741b19c09d99e5516c4a02db6d46138d7c18d618845a3de0e640d7283ef6",
+      "use": "Existing registered building outlines, mapped roads, footways, water and bridge axis; no new aerial survey."
+    },
+    {
+      "type": "Hikone City cultural-property descriptions",
+      "url": "https://www.city.hikone.lg.jp/kakuka/kanko_bunka/8/2_1/3/4581.html",
+      "retrieved": "2026-10-30",
+      "pageUpdated": "2024-09-02",
+      "licence": "Copyright Hikone City; factual identification only, no image or page artwork redistributed."
+    },
+    {
+      "type": "Official Hikone Castle site",
+      "url": "https://hikonecastle.com/about.html",
+      "retrieved": "2026-10-30",
+      "licence": "Factual cross-check only; no copied artwork.",
+      "use": "Irohamatsu name and historic count; this model does not claim the present total tree count."
+    }
+  ],
+  "uncertainty": "Footprints/road axes retain the existing map registration. Heights, roof tiers, window spacing, fixture sizes and photo-relative placements are estimates. Unseen faces are closed with coherent construction, not claimed as photographed. 0929-0933 inform corridor character only; the unique gate in 0930 is not relocated from stale GPS.",
+  "buildings": [
+    {
+      "osm": "way/363244220",
+      "kind": "museum",
+      "anchor": [
+        64.47554,
+        441.63216
+      ],
+      "height": 8.2,
+      "rise": 2.1,
+      "maxHeight": 12.8,
+      "photos": [
+        917,
+        920
+      ],
+      "cameraFootprint": [
+        [
+          60.76539,
+          432.14041999999995
+        ],
+        [
+          79.36348,
+          432.14041999999995
+        ],
+        [
+          79.36348,
+          548.86864
+        ],
+        [
+          60.76539,
+          548.86864
+        ]
+      ]
+    },
+    {
+      "osm": "way/363244221",
+      "kind": "historic-turret",
+      "anchor": [
+        62.5259,
+        383.62816
+      ],
+      "height": 6.7,
+      "rise": 2.0,
+      "maxHeight": 10.8,
+      "photos": [
+        918,
+        919,
+        925
+      ],
+      "cameraFootprint": [
+        [
+          46.73489,
+          382.5838
+        ],
+        [
+          76.20612999999999,
+          382.5838
+        ],
+        [
+          76.20612999999999,
+          433.82869
+        ],
+        [
+          46.73489,
+          433.82869
+        ]
+      ]
+    },
+    {
+      "osm": "way/1376711305",
+      "kind": "kiosk",
+      "anchor": [
+        33.19814,
+        382.30111
+      ],
+      "height": 2.65,
+      "rise": 1.35,
+      "maxHeight": 4.0,
+      "photos": [
+        925
+      ],
+      "cameraFootprint": [
+        [
+          20.86256,
+          378.12120999999996
+        ],
+        [
+          34.048140000000004,
+          378.12120999999996
+        ],
+        [
+          34.048140000000004,
+          391.56748000000005
+        ],
+        [
+          20.86256,
+          391.56748000000005
+        ]
+      ]
+    },
+    {
+      "osm": "way/1375275213",
+      "kind": "office",
+      "anchor": [
+        15.91972,
+        455.82973
+      ],
+      "height": 2.65,
+      "rise": 1.15,
+      "maxHeight": 3.8,
+      "photos": [
+        921,
+        922
+      ],
+      "cameraFootprint": [
+        [
+          14.97783,
+          454.97972999999996
+        ],
+        [
+          22.679920000000003,
+          454.97972999999996
+        ],
+        [
+          22.679920000000003,
+          461.00442000000004
+        ],
+        [
+          14.97783,
+          461.00442000000004
+        ]
+      ]
+    },
+    {
+      "osm": "way/585543135",
+      "kind": "iroha-house",
+      "anchor": [
+        192.96005,
+        449.03924
+      ],
+      "height": 5.7,
+      "rise": 1.65,
+      "maxHeight": 7.35,
+      "photos": [
+        912
+      ],
+      "cameraFootprint": [
+        [
+          184.49317,
+          438.84700999999995
+        ],
+        [
+          208.70735,
+          438.84700999999995
+        ],
+        [
+          208.70735,
+          452.42461000000003
+        ],
+        [
+          184.49317,
+          452.42461000000003
+        ]
+      ]
+    },
+    {
+      "osm": "way/585543139",
+      "kind": "iroha-gable",
+      "anchor": [
+        218.42623,
+        438.16086
+      ],
+      "height": 3.6,
+      "rise": 1.6,
+      "maxHeight": 5.2,
+      "photos": [
+        912
+      ],
+      "cameraFootprint": [
+        [
+          207.22623000000002,
+          437.31086
+        ],
+        [
+          219.47877,
+          437.31086
+        ],
+        [
+          219.47877,
+          447.68686
+        ],
+        [
+          207.22623000000002,
+          447.68686
+        ]
+      ]
+    }
+  ],
+  "stair": {
+    "lower": [
+      62.4,
+      453.8
+    ],
+    "upper": [
+      62.5,
+      466.0
+    ],
+    "width": 1.8,
+    "height": 4.4,
+    "photos": [
+      920
+    ],
+    "basis": "Ascending direction corrected using photo 0920 and mapped upper entrance at z=466. Stair stays west of the existing ground passage; an overhead landing connects to the building. Dimensions estimated; upper storey is visual only."
+  },
+  "bridge": {
+    "osm": "way/73533338",
+    "points": [
+      [
+        -4.9957,
+        353.53872
+      ],
+      [
+        4.39487,
+        374.6466
+      ]
+    ],
+    "deckWidth": 2.0,
+    "railOffset": 1.16,
+    "photos": [
+      924
+    ],
+    "basis": "Existing OSM footway axis and width retained. Timber members and metal finials estimated from photo."
+  },
+  "boards": [
+    {
+      "id": "iroha",
+      "point": [
+        235.3,
+        422.5
+      ],
+      "normal": [
+        0,
+        1
+      ],
+      "width": 1.65,
+      "bottom": 0.6,
+      "top": 1.85,
+      "title": "いろは松",
+      "style": "interpretation",
+      "photos": [
+        913
+      ],
+      "basis": "Photo-relative estimate on the existing dry verge."
+    },
+    {
+      "id": "town-map",
+      "sourcePoint": [
+        133.78731,
+        433.35537
+      ],
+      "point": [
+        139.8,
+        434.1
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 2.45,
+      "bottom": 0.8,
+      "top": 2.25,
+      "title": "彦根城下町マップ",
+      "style": "map",
+      "photos": [
+        914
+      ],
+      "basis": "OSM source preserved separately; display order adjusted from 0914, about 6 m along the frontage."
+    },
+    {
+      "id": "poem",
+      "sourcePoint": [
+        136.53544,
+        433.31363
+      ],
+      "point": [
+        136.5,
+        434.1
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 1.3,
+      "bottom": 0.25,
+      "top": 2.15,
+      "title": "井伊大老（直弼）歌碑",
+      "style": "poem",
+      "photos": [
+        914
+      ]
+    },
+    {
+      "id": "moat-map",
+      "point": [
+        122,
+        434.5
+      ],
+      "normal": [
+        0.92,
+        0.39191836
+      ],
+      "width": 2.05,
+      "bottom": 0.5,
+      "top": 1.65,
+      "title": "彦根城周辺案内",
+      "style": "map",
+      "photos": [
+        915,
+        916
+      ],
+      "basis": "Estimated beside the source guidepost at [120.75198,434.20172] on the northern approach. GPS/heading alone incorrectly put this map across the street; shoreline, turret and road relations in 0915-0916 determine its side."
+    },
+    {
+      "id": "museum",
+      "sourcePoint": [
+        46.83012,
+        457.21373
+      ],
+      "point": [
+        46.83012,
+        457.21373
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 2.0,
+      "bottom": 0.55,
+      "top": 2.05,
+      "title": "開国記念館",
+      "style": "museum",
+      "photos": [
+        920,
+        921
+      ]
+    },
+    {
+      "id": "sawaguchi",
+      "sourcePoint": [
+        21.47129,
+        455.84643
+      ],
+      "point": [
+        21.47129,
+        455.84643
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 1.6,
+      "bottom": 0.45,
+      "top": 2.35,
+      "title": "佐和口門",
+      "style": "map",
+      "photos": [
+        922
+      ]
+    },
+    {
+      "id": "omotemon",
+      "sourcePoint": [
+        9.71073,
+        374.37163
+      ],
+      "point": [
+        9.71073,
+        374.37163
+      ],
+      "normal": [
+        0.84,
+        0.5425864
+      ],
+      "width": 2.05,
+      "bottom": 1.15,
+      "top": 2.1,
+      "title": "彦根城",
+      "style": "directions",
+      "photos": [
+        924
+      ]
+    },
+    {
+      "id": "iroha-directory",
+      "point": [
+        250.8,
+        436.2
+      ],
+      "normal": [
+        0,
+        -1
+      ],
+      "width": 2.9,
+      "bottom": 0.7,
+      "top": 2.35,
+      "title": "彦根城 ご案内",
+      "style": "map",
+      "photos": [
+        912
+      ],
+      "basis": "Estimated from the large roofed directory beside the clock in 0912. Diagram is original OSM geometry."
+    },
+    {
+      "id": "umoregi-guide",
+      "sourcePoint": [
+        120.75198,
+        434.20172
+      ],
+      "point": [
+        120.75198,
+        434.20172
+      ],
+      "normal": [
+        0.92,
+        0.39191836
+      ],
+      "width": 1.2,
+      "bottom": 1.65,
+      "top": 1.95,
+      "title": "埋木舎 →",
+      "style": "guide",
+      "photos": [
+        915
+      ],
+      "basis": "Retain the source guidepost position; title and arrow are readable in 0915. No unconfirmed secondary directions."
+    }
+  ],
+  "replacedFacilities": [
+    "node/13436721857",
+    "node/13436721858",
+    "node/13433891128",
+    "node/13431583232",
+    "node/13431583248",
+    "node/13431584910"
+  ],
+  "monument": {
+    "point": [
+      133.2,
+      437.1
+    ],
+    "height": 2.6,
+    "photos": [
+      914
+    ],
+    "basis": "Photo-relative placement behind two steps; inscription not transcribed because fine calligraphy is not reliably readable."
+  },
+  "pineInstances": [
+    {
+      "point": [
+        128,
+        423.2
+      ],
+      "scale": 1.55,
+      "yaw": 18,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        145,
+        423.2
+      ],
+      "scale": 1.5,
+      "yaw": 70,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        165,
+        422.8
+      ],
+      "scale": 1.65,
+      "yaw": 145,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        185,
+        422.4
+      ],
+      "scale": 1.5,
+      "yaw": 210,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        205,
+        422
+      ],
+      "scale": 1.6,
+      "yaw": 35,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        224,
+        421.9
+      ],
+      "scale": 1.6,
+      "yaw": 112,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        242,
+        420.5
+      ],
+      "scale": 1.45,
+      "yaw": 258,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    },
+    {
+      "point": [
+        259,
+        420.2
+      ],
+      "scale": 1.6,
+      "yaw": 195,
+      "basis": "Photo-estimated row rhythm on mapped dry verge; not a measured tree inventory."
+    }
+  ],
+  "groveReplacement": {
+    "bounds": [
+      25,
+      449,
+      65,
+      479
+    ],
+    "basis": "Remove illustrative regular forest instances from the photographed museum forecourt; replace only the observed screen behind the timber fence."
+  },
+  "planting": [
+    {
+      "point": [
+        129,
+        441
+      ],
+      "height": 11,
+      "species": "cedar",
+      "spread": 2.2,
+      "photos": [
+        914
+      ]
+    },
+    {
+      "point": [
+        137,
+        442
+      ],
+      "height": 10,
+      "species": "tabu",
+      "spread": 3.2,
+      "photos": [
+        914
+      ]
+    },
+    {
+      "point": [
+        145,
+        440
+      ],
+      "height": 9,
+      "species": "tabu",
+      "spread": 2.8,
+      "photos": [
+        914
+      ]
+    },
+    {
+      "point": [
+        31,
+        469
+      ],
+      "height": 11,
+      "species": "tabu",
+      "spread": 3.8,
+      "photos": [
+        920,
+        921
+      ]
+    },
+    {
+      "point": [
+        40,
+        467
+      ],
+      "height": 13,
+      "species": "cedar",
+      "spread": 2.7,
+      "photos": [
+        920,
+        921
+      ]
+    },
+    {
+      "point": [
+        49,
+        471
+      ],
+      "height": 12,
+      "species": "tabu",
+      "spread": 4,
+      "photos": [
+        920,
+        921
+      ]
+    },
+    {
+      "point": [
+        55,
+        476
+      ],
+      "height": 15,
+      "species": "cedar",
+      "spread": 3,
+      "photos": [
+        920,
+        921
+      ]
+    }
+  ],
+  "courtFence": {
+    "points": [
+      [
+        22.5,
+        461
+      ],
+      [
+        58.5,
+        462.2
+      ]
+    ],
+    "gateAt": 0.46,
+    "photos": [
+      921
+    ],
+    "height": 2.0,
+    "basis": "Photo-relative estimate; distinct from the stable across the public road."
+  },
+  "rails": [
+    {
+      "points": [
+        [
+          78,
+          432.3
+        ],
+        [
+          115,
+          432.5
+        ]
+      ],
+      "height": 0.85,
+      "style": "bamboo",
+      "photos": [
+        917
+      ],
+      "basis": "Photo 0915/0917 barrier follows the north moat edge (OSM way/45731151), clear of the opposite public footway."
+    },
+    {
+      "points": [
+        [
+          126,
+          434
+        ],
+        [
+          145.8,
+          434
+        ]
+      ],
+      "height": 0.65,
+      "style": "chain",
+      "photos": [
+        914
+      ]
+    }
+  ],
+  "clock": {
+    "point": [
+      255,
+      436.3
+    ],
+    "height": 3.3,
+    "photos": [
+      912
+    ],
+    "basis": "Photo-relative estimate behind the northern footway, clear of mapped driveways; clock hands reproduce the approximate photographed time, not live time."
+  },
+  "photoIndex": "field-photos/INDEX.md (local, git-ignored; camera fixes remain there, separate from estimated model placements)"
+}

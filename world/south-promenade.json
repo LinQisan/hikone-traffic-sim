@@ -1,0 +1,35 @@
+{
+  "format": "hikone-south-promenade",
+  "version": 1,
+  "reviewed": "2026-10-31",
+  "sources": [
+    {"type":"owner photographs","captureDate":"2026-10-29","folders":["05-saigo-kyobashi","06-east-moat-promenade"],"files":"IMG_0867–IMG_0894 (28 originals)","licence":"Local reference only. No photograph, crop or photo texture is distributed.","accuracy":"GPS horizontal errors 3.0–12.9 m; headings are not calibrated camera poses. Dimensions below are visual estimates."},
+    {"type":"OpenStreetMap","snapshotDate":"2026-10-29","url":"https://api.openstreetmap.org/api/0.6/map?bbox=136.2468,35.2701,136.2577,35.2773","sha256":"dc747618915e00132bc664fd73b43d9a8568df5e7d5e654a00a3f3c98cd64f1b","licence":"ODbL-1.0; OpenStreetMap contributors","use":"Existing registered facilities, tower, footways and road/water geometry; no new map imagery was accessed."}
+  ],
+  "registration":"world/geographic-frame.json. Existing street and water surfaces retained; photo GPS is evidence, not a replacement placement.",
+  "facilities": {
+    "node/4405142292":"sloping-map",
+    "node/4405142293":"sloping-map-boat",
+    "node/4405142720":"gangi",
+    "node/4405142721":"saigo",
+    "node/13429910371":"saigo-marker"
+  },
+  "gate":{"name":"Saigo longhouse gate","photos":[867,868],"frontEdge":[3,2],"doorStation":18.8,"doorWidth":3.8,"eave":3.75,"roofRise":1.5,"roofOverhang":0.65,"note":"Registered footprint retained. Closed paired doors, strap hinges, studded posts, side wicket and projecting barred windows are photo-derived; rear is a closed modest timber/plaster exterior."},
+  "benchPads":{"halfWidth":1.08,"front":-0.55,"back":0.40,"height":0.15,"basis":"Photo 0881 gravel seat openings, estimated dimensions on the retained level verge. The same polygons supply rendered finish and Ground support."},
+  "buildings":[{"osm":"way/1412461608","kind":"shutter-shop","anchor":[268.6016,34.01223],"height":7.0,"rise":0,"maxHeight":9.2,"photos":[892],"registrationConfidence":"Medium: closest long north-facing shop footprint along the photographed heading; the 12.9 m GPS error prevents survey-level identification. Frontage and roof-room dimensions are estimates; no business name or hidden interior is asserted."}],
+  "guide":{"id":"tachibana-Y15","photoPoints":[[259.5,55.5],[254.6,57.9]],"placement":[257.8,51.0],"normal":[-0.81,-0.5864],"width":0.87,"height":2.55,"photos":[893,894],"placementBasis":"Photographed on the town side, looking across the junction to the low moat map. GPS fixes straddle the street (6.2–7.2 m uncertainty); placed on the existing town-side corner behind the mapped walking line. Not surveyed.","distances":"Photo-date text, not live directions or simulated traffic rules."},
+  "extraGuide":{"placement":[239.3,55.8],"normal":[0,-1],"photos":[887],"title":"路上喫煙 禁止地区です","placementBasis":"Photo-relative to map node/4405142292; behind the public footway."},
+  "tactile":{"coreFrom":82,"coreTo":181,"mappedWay":"way/1374082612","mappedFromX":184,"mappedToX":240,"note":"Follows the retained bent footway then the mapped footway. No invented warning pad at an unverified crossing; edge detail does not change Ground height."},
+  "trees":[
+    {"sourcePhotoPoint":[160.2,44.4],"placement":[159.5,43.1],"yaw":0,"scale":1,"photos":[883,884],"placementBasis":"Root fitted to the retained landward bank; branches lean over water."},
+    {"sourcePhotoPoint":[187.8,47.4],"placement":[190.8,53.0],"yaw":-12,"scale":0.94,"photos":[885,886],"placementBasis":"Root on the mapped moat-side verge east of the ownership join; photo position is the photographer, not the trunk."},
+    {"sourcePhotoPoint":[235.9,49.0],"placement":[231.0,53.0],"yaw":17,"scale":0.83,"photos":[887],"placementBasis":"Tree behind the sloping map, on the mapped bank; photo-relative estimate."}
+  ],
+  "lamps":[{"point":[132,34.9],"photos":[881,882]},{"point":[168.0,44.7],"photos":[883]},{"point":[235.0,55.4],"photos":[887]}],
+  "limitations":[
+    "The retained south shore differs from OSM. Bench source points remain in field-observations.json; explicit placements fit the curved retained bank. The separate gravel waterside path in 0881 is compressed into the existing narrow verge, not claimed as a surveyed reconstruction.",
+    "The 0871 parade closure is temporary and is not made permanent. 0879 confirms restriction text but not a reliably registered pole; no invented restriction pole or traffic-rule change.",
+    "0890/0891 view an office beyond the eastern walkable boundary and are not used to invent an extension. 0892 has a medium-confidence footprint match based on proximity, the southward camera heading and long north frontage; it is explicitly estimated, not a surveyed identification.",
+    "Map artwork and historical photographs on the boards are not copied. In-scene maps are original schematics of existing OSM geometry; small unreadable text and hidden interiors are not fabricated."
+  ]
+}

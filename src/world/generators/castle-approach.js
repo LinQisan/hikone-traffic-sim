@@ -7,6 +7,7 @@ import { EAST_GEOGRAPHY } from './east-layout.ts';
 import higashi from '../../../world/higashi-frontage.json' with { type: 'json' };
 import island from '../../../world/higashi-island.json' with { type: 'json' };
 import street from '../../../world/east-street.json' with { type: 'json' };
+import south from '../../../world/south-promenade.json' with { type: 'json' };
 export const HIGASHI_FRONTAGE = higashi;
 export const HIGASHI_ISLAND = island;
 export const HIGASHI_STREET = street;
@@ -104,7 +105,13 @@ const gateWalls = higashi.gate.walls.flatMap(path => path.slice(1).map((c, i) =>
   return {footprint: [[a[0]+nx,a[1]+nz],[c[0]+nx,c[1]+nz],[c[0]-nx,c[1]-nz],[a[0]-nx,a[1]-nz]], height: 2.2, rise: 0};
 }));
 const [kx, kz] = higashi.kiosk.center;
-export const APPROACH_CAMERA_SOLIDS = [...APPROACH_BUILDINGS, ...gateWalls,
+export const APPROACH_CAMERA_SOLIDS = [...APPROACH_BUILDINGS.map(b => {
+  if (b.name !== south.gate.name) return b;
+  // The new roof projects beyond the registered wall, including its end soffits.
+  const cx=b.footprint.reduce((s,p)=>s+p[0],0)/4,cz=b.footprint.reduce((s,p)=>s+p[1],0)/4;
+  return {...b,footprint:b.footprint.map(([x,z])=>[cx+(x-cx)*1.17,cz+(z-cz)*1.032]),
+    height:south.gate.eave,rise:south.gate.roofRise+.35};
+}), ...gateWalls,
   {footprint: [[kx-1.96,kz-1.61],[kx+1.96,kz-1.61],[kx+1.96,kz+1.61],[kx-1.96,kz+1.61]], height: 3.65, rise: 0}];
 export const APPROACH_PATCHES = [
   { material: 'ART_Sand', footprint: outline([[299, 368], [365, 303], [562, 480], [578, 520], [484, 627]]) },

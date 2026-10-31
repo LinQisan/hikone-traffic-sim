@@ -890,37 +890,8 @@ def inner_banks_mesh(b):
 
 
 def bridge_mesh(b):
-    # 18 October 2026 photographs: a weathered timber-style balustrade (top and bottom rails with
-    # close balusters) between round grey posts with onion-shaped giboshi caps, every ~4.3 m.
-    # Keep the 34.4 m authored deck; the four shaped newels stand at its ends.
-    from streetscape import bridge_posts, lathe
-    from abstract_props import cylinder
-    giboshi = [(1.02, 0.16), (1.07, 0.17), (1.11, 0.11), (1.19, 0.15), (1.29, 0.17),
-               (1.39, 0.12), (1.47, 0.05), (1.52, 0.01)]
-    for x in (25.25, 38.75):
-        for z in [39.6 + i * 4.3 for i in range(1, 8)]:
-            base = walk_height(x, z)
-            cylinder(b, (x, base, z), (x, base + 1.02, z), 0.15, 'HK_Stone', segments=12)
-            lathe(b, x, z, [(base + y, r) for y, r in giboshi], 'ART_StoneLight')
-        b.box((x, 0.95, 56.8), (0.13, 0.13, 34.4), 'HK_WoodDark')
-        b.box((x, 0.30, 56.8), (0.12, 0.10, 34.4), 'HK_WoodDark')
-        for i in range(77):
-            z = 39.8 + i * 0.45
-            if any(abs(z - (39.6 + k * 4.3)) < 0.25 for k in range(9)):
-                continue
-            base = walk_height(x, z)
-            b.box((x, max(base, 0.35) + 0.27, z), (0.07, 0.54, 0.07), 'HK_WoodDark')
-    b.box((32, -0.28, 56.8), (14, 0.50, 34.4), 'HK_StoneDark')
-    # Keep the separately modelled stone newels at both banks.
-    before = len(b.vertices)
-    bridge_posts(b)
-    for i in range(before, len(b.vertices)):
-        x, z, y = b.vertices[i]
-        # Existing newels are local to a bridge whose origin is (32,39.6).
-        unity_x, unity_z = -x + 32, -z
-        if unity_z > 6:
-            unity_z += 22
-        b.vertices[i] = (-unity_x, -(unity_z + 39.6), y + 0.01)
+    from south_promenade import bridge
+    bridge(b)
 
 
 def otemon_bridge_mesh(b):
@@ -1018,6 +989,8 @@ def export_plan(markings=()):
     from higashi_school import ground_surfaces
     for name, p, height, material in ground_surfaces():
         groups.setdefault(name + ' grounds', []).extend(triangles(p, height))
+    from south_promenade import bench_pads
+    groups['South promenade bench grounds']=[t for ring,y in bench_pads() for t in triangles(ring,y)]
     from castle_paths import ground_triangles, segments, quad
     groups.update({'Hikone castle path ' + name: triangles for name, triangles in ground_triangles().items()})
     with open(os.path.join(ROOT, 'data', 'road_tiles.json'), 'w') as f:

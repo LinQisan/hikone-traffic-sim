@@ -24,7 +24,7 @@ export const MOAT_BANK_ITEMS = [
   // Low, irregular patches leave the bridge approaches and the main path open.
   // Shallow enough to stay between the footway and the fence on the narrow strip.
   ...[-109, -99, -87, -76, -63, -53, -42, -31, -18, -5, 8, 19,
-    47, 54, 63, 72, 80, 88, 96, 106, 114, 123, 132, 140].map((x, i) => ({
+    47, 54, 63, 72, 80, 88, 96, 106, 114, 123].map((x, i) => ({
     ...plant('ART_MoatBankPatch', x, 0, (i % 3 - 1) * 3,
       [0.72 + (i % 4) * 0.12, 0.70 + (i % 3) * 0.14, 0.7]),
     p: [x, 0.15, moatEdge(x) - 1.45 + (i % 3) * 0.1] })),

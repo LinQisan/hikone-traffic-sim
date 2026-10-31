@@ -10,7 +10,7 @@ from abstract_props import beveled_box as box, cylinder, face, car_body, wheel, 
 from display_case import display_kiosk
 
 MODELS = ('ART_CornerShop', 'ART_WhiteStorehouse', 'ART_EavesStorehouse', 'ART_ThreeStorey',
-          'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_IslandWood', 'ART_StreetWillow', 'ART_GardenPine', 'ART_StreetHedge', 'ART_TownTree',
+          'ART_NorthLonghouse', 'ART_ParkingPavilion', 'ART_ClippedHedge', 'ART_CastleGrove', 'ART_IslandWood', 'ART_StreetWillow', 'ART_GardenPine', 'ART_IrohaPine', 'ART_StreetHedge', 'ART_TownTree',
           'HK_Sign_ParkingDirection',
           'ART_WestCorner', 'HK_Sign_Paired30', 'HK_Sign_Paired40', 'HK_Sign_NoParking',
           'ART_PavingDetails', 'ART_KeiBox', 'HK_ChainFence', 'ART_DisplayKiosk')
@@ -144,7 +144,7 @@ def street_willow(b):
             y -= .46
 
 
-def garden_pine(b):
+def garden_pine(b, mature=False):
     # A trained Japanese black pine (0899, 0908): leaning red-brown trunk, level boughs and pads of
     # needle fans over a dark core, so the crown is brushed rather than a stack of pillows.
     import random
@@ -165,17 +165,43 @@ def garden_pine(b):
     pads.append(((trunk[-1][0], trunk[-1][1] + .3, trunk[-1][2]), 1.5))
     for i in range(first, len(b.faces)):
         b.pigments[i] = (.46, .33, .31)
-    blades, fans = 9, 10
+    blades, fans = (9,30) if mature else (9,10)
     for k, ((x, y, z), r) in enumerate(pads):
-        spray(b, (x, y - .08, z), (r * .72, .26, r * .72), k, 'HK_LeafDark', 971 + k, fine=False)
+        if not mature:
+            spray(b, (x, y - .08, z), (r * .72, .26, r * .72), k, 'HK_LeafDark', 971 + k, fine=False)
         for f in range(fans):
+            fan_start=len(b.faces)
             a, d = rng.uniform(0, math.tau), math.sqrt(rng.uniform(0, 1)) * r
             cx, cz = x + d * math.cos(a), z + d * math.sin(a)
-            cy = y + .24 * (1 - (d / r) ** 2) + rng.uniform(-.04, .06)
+            cy = y + .24 * (1 - (d / r) ** 2) + rng.uniform(-.22,.22) if mature else y + .24 * (1 - (d / r) ** 2) + rng.uniform(-.04,.06)
             tone = ((.26, .40, .34), (.33, .47, .36), (.42, .52, .36), (.20, .34, .34))[f % 4]
+            if mature:
+                twig=len(b.faces)
+                cylinder(b,(x,y-.12,z),(cx,cy,cz),.008,'ART_TreeBark',segments=3,end_radius=.003)
+                for i in range(twig,len(b.faces)):b.pigments[i]=(.37,.32,.29)
             for n in range(blades):
-                leaf_card(b, (cx, cy, cz), rng.uniform(.34, .5), .022 if not b.distant else .05,
-                          n * math.tau / blades + f, rng.uniform(-.14, .1), tone, 'HK_LeafDark')
+                length=rng.uniform(.34,.5)
+                angle=n*math.tau/blades+f
+                droop=rng.uniform(-.48,.48) if mature else rng.uniform(-.14,.1)
+                if mature:
+                    # A closed, folded needle stays green from the pedestrian's
+                    # upward view even in a front-face-only merged tree batch.
+                    ux,uz=math.cos(angle),math.sin(angle)
+                    mx,my,mz=cx+ux*length*.45,cy-droop*.3,cz+uz*length*.45
+                    rim=[(cx,cy,cz),(mx-uz*.055,my,mz+ux*.055),
+                         (cx+ux*length,cy-droop,cz+uz*length),(mx+uz*.055,my,mz-ux*.055)]
+                    for i in range(4):
+                        j=(i+1)%4
+                        for points in ([rim[i],rim[j],(mx,my+.008,mz)],
+                                       [rim[j],rim[i],(mx,my-.008,mz)]):
+                            b.face(points,'HK_LeafDark',strokes=False,pigment=tone)
+                else:
+                    leaf_card(b,(cx,cy,cz),length,.022 if not b.distant else .05,angle,droop,tone,'HK_LeafDark')
+            if mature and f%3:
+                # Both authors see one deterministic crown. The ordinary low compiler
+                # keeps one fan in three plus the actual silhouette extrema.
+                b.strokes+=1
+                for i in range(fan_start,len(b.faces)):b.details[i]=b.strokes*16+1
 
 
 def street_hedge(b):
@@ -589,6 +615,9 @@ def build(name, mesh_class, lod=False):
         parking_direction(b)
     elif name == 'ART_GardenPine':
         garden_pine(b)
+    elif name == 'ART_IrohaPine':
+        # The photographed old pines have needle fans and sky gaps, not enlarged leaf pillows.
+        garden_pine(b, mature=True)
     elif name == 'ART_StreetHedge':
         street_hedge(b)
     elif name == 'ART_StreetWillow':

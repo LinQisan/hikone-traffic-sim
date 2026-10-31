@@ -597,6 +597,8 @@ def main():
         # leave missing or stale distant geometry behind.
         for distant in ([True] if args.lod_only else [False, True]):
             detail = streetscape.build(name, BrushMesh, lod=True) if distant and name in streetscape.MODELS and not args.lod_only else b
+            if distant and name in east_extension.MODELS and not args.lod_only:
+                detail = east_extension.build(name, BrushMesh, lod=True)
             if distant and name in hikone_castle.MODELS and not args.lod_only:
                 detail = hikone_castle.build(name, BrushMesh, lod=True)
             if distant and name in castle_approach.MODELS and not args.lod_only:

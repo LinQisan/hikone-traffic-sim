@@ -83,13 +83,15 @@ for(const detail of ['','.lod'])test(`photo roofs have their real gable and step
 test('photographed boards, posts and lamps stand beside the carriageway, not on it',()=>{
  const tiles=read('data/road_tiles.json'),carriageways=['Kyobashi carriageway','East Hikone carriageway'].map(name=>tiles[name]);
  const onCarriageway=(x,z)=>carriageways.some(t=>{
-  for(let i=0;i<t.length;i+=9){
-   const [ax,,az,bx,,bz,cx,,cz]=t.slice(i,i+9),d=(bz-cz)*(ax-cx)+(cx-bx)*(az-cz);
+  for(const [ax,,az,bx,,bz,cx,,cz] of t){
+   const d=(bz-cz)*(ax-cx)+(cx-bx)*(az-cz);
+   if(Math.abs(d)<1e-12)continue;
    const u=((bz-cz)*(x-cx)+(cx-bx)*(z-cz))/d,v=((cz-az)*(x-cx)+(ax-cx)*(z-cz))/d;
    if(u>=0&&v>=0&&u+v<=1)return true;
   }
   return false;
  });
+ assert.ok(onCarriageway(32,26),'the test samples actual carriageway triangles');
  const photos=read('world/field-observations.json');
  for(const item of [...photos.facilities,...photos.lamps]){
   const [x,z]=item.placement??item.point;

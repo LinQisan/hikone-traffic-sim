@@ -311,7 +311,11 @@ def building_region(building):
     from east_street import data as street
     from higashi_school import east_replaced
     from university_photos import ALLEY_PROFILES
-    reviewed = building['id'] in photos()['buildings'] or building['id'] in street()['houses'] or building['id'] in ALLEY_PROFILES
+    from north_streetscape import data as north
+    from south_promenade import data as south
+    reviewed = (building['id'] in photos()['buildings'] or building['id'] in street()['houses']
+                or building['id'] in ALLEY_PROFILES or any(q['osm']==building['id'] for q in north()['buildings'])
+                or any(q['osm']==building['id'] for q in south()['buildings']))
     if reviewed or building['id'] in east_replaced():
         return 'ART_EastHikoneBuildings'
     ring = building['outlines'][0]

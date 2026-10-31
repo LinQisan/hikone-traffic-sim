@@ -349,59 +349,6 @@
         281.18933,
         419.32058
       ]
-    },
-    "way/363244220": {
-      "kind": "turret",
-      "height": 8.2,
-      "rise": 2.2,
-      "plinth": 3.2,
-      "front": [
-        1,
-        0
-      ],
-      "photos": [
-        917,
-        918
-      ],
-      "anchor": [
-        64.47554,
-        441.63216
-      ]
-    },
-    "way/363244221": {
-      "kind": "turret",
-      "height": 6.7,
-      "rise": 2,
-      "plinth": 1.8,
-      "front": [
-        -1,
-        0
-      ],
-      "photos": [
-        919,
-        920,
-        921
-      ],
-      "anchor": [
-        62.5259,
-        383.62816
-      ]
-    },
-    "way/1376711305": {
-      "kind": "kiosk",
-      "height": 2.9,
-      "rise": 1.5,
-      "front": [
-        0,
-        -1
-      ],
-      "photos": [
-        925
-      ],
-      "anchor": [
-        33.19814,
-        382.30111
-      ]
     }
   },
   "retainedBuildings": {
@@ -536,10 +483,10 @@
       "heading": 65.93218997361478,
       "placement": [
         150.31176,
-        34.05
+        40.36502
       ],
-      "placementBasis": "Registered to retained practice shore for continuity; original mapped point retained. Not a surveyed placement.",
-      "offsetMetres": 16.869580000000006
+      "placementBasis": "Photo 0881: backed slatted seats on the waterside verge, following the retained curved bank. Corrected from a straight row; original OSM point retained. This shore is not surveyed.",
+      "offsetMetres": 10.55456
     },
     {
       "osm": "node/4405142299",
@@ -555,10 +502,10 @@
       "heading": 65.93218997361478,
       "placement": [
         146.12057,
-        34.05
+        39.16106
       ],
-      "placementBasis": "Registered to retained practice shore for continuity; original mapped point retained. Not a surveyed placement.",
-      "offsetMetres": 17.059730000000002
+      "placementBasis": "Photo 0881: backed slatted seats on the waterside verge, following the retained curved bank. Corrected from a straight row; original OSM point retained. This shore is not surveyed.",
+      "offsetMetres": 11.94867
     },
     {
       "osm": "node/4405142304",
@@ -574,10 +521,10 @@
       "heading": 65.93218997361478,
       "placement": [
         132.33056,
-        34.05
+        35.85145
       ],
-      "placementBasis": "Registered to retained practice shore for continuity; original mapped point retained. Not a surveyed placement.",
-      "offsetMetres": 10.109860000000005
+      "placementBasis": "Photo 0881: backed slatted seats on the waterside verge, following the retained curved bank. Corrected from a straight row; original OSM point retained. This shore is not surveyed.",
+      "offsetMetres": 8.30841
     },
     {
       "osm": "node/4405142306",
@@ -593,10 +540,10 @@
       "heading": 65.93218997361478,
       "placement": [
         135.45319,
-        34.05
+        36.49982
       ],
-      "placementBasis": "Registered to retained practice shore for continuity; original mapped point retained. Not a surveyed placement.",
-      "offsetMetres": 12.573030000000003
+      "placementBasis": "Photo 0881: backed slatted seats on the waterside verge, following the retained curved bank. Corrected from a straight row; original OSM point retained. This shore is not surveyed.",
+      "offsetMetres": 10.12321
     },
     {
       "osm": "node/4405142308",
@@ -612,10 +559,10 @@
       "heading": 65.93218997361478,
       "placement": [
         138.1995,
-        34.05
+        37.12244
       ],
-      "placementBasis": "Registered to retained practice shore for continuity; original mapped point retained. Not a surveyed placement.",
-      "offsetMetres": 14.866680000000002
+      "placementBasis": "Photo 0881: backed slatted seats on the waterside verge, following the retained curved bank. Corrected from a straight row; original OSM point retained. This shore is not surveyed.",
+      "offsetMetres": 11.79424
     },
     {
       "osm": "node/4405142720",
@@ -645,9 +592,10 @@
       "heading": 196.8816376165383,
       "placement": [
         -2.7,
-        126.9
+        126.25
       ],
-      "placementBasis": "Photo 0867: the board stands on the grass verge just behind the kerb and chained posts; the OSM point falls on the reviewed carriageway edge. Original mapped point retained."
+      "placementBasis": "IMG_0867 grass-verge board, facing the approach. Shifted 0.65 m along the retained verge to separate its panel from the photo-corrected inscribed stone and projecting grille. Original OSM point retained; photo-relative placement, not surveyed.",
+      "offsetMetres": 1.71835
     },
     {
       "osm": "node/13429910371",
@@ -656,16 +604,20 @@
         122.56158
       ],
       "kind": "marker",
-      "name": "彦根市指定文化財",
+      "name": "家老 西郷屋敷跡",
       "photos": [
         868
       ],
       "heading": 284.904296875,
       "placement": [
-        -3.9,
-        122.3
+        -2.5,
+        127.11
       ],
-      "placementBasis": "Photo 0868 shows a small inscribed stone post at the gate frontage, not a board. Projected 0.4 m in front of the existing longhouse facade; original mapped point retained. Post size is a photo estimate."
+      "placementBasis": "IMG_0868: inscribed stone in front of the projecting grille beside the paired gate doors. Set beyond the grille front on the private verge so the full inscription is visible; original mapped point retained. Photo-relative estimate.",
+      "observedName": "家老 西郷屋敷跡",
+      "nameBasis": "IMG_0868 original-resolution inscription; OSM name is retained as sourceName.",
+      "sourceName": "彦根市指定文化財",
+      "offsetMetres": 5.43816
     },
     {
       "osm": "node/13436721857",
@@ -837,5 +789,7 @@
         0
       ]
     }
-  ]
+  ],
+  "northStreetscape": "world/north-streetscape.json owns the superseding northern building profiles and furniture.",
+  "southPromenade": "world/south-promenade.json owns the superseding Saigo frontage and south-promenade furniture."
 }

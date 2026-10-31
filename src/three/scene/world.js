@@ -23,7 +23,7 @@ export const ENVIRONMENT_CELLS = Object.freeze({
   ART_EastHikoneWest: 2048, ART_EastHikoneSouth: 2048, ART_EastHikoneNorth: 2048,
 });
 // Dense foliage loses individual leaf detail long before a building loses its joinery.
-const TREE_ASSET = /^(HK_Tree_|ART_(TownTree$|MoatTree_|CastleGrove$))/;
+const TREE_ASSET = /^(HK_Tree_|ART_(TownTree$|MoatTree_|CastleGrove$|IrohaPine$|PromenadeCherry$))/;
 const models = new Map();
 const loaded = new Map();
 let modelGeneration = 0;

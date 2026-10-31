@@ -7,7 +7,7 @@ import math
 from abstract_props import cylinder
 
 MODELS = ('ART_MoatRoadSurface', 'ART_MoatRoadPaint', 'ART_MoatTree_Broad',
-          'ART_MoatTree_Airy', 'ART_MoatBankPatch')
+          'ART_MoatTree_Airy', 'ART_MoatBankPatch', 'ART_PromenadeCherry')
 
 
 def area(points):
@@ -122,6 +122,9 @@ def build(name, mesh_class, lod=False):
         road_paint(b)
     elif name == 'ART_MoatBankPatch':
         bank_patch(b)
+    elif name == 'ART_PromenadeCherry':
+        from south_promenade import cherry
+        cherry(b)
     else:
         bank_tree(b, name.endswith('Airy'))
     return b

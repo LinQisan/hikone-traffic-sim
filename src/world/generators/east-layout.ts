@@ -4,12 +4,19 @@ import {frame} from '../geography/coordinates.ts';
 import observations from '../../../world/field-observations.json' with {type:'json'};
 import nishi from '../../../world/nishi-frontage.json' with {type:'json'};
 import island from '../../../world/higashi-island.json' with {type:'json'};
-const photoProfiles: {height:number;rise:number;maxHeight?:number;anchor:number[]}[] = Object.values(observations.buildings);
+import north from '../../../world/north-streetscape.json' with {type:'json'};
+import south from '../../../world/south-promenade.json' with {type:'json'};
+const photoProfiles: {height:number;rise:number;maxHeight?:number;anchor:number[]}[] = [
+  ...Object.values(observations.buildings), ...south.buildings];
 export const EAST_GEOGRAPHY = source;
 // Mapped generic houses by region; tools/east_extension.py authors the same split.
 export const EAST_BUILDING_REGIONS = ['ART_EastHikoneWest', 'ART_EastHikoneSouth', 'ART_EastHikoneNorth'];
 // Each extruded building keeps its own camera bounds (eave height plus any gable rise).
 export const EAST_CAMERA_SOLIDS = source.buildings.flatMap(b => {
+  const northern = north.buildings.find(p => Math.abs(p.anchor[0]-(b.outlines[0]?.[0]?.[0]??Infinity))<.006
+    && Math.abs(p.anchor[1]-(b.outlines[0]?.[0]?.[1]??Infinity))<.006);
+  if (northern) return [{footprint: northern.cameraFootprint as [number, number][],
+    height: northern.maxHeight, rise: 0}];
   // The compact transport omits source IDs. The reviewed frozen outline anchor ties the
   // same photo profile to its camera envelope without loading the full GIS plan at startup.
   const profile=photoProfiles.find(p=>Math.abs(p.anchor[0]-(b.outlines[0]?.[0]?.[0]??Infinity))<.006
@@ -60,7 +67,15 @@ export function eastLayout(layout: SceneLayout): SceneLayout {
     && !(GENERIC_HOUSE.test(i.a) && boundaryDistance(i.p[0], i.p[2]) < 12));
   for (const a of assets) items.push({a, p:[0,0,0], r:0, s:[1,1,1], g:'WebEast'});
   // Mapped trees, plus the illustrative planting of mapped woods (groves), parks and gardens.
-  for (const t of source.trees) items.push({a:'kind' in t && t.kind === 'grove' ? 'ART_CastleGrove' : 'ART_TownTree',
-    p:[t.x,t.ground,t.z],r:0,s:[1,1,1],g:'WebEast'} satisfies LayoutItem);
+  const [x0,z0,x1,z1] = north.groveReplacement.bounds;
+  for (const t of source.trees) {
+    if ('kind' in t && t.kind === 'grove' && t.x>x0! && t.x<x1! && t.z>z0! && t.z<z1!) continue;
+    items.push({a:'kind' in t && t.kind === 'grove' ? 'ART_CastleGrove' : 'ART_TownTree',
+      p:[t.x,t.ground,t.z],r:0,s:[1,1,1],g:'WebEast'} satisfies LayoutItem);
+  }
+  for (const t of north.pineInstances) items.push({a:'ART_IrohaPine',p:[t.point[0]!,.15,t.point[1]!],
+    r:t.yaw,s:[t.scale,t.scale,t.scale],g:'WebEast'});
+  for (const t of south.trees) items.push({a:'ART_PromenadeCherry',p:[t.placement[0]!,.15,t.placement[1]!],
+    r:t.yaw,s:[t.scale,t.scale,t.scale],g:'WebEast'});
   return {...layout, items};
 }

@@ -76,6 +76,10 @@ def round_window(b,center,normal,radius):
 
 
 def photographed_building(b,item):
+    from south_promenade import building as south_building
+    if south_building(b,item):return True
+    from north_streetscape import building as north_building
+    if north_building(b,item):return True
     spec=data()['buildings'].get(item['id'])
     if not spec:return False
     from university_photos import framed_window
@@ -232,6 +236,8 @@ def stair(b,a,c,height):
 
 
 def retained_building(b,item):
+    from south_promenade import saigo
+    if saigo(b,item):return True
     spec=data()['retainedBuildings'].get(item.get('name'))
     if not spec:return False
     from university_photos import framed_window
@@ -320,19 +326,6 @@ def board(b,item):
             cylinder(b,at(-width*.35,yy,.055),at(width*.35,yy,.055),.013,'HK_MetalLight',segments=3)
 
 
-def bench(b,item):
-    from university import prism
-    from abstract_props import cylinder
-    x,z=item.get('placement',item['point']);y=height(x,z)
-    # The registered core benches follow its retained east-west footway. Keep their
-    # long axes parallel to the walk and their narrow profiles outside its body corridor.
-    a=math.pi/2 if 'placement' in item else (item['heading']-122)*math.pi/180;ux,uz=-math.sin(a),math.cos(a)
-    p,q=(x-ux,z-uz),(x+ux,z+uz)
-    prism(b,p,q,y+.4,y+.48,.4,'ART_Timber')
-    prism(b,(p[0]+uz*.2,p[1]-ux*.2),(q[0]+uz*.2,q[1]-ux*.2),y+.65,y+1,.08,'ART_Timber')
-    for t in (-.7,.7):cylinder(b,(x+ux*t,y,z+uz*t),(x+ux*t,y+.43,z+uz*t),.11,'HK_Stone',segments=4)
-
-
 def chain(b,line):
     from abstract_props import cylinder
     for a,c in zip(line,line[1:]):
@@ -355,31 +348,16 @@ def palm(b,x,z,h):
             face(b,[(x,y+h,z),(tip[0]-.08*uz,tip[1],tip[2]+.08*ux),(tip[0]+.08*uz,tip[1],tip[2]-.08*ux)],'ART_Patina',inside)
 
 
-def tower(b):
-    from abstract_props import cylinder
-    d=data()['tower'];x,z=d['point'];base,top=d['base'],d['height']
-    for level in range(8):
-        lo,hi=base+(top-base)*level/8,base+(top-base)*(level+1)/8
-        r,rr=2.7*(1-level*.08),2.7*(1-(level+1)*.08)
-        p=[(x+r*math.cos(i*math.tau/4+math.pi/4),lo,z+r*math.sin(i*math.tau/4+math.pi/4)) for i in range(4)]
-        q=[(x+rr*math.cos(i*math.tau/4+math.pi/4),hi,z+rr*math.sin(i*math.tau/4+math.pi/4)) for i in range(4)]
-        for i in range(4):
-            j=(i+1)%4
-            for a,c,rad in ((p[i],q[i],.07),(p[i],q[j],.035),(p[j],q[i],.035),(q[i],q[j],.05)):
-                cylinder(b,a,c,rad,'HK_MetalLight',segments=4)
-        if level in (2,4,6):
-            for i in range(4):
-                a=math.tau*i/4
-                cylinder(b,(x+math.cos(a)*2,hi,z+math.sin(a)*2),(x+math.cos(a)*2,hi+1,z+math.sin(a)*2),.3,'HK_MetalLight',segments=8)
-    cylinder(b,(x,top,z),(x,top+2,z),.08,'HK_MetalLight',segments=5)
-
-
 def furniture(b):
     from abstract_props import cylinder
     from university import prism
     from road_network import face as ground_face,strip
     first=len(b.faces);d=data()
+    from north_streetscape import data as north_data
+    from south_promenade import data as south_data
     for item in d['facilities']:
+        if item['osm'] in north_data()['replacedFacilities']:continue
+        if item['osm'] in south_data()['facilities'] or item['kind']=='bench':continue
         (bench if item['kind']=='bench' else board)(b,item)
     # The retained practice shore already owns its original fence. Extend the mapped
     # chain only into the photographed eastern promenade, preserving event corridors.
@@ -410,16 +388,14 @@ def furniture(b):
     # The low roadside shrine in 0895, behind the narrow shoulder (estimated dimensions).
     shrine=(255.7,116.8);y=height(*shrine);b.box((shrine[0],y+.7,shrine[1]),(.65,1.4,.6),'HK_Stone',False)
     portal(b,shrine,(-1,0),1.4,1.6,2.05)
-    # Roadside wayfinding/vending kiosk context; machines are stationary furniture, no logos.
-    for i in range(3):
-        x,z=27.8+i*.7,382.7;y=height(x,z)
-        b.box((x,y+.9,z),(.62,1.8,.7),'HK_MetalLight',False)
-        b.box((x,y+1.15,z-.36),(.48,.65,.018),'ART_Window',False)
-    tower(b)
     road_details(b)
     recolor(b,first)
     from nishi_school import build as nishi_frontage
     nishi_frontage(b)
+    from north_streetscape import furniture as north_furniture
+    north_furniture(b)
+    from south_promenade import furniture as south_furniture
+    south_furniture(b)
 
 
 def road_details(b):
