@@ -38,6 +38,10 @@ The town is painted, not photographic: shader dabs on vertex pigments, cached br
 
 Recent reference points, desktop Chrome at 1280×800: practice junction about 110 draws and 1.6 M triangles; scene buffers about 78 MB before the school island. All samples are capped near 16.7 ms and show no phone result.
 
+The [northern pedestrian reconstruction](north-streetscape.md#rendering-cost) records its fixed-view A/B, including the extra geometry and resident buffers.
+
+The [Saigo and south-promenade reconstruction](south-promenade.md) records the next photo-based pass, including sloped mesh maps and views beneath closed roof soffits.
+
 ## Startup
 
 `?benchmark=1&quality=high&view=street` exposes `window.vrlearn.startup`. Add `&modelWorkers=1&modelEncoding=plain` for the baseline. On 2026-10-26, two workers plus gzip took first frame from 8.2–9.3 s to about 5.4 s on local delivery, and 21 s to 6.9 s with model bodies capped at 100 Mbps, with model responses 76% smaller. The cap is a controlled experiment, not a mobile network, and the scene has grown since. Earlier one-off samples did not reproduce; do not quote them.

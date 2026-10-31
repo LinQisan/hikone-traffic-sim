@@ -4,9 +4,9 @@ Upgrade audit dated 2026-10-31. The runtime and its declarations are pinned to `
 
 ## Baseline and scope
 
-The starting HEAD is `b5699a42472c51a7981a8f79a9d881dbe6b8b196` on `field-survey-modeling`. `baseline/three-r186-20261031` preserves that commit; `upgrade/three-r187` contains this upgrade. The starting checkout also has uncommitted field-survey geometry, data, docs and tests. Those changes remain outside the upgrade commit. Both production snapshots used for measurement include the same starting working-tree assets, rather than comparing different map revisions.
+The r186 baseline is commit `b5699a42472c51a7981a8f79a9d881dbe6b8b196`; the upgrade is `376c824`, its direct child. The starting checkout also has uncommitted field-survey geometry, data, docs and tests. Those changes remain outside the upgrade commit. Both production snapshots used for measurement include the same starting working-tree assets, rather than comparing different map revisions.
 
-Local evidence in `.git/three-r187-audit/` includes the original manifests, starting status, binary tracked-file patch, SHA-256 file inventory, command logs and frozen `r186-dist/` and `r187-dist/` production builds. The reference branch alone does **not** contain the starting uncommitted changes. These local artifacts are not deployed. Field photos are excluded from the snapshots and delivery.
+Local evidence in `.git/three-r187-audit/` includes the original manifests, starting status, binary tracked-file patch, SHA-256 file inventory, command logs and frozen `r186-dist/` and `r187-dist/` production builds. The baseline commit alone does **not** contain the starting uncommitted changes. These local artifacts are not deployed. Field photos are excluded from the snapshots and delivery.
 
 Only dependencies and this audit/measurement record change. No renderer, material, model generator, layout, simulation, scenario, editor, Vite or Actions implementation change is needed. Existing uncommitted files are compared with the initial hashes before handoff.
 
@@ -82,7 +82,7 @@ No material rendering-workload or frame-time regression appears in these samples
 
 ## Integration
 
-The upgrade commit is intentionally independent of the uncommitted field-survey work. To integrate only the upgrade into `main`, use a clean checkout/worktree of `main`, cherry-pick the upgrade commit shown in the handoff, run `npm ci && npm run check`, and review the diff before pushing. To retain the whole modeling branch, finish/review its separate work first, then merge `upgrade/three-r187` through the usual review process. Do not reset or stash the current working tree as part of integration. A push to `main` still triggers the existing Pages workflow; this task does not push or deploy.
+The upgrade was fast-forwarded into `main`, and its check was repeated on a clean checkout (324 tests). The field-survey work followed it in separate commits. A push to `main` still triggers the existing Pages workflow.
 
 To repeat the performance comparison, produce two builds from exactly the same source/data snapshot using the saved r186 and r187 manifests, with `npm ci` completed before each build. Save the outputs as `.git/three-r187-audit/r186-dist/` and `r187-dist/`. With Playwright installed outside project dependencies, run:
 

@@ -1,0 +1,155 @@
+{
+  "traversals": [
+    {
+      "mode": "walking",
+      "name": "iroha",
+      "frames": 2367,
+      "end": [
+        183.8290465512921,
+        425.09640579254517
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "moatFront",
+      "frames": 1036,
+      "end": [
+        76.32901232091065,
+        425.2042982490973
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "sawaguchi",
+      "frames": 1622,
+      "end": [
+        23.90276902556549,
+        444.2032075710002
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "museumCourt",
+      "frames": 817,
+      "end": [
+        52.8644816383408,
+        455.68180021809576
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "return",
+      "frames": 1623,
+      "end": [
+        17.70091160808552,
+        383.13131889650015
+      ],
+      "ground": 0.010000000000000002
+    },
+    {
+      "mode": "walking",
+      "name": "bridge",
+      "frames": 563,
+      "end": [
+        4.158099668920873,
+        374.1143937829139
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "iroha",
+      "frames": 2406,
+      "end": [
+        183.8302161164592,
+        425.01244150435434
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "moatFront",
+      "frames": 1064,
+      "end": [
+        76.34109435892421,
+        425.20447517247027
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "sawaguchi",
+      "frames": 1658,
+      "end": [
+        23.938398409377356,
+        444.20242760543925
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "museumCourt",
+      "frames": 846,
+      "end": [
+        52.88795192388359,
+        455.7424948518134
+      ],
+      "ground": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "return",
+      "frames": 1656,
+      "end": [
+        17.652138131854937,
+        383.0893674861458
+      ],
+      "ground": 0.010000000000000002
+    },
+    {
+      "mode": "bicycle",
+      "name": "bridge",
+      "frames": 591,
+      "end": [
+        4.1531881053065955,
+        374.10335369743444
+      ],
+      "ground": 0.01
+    }
+  ],
+  "events": [
+    {
+      "id": "builtin-01",
+      "keyboardLook": true,
+      "moved": {
+        "x": 40.022895147096634,
+        "z": 14.112167208403621
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "keyboardLook": true,
+      "moved": {
+        "x": -68.64592238825892,
+        "z": 22.771838930351723
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "editor": {
+    "viewport": 390,
+    "width": 390,
+    "coordinateX": 115,
+    "coordinateZ": 427
+  },
+  "errors": []
+}

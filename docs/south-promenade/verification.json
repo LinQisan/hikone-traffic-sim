@@ -1,0 +1,199 @@
+{
+  "date": "2026-10-31",
+  "fullCheck": {
+    "tests": 330,
+    "passed": 330,
+    "skipped": 0,
+    "log": "Local check-delivery.log"
+  },
+  "finalGeometryCheck": {
+    "tests": 79,
+    "passed": 79,
+    "skipped": 0
+  },
+  "routes": {
+    "checked": 46,
+    "failed": 0
+  },
+  "traversals": {
+    "traversals": [
+      {
+        "mode": "walking",
+        "name": "saigo",
+        "frames": 619,
+        "end": [
+          2.307481705494136,
+          142.44733006582464
+        ]
+      },
+      {
+        "mode": "walking",
+        "name": "bridgeEast",
+        "frames": 935,
+        "end": [
+          26.6,
+          75.40000000000123
+        ]
+      },
+      {
+        "mode": "walking",
+        "name": "bridgeWest",
+        "frames": 936,
+        "end": [
+          37.401164724189734,
+          38.57374759864187
+        ]
+      },
+      {
+        "mode": "walking",
+        "name": "promenade",
+        "frames": 2546,
+        "end": [
+          181.43712668426204,
+          48.620547713606236
+        ]
+      },
+      {
+        "mode": "walking",
+        "name": "mapped",
+        "frames": 1337,
+        "end": [
+          239.40364344182427,
+          49.79610019068318
+        ]
+      },
+      {
+        "mode": "walking",
+        "name": "directory",
+        "frames": 248,
+        "end": [
+          264.419352226724,
+          49.286635974551736
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "name": "saigo",
+        "frames": 647,
+        "end": [
+          2.2327777676192877,
+          142.44013165528708
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "name": "bridgeEast",
+        "frames": 964,
+        "end": [
+          26.6,
+          75.42791666666793
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "name": "bridgeWest",
+        "frames": 965,
+        "end": [
+          37.31906271707069,
+          38.56024175553087
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "name": "promenade",
+        "frames": 2575,
+        "end": [
+          181.46153613145654,
+          48.60999394116231
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "name": "mapped",
+        "frames": 1366,
+        "end": [
+          239.43267214988342,
+          49.737491542888336
+        ]
+      },
+      {
+        "mode": "bicycle",
+        "name": "directory",
+        "frames": 276,
+        "end": [
+          264.40726968242933,
+          49.28677406077294
+        ]
+      }
+    ],
+    "errors": []
+  },
+  "browser": {
+    "events": [
+      {
+        "id": "builtin-01",
+        "keyboardLook": true,
+        "moved": {
+          "x": 40.02483569817737,
+          "z": 14.118628108372521
+        },
+        "participantReplay": true,
+        "replayEnded": true,
+        "resultsAndMenu": true
+      },
+      {
+        "id": "builtin-07",
+        "keyboardLook": true,
+        "moved": {
+          "x": -68.64541403987216,
+          "z": 22.771830104858893
+        },
+        "participantReplay": true,
+        "replayEnded": true,
+        "resultsAndMenu": true
+      }
+    ],
+    "editor": {
+      "viewport": 390,
+      "width": 390,
+      "coordinateX": 150,
+      "coordinateZ": 38
+    },
+    "errors": []
+  },
+  "production": {
+    "viewport": 390,
+    "width": 390,
+    "state": "title",
+    "heights": [
+      {
+        "x": 150.31176,
+        "z": 40.36502,
+        "height": 0.15000001000000002
+      },
+      {
+        "x": 132.33056,
+        "z": 35.85145,
+        "height": 0.15000000999999996
+      },
+      {
+        "x": 32,
+        "z": 56.8,
+        "height": 0.01
+      }
+    ],
+    "errors": [],
+    "failed": [],
+    "glbRequests": [],
+    "realPhone": false
+  },
+  "ground": {
+    "changed": [],
+    "added": [
+      "South promenade bench grounds"
+    ],
+    "addedTriangles": 10
+  },
+  "realPhone": false,
+  "quest": false
+}

@@ -22,6 +22,8 @@ Keep sources separate from estimates. Reviewed data lives in `world/`; authors r
 | `world/school-moat.json` | `tools/school_moat.py` | University-facing rampart |
 | `src/world/generators/university-layout.js` | `tools/university_photos.py`, `tools/university_frontage.py` | Campus and gate |
 | `world/east-street.json` | `tools/east_street.py` | East street on foot |
+| `world/north-streetscape.json` | `tools/north_streetscape.py` | Irohamatsu, Sawaguchi and Omotemon on foot |
+| `world/south-promenade.json` | `tools/south_promenade.py` | Saigo, Kyobashi and the south moat walk |
 
 Facilities keep the OSM position in `point` and any move in `placement`, with `placementBasis`. All untagged dimensions are visual estimates.
 
@@ -39,9 +41,9 @@ Facilities keep the OSM position in `point` and any move in `placement`, with `p
 
 The East author owns x≥120, z≥100 and clips others there. Island buildings reaching it are authored whole by that author (`east_owned`, `east_replaced`); `island_cut` swaps its green for the courts in mesh and Ground.
 
-**Saigo and Kyobashiguchi (0867–0879).** Road follows OSM, leaving a grass verge before the longhouse. Bank corners at x 25.5/38.5 are closed: materials are double-sided, so an open wedge showed the bank's inside. Eight estimated gangi treads sit behind the 京橋口門と雁木 board. The Saigo board stands on the verge, and 彦根市指定文化財 is a small stone post. The east lamp carries the 30 km/h and no-parking sign for southbound traffic. The west lamp's sign is seen only from behind and is not modelled, and the timed restriction in 0879 has no confirmed pole.
+**Saigo and Kyobashiguchi (0867–0879).** Road follows OSM, leaving a grass verge before the longhouse. Bank corners at x 25.5/38.5 are closed; eight estimated gangi treads sit behind the interpretation board. The 31 October [pedestrian reconstruction](south-promenade.md) replaces the longhouse facade, bridge rails, boards and low maps, including the corrected **家老 西郷屋敷跡** inscription. Existing traffic-sign placement and rules remain; 0879's restriction has no reliably registered pole.
 
-**East promenade (0880–0894).** Directories, backed benches and tower silhouette; mapped chain posts east of the retained core. Bench placement is covered in [geography.md](geography.md).
+**East promenade (0880–0894).** See the same [pedestrian reconstruction](south-promenade.md) for slatted benches following the bank, tactile guidance, leaning cherries, lanterns, tower platforms, the estimated shutter-shop profile and two-sided Information totem. Bench registration limits are covered in [geography.md](geography.md).
 
 **East street on foot (0895–0910).** Rebuilt from the pedestrian's eye height. The moat edge lies 3.5–5 m west of the mapped centreline and photo GPS puts the footway 4–6 m east of it, so the street section is offset: 5 m road, 2 m footway, edge lines, stone kerb and a grass verge with moat-side trees. Lots, the cafe garden and hotel forecourt replace the plain yards in mesh and Ground. Facades follow the photos: cafe gable to the parking with brick plinth, half-round canopy, street dormer and leaded arched window; shop bays, lattices, striped doors, banners and red storehouse tower; hotel brick podium, tiled skirt, porch piers, board screens and lantern. The church is one authored nave with deep bracketed eaves, grey panelled centre, rose window and white cross, flat canopy on slim posts, and the spire just behind the front gable. Poles, wires, rail, cones and parking sign are added. Foliage is built from leaves, not blobs: `ART_StreetWillow` hangs as falling leaf chains, `ART_GardenPine` has needle fans over a dark core, and `ART_StreetHedge` is an instanced 3 m run of small leaves. Signs carry the real names read from the photographs (サンチョ, SANCHO, Pomme d'Amour, カトリック教会, 彦根キャッスル リゾート&スパ, 近江ダイニング 橘, 消火栓, 栗, どら焼き, 彦根城を世界遺産に), as triangulated mesh lettering; the SANCHO and OC marks are simplified redrawings. Pigments stay warm with violet-brown darks, so the painted shaders keep the Renoir palette on realistic forms.
 
@@ -49,7 +51,7 @@ The footway narrows to about 1 m beside mapped buildings near z≈110, z≈147 a
 
 **Real-world audit, 30 October.** Layout items were checked against carriageways, water and Ground, and walked against the photographs. Fixed: a utility pole and three mapped trees on carriageways, the mapped chain line in the moat west of X=200 (the retained shore has its own fence), and East source groves sunk into the mapped rampart, whose long ground triangles are now refined. The South promenade's retained shore and the Sawaguchi facades remain simplified.
 
-**North (0912–0928).** Iroha-matsu and Sawaguchi boards, turret wings fitted to clipped footprints, a visual exterior stair with no upper-floor route, guideposts and vending furniture.
+**North (0912–0933).** See [the pedestrian reconstruction](north-streetscape.md). The two Sawaguchi wings retain their registered concave footprints, with tiered end turrets, curved tiled eaves, barred windows, irregular stone faces and closed returns. The museum's stair rises toward z=466 with a supported slab and open space below. Eight estimated old pines use needle fans rather than enlarged foliage pillows; the regular grove in the museum forecourt is replaced with the photographed fence and a tree screen behind it. Irohamatsu, poem, museum, bridge-direction and town-map boards have readable mesh labels and original OSM-based schematics. The Omotemon bridge has timber members and metal finials on its existing walk axis; the kiosk has shutters, a green awning, brown vending machines and recycling bins. The weak/held fixes in 0929–0933 do not locate the unique gate in 0930.
 
 ## Verification habits
 

@@ -1,0 +1,26 @@
+{
+  "photos": {
+    "count": 86,
+    "changed": []
+  },
+  "events": {
+    "count": 10,
+    "changed": []
+  },
+  "simulation": {
+    "count": 12,
+    "changed": []
+  },
+  "frame": {
+    "count": 1,
+    "changed": []
+  },
+  "ground": {
+    "count": 1,
+    "changed": []
+  },
+  "walls": {
+    "count": 1,
+    "changed": []
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-31",
+  "tests": {
+    "total": 327,
+    "passed": 327,
+    "failed": 0,
+    "skipped": 0,
+    "command": "npm run check"
+  },
+  "routeCheck": {
+    "total": 46,
+    "failed": 0
+  },
+  "controllerTraversals": 12,
+  "originalPhotoIndexChecksums": {
+    "matched": 21,
+    "total": 21
+  },
+  "needleVisibilityFromBelow": {
+    "high": 134,
+    "low": 82,
+    "method": "Actual native surfaces, front-face culling, upward rays from pedestrian height"
+  },
+  "realPhone": false,
+  "satelliteOrStreetViewNewlyInspected": false
+}

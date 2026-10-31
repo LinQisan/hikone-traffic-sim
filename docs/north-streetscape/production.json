@@ -1,0 +1,26 @@
+{
+  "viewport": 390,
+  "width": 390,
+  "state": "title",
+  "heights": [
+    {
+      "x": 100,
+      "z": 428,
+      "height": 0.01
+    },
+    {
+      "x": 21.93665,
+      "z": 448.77319,
+      "height": 0.01
+    },
+    {
+      "x": -0.3004,
+      "z": 364.09266,
+      "height": 0.010000000000000002
+    }
+  ],
+  "errors": [],
+  "failed": [],
+  "glbRequests": [],
+  "realPhone": false
+}

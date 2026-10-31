@@ -59,7 +59,7 @@ No provider tile is used as a scene texture. The attributed GSI aerial compariso
 
 **Whole map.** The castle hill ended about 40 m too far north; the inner moat now wraps it. Genkyū-en, Rakuraku-en, the north-east moat, the port channel and canals are present. The invented road west of the campus and generic south-town houses were replaced by mapped ones.
 
-**Retained shore.** The south promenade in the core is still schematic. Five benches keep OSM coordinates in `point` and an adjusted `placement` 10–17 m away; that strip is not geographically verified and needs a coordinated road and scenario migration.
+**Retained shore.** The south promenade in the core is still schematic. Five benches keep OSM coordinates in `point` and an adjusted `placement` about 8–12 m away, following the curved retained bank after the [pedestrian pass](south-promenade.md). That strip is not geographically verified; exact alignment still needs a coordinated road and scenario migration.
 
 ## Regeneration
 
