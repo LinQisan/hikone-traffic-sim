@@ -730,13 +730,13 @@
       }
     },
     "ART_KyobashiBridge": {
-      "triangles": 37686,
-      "strokes": 5135,
-      "bytes": 1519580,
+      "triangles": 4220,
+      "strokes": 0,
+      "bytes": 188664,
       "remodeled": false,
       "lod": {
-        "triangles": 8802,
-        "bytes": 383452
+        "triangles": 4220,
+        "bytes": 188668
       }
     },
     "ART_KyobashiLand": {
@@ -913,14 +913,14 @@
       }
     },
     "ART_CastleApproach": {
-      "triangles": 61880,
+      "triangles": 69636,
       "strokes": 840,
-      "bytes": 2482432,
+      "bytes": 2839080,
       "remodeled": true,
       "design": "hikone-approach-v1",
       "lod": {
-        "triangles": 40648,
-        "bytes": 1778012
+        "triangles": 41564,
+        "bytes": 1820940
       }
     },
     "ART_DisplayKiosk": {
@@ -979,14 +979,14 @@
       }
     },
     "ART_EastHikoneBuildings": {
-      "triangles": 95547,
-      "strokes": 1008,
-      "bytes": 4769156,
+      "triangles": 255600,
+      "strokes": 1680,
+      "bytes": 13569956,
       "remodeled": false,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 95547,
-        "bytes": 4769160
+        "triangles": 172183,
+        "bytes": 9530776
       }
     },
     "ART_EastHikoneSurface": {
@@ -1086,6 +1086,28 @@
       "lod": {
         "triangles": 36120,
         "bytes": 1749344
+      }
+    },
+    "ART_IrohaPine": {
+      "triangles": 41040,
+      "strokes": 340,
+      "bytes": 2864244,
+      "remodeled": true,
+      "design": "street-view-details-v1",
+      "lod": {
+        "triangles": 13842,
+        "bytes": 889724
+      }
+    },
+    "ART_PromenadeCherry": {
+      "triangles": 19328,
+      "strokes": 2304,
+      "bytes": 427040,
+      "remodeled": true,
+      "design": "abstract-closed-solids-v2",
+      "lod": {
+        "triangles": 3200,
+        "bytes": 88340
       }
     }
   }
