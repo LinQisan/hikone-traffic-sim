@@ -181,7 +181,7 @@
       "design": "abstract-closed-solids-v2",
       "lod": {
         "triangles": 2120,
-        "bytes": 98024
+        "bytes": 95588
       }
     },
     "HK_Kei_Tall": {
@@ -192,7 +192,7 @@
       "design": "abstract-closed-solids-v2",
       "lod": {
         "triangles": 2076,
-        "bytes": 95520
+        "bytes": 93404
       }
     },
     "HK_Kura": {
@@ -414,7 +414,7 @@
       "design": "abstract-closed-solids-v2",
       "lod": {
         "triangles": 360,
-        "bytes": 18548
+        "bytes": 18232
       }
     },
     "HK_Terrain_Castle": {
@@ -450,14 +450,14 @@
       }
     },
     "HK_Tree_Round": {
-      "triangles": 17674,
+      "triangles": 18322,
       "strokes": 2016,
-      "bytes": 405728,
+      "bytes": 417392,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 2392,
-        "bytes": 60384
+        "triangles": 2572,
+        "bytes": 64552
       }
     },
     "HK_Tree_RoundLow": {
@@ -543,7 +543,7 @@
       "design": "abstract-closed-solids-v2",
       "lod": {
         "triangles": 2080,
-        "bytes": 95120
+        "bytes": 92700
       }
     },
     "ART_Signal_Car": {
@@ -693,40 +693,40 @@
       "bytes": 31652,
       "remodeled": true,
       "lod": {
-        "triangles": 53,
-        "bytes": 3440
+        "triangles": 2572,
+        "bytes": 64592
       }
     },
     "ART_MoatTree_Airy": {
-      "triangles": 17674,
+      "triangles": 18322,
       "strokes": 2016,
-      "bytes": 405788,
+      "bytes": 417452,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 2392,
-        "bytes": 60444
+        "triangles": 2572,
+        "bytes": 64612
       }
     },
     "ART_MoatTree_Broad": {
-      "triangles": 17674,
+      "triangles": 18322,
       "strokes": 2016,
-      "bytes": 405736,
+      "bytes": 417412,
       "remodeled": true,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 2392,
-        "bytes": 60408
+        "triangles": 2572,
+        "bytes": 64592
       }
     },
     "ART_KyobashiBanks": {
-      "triangles": 5479,
+      "triangles": 5451,
       "strokes": 0,
-      "bytes": 255252,
+      "bytes": 253964,
       "remodeled": false,
       "lod": {
-        "triangles": 5479,
-        "bytes": 255256
+        "triangles": 5451,
+        "bytes": 253968
       }
     },
     "ART_KyobashiBridge": {
@@ -750,13 +750,13 @@
       }
     },
     "ART_KyobashiRoads": {
-      "triangles": 64717,
-      "strokes": 11638,
-      "bytes": 2862048,
+      "triangles": 64755,
+      "strokes": 11644,
+      "bytes": 2863516,
       "remodeled": false,
       "lod": {
-        "triangles": 16749,
-        "bytes": 733788
+        "triangles": 16751,
+        "bytes": 733840
       }
     },
     "ART_KyobashiWater": {
@@ -825,14 +825,14 @@
       }
     },
     "ART_CastleGrove": {
-      "triangles": 35428,
+      "triangles": 36724,
       "strokes": 4032,
-      "bytes": 812996,
+      "bytes": 835400,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 4784,
-        "bytes": 118600
+        "triangles": 5144,
+        "bytes": 126024
       }
     },
     "ART_NorthLonghouse": {
@@ -847,14 +847,14 @@
       }
     },
     "ART_TownTree": {
-      "triangles": 19434,
+      "triangles": 20082,
       "strokes": 2058,
-      "bytes": 442420,
+      "bytes": 453144,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 2860,
-        "bytes": 72004
+        "triangles": 3040,
+        "bytes": 75244
       }
     },
     "ART_ParkingPavilion": {
@@ -902,25 +902,25 @@
       }
     },
     "HK_Terrain_Hikone": {
-      "triangles": 395026,
-      "strokes": 44016,
-      "bytes": 13106988,
+      "triangles": 991684,
+      "strokes": 108360,
+      "bytes": 29011248,
       "remodeled": true,
       "design": "hikone-landmark-v1",
       "lod": {
-        "triangles": 234897,
-        "bytes": 8370180
+        "triangles": 268574,
+        "bytes": 8827576
       }
     },
     "ART_CastleApproach": {
-      "triangles": 69636,
-      "strokes": 840,
-      "bytes": 2839080,
+      "triangles": 103058,
+      "strokes": 2100,
+      "bytes": 3841264,
       "remodeled": true,
       "design": "hikone-approach-v1",
       "lod": {
-        "triangles": 41564,
-        "bytes": 1820940
+        "triangles": 44294,
+        "bytes": 1891904
       }
     },
     "ART_DisplayKiosk": {
@@ -957,47 +957,47 @@
       }
     },
     "ART_ShigaCampus": {
-      "triangles": 180289,
-      "strokes": 7210,
-      "bytes": 9668408,
+      "triangles": 253595,
+      "strokes": 15274,
+      "bytes": 15338000,
       "remodeled": true,
       "design": "shiga-connected-campus-v1",
       "lod": {
-        "triangles": 69895,
-        "bytes": 3848348
+        "triangles": 75151,
+        "bytes": 4196476
       }
     },
     "ART_WestMoat": {
-      "triangles": 103426,
-      "strokes": 5124,
-      "bytes": 5863576,
+      "triangles": 171339,
+      "strokes": 6384,
+      "bytes": 9320020,
       "remodeled": true,
       "design": "shiga-connected-campus-v1",
       "lod": {
-        "triangles": 75247,
-        "bytes": 4470788
+        "triangles": 79998,
+        "bytes": 4777356
       }
     },
     "ART_EastHikoneBuildings": {
-      "triangles": 255600,
-      "strokes": 1680,
-      "bytes": 13569956,
+      "triangles": 608575,
+      "strokes": 4340,
+      "bytes": 33924064,
       "remodeled": false,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 172183,
-        "bytes": 9530776
+        "triangles": 185115,
+        "bytes": 10167664
       }
     },
     "ART_EastHikoneSurface": {
-      "triangles": 25307,
+      "triangles": 23293,
       "strokes": 0,
-      "bytes": 1548316,
+      "bytes": 1455532,
       "remodeled": false,
       "design": "abstract-closed-solids-v2",
       "lod": {
-        "triangles": 25307,
-        "bytes": 1548320
+        "triangles": 23293,
+        "bytes": 1455536
       }
     },
     "ART_EastHikoneWater": {
@@ -1012,14 +1012,14 @@
       }
     },
     "ART_IslandWood": {
-      "triangles": 3200,
-      "strokes": 336,
-      "bytes": 81404,
+      "triangles": 8528,
+      "strokes": 840,
+      "bytes": 188484,
       "remodeled": true,
       "design": "street-view-details-v1",
       "lod": {
-        "triangles": 1856,
-        "bytes": 53180
+        "triangles": 2216,
+        "bytes": 60604
       }
     },
     "ART_GardenPine": {
@@ -1108,6 +1108,28 @@
       "lod": {
         "triangles": 3200,
         "bytes": 88340
+      }
+    },
+    "ART_HillWood": {
+      "triangles": 486000,
+      "strokes": 0,
+      "bytes": 21484780,
+      "remodeled": true,
+      "design": "hikone-approach-v1",
+      "lod": {
+        "triangles": 135000,
+        "bytes": 7496528
+      }
+    },
+    "ART_InnerMoatStreet": {
+      "triangles": 58281,
+      "strokes": 0,
+      "bytes": 2258692,
+      "remodeled": true,
+      "design": "hikone-approach-v1",
+      "lod": {
+        "triangles": 15826,
+        "bytes": 724712
       }
     }
   }
