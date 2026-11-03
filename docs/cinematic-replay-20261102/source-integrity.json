@@ -1,0 +1,55 @@
+{
+  "baseline": "Starting tracked and untracked nonignored file hashes; no commit or reset.",
+  "unchangedFiles": 1051,
+  "changedExistingFiles": [
+    {
+      "path": "RATIONALE.md",
+      "before": "32190d1bf420b222572c07a189f8fa528f246e83cb51a60583561152b515953c",
+      "after": "b0cf3e51a4fee3ffab1cccd5832ff438f6353282119d736e2eb5013a8f9d9a7c"
+    },
+    {
+      "path": "docs/reference.html",
+      "before": "b9a5326d12288690d30b38fb97d2367c2e553c08f7cc02b1de8dc258db64fa4b",
+      "after": "67cc19927b9c66b9b8d41f30518b9220888a962735c6a04e641d90aa5fc14073"
+    },
+    {
+      "path": "style.css",
+      "before": "7e947678c2c72687b36e14be81044611ab330930f76edf6c6df07297984be996",
+      "after": "8890550a9672a44c052fd70a436020549eeac6c6853a005876b374e955cc9ffd"
+    },
+    {
+      "path": "test/replay-camera.test.mjs",
+      "before": "824e19936f52b1bd32a20125388eb902c3b9a73a51ba44c3425267c3b72a1fea",
+      "after": "c0dbdda5ac72eff5c40557852811da9c36419cafaff3d70d1e268324256b6de8"
+    },
+    {
+      "path": "src/three/entities/replay.js",
+      "before": "ebe243a1f6920679951d86f872e0148a45fea13f4cf2d463602d5d2ecb6f4e54",
+      "after": "91b2d4d209c9cd9e50f183a228f2a7800f87c2a4c37761a743f9b4dac53ea0c3"
+    },
+    {
+      "path": "src/three/engine/TrafficEngine.ts",
+      "before": "8506f3cb27b6d1384b151fc14fb84323eda6d518b465d58858ace2f0f340941c",
+      "after": "8eadc0e58a9b0b64a3f80a78961140d144ab0fad341d3dc0877a6c67c1dc3e7b"
+    },
+    {
+      "path": "README.md",
+      "before": "c5bd759c96278b4b8640d867c1454d76ad5cc6e7d1248c915321e321bba3a6a1",
+      "after": "49bcb98dffcfa5feaff274ee558dd690ac4730a70eb5142728f3f7ab60238c0c"
+    },
+    {
+      "path": "src/components/hud/GameOverlays.tsx",
+      "before": "809a506b1fe07fe71c35274efc99961938d5f1102bee356ce1a72e0d4fbc0e1c",
+      "after": "f141e5aa1b79bad3eb6b80c06a55821b2ac068968fe3bea2f53380c4751441e9"
+    },
+    {
+      "path": "src/three/camera/replay-camera.js",
+      "before": "1f1cf06f9f47c99c8e9decc3391afcaa5e820e3f9aae1f004c078631613f1617",
+      "after": null
+    }
+  ],
+  "newFilesOutsideReport": [
+    "src/three/camera/ReplayCamera.ts"
+  ],
+  "unexpectedChanges": []
+}

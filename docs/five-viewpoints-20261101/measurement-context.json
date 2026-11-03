@@ -1,0 +1,14 @@
+{
+  "taskOwnedHeavyJobsStopped": true,
+  "otherWorkloads": "Other browser and simulator workloads remained active; they were not stopped.",
+  "loadAverages": [
+    125.39,
+    234.54,
+    137.24
+  ],
+  "logicalCpus": 12,
+  "cpuSpeedLimitPercent": 77,
+  "cpuSchedulerLimitPercent": 100,
+  "thermalWarningRecorded": false,
+  "measurementScope": "Submitted geometry counters only; no frame-time or speedup comparison."
+}

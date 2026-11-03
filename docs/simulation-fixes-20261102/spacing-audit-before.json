@@ -1,0 +1,98 @@
+[
+  {
+    "id": "builtin-01",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-02",
+    "contacts": 10682,
+    "worst": {
+      "seed": 1,
+      "behaviour": "waiting",
+      "t": 37.98333333333246,
+      "depth": 2.850223040232717,
+      "a": {
+        "id": 1,
+        "vehicle": 2,
+        "x": 33.60515216779773,
+        "z": 24.378625972157394,
+        "yaw": 45.61209546910217,
+        "v": 4.979751446853881,
+        "reason": "turn"
+      },
+      "b": {
+        "id": 3,
+        "vehicle": 1,
+        "x": 33.84671961740252,
+        "z": 24.21058161789103,
+        "yaw": 179.99458746633675,
+        "v": 6.509759367373747,
+        "reason": null
+      }
+    }
+  },
+  {
+    "id": "builtin-03",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-04",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-05",
+    "contacts": 9272,
+    "worst": {
+      "seed": 3,
+      "behaviour": "waiting",
+      "t": 101.4166666666622,
+      "depth": 0.6995211073626137,
+      "a": {
+        "id": 35,
+        "vehicle": 1,
+        "x": 32.07483867055031,
+        "z": 93.01262313800099,
+        "yaw": 146.67340564101568,
+        "v": 0.000006153275377229761,
+        "reason": "traffic"
+      },
+      "b": {
+        "id": 37,
+        "vehicle": 1,
+        "x": 29.056680582974415,
+        "z": 95.86947179841462,
+        "yaw": 120.68840855553267,
+        "v": 3.3999469906120794e-12,
+        "reason": "traffic"
+      }
+    }
+  },
+  {
+    "id": "builtin-06",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-07",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-08",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-09",
+    "contacts": 0,
+    "worst": null
+  },
+  {
+    "id": "builtin-10",
+    "contacts": 0,
+    "worst": null
+  }
+]

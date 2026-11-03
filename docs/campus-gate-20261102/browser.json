@@ -1,0 +1,475 @@
+{
+  "traversals": [
+    {
+      "mode": "walking",
+      "name": "gateNorth",
+      "direction": "forward",
+      "frames": 167,
+      "end": [
+        -600.5000275589124,
+        181.4134537098061
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "walking",
+      "name": "gateNorth",
+      "direction": "reverse",
+      "frames": 167,
+      "end": [
+        -595.209456508822,
+        183.49731163565852
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "gateSouth",
+      "direction": "forward",
+      "frames": 167,
+      "end": [
+        -601.0159529755097,
+        175.28683938783064
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "gateSouth",
+      "direction": "reverse",
+      "frames": 167,
+      "end": [
+        -596.1483830412336,
+        172.34755906329477
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "walking",
+      "name": "campusTurn",
+      "direction": "forward",
+      "frames": 1199,
+      "end": [
+        -621.8349937734416,
+        214.02812606370833
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "walking",
+      "name": "campusTurn",
+      "direction": "reverse",
+      "frames": 1198,
+      "end": [
+        -597.2426753404051,
+        178.06282255710724
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "forkWest",
+      "direction": "forward",
+      "frames": 689,
+      "end": [
+        -525.345436011747,
+        270.0197587296548
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "forkWest",
+      "direction": "reverse",
+      "frames": 689,
+      "end": [
+        -542.4589114331854,
+        249.28418864103247
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "walking",
+      "name": "forkEast",
+      "direction": "forward",
+      "frames": 582,
+      "end": [
+        -524.974825943486,
+        269.8715615961714
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "forkEast",
+      "direction": "reverse",
+      "frames": 582,
+      "end": [
+        -526.683054056514,
+        247.29398840382856
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "walking",
+      "name": "backLane",
+      "direction": "forward",
+      "frames": 4004,
+      "end": [
+        -401.3116334261007,
+        226.97626613650334
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "backLane",
+      "direction": "reverse",
+      "frames": 4004,
+      "end": [
+        -522.9362679284982,
+        284.1916789848894
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "tennisLane",
+      "direction": "forward",
+      "frames": 3565,
+      "end": [
+        -401.97990370163177,
+        226.43424669001192
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "tennisLane",
+      "direction": "reverse",
+      "frames": 3565,
+      "end": [
+        -542.200131672222,
+        248.66812671121167
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "walking",
+      "name": "localSouth",
+      "direction": "forward",
+      "frames": 1272,
+      "end": [
+        -406.7843196176723,
+        175.80913717619563
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "localSouth",
+      "direction": "reverse",
+      "frames": 1272,
+      "end": [
+        -401.5318678740025,
+        225.74355153481594
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "localBack",
+      "direction": "forward",
+      "frames": 1216,
+      "end": [
+        -404.5405931273826,
+        193.31753301729555
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "localBack",
+      "direction": "reverse",
+      "frames": 1216,
+      "end": [
+        -356.8494068726174,
+        187.91246698270444
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "walking",
+      "name": "woodBridge",
+      "direction": "forward",
+      "frames": 1285,
+      "end": [
+        -152.9540387225553,
+        239.19564423765965
+      ],
+      "height": 0.16
+    },
+    {
+      "mode": "walking",
+      "name": "woodBridge",
+      "direction": "reverse",
+      "frames": 1285,
+      "end": [
+        -177.2745088093328,
+        194.65201127260536
+      ],
+      "height": 0.016370527141023966
+    },
+    {
+      "mode": "bicycle",
+      "name": "gateNorth",
+      "direction": "forward",
+      "frames": 198,
+      "end": [
+        -600.4960397166376,
+        181.27518042360632
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "gateNorth",
+      "direction": "reverse",
+      "frames": 198,
+      "end": [
+        -595.1443560399355,
+        183.39462150449233
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "gateSouth",
+      "direction": "forward",
+      "frames": 198,
+      "end": [
+        -600.9888971443185,
+        175.4224984699476
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "gateSouth",
+      "direction": "reverse",
+      "frames": 198,
+      "end": [
+        -596.0670259831322,
+        172.4379159290292
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "bicycle",
+      "name": "campusTurn",
+      "direction": "forward",
+      "frames": 1232,
+      "end": [
+        -621.7585091795764,
+        214.1718008031645
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "campusTurn",
+      "direction": "reverse",
+      "frames": 1232,
+      "end": [
+        -597.2446925627946,
+        178.00161210608763
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "forkWest",
+      "direction": "forward",
+      "frames": 718,
+      "end": [
+        -525.3955728601477,
+        270.08601780230833
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "forkWest",
+      "direction": "reverse",
+      "frames": 718,
+      "end": [
+        -542.5151905572155,
+        249.29074229042848
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "forkEast",
+      "direction": "forward",
+      "frames": 610,
+      "end": [
+        -524.975737567667,
+        269.8595127005474
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "bicycle",
+      "name": "forkEast",
+      "direction": "reverse",
+      "frames": 610,
+      "end": [
+        -526.682142432333,
+        247.30603729945267
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "backLane",
+      "direction": "forward",
+      "frames": 4037,
+      "end": [
+        -401.2235427476026,
+        226.9502462481963
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "backLane",
+      "direction": "reverse",
+      "frames": 4037,
+      "end": [
+        -522.9324603791058,
+        284.2759003386923
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "tennisLane",
+      "direction": "forward",
+      "frames": 3595,
+      "end": [
+        -401.9611522485894,
+        226.50239071467217
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "tennisLane",
+      "direction": "reverse",
+      "frames": 3593,
+      "end": [
+        -542.1729968574763,
+        248.73906718019327
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "localSouth",
+      "direction": "forward",
+      "frames": 1301,
+      "end": [
+        -406.7134575643166,
+        175.79921794789368
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "localSouth",
+      "direction": "reverse",
+      "frames": 1300,
+      "end": [
+        -401.58315176057954,
+        225.74222264077505
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "localBack",
+      "direction": "forward",
+      "frames": 1245,
+      "end": [
+        -404.568332211637,
+        193.32067681793808
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "localBack",
+      "direction": "reverse",
+      "frames": 1245,
+      "end": [
+        -356.82166778836296,
+        187.9093231820619
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "bicycle",
+      "name": "woodBridge",
+      "direction": "forward",
+      "frames": 1314,
+      "end": [
+        -153.0079441550683,
+        239.25216899965778
+      ],
+      "height": 0.16
+    },
+    {
+      "mode": "bicycle",
+      "name": "woodBridge",
+      "direction": "reverse",
+      "frames": 1314,
+      "end": [
+        -177.3357388372462,
+        194.65444555885017
+      ],
+      "height": 0.01610655393775861
+    }
+  ],
+  "events": [
+    {
+      "id": "builtin-01",
+      "keyboardLook": true,
+      "moved": {
+        "x": 39.794657076771415,
+        "z": 15.10101511519143
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "keyboardLook": true,
+      "moved": {
+        "x": -68.84396007326288,
+        "z": 22.77527708460526
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "editor": {
+    "viewport": 390,
+    "width": 390,
+    "x": -533.4,
+    "z": 254.2
+  },
+  "errors": []
+}

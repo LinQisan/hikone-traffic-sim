@@ -1,0 +1,5417 @@
+{
+  "claim": "Camera movement and rendered workload; no frame-time or speedup conclusion.",
+  "method": "Five alternating before/after production reload pairs on the same page, origin and URL. 1440x960, DPR 1, quality=high, benchmark=1, normal motion. Fixed review recording. Each view warms for 500 ms and samples 30 distinct rendered frames. Within-run medians are observations; five reloads are the trials. Camera movement is sampled directly at 60 Hz. Different compositions intentionally render different geometry.",
+  "browser": "156.0.8078.74",
+  "summary": {
+    "establish": {
+      "before": {
+        "calls": {
+          "median": 76,
+          "range": [
+            76,
+            76
+          ],
+          "runs": [
+            76,
+            76,
+            76,
+            76,
+            76
+          ]
+        },
+        "triangles": {
+          "median": 443681,
+          "range": [
+            443681,
+            443681
+          ],
+          "runs": [
+            443681,
+            443681,
+            443681,
+            443681,
+            443681
+          ]
+        }
+      },
+      "after": {
+        "calls": {
+          "median": 75,
+          "range": [
+            75,
+            75
+          ],
+          "runs": [
+            75,
+            75,
+            75,
+            75,
+            75
+          ]
+        },
+        "triangles": {
+          "median": 510521,
+          "range": [
+            510521,
+            510521
+          ],
+          "runs": [
+            510521,
+            510521,
+            510521,
+            510521,
+            510521
+          ]
+        }
+      }
+    },
+    "interaction": {
+      "before": {
+        "calls": {
+          "median": 68,
+          "range": [
+            68,
+            68
+          ],
+          "runs": [
+            68,
+            68,
+            68,
+            68,
+            68
+          ]
+        },
+        "triangles": {
+          "median": 425085,
+          "range": [
+            425085,
+            425085
+          ],
+          "runs": [
+            425085,
+            425085,
+            425085,
+            425085,
+            425085
+          ]
+        }
+      },
+      "after": {
+        "calls": {
+          "median": 68,
+          "range": [
+            68,
+            68
+          ],
+          "runs": [
+            68,
+            68,
+            68,
+            68,
+            68
+          ]
+        },
+        "triangles": {
+          "median": 566201,
+          "range": [
+            566201,
+            566201
+          ],
+          "runs": [
+            566201,
+            566201,
+            566201,
+            566201,
+            566201
+          ]
+        }
+      }
+    },
+    "landing": {
+      "before": {
+        "calls": {
+          "median": 66,
+          "range": [
+            66,
+            66
+          ],
+          "runs": [
+            66,
+            66,
+            66,
+            66,
+            66
+          ]
+        },
+        "triangles": {
+          "median": 411316,
+          "range": [
+            411316,
+            411316
+          ],
+          "runs": [
+            411316,
+            411316,
+            411316,
+            411316,
+            411316
+          ]
+        }
+      },
+      "after": {
+        "calls": {
+          "median": 67,
+          "range": [
+            67,
+            67
+          ],
+          "runs": [
+            67,
+            67,
+            67,
+            67,
+            67
+          ]
+        },
+        "triangles": {
+          "median": 566209,
+          "range": [
+            566209,
+            566209
+          ],
+          "runs": [
+            566209,
+            566209,
+            566209,
+            566209,
+            566209
+          ]
+        }
+      }
+    }
+  },
+  "results": [
+    {
+      "run": 0,
+      "stage": "before",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              31.980474223071745,
+              35.22639830315224
+            ],
+            "firstPosition": [
+              -40.79190068767778,
+              27.03509325440475,
+              11.980459015746295
+            ],
+            "lastPosition": [
+              -43.8781997515048,
+              24.622951854963883,
+              14.088188019058288
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              16.459974923122093,
+              31.902144827764296
+            ],
+            "firstPosition": [
+              -43.87324616490078,
+              24.56475207742894,
+              14.125102177104951
+            ],
+            "lastPosition": [
+              -39.63093230465021,
+              12.959087077168062,
+              20.561676969439244
+            ]
+          }
+        ],
+        "fov": 50
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 44,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 45,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 46,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 47,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 48,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 49,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 50,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 51,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 52,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 53,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 54,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 55,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 56,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 57,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 58,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 59,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 60,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 61,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 62,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 63,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 64,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 65,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 66,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 67,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 68,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 69,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 70,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 71,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 72,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 73,
+              "calls": 76,
+              "triangles": 443681
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 133,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 134,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 135,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 136,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 137,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 138,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 139,
+              "calls": 68,
+              "triangles": 425085
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 176,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 177,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 178,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 179,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 180,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 181,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 182,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 183,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 184,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 185,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 186,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 187,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 188,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 189,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 190,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 191,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 192,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 193,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 194,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 195,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 196,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 197,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 198,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 199,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 200,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 201,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 202,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 203,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 204,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 205,
+              "calls": 66,
+              "triangles": 411316
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 0,
+      "stage": "after",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              32.05719888766695,
+              32.05719888766695
+            ],
+            "firstPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ],
+            "lastPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              14.789160955669118,
+              14.789160955669118
+            ],
+            "firstPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ],
+            "lastPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ]
+          }
+        ],
+        "fov": 50,
+        "shots": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "purpose": "establish",
+            "visibility": "clear"
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "purpose": "interaction",
+            "visibility": "clear"
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 44,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 45,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 46,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 47,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 48,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 49,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 50,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 51,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 52,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 53,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 54,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 55,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 56,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 57,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 58,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 59,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 60,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 61,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 62,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 63,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 64,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 65,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 66,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 67,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 68,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 69,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 70,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 71,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 72,
+              "calls": 75,
+              "triangles": 510521
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 133,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 134,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 135,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 136,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 137,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 138,
+              "calls": 68,
+              "triangles": 566201
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 176,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 177,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 178,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 179,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 180,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 181,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 182,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 183,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 184,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 185,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 186,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 187,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 188,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 189,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 190,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 191,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 192,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 193,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 194,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 195,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 196,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 197,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 198,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 199,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 200,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 201,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 202,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 203,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 204,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 205,
+              "calls": 67,
+              "triangles": 566209
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "stage": "before",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              31.980474223071745,
+              35.22639830315224
+            ],
+            "firstPosition": [
+              -40.79190068767778,
+              27.03509325440475,
+              11.980459015746295
+            ],
+            "lastPosition": [
+              -43.8781997515048,
+              24.622951854963883,
+              14.088188019058288
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              16.459974923122093,
+              31.902144827764296
+            ],
+            "firstPosition": [
+              -43.87324616490078,
+              24.56475207742894,
+              14.125102177104951
+            ],
+            "lastPosition": [
+              -39.63093230465021,
+              12.959087077168062,
+              20.561676969439244
+            ]
+          }
+        ],
+        "fov": 50
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 44,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 45,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 46,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 47,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 48,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 49,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 50,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 51,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 52,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 53,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 54,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 55,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 56,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 57,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 58,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 59,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 60,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 61,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 62,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 63,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 64,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 65,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 66,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 67,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 68,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 69,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 70,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 71,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 72,
+              "calls": 76,
+              "triangles": 443681
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 425085
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 164,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 165,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 166,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 167,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 168,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 169,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 170,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 171,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 172,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 173,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 174,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 175,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 176,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 177,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 178,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 179,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 180,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 181,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 182,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 183,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 184,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 185,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 186,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 187,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 188,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 189,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 190,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 191,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 192,
+              "calls": 66,
+              "triangles": 411316
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 1,
+      "stage": "after",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              32.05719888766695,
+              32.05719888766695
+            ],
+            "firstPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ],
+            "lastPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              14.789160955669118,
+              14.789160955669118
+            ],
+            "firstPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ],
+            "lastPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ]
+          }
+        ],
+        "fov": 50,
+        "shots": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "purpose": "establish",
+            "visibility": "clear"
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "purpose": "interaction",
+            "visibility": "clear"
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 44,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 45,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 46,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 47,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 48,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 49,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 50,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 51,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 52,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 53,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 54,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 55,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 56,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 57,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 58,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 59,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 60,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 61,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 62,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 63,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 64,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 65,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 66,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 67,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 68,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 69,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 70,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 71,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 72,
+              "calls": 75,
+              "triangles": 510521
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 566201
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 164,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 165,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 166,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 167,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 168,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 169,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 170,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 171,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 172,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 173,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 174,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 175,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 176,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 177,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 178,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 179,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 180,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 181,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 182,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 183,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 184,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 185,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 186,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 187,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 188,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 189,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 190,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 191,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 192,
+              "calls": 67,
+              "triangles": 566209
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "stage": "before",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              31.980474223071745,
+              35.22639830315224
+            ],
+            "firstPosition": [
+              -40.79190068767778,
+              27.03509325440475,
+              11.980459015746295
+            ],
+            "lastPosition": [
+              -43.8781997515048,
+              24.622951854963883,
+              14.088188019058288
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              16.459974923122093,
+              31.902144827764296
+            ],
+            "firstPosition": [
+              -43.87324616490078,
+              24.56475207742894,
+              14.125102177104951
+            ],
+            "lastPosition": [
+              -39.63093230465021,
+              12.959087077168062,
+              20.561676969439244
+            ]
+          }
+        ],
+        "fov": 50
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 44,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 45,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 46,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 47,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 48,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 49,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 50,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 51,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 52,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 53,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 54,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 55,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 56,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 57,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 58,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 59,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 60,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 61,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 62,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 63,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 64,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 65,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 66,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 67,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 68,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 69,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 70,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 71,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 72,
+              "calls": 76,
+              "triangles": 443681
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 425085
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 164,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 165,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 166,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 167,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 168,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 169,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 170,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 171,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 172,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 173,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 174,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 175,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 176,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 177,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 178,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 179,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 180,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 181,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 182,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 183,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 184,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 185,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 186,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 187,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 188,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 189,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 190,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 191,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 192,
+              "calls": 66,
+              "triangles": 411316
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "stage": "after",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              32.05719888766695,
+              32.05719888766695
+            ],
+            "firstPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ],
+            "lastPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              14.789160955669118,
+              14.789160955669118
+            ],
+            "firstPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ],
+            "lastPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ]
+          }
+        ],
+        "fov": 50,
+        "shots": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "purpose": "establish",
+            "visibility": "clear"
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "purpose": "interaction",
+            "visibility": "clear"
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 44,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 45,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 46,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 47,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 48,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 49,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 50,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 51,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 52,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 53,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 54,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 55,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 56,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 57,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 58,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 59,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 60,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 61,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 62,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 63,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 64,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 65,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 66,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 67,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 68,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 69,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 70,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 71,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 72,
+              "calls": 75,
+              "triangles": 510521
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 566201
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 164,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 165,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 166,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 167,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 168,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 169,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 170,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 171,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 172,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 173,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 174,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 175,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 176,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 177,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 178,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 179,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 180,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 181,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 182,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 183,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 184,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 185,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 186,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 187,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 188,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 189,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 190,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 191,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 192,
+              "calls": 67,
+              "triangles": 566209
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "stage": "before",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              31.980474223071745,
+              35.22639830315224
+            ],
+            "firstPosition": [
+              -40.79190068767778,
+              27.03509325440475,
+              11.980459015746295
+            ],
+            "lastPosition": [
+              -43.8781997515048,
+              24.622951854963883,
+              14.088188019058288
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              16.459974923122093,
+              31.902144827764296
+            ],
+            "firstPosition": [
+              -43.87324616490078,
+              24.56475207742894,
+              14.125102177104951
+            ],
+            "lastPosition": [
+              -39.63093230465021,
+              12.959087077168062,
+              20.561676969439244
+            ]
+          }
+        ],
+        "fov": 50
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 44,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 45,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 46,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 47,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 48,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 49,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 50,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 51,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 52,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 53,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 54,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 55,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 56,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 57,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 58,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 59,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 60,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 61,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 62,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 63,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 64,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 65,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 66,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 67,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 68,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 69,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 70,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 71,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 72,
+              "calls": 76,
+              "triangles": 443681
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 425085
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 164,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 165,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 166,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 167,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 168,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 169,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 170,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 171,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 172,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 173,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 174,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 175,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 176,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 177,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 178,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 179,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 180,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 181,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 182,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 183,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 184,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 185,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 186,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 187,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 188,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 189,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 190,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 191,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 192,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 193,
+              "calls": 66,
+              "triangles": 411316
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "stage": "after",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              32.05719888766695,
+              32.05719888766695
+            ],
+            "firstPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ],
+            "lastPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              14.789160955669118,
+              14.789160955669118
+            ],
+            "firstPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ],
+            "lastPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ]
+          }
+        ],
+        "fov": 50,
+        "shots": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "purpose": "establish",
+            "visibility": "clear"
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "purpose": "interaction",
+            "visibility": "clear"
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 44,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 45,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 46,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 47,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 48,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 49,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 50,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 51,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 52,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 53,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 54,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 55,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 56,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 57,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 58,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 59,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 60,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 61,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 62,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 63,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 64,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 65,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 66,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 67,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 68,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 69,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 70,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 71,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 72,
+              "calls": 75,
+              "triangles": 510521
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 566201
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 164,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 165,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 166,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 167,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 168,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 169,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 170,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 171,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 172,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 173,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 174,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 175,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 176,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 177,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 178,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 179,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 180,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 181,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 182,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 183,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 184,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 185,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 186,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 187,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 188,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 189,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 190,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 191,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 192,
+              "calls": 67,
+              "triangles": 566209
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 4,
+      "stage": "before",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              31.980474223071745,
+              35.22639830315224
+            ],
+            "firstPosition": [
+              -40.79190068767778,
+              27.03509325440475,
+              11.980459015746295
+            ],
+            "lastPosition": [
+              -43.8781997515048,
+              24.622951854963883,
+              14.088188019058288
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              16.459974923122093,
+              31.902144827764296
+            ],
+            "firstPosition": [
+              -43.87324616490078,
+              24.56475207742894,
+              14.125102177104951
+            ],
+            "lastPosition": [
+              -39.63093230465021,
+              12.959087077168062,
+              20.561676969439244
+            ]
+          }
+        ],
+        "fov": 50
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 44,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 45,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 46,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 47,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 48,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 49,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 50,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 51,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 52,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 53,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 54,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 55,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 56,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 57,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 58,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 59,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 60,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 61,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 62,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 63,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 64,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 65,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 66,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 67,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 68,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 69,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 70,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 71,
+              "calls": 76,
+              "triangles": 443681
+            },
+            {
+              "frame": 72,
+              "calls": 76,
+              "triangles": 443681
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 425085
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 425085
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 164,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 165,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 166,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 167,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 168,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 169,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 170,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 171,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 172,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 173,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 174,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 175,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 176,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 177,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 178,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 179,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 180,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 181,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 182,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 183,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 184,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 185,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 186,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 187,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 188,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 189,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 190,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 191,
+              "calls": 66,
+              "triangles": 411316
+            },
+            {
+              "frame": 192,
+              "calls": 66,
+              "triangles": 411316
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "run": 4,
+      "stage": "after",
+      "motion": {
+        "intervals": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "boom": [
+              32.05719888766695,
+              32.05719888766695
+            ],
+            "firstPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ],
+            "lastPosition": [
+              -36.27939247142245,
+              23.254869196694557,
+              7.804546363956373
+            ]
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "boom": [
+              14.789160955669118,
+              14.789160955669118
+            ],
+            "firstPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ],
+            "lastPosition": [
+              -32.15601665470061,
+              9.678918359429826,
+              15.666933868426375
+            ]
+          }
+        ],
+        "fov": 50,
+        "shots": [
+          {
+            "from": 0,
+            "until": 2.5,
+            "purpose": "establish",
+            "visibility": "clear"
+          },
+          {
+            "from": 2.5,
+            "until": 5.6,
+            "purpose": "interaction",
+            "visibility": "clear"
+          }
+        ]
+      },
+      "views": [
+        {
+          "view": "establish",
+          "t": 1,
+          "frames": [
+            {
+              "frame": 43,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 44,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 45,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 46,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 47,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 48,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 49,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 50,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 51,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 52,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 53,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 54,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 55,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 56,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 57,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 58,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 59,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 60,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 61,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 62,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 63,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 64,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 65,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 66,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 67,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 68,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 69,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 70,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 71,
+              "calls": 75,
+              "triangles": 510521
+            },
+            {
+              "frame": 72,
+              "calls": 75,
+              "triangles": 510521
+            }
+          ]
+        },
+        {
+          "view": "interaction",
+          "t": 3.8,
+          "frames": [
+            {
+              "frame": 103,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 104,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 105,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 106,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 107,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 108,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 109,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 110,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 111,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 112,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 113,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 114,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 115,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 116,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 117,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 118,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 119,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 120,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 121,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 122,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 123,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 124,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 125,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 126,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 127,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 128,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 129,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 130,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 131,
+              "calls": 68,
+              "triangles": 566201
+            },
+            {
+              "frame": 132,
+              "calls": 68,
+              "triangles": 566201
+            }
+          ]
+        },
+        {
+          "view": "landing",
+          "t": 4.5,
+          "frames": [
+            {
+              "frame": 163,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 164,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 165,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 166,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 167,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 168,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 169,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 170,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 171,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 172,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 173,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 174,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 175,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 176,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 177,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 178,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 179,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 180,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 181,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 182,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 183,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 184,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 185,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 186,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 187,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 188,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 189,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 190,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 191,
+              "calls": 67,
+              "triangles": 566209
+            },
+            {
+              "frame": 192,
+              "calls": 67,
+              "triangles": 566209
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "failures": []
+}

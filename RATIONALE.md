@@ -97,8 +97,14 @@ not a required event: waiting, crossing time, driver reaction and visibility can
   `environment.roadGrip` (0.2–1, default 1) scales braking and corner grip. The browser and event
   checker share conservative 2D body-height visibility from the collision grid, parked boxes and
   traffic bodies. This is an approximation, not eye-height ray tracing or weather rendering.
-- Junctions use stop lines and deterministic gap acceptance (arrival order, then vehicle id for
-  ties). This is not a complete model of statutory priorities, lane changes or overtaking.
+- Following projects the lead body onto the actual upcoming rounded lane, including curved queues.
+  Cached route intersections let turning drivers yield to oncoming straight traffic. A saved yield
+  decision persists while braking and releases once the other car clears or waits safely upstream.
+  Stop envelopes include the turning body's front corner. These are practice rules, not a complete
+  model of statutory priority, lane changes or overtaking.
+- Bounded braking remains responsible for avoidance. If vehicle bodies still touch, swept body
+  checks stop longitudinal/lateral travel at contact instead of allowing interpenetration. This
+  contact response does not snap participants or make a crash a required outcome.
 - The event checker reports different departure times and cautious traversal, using city meshes
   for participant sight lines. Regression tests separately require early detection to avoid contact
   and late detection/insufficient braking to allow contact. No seed is required to produce a crash. A separate ordinary-driver reference verifies
@@ -119,28 +125,37 @@ not a required event: waiting, crossing time, driver reaction and visibility can
 
 ## Replay and results
 
-Contact uses Unity's window (8 s before to 1.6 s after contact); a safe arrival reviews the recorder's last 12 s before showing the successful crossing feedback. Both use the same replay controls and wait on their last frame until an explicit restart, results or menu action. A safe arrival has no contact marker, fall or contact slow motion.
+Contact recordings retain the window from 8 s before to 1.6 s after contact. The live view shows
+0.65 s of the fall, then finishes the remaining simulation/recording steps before replay. A safe
+arrival holds its terminal recording, shows a 0.25 s goal confirmation and reviews the last 12 s
+before successful crossing feedback. Both use the same replay controls and wait on their last frame until an explicit restart, results or menu action. A safe arrival has no contact marker, fall or contact slow motion.
 
-Bird's-eye explains the situation; the participant view restores recorded eye position, yaw, pitch and roll, including independent bicycle head turns and the live fall. Body coordinates stay unchanged for traffic analysis. Eye fields are optional additions to version-one recordings; older clips use their body position and participant eye height. Reduced motion suppresses replay camera roll. The driver's seat asks "could the driver see me?": it follows the accident car for contact, or the nearest recorded car for a safe arrival; that view is unavailable when no car was recorded. V cycles the available views. The third-person fall depends on where and how fast the car hit — educational, not reconstruction.
+The analysis view explains the relationship between the participant, vehicle and road. The
+participant view restores recorded eye position, yaw, pitch and roll, including independent bicycle
+head turns and the live fall. Body coordinates stay unchanged for traffic analysis. Eye fields are
+optional additions to version-one recordings; older clips use body position and participant eye
+height. Reduced motion suppresses replay camera roll. The driver's seat asks "could the driver see
+me?": it follows the contact car, or the nearest recorded car for a safe arrival; it is unavailable
+when no car was recorded. V cycles the available views. The third-person fall depends on where and
+how fast the car hit — educational, not reconstruction.
 
-The overview plans against the recorded approach, car and posed landing before playback. CPU-only
-copies of the town's low-detail silhouettes retain roofs, trees and signal poles independently of
-render culling; parked vehicles and recorded traffic also obstruct the view. The planner prefers
-one clear three-quarter angle for the complete clip, raises or moves it when necessary, and checks
-the translation between camera positions as well as the subject sight lines. Turn costs are per
-second, so an angle change happens on the slower approach rather than in the dense samples around
-contact. The planned key poses then become one continuous orbit: focus, heading, pitch and boom
-length are resampled on a uniform 1/30 s clock and Gaussian-smoothed there (a positional blend
-would cut chords across a turn). The boom is dilated by the full kernel radius before easing, so
-the camera pulls back ahead of a widening shot (the arriving car) and never closer than any shot
-needs. The smoothed path is re-validated at every key pose; where it fails, smoothing softens only
-around that moment. A move still faster than a whip pan becomes a clean cut instead. If no
-continuous clear connection exists, an angle change is preferred away from contact. Buildings stay
-visible. Portrait resizing replans the framing and reserves the area covered by replay controls;
-reduced motion prefers a stationary wide shot. Normal playback evaluates a Catmull-Rom spline
-through the precomputed samples (continuous velocity), without scene raycasts or new camera vectors
-each frame. On the built-in walking events, peak camera acceleration fell from up to ~3,700 m/s²
-(velocity jumps at every 0.2 s key) to under ~60 m/s².
+`ReplayCamera` prepares fixed compositions before playback. An establishing shot shows the
+participant's travel path, an approach shot is available for longer clips, and an interaction shot
+holds the participant, relevant vehicle, contact and landing together. Short clips omit unnecessary
+beats; compatible neighboring shots merge. Each shot has a constant position, focus and field of
+view. Arriving or departing vehicles cannot repeatedly stretch the camera boom. Cuts select a new
+composition directly, without flying through the town, and keep the contact window uninterrupted
+where visibility permits.
+
+CPU-only low-detail silhouettes retain roofs, trees and signal poles independently of render
+culling. Parked vehicles and swept bounds of recorded traffic also obstruct the view. Planning
+checks posed participant/bicycle bounds and separate body/vehicle target groups at 30 Hz, with
+additional contact samples and bracketing samples at cuts. It prefers a three-quarter view from
+the participant's approach side, raising or changing the angle only when necessary. A blind corner
+may require shorter visibility cuts; an enclosed custom recording gets a finite fallback marked
+obstructed rather than hidden buildings. Portrait resizing replans against the area covered by
+replay controls. Reduced motion first attempts one stationary composition for the whole recording.
+Playback only selects prepared poses, without scene raycasts or new camera vectors each frame.
 
 ## Performance
 

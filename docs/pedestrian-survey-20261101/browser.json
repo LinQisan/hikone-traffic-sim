@@ -1,0 +1,205 @@
+{
+  "traversals": [
+    {
+      "mode": "walking",
+      "name": "moatStreet",
+      "direction": "forward",
+      "frames": 8764,
+      "end": [
+        -54.88376114392755,
+        175.91761345737189
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "walking",
+      "name": "moatStreet",
+      "direction": "reverse",
+      "frames": 8764,
+      "end": [
+        -400.75348678623146,
+        226.23724023677022
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "tennisLane",
+      "direction": "forward",
+      "frames": 4689,
+      "end": [
+        -586.9560998159221,
+        252.94655113161542
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "tennisLane",
+      "direction": "reverse",
+      "frames": 4689,
+      "end": [
+        -401.99927014453647,
+        226.43738621681624
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "campus",
+      "direction": "forward",
+      "frames": 1762,
+      "end": [
+        -587.6639977567265,
+        252.38027436757577
+      ],
+      "height": 0.010000000000000002
+    },
+    {
+      "mode": "walking",
+      "name": "campus",
+      "direction": "reverse",
+      "frames": 1762,
+      "end": [
+        -590.4418821495251,
+        182.69118033807655
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "forkBranch",
+      "direction": "forward",
+      "frames": 582,
+      "end": [
+        -524.974825943486,
+        269.8715615961714
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "walking",
+      "name": "forkBranch",
+      "direction": "reverse",
+      "frames": 582,
+      "end": [
+        -526.683054056514,
+        247.29398840382856
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "moatStreet",
+      "direction": "forward",
+      "frames": 8793,
+      "end": [
+        -54.8796488666168,
+        175.84595594423138
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "moatStreet",
+      "direction": "reverse",
+      "frames": 8797,
+      "end": [
+        -400.7489650158754,
+        226.34727147767794
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "tennisLane",
+      "direction": "forward",
+      "frames": 4718,
+      "end": [
+        -586.9643400375246,
+        252.85099282869228
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "tennisLane",
+      "direction": "reverse",
+      "frames": 4719,
+      "end": [
+        -402.0119820405108,
+        226.36624931064256
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "campus",
+      "direction": "forward",
+      "frames": 1791,
+      "end": [
+        -587.7350767920024,
+        252.404311624822
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "campus",
+      "direction": "reverse",
+      "frames": 1791,
+      "end": [
+        -590.3623477477533,
+        182.67742434005137
+      ],
+      "height": 0.009999999999999998
+    },
+    {
+      "mode": "bicycle",
+      "name": "forkBranch",
+      "direction": "forward",
+      "frames": 610,
+      "end": [
+        -524.975737567667,
+        269.8595127005474
+      ],
+      "height": 0.01
+    },
+    {
+      "mode": "bicycle",
+      "name": "forkBranch",
+      "direction": "reverse",
+      "frames": 610,
+      "end": [
+        -526.682142432333,
+        247.30603729945267
+      ],
+      "height": 0.010000000000000002
+    }
+  ],
+  "events": [
+    {
+      "id": "builtin-01",
+      "keyboardLook": true,
+      "moved": {
+        "x": 39.794657076771415,
+        "z": 15.10101511519143
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "keyboardLook": true,
+      "moved": {
+        "x": -68.82190196386641,
+        "z": 22.774894131317126
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "errors": []
+}

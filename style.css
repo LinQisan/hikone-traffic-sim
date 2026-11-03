@@ -101,6 +101,7 @@ kbd { display: inline-block; min-width: 1.6em; padding: 0 5px; border: 1px solid
 .hud span { font-size: 13px; color: var(--sub); }
 .hud #hudsignal { display: block; color: var(--text); }
 .bar { left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 12px; padding: 12px 16px; border-radius: 16px; background: rgba(11, 18, 32, 0.9); border: 1px solid var(--edge); width: max-content; max-width: calc(100vw - 24px); }
+.bar button { min-height: 44px; }
 .time { color: var(--accent); min-width: 130px; }
 .views { display: inline-flex; flex-wrap: wrap; justify-content: center; max-width: 100%; border: 1px solid var(--edge); border-radius: 12px; overflow: hidden; }
 .views button { border: 0; border-radius: 0; background: transparent; padding: 8px 12px; }

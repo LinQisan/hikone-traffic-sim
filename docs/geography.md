@@ -30,6 +30,7 @@ Coverage rules:
 | Buildings | 1483 mapped footprints. A few have OSM heights or storeys; the rest use an estimate from type and area (`heightBasis`). Compact house outlines get a gable. Camera bounds stay per building. |
 | Streets, footways | Mapped centre lines with class-width estimates: primary 8.2 m, secondary/tertiary 7 m, residential 4.4 m, service 3.6 m, footway 2 m. Never through a footprint. |
 | Crossings | Marked crossings only; unmarked nodes get no zebra. |
+| Road lines | One rule in [road-markings.ts](../src/world/generators/road-markings.ts), set by [road-markings.json](../world/road-markings.json). Line width and the 5 m dash and gap follow the [1974 MLIT standard](https://www.mlit.go.jp/road/sign/kijyun/pdf/19741226kukakusenn.pdf). Named corridors were sampled in Street View at one or two points, viewed only and dated in the file; other roads use width-class defaults. Edge lines and green margins run through driveways and car-park mouths and break only at public roads, as seen at the hotel forecourt and the car park off the inner-moat street. The loop from Kyobashi by the university, the inner moat and the north road to the east street was sampled at about 20 points (November 2022 and October 2024 panoramas), not surveyed. Stop bars, side-road gaps and diamond stations are generated estimates of common practice, not observations of each junction. Carriageway widths are unchanged: the south end of the east street is modelled at 4.4 m against a visibly wider road, so its centre line sits in narrower lanes than the real one. |
 | Water | Water areas plus the complete moat relation 3548105, fetched separately because a bbox can omit members. Road and footway decks are subtracted from water and blockers. Incomplete relations are rejected, not closed by guesswork. |
 | Green | Mapped parks, woods, pitches and grass. Woods get deterministic illustrative groves; mapped trees stay at their node. |
 | Signals | Not modelled outside the practice town. |
@@ -43,11 +44,16 @@ Roads and footways stay at 0.01 m, plots at 0.15 m and water at −1.35 m. The b
 | [OpenStreetMap](https://www.openstreetmap.org/copyright), © OpenStreetMap contributors, ODbL | Roads, footprints, water, walls. Element IDs, versions and hashes are in `world/east-hikone.json`; the subset is `world/east-hikone-source.geojson`. | Community data; some tags conflict, such as `uncontrolled` footways at signalised junction nodes. |
 | [GSI seamless aerial](https://maps.gsi.go.jp/development/ichiran.html) | Topology and outline checks | [Capture metadata](https://maps.gsi.go.jp/xyz/seamlessphoto_spec/11/1799/809.geojson) says September–October 2011 here. Predates later changes. |
 | GSI pale map and elevation API | Connections; relative raised-bank profile | Elevations are not copied into the local datum. |
+| [GSI optimal vector tiles](https://github.com/gsi-cyberjapan/optimal_bvmap), processed under PDL 1.0 | School-side building envelopes, a service lane and castle landmark registration | Catalog 2026-07-01; survey dates and building heights are not established. See the [registration review](map-registration.md). |
 | Google satellite and Street View | Visual cross-checks where reachable, noted per area | Nothing is shipped. A displayed copyright year is not a capture date. |
 
 No provider tile is used as a scene texture. The attributed GSI aerial comparisons in this folder are the only redistributed external rasters; `world/town-streets.json` carries its own ODbL notice.
 
 ## Corrections by area
+
+The [1 November pedestrian review](pedestrian-survey-20261101.md) registers the inner-moat street and western water edges together, replacing a road trace that drifted into the parking frontage. Source coordinates, transition estimates and photo limits are recorded separately.
+
+The [31 October city-map review](map-registration.md) corrects Nishi school footprints, roadside houses, five tennis courts, the school service lane and four castle landmark placements using independent OSM/GSI data. The global frame and photo-registered frontage anchors stay fixed. The museum and unreviewed shores remain approximate.
 
 **Practice town.** Eastern alley moved about 18–20 m west to x≈114–117 and continued. Castle Road's southward drift cut from 0.065 to 0.009 m/m. The second southern cross street and its connections added near z≈−138, with zebras at z≈−69 and −145.5. New minor streets use an estimated 4.4 m width. Junction topology, bridge and five signal installations kept.
 

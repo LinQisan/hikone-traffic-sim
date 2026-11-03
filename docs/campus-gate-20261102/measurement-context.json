@@ -1,0 +1,14 @@
+{
+  "date": "2026-11-02",
+  "logicalCPUs": 12,
+  "loadAverageBefore": [
+    24.03,
+    17.13,
+    15.9
+  ],
+  "cpuSchedulerLimit": 100,
+  "cpuSpeedLimit": 100,
+  "taskOwnedHeavyJobsStopped": true,
+  "otherBrowserWorkloadsActive": true,
+  "scope": "Submitted draw and triangle counters only; no FPS, latency or speedup claim."
+}

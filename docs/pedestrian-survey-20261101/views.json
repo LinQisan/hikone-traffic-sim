@@ -1,0 +1,32 @@
+{
+  "viewPoses": [
+    "IMG_1083",
+    "IMG_1084",
+    "IMG_1085",
+    "IMG_1075",
+    "IMG_1076",
+    "IMG_1077",
+    "IMG_1078",
+    "IMG_1079",
+    "IMG_1081",
+    "IMG_1082",
+    "IMG_1074",
+    "IMG_1071",
+    "IMG_1072",
+    "moatStreet",
+    "bridgeApproach",
+    "bridgeMoat",
+    "innerBridge",
+    "innerBridgeReverse",
+    "moatHedge",
+    "fork",
+    "forkReverse",
+    "campus"
+  ],
+  "additionalDistantDetailViews": [
+    "moatStreet",
+    "fork",
+    "bridgeApproach"
+  ],
+  "errors": []
+}

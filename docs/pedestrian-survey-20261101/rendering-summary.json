@@ -1,0 +1,124 @@
+{
+  "samples": 30,
+  "runsPerViewAndStage": 5,
+  "errors": 0,
+  "httpFailures": 0,
+  "verdict": "Draw workload stays within the existing draw-call budget at these three views. Frame-time comparisons are inconclusive; see measurement-context.json.",
+  "views": [
+    {
+      "view": "moatStreet",
+      "before": {
+        "calls": {
+          "median": 23,
+          "min": 23,
+          "max": 23
+        },
+        "triangles": {
+          "median": 1025421,
+          "min": 1025421,
+          "max": 1025421
+        },
+        "p95Ms": {
+          "median": 17.599999964237213,
+          "min": 17.19999998807907,
+          "max": 17.600000023841858
+        }
+      },
+      "after": {
+        "calls": {
+          "median": 24,
+          "min": 24,
+          "max": 24
+        },
+        "triangles": {
+          "median": 1074114,
+          "min": 1074114,
+          "max": 1074114
+        },
+        "p95Ms": {
+          "median": 17.600000023841858,
+          "min": 17.5,
+          "max": 17.600000023841858
+        }
+      }
+    },
+    {
+      "view": "fork",
+      "before": {
+        "calls": {
+          "median": 66,
+          "min": 66,
+          "max": 66
+        },
+        "triangles": {
+          "median": 2878134,
+          "min": 2878134,
+          "max": 2878134
+        },
+        "p95Ms": {
+          "median": 17.600000023841858,
+          "min": 16.899999976158142,
+          "max": 17.69999998807907
+        }
+      },
+      "after": {
+        "calls": {
+          "median": 66,
+          "min": 66,
+          "max": 66
+        },
+        "triangles": {
+          "median": 2876034,
+          "min": 2876034,
+          "max": 2876034
+        },
+        "p95Ms": {
+          "median": 17.399999976158142,
+          "min": 17.399999976158142,
+          "max": 17.69999998807907
+        }
+      }
+    },
+    {
+      "view": "bridgeApproach",
+      "before": {
+        "calls": {
+          "median": 23,
+          "min": 23,
+          "max": 23
+        },
+        "triangles": {
+          "median": 2117317,
+          "min": 2117317,
+          "max": 2117317
+        },
+        "p95Ms": {
+          "median": 17.600000023841858,
+          "min": 17.399999976158142,
+          "max": 17.69999998807907
+        }
+      },
+      "after": {
+        "calls": {
+          "median": 23,
+          "min": 23,
+          "max": 23
+        },
+        "triangles": {
+          "median": 2097041,
+          "min": 2097041,
+          "max": 2097041
+        },
+        "p95Ms": {
+          "median": 17.600000023841858,
+          "min": 17.599999964237213,
+          "max": 17.600000023841858
+        }
+      }
+    }
+  ],
+  "runtimeManifestSha256": {
+    "before": "f3f4797d66bf97d39239b49998f7e94ae9295b73222c1449202b3bdbf1bbaac2",
+    "after": "d5d9339b1686c1c53f3d9794dd8db6239d9326f6f0cc6f39fe51f4fda77f0030"
+  }
+}

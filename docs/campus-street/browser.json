@@ -1,0 +1,33 @@
+{
+  "events": [
+    {
+      "id": "builtin-01",
+      "keyboardLook": true,
+      "moved": {
+        "x": 40.024369656383904,
+        "z": 14.118724722984435
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "keyboardLook": true,
+      "moved": {
+        "x": -68.64643873545134,
+        "z": 22.771847894712696
+      },
+      "participantReplay": true,
+      "replayEnded": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "editor": {
+    "viewport": 390,
+    "width": 390,
+    "coordinateX": 150,
+    "coordinateZ": 38
+  },
+  "errors": []
+}

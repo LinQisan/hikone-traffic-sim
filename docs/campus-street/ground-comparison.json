@@ -1,0 +1,16 @@
+{
+  "changedGroundGroups": [
+    "Shiga University grounds",
+    "Shiga University rampart grounds"
+  ],
+  "unchangedOutsideHeightSamples": 38312,
+  "localChangedSamples": 1898,
+  "cornerBounds": {
+    "xMin": -586,
+    "xMax": -532,
+    "zMin": 226,
+    "zMax": 246
+  },
+  "toleranceMetres": 0.0001,
+  "maxOutsideHeightDelta": 0.00001716714798050134
+}

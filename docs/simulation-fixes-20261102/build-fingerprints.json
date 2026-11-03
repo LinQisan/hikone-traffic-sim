@@ -1,0 +1,14 @@
+{
+  "before": {
+    "index.html": "ad685827fd1e78992dd784b5a5c29beb8b075d2b6bc678a9ffaf330da632f070",
+    "models/runtime.json": "2e44db8ac083e22ce6260a149201d9882ba6c5a39c2e88765a6535efc83c6ab6",
+    "data/collision.json": "115308d6585d437fc50414d7c886050fdf38fe98cbd483bd1ad18e8297840465",
+    "data/road_tiles.json": "fbd537bbd79d2fd3603fa9d90ff0b1ae7acb27cd9b61a4295c2f1ea31f692975"
+  },
+  "after": {
+    "index.html": "117e37855db4329d826023a988a026b9401cc1b432be82ee1cb0cf1bf184e5a7",
+    "models/runtime.json": "314175af9ffe7e8fb0416d95c63d204a14c438a29a964c0c98fd01067e66be18",
+    "data/collision.json": "2ae5c8556c193d919c95318031700064e4706ba60e9f4875047f1d0352707b7d",
+    "data/road_tiles.json": "fbd537bbd79d2fd3603fa9d90ff0b1ae7acb27cd9b61a4295c2f1ea31f692975"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-01",
+  "fullCheck": {
+    "tests": 362,
+    "passed": 362,
+    "failed": 0,
+    "skipped": 0,
+    "typecheck": true,
+    "generatedDocs": true,
+    "productionBuild": true
+  },
+  "geometry": {
+    "tests": 118,
+    "passed": 118,
+    "failed": 0
+  },
+  "routes": {
+    "checked": 46,
+    "failed": 0
+  },
+  "newRegressions": {
+    "tests": 5,
+    "baselineFailed": 5,
+    "finalPassed": 5
+  },
+  "browser": {
+    "traversals": 16,
+    "events": [
+      "builtin-01",
+      "builtin-07"
+    ],
+    "errors": 0,
+    "viewPoses": 22,
+    "additionalFarViews": 3
+  },
+  "editor": {
+    "viewportWidth": 390,
+    "horizontalOverflow": false,
+    "errors": 0
+  },
+  "privateOriginals": {
+    "files": 39,
+    "sha256Unchanged": true
+  },
+  "limits": [
+    "Model dimensions and estimated camera poses are not surveyed.",
+    "Street View dates are 2015 and 2022.",
+    "No physical phone or headset was checked.",
+    "Vite retains its existing warning for chunks exceeding 500 kB."
+  ],
+  "rendering": {
+    "samples": 30,
+    "httpFailures": 0,
+    "browserErrors": 0,
+    "finalBuildMatchesMeasuredManifest": true,
+    "timingVerdict": "inconclusive"
+  }
+}

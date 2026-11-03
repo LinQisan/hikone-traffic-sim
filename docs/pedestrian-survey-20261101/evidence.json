@@ -1,0 +1,37 @@
+{
+  "reviewDate": "2026-11-01",
+  "privateOriginalCount": 39,
+  "photoCount": 18,
+  "standaloneVideoCount": 4,
+  "googlePanoramas": [
+    {
+      "id": "7tycG57tNzur-V15pWvrBQ",
+      "capture": "2022-11",
+      "viewed": true
+    },
+    {
+      "id": "bgXIisfV1B3gw4Izz-_v1Q",
+      "capture": "2022-11",
+      "viewed": true
+    },
+    {
+      "id": "Fb8p09GQ2j9Wf9peHF1Lmw",
+      "capture": "2015-05",
+      "viewed": true
+    }
+  ],
+  "osmWater": {
+    "way": 264072301,
+    "version": 29,
+    "timestamp": "2026-03-14T11:22:11Z",
+    "sha256": "47eb11566b7be2c5a8863375414a12647e33c58202d09c329c46f31164acb9be"
+  },
+  "privateImagesPublished": false,
+  "photoTextureUsed": false,
+  "knownLimits": [
+    "GPS locates cameras, not subjects.",
+    "Source errors of 36\u2013110 m affect the first five stills.",
+    "Street View dates precede current temporary facilities.",
+    "Dimensions and western shoreline transition remain estimates."
+  ]
+}

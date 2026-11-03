@@ -15,6 +15,7 @@ npm run check                      # typecheck + generated docs + full regressio
 npm run check:docs                 # generated reference tables against source
 npm run test:geometry              # generated data, art, collision, routes, photographed streets
 node tools/rebuild_models.mjs <model>…  # every stage for named models; stops on the first failure
+node tools/build_road_markings.mjs      # the road-paint layer alone, without Blender
 node tools/check_events.mjs [id]   # event purposes, with real sight lines
 node tools/check_routes.mjs        # cars and bodies stay on roads
 node tools/check_red_crossings.mjs [n] [walking|bicycle] [gaze°]  # open-world red-crossing contact rate
@@ -58,6 +59,7 @@ Use the smallest checks that cover the change. Do not add tests for prose, forma
 | Docs, comments, formatting | Review content and paths; `git diff --check` |
 | CSS, copy, cosmetic values | Inspect the view, keyboard/touch reach and console |
 | Isolated logic | The affected test file |
+| Road markings | `tools/build_road_markings.mjs`; `test/road-markings.test.mjs`; inspect the view |
 | Vehicles, steering | `test/turning.test.mjs`, plus logic, crash or bicycle tests if affected |
 | Art, models, layout, collision | `tools/rebuild_models.mjs`; `npm run test:geometry`; inspect the view. Roads also need `check_routes.mjs`. Rendering workload needs `test/performance.test.mjs` and a benchmark |
 | Editor storage, server, Quest | `test/editor-store`, `editor-server`, `editor-quest` |

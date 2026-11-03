@@ -1,0 +1,166 @@
+{
+  "cases": [
+    {
+      "id": "builtin-01",
+      "frames": 3600,
+      "cars": 38,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-02",
+      "frames": 3600,
+      "cars": 34,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-03",
+      "frames": 3600,
+      "cars": 2,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-04",
+      "frames": 3600,
+      "cars": 1,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-05",
+      "frames": 3600,
+      "cars": 31,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-06",
+      "frames": 3600,
+      "cars": 1,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-07",
+      "frames": 3600,
+      "cars": 23,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-08",
+      "frames": 3600,
+      "cars": 23,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-09",
+      "frames": 3600,
+      "cars": 2,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    },
+    {
+      "id": "builtin-10",
+      "frames": 3600,
+      "cars": 23,
+      "maxBodyOverlap": 0,
+      "collision": {
+        "liveDelay": 0.65,
+        "recordedTail": 1.5999999999999948,
+        "frames": 87
+      },
+      "success": {
+        "liveDelay": 0.25,
+        "terminalRecordedAt": 2.033333333333331,
+        "frames": 1
+      }
+    }
+  ],
+  "menuCancelsPendingReplay": true,
+  "errors": []
+}

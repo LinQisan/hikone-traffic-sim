@@ -1,0 +1,142 @@
+{
+ "label": "ab3-final3",
+ "profile": "mobile",
+ "date": "2026-11-01T04:47:21.509Z",
+ "loadMs": 14750,
+ "startup": {
+  "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 5300M, Unspecified Version)",
+  "stages": {
+   "appModule": 600,
+   "rendererStart": 601,
+   "rendererReady": 1606,
+   "initialDataReady": 1890,
+   "dataReady": 1953,
+   "lightReady": 2426,
+   "environmentStart": 2584,
+   "environmentModelsReady": 3619,
+   "environmentMerged": 10687,
+   "cameraObstaclesReady": 12484,
+   "vehiclesReady": 12627,
+   "signalsReady": 12767,
+   "shadersReady": 14605,
+   "menuReady": 14605,
+   "firstRenderStart": 14709,
+   "firstFrame": 14724
+  },
+  "wireBytes": 28867795
+ },
+ "views": {
+  "junction": {
+   "frames": 1022,
+   "fps": 256,
+   "p50": 3.8,
+   "p95": 5.1,
+   "p99": 5.9,
+   "max": 7.6,
+   "calls": 69,
+   "triangles": 1755952
+  },
+  "moatEast": {
+   "frames": 1065,
+   "fps": 266.8,
+   "p50": 3.7,
+   "p95": 5,
+   "p99": 5.7,
+   "max": 10.4,
+   "calls": 69,
+   "triangles": 2101739
+  },
+  "nishiCorner": {
+   "frames": 1194,
+   "fps": 298.9,
+   "p50": 3.3,
+   "p95": 4.4,
+   "p99": 5,
+   "max": 6.6,
+   "calls": 58,
+   "triangles": 1688541
+  },
+  "campus": {
+   "frames": 1522,
+   "fps": 380.9,
+   "p50": 2.6,
+   "p95": 3.5,
+   "p99": 4,
+   "max": 5.6,
+   "calls": 16,
+   "triangles": 1847259
+  },
+  "castleRoad": {
+   "frames": 1883,
+   "fps": 472.7,
+   "p50": 2,
+   "p95": 3,
+   "p99": 4.5,
+   "max": 16.4,
+   "calls": 19,
+   "triangles": 316816
+  },
+  "northRoad": {
+   "frames": 879,
+   "fps": 220.1,
+   "p50": 3.8,
+   "p95": 11.2,
+   "p99": 13.8,
+   "max": 15.6,
+   "calls": 68,
+   "triangles": 1719346
+  },
+  "eastStreet": {
+   "frames": 1573,
+   "fps": 393.7,
+   "p50": 2.1,
+   "p95": 6.5,
+   "p99": 9.5,
+   "max": 13.5,
+   "calls": 22,
+   "triangles": 1955000
+  },
+  "panorama": {
+   "frames": 1022,
+   "fps": 255.7,
+   "p50": 3.7,
+   "p95": 5.6,
+   "p99": 8,
+   "max": 34.3,
+   "calls": 62,
+   "triangles": 2786954
+  },
+  "overview": {
+   "frames": 1110,
+   "fps": 277.8,
+   "p50": 3.5,
+   "p95": 4.8,
+   "p99": 5.2,
+   "max": 6.2,
+   "calls": 62,
+   "triangles": 3206272
+  }
+ },
+ "flight": {
+  "metres": 2620,
+  "frames": 9797,
+  "fps": 163.4,
+  "p50": 5.7,
+  "p95": 10.1,
+  "p99": 11.6,
+  "max": 95.2,
+  "over33": 2,
+  "calls": 29,
+  "maxCalls": 107,
+  "triangles": 1299181,
+  "maxTriangles": 3604060
+ },
+ "memory": {
+  "geometries": 130,
+  "textures": 25,
+  "programs": 28,
+  "sceneBufferMB": 192.2,
+  "heapMB": 361
+ },
+ "errors": []
+}

@@ -1,0 +1,79 @@
+{
+  "reviewed": "2026-10-31",
+  "baselineCommit": "02dd15ea583d4bc87694684aec69152e325dfb7b",
+  "models": [
+    "ART_ShigaCampus",
+    "ART_WestMoat",
+    "ART_EastHikoneBuildings",
+    "ART_InnerMoatStreet"
+  ],
+  "geometryTests": 113,
+  "fullCheckTests": 338,
+  "skippedTests": 0,
+  "vehicleRoutes": 46,
+  "cautiousReferenceGoalEvents": [
+    "builtin-01",
+    "builtin-02",
+    "builtin-03",
+    "builtin-04",
+    "builtin-05",
+    "builtin-06",
+    "builtin-07",
+    "builtin-08",
+    "builtin-09",
+    "builtin-10"
+  ],
+  "interactiveEventAndReplayChecks": [
+    "builtin-01",
+    "builtin-07"
+  ],
+  "controllerTraversals": 11,
+  "browserErrors": [],
+  "layoutExportsCompared": 44,
+  "groundComparison": {
+    "changedGroundGroups": [
+      "Shiga University grounds",
+      "Shiga University rampart grounds"
+    ],
+    "unchangedOutsideHeightSamples": 38312,
+    "localChangedSamples": 1898,
+    "cornerBounds": {
+      "xMin": -586,
+      "xMax": -532,
+      "zMin": 226,
+      "zMax": 246
+    },
+    "toleranceMetres": 0.0001,
+    "maxOutsideHeightDelta": 1.716714798050134e-05
+  },
+  "references": {
+    "privatePhotoCount": 33,
+    "streetViewCapture": "2022-11",
+    "streetViewPanoramas": [
+      "coHTEsedAMURADClgrac_A",
+      "8WoHMsMgJcvNfwFXje9tbw",
+      "RLtDexg3bdeS7pa8p3q-ZQ"
+    ]
+  },
+  "privacy": {
+    "originalHashesUnchanged": 33,
+    "lanAppStatus": 200,
+    "privateOriginalStatus": 403,
+    "fieldPhotosInDist": false
+  },
+  "benchmark": {
+    "samples": 30,
+    "views": 5,
+    "runsPerSideAndView": 3,
+    "errors": 0,
+    "requestFailures": 0,
+    "initialReadinessTimeoutSeconds": 45,
+    "startupExcluded": true
+  },
+  "limitations": [
+    "No real phone or headset run.",
+    "Photo-relative dimensions, pole placement and tree species are estimates.",
+    "Street View predates the temporary office and current notices.",
+    "Work counters repeat exactly; frame timing does not isolate a latency change."
+  ]
+}

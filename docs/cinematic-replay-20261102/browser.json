@@ -1,0 +1,596 @@
+{
+  "fixtures": [
+    {
+      "mode": "walking",
+      "presentation": "landscape",
+      "shots": [
+        {
+          "from": 0,
+          "until": 2.5,
+          "purpose": "establish",
+          "pitch": 36,
+          "boom": 43.17843482354557,
+          "visibility": "clear"
+        },
+        {
+          "from": 2.5,
+          "until": 6.5,
+          "purpose": "approach",
+          "pitch": 36,
+          "boom": 31.453073879196435,
+          "visibility": "clear"
+        },
+        {
+          "from": 6.5,
+          "until": 9.6,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 14.799676120274182,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "walking",
+      "presentation": "portrait",
+      "shots": [
+        {
+          "from": 0,
+          "until": 6.5,
+          "purpose": "establish",
+          "pitch": 36,
+          "boom": 74.4759681120047,
+          "visibility": "clear"
+        },
+        {
+          "from": 6.5,
+          "until": 9.6,
+          "purpose": "interaction",
+          "pitch": 43.99999999999999,
+          "boom": 43.66214416425163,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 390,
+      "scrollWidth": 390,
+      "fov": 50
+    },
+    {
+      "mode": "walking",
+      "presentation": "reduced",
+      "shots": [
+        {
+          "from": 0,
+          "until": 9.6,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 54.174580141588095,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "bicycle",
+      "presentation": "landscape",
+      "shots": [
+        {
+          "from": 0,
+          "until": 2.5,
+          "purpose": "establish",
+          "pitch": 36,
+          "boom": 55.74983051557366,
+          "visibility": "clear"
+        },
+        {
+          "from": 2.5,
+          "until": 6.5,
+          "purpose": "approach",
+          "pitch": 43.99999999999999,
+          "boom": 42.88719048430396,
+          "visibility": "clear"
+        },
+        {
+          "from": 6.5,
+          "until": 9.6,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 18.15582449475926,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "bicycle",
+      "presentation": "portrait",
+      "shots": [
+        {
+          "from": 0,
+          "until": 6.5,
+          "purpose": "establish",
+          "pitch": 36,
+          "boom": 106.56149028285449,
+          "visibility": "clear"
+        },
+        {
+          "from": 6.5,
+          "until": 9.6,
+          "purpose": "interaction",
+          "pitch": 43.99999999999999,
+          "boom": 46.66430868000399,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 390,
+      "scrollWidth": 390,
+      "fov": 50
+    },
+    {
+      "mode": "bicycle",
+      "presentation": "reduced",
+      "shots": [
+        {
+          "from": 0,
+          "until": 9.6,
+          "purpose": "interaction",
+          "pitch": 43.99999999999999,
+          "boom": 53.46076756512837,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "safe",
+      "presentation": "landscape",
+      "shots": [
+        {
+          "from": 0,
+          "until": 2.5,
+          "purpose": "establish",
+          "pitch": 43.99999999999999,
+          "boom": 15.12605640927554,
+          "visibility": "clear"
+        },
+        {
+          "from": 2.5,
+          "until": 10.5,
+          "purpose": "approach",
+          "pitch": 36,
+          "boom": 36.01217881605223,
+          "visibility": "clear"
+        },
+        {
+          "from": 10.5,
+          "until": 12,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 27.303455931623265,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "safe",
+      "presentation": "portrait",
+      "shots": [
+        {
+          "from": 0,
+          "until": 2.5,
+          "purpose": "establish",
+          "pitch": 36,
+          "boom": 26.09697929905176,
+          "visibility": "clear"
+        },
+        {
+          "from": 2.5,
+          "until": 10.5,
+          "purpose": "approach",
+          "pitch": 36,
+          "boom": 110.39923740030046,
+          "visibility": "clear"
+        },
+        {
+          "from": 10.5,
+          "until": 12,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 79.95856341774046,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 390,
+      "scrollWidth": 390,
+      "fov": 50
+    },
+    {
+      "mode": "safe",
+      "presentation": "reduced",
+      "shots": [
+        {
+          "from": 0,
+          "until": 12,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 36.20701917077755,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "no-car",
+      "presentation": "landscape",
+      "shots": [
+        {
+          "from": 0,
+          "until": 2.5,
+          "purpose": "establish",
+          "pitch": 43.99999999999999,
+          "boom": 15.12605640927554,
+          "visibility": "clear"
+        },
+        {
+          "from": 2.5,
+          "until": 10.5,
+          "purpose": "approach",
+          "pitch": 43.99999999999999,
+          "boom": 13.02264081738017,
+          "visibility": "clear"
+        },
+        {
+          "from": 10.5,
+          "until": 12,
+          "purpose": "interaction",
+          "pitch": 62,
+          "boom": 10,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    },
+    {
+      "mode": "no-car",
+      "presentation": "portrait",
+      "shots": [
+        {
+          "from": 0,
+          "until": 2.5,
+          "purpose": "establish",
+          "pitch": 36,
+          "boom": 26.09697929905176,
+          "visibility": "clear"
+        },
+        {
+          "from": 2.5,
+          "until": 10.5,
+          "purpose": "approach",
+          "pitch": 36,
+          "boom": 14.90066781248804,
+          "visibility": "clear"
+        },
+        {
+          "from": 10.5,
+          "until": 12,
+          "purpose": "interaction",
+          "pitch": 62,
+          "boom": 9.999999999999998,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 390,
+      "scrollWidth": 390,
+      "fov": 50
+    },
+    {
+      "mode": "no-car",
+      "presentation": "reduced",
+      "shots": [
+        {
+          "from": 0,
+          "until": 12,
+          "purpose": "interaction",
+          "pitch": 36,
+          "boom": 16.823384452522383,
+          "visibility": "clear"
+        }
+      ],
+      "cameraDrift": 0,
+      "focusDrift": 0,
+      "width": 1440,
+      "scrollWidth": 1440,
+      "fov": 50
+    }
+  ],
+  "events": [
+    {
+      "id": "builtin-01",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.0175,
+            "until": 2.3026000000238334,
+            "visibility": "clear"
+          },
+          {
+            "from": 2.3026000000238334,
+            "until": 5.402600000023828,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-02",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.025299999952316285,
+            "until": 2.3023999999761497,
+            "visibility": "clear"
+          },
+          {
+            "from": 2.3023999999761497,
+            "until": 5.4023999999761445,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-03",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.023400000035762786,
+            "until": 2.2822000000476756,
+            "visibility": "clear"
+          },
+          {
+            "from": 2.2822000000476756,
+            "until": 5.38220000004767,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-04",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.02119999998807907,
+            "until": 2.2836000000238337,
+            "visibility": "clear"
+          },
+          {
+            "from": 2.2836000000238337,
+            "until": 5.383600000023828,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-05",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.017900000035762788,
+            "until": 5.383800000011907,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-06",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.02280000001192093,
+            "until": 2.2831999999880708,
+            "visibility": "clear"
+          },
+          {
+            "from": 2.2831999999880708,
+            "until": 5.383199999988065,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-07",
+      "contact": {
+        "mode": "bicycle",
+        "shots": [
+          {
+            "from": 0.010900000035762787,
+            "until": 5.377199999988065,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-08",
+      "contact": {
+        "mode": "bicycle",
+        "shots": [
+          {
+            "from": 0.018100000023841857,
+            "until": 5.382600000023828,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-09",
+      "contact": {
+        "mode": "walking",
+        "shots": [
+          {
+            "from": 0.022900000035762785,
+            "until": 2.2873000000119124,
+            "visibility": "clear"
+          },
+          {
+            "from": 2.2873000000119124,
+            "until": 5.387300000011907,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    },
+    {
+      "id": "builtin-10",
+      "contact": {
+        "mode": "bicycle",
+        "shots": [
+          {
+            "from": 0.010100000023841859,
+            "until": 5.360100000023828,
+            "visibility": "clear"
+          }
+        ]
+      },
+      "safe": {
+        "shots": 1
+      },
+      "keyboardViewsAndRestart": true,
+      "resultsAndMenu": true
+    }
+  ],
+  "accessibility": {
+    "width": 320,
+    "scrollWidth": 320,
+    "buttons": [
+      {
+        "id": "viewover",
+        "width": 90.65625,
+        "height": 54
+      },
+      {
+        "id": "viewparticipant",
+        "width": 90.671875,
+        "height": 54
+      },
+      {
+        "id": "viewdriver",
+        "width": 90.671875,
+        "height": 54
+      },
+      {
+        "id": "again",
+        "width": 192.09375,
+        "height": 44
+      },
+      {
+        "id": "next",
+        "width": 127.390625,
+        "height": 44
+      },
+      {
+        "id": "replaymenu",
+        "width": 159.9375,
+        "height": 44
+      }
+    ],
+    "forcedColors": true,
+    "reducedMotion": true,
+    "focus": "replaymenu"
+  },
+  "errors": []
+}

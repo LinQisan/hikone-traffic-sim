@@ -1,0 +1,24 @@
+{
+  "startingDirtyPathsRecorded": true,
+  "protectedFilesUnchangedFromTaskStart": [
+    "AGENTS.md",
+    "package.json",
+    "package-lock.json",
+    "src/three/engine/TrafficEngine.ts",
+    "src/three/scene/coords.ts",
+    "src/three/materials/stone-texture.ts",
+    "world/geographic-frame.json",
+    "world/hikone.json",
+    "events/builtin-01.json",
+    "events/builtin-02.json",
+    "events/builtin-03.json",
+    "events/builtin-04.json",
+    "events/builtin-05.json",
+    "events/builtin-06.json",
+    "events/builtin-07.json",
+    "events/builtin-08.json",
+    "events/builtin-09.json",
+    "events/builtin-10.json"
+  ],
+  "startingFilesMissing": []
+}

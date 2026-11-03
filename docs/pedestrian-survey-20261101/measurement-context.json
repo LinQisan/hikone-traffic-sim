@@ -1,0 +1,9 @@
+{
+  "at": "2026-11-01T12:17:33.908789+00:00",
+  "uptime": "21:17  up 3 days,  2:44, 3 users, load averages: 10.21 12.02 11.33",
+  "logicalCPUs": 12,
+  "thermal": "Note: No thermal warning level has been recorded\nNote: No performance warning level has been recorded\n2026-11-01 21:17:33 +0900 CPU Power notify\n\tCPU_Scheduler_Limit \t= 100\n\tCPU_Available_CPUs \t= 12\n\tCPU_Speed_Limit \t= 100",
+  "heavyTaskJobsStopped": true,
+  "otherBrowserRenderingActive": true,
+  "timingLimit": "Other browser and operating-system activity is uncontrolled. Frame timing is descriptive; no performance improvement is inferred. Draw calls and submitted triangles measure rendered work."
+}

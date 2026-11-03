@@ -1,0 +1,128 @@
+{
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "runsPerStageAndView": 3,
+  "protocol": "Same page; frozen baseline model programs and Ground/collision, alternating before/after pairs; each sample resets the 2 s warmup and 8 s measurement. Startup excluded.",
+  "baselineCommit": "02dd15ea583d4bc87694684aec69152e325dfb7b",
+  "views": {
+    "university": {
+      "before": {
+        "calls": 37,
+        "triangles": 887062,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 17.599999994039536,
+          "min": 17.5,
+          "max": 17.799999982118607
+        }
+      },
+      "after": {
+        "calls": 37,
+        "triangles": 932898,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 17.599999994039536,
+          "min": 17.599999994039536,
+          "max": 17.599999994039536
+        }
+      }
+    },
+    "nishi": {
+      "before": {
+        "calls": 59,
+        "triangles": 2905362,
+        "medianMs": 16.600000023841858,
+        "p95Ms": {
+          "median": 17.599999994039536,
+          "min": 17.599999994039536,
+          "max": 17.799999982118607
+        }
+      },
+      "after": {
+        "calls": 59,
+        "triangles": 2943205,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 17.599999994039536,
+          "min": 17.5,
+          "max": 18.100000023841858
+        }
+      }
+    },
+    "junction": {
+      "before": {
+        "calls": 192,
+        "triangles": 4828358,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 17.599999994039536,
+          "min": 17.599999994039536,
+          "max": 17.600000023841858
+        }
+      },
+      "after": {
+        "calls": 192,
+        "triangles": 4873032,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 18.099999994039536,
+          "min": 17.599999994039536,
+          "max": 20.700000017881393
+        }
+      }
+    },
+    "wall": {
+      "before": {
+        "calls": 29,
+        "triangles": 715625,
+        "medianMs": 16.600000023841858,
+        "p95Ms": {
+          "median": 17.599999994039536,
+          "min": 17.5,
+          "max": 17.599999994039536
+        }
+      },
+      "after": {
+        "calls": 29,
+        "triangles": 764001,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 17.69999998807907,
+          "min": 17.5,
+          "max": 18.19999998807907
+        }
+      }
+    },
+    "wallWalking": {
+      "before": {
+        "calls": 138,
+        "triangles": 1563670,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 17.600000023841858,
+          "min": 17.5,
+          "max": 17.69999998807907
+        }
+      },
+      "after": {
+        "calls": 138,
+        "triangles": 1616612,
+        "medianMs": 16.69999998807907,
+        "p95Ms": {
+          "median": 18.200000017881393,
+          "min": 17.5,
+          "max": 30.900000005960464
+        }
+      }
+    }
+  },
+  "errors": [],
+  "requestFailures": [],
+  "limitations": [
+    "Frame timing is vsync-limited and background browser activity was not controlled. No speedup is claimed.",
+    "A first baseline readiness attempt timed out at 45 seconds before producing any samples; retained separately. The complete retry waited for actual environment readiness.",
+    "No real phone or headset was measured."
+  ]
+}

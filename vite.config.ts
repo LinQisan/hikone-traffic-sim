@@ -15,7 +15,7 @@ function editorApi(server: Pick<ViteDevServer | PreviewServer, 'middlewares'>) {
     try { pathname = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname); }
     catch { res.writeHead(400); res.end('Bad request'); return; }
     const resourcePath = pathname.replace(/^\/node_modules\/\.vite\//, '/node_modules/vite-cache/');
-    if (/\/(?:\.[^/]*|server|tools|test)(?:\/|$)/.test(resourcePath)) {
+    if (/\/(?:\.[^/]*|server|tools|test|field-photos)(?:\/|$)/i.test(resourcePath)) {
       res.writeHead(403); res.end('Forbidden'); return;
     }
     Promise.resolve(handle(req, res)).then(handled => { if (!handled) next(); }).catch(next);
@@ -58,7 +58,7 @@ export default defineConfig({
   publicDir: false,
   plugins: [react(), resources()],
   server: { host: '127.0.0.1', port: 8770, strictPort: true,
-    fs: { deny: ['.git/**', '.claude/**', '**/.env*', '**/*.pem', 'server/**', 'test/**', 'tools/**'] } },
+    fs: { deny: ['.git/**', '.claude/**', '**/.env*', '**/*.pem', 'server/**', 'test/**', 'tools/**', '**/field-photos/**'] } },
   preview: { host: '127.0.0.1', port: 8770, strictPort: true },
   build: {
     target: 'esnext',

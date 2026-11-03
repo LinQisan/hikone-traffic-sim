@@ -1,0 +1,15 @@
+{
+  "before": {
+    "index.html": "7d75b1824f8e456c1a719419e91ff07b2fb645232d474a876adfec1cae050c86",
+    "models/runtime.json": "1ab08c6a6a1951a3b70caf8c612b949233229a04fe1326a63d9b7929ba41cbb8",
+    "data/collision.json": "2b1edf9764f2da8a9f67823847dc733871b704e4376b3a619225d473dcffbeac",
+    "data/road_tiles.json": "99071b8fa0d8dbc817effc55da28c878212782b6e4414a7b72375389671e275b"
+  },
+  "after": {
+    "index.html": "ad685827fd1e78992dd784b5a5c29beb8b075d2b6bc678a9ffaf330da632f070",
+    "models/runtime.json": "2e44db8ac083e22ce6260a149201d9882ba6c5a39c2e88765a6535efc83c6ab6",
+    "data/collision.json": "115308d6585d437fc50414d7c886050fdf38fe98cbd483bd1ad18e8297840465",
+    "data/road_tiles.json": "fbd537bbd79d2fd3603fa9d90ff0b1ae7acb27cd9b61a4295c2f1ea31f692975"
+  },
+  "note": "Before is the frozen production build saved at task start. After is the successful final npm run check production build. Source paths were audited separately."
+}
