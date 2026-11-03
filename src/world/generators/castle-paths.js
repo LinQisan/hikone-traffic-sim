@@ -97,7 +97,7 @@ export function castlePaths(otemonLanding, innerRoad, innerBank, outerBank) {
   route('honmaru-west', 'honmaru', 'westJunction', 'walk', 4, [
     south(610, 273, 49.5), south(575, 251, 49.5), south(557, 222, 49.5),
     south(548, 190, 49.5), south(548, 164, 49.5), south(575, 132, 49.5),
-    south(583, 109, 49), north(936, 627, 48), north(936, 601, 47),
+    north(936, 627, 48), north(936, 601, 47), // The two image traces meet here; a point at their seam doubled back.
   ]);
   route('nishinomaru-ridge', 'westJunction', 'nishinomaru', 'walk', 4.2, [
     north(925, 545, 46.5), north(913, 507, 46), north(876, 459, 45.5),

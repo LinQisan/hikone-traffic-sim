@@ -1,6 +1,7 @@
 {
-  "reviewed": "2026-10-30",
+  "reviewed": "2026-10-31",
   "frame": "geographic-frame.json, existing X/Z metres and heading retained",
+  "wallBatter": 0.12,
   "photos": [
     {
       "file": "IMG_0855.HEIC",
@@ -490,7 +491,37 @@
       "3月15日–5月15日 8–18",
       "5月16日–10月31日 日曜・休日 8–18"
     ],
-    "restrictionBasis": "Readable in the full-resolution IMG_0855 crop; static photo-date signage only, no new runtime driver rule."
+    "restrictionBasis": "Readable in the full-resolution IMG_0855 crop; static photo-date signage only, no new runtime driver rule.",
+    "crossingSigns": [
+      {
+        "point": [
+          -593.0,
+          241.6
+        ],
+        "normal": [
+          0,
+          -1
+        ],
+        "photos": [
+          "IMG_0985",
+          "IMG_0986"
+        ]
+      },
+      {
+        "point": [
+          -585.3,
+          246.6
+        ],
+        "normal": [
+          0.8,
+          0.6
+        ],
+        "photos": [
+          "IMG_0993",
+          "IMG_0995"
+        ]
+      }
+    ]
   },
   "notice": {
     "point": [
@@ -524,8 +555,8 @@
       257.6
     ],
     [
-      -540,
-      254.6
+      -544.4,
+      255.7
     ]
   ],
   "gateGravel": [
@@ -545,5 +576,45 @@
       -590.6,
       276
     ]
-  ]
+  ],
+  "photoReview20261031": {
+    "sources": [
+      "02-shiga-university/IMG_0971–0977, IMG_0984",
+      "03-nishi-school-road/IMG_0978–1004"
+    ],
+    "streetView": {
+      "capture": "2022-11",
+      "reviewed": "2026-10-31",
+      "panos": [
+        "coHTEsedAMURADClgrac_A",
+        "8WoHMsMgJcvNfwFXje9tbw",
+        "RLtDexg3bdeS7pa8p3q-ZQ"
+      ],
+      "use": "Fixed street, gate, wall and junction relationships only. No imagery redistributed."
+    },
+    "uncertainty": "Placements and dimensions remain photo-relative estimates. Camera GPS error is 4.6–8.7 m. Secondary crossing-sign placement is estimated from 0993/0995; the supplied camera position is not the sign position."
+  },
+  "previousGardenEdgeEstimate": [
+    [
+      -584.2,
+      263.2
+    ],
+    [
+      -583.5,
+      259.5
+    ],
+    [
+      -566,
+      258
+    ],
+    [
+      -552,
+      257.6
+    ],
+    [
+      -540,
+      254.6
+    ]
+  ],
+  "gardenEdgeBasis": "IMG_0997 and IMG_1075-1081: the planting edge stops before the western junction arm. Trim the earlier estimated end clear of the mapped public lane; the photographed garden remains behind it."
 }

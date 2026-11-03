@@ -1,7 +1,8 @@
 import type * as THREE from 'three';
-export type ModelDetail = 'high' | 'low';
+export type ModelDetail = 'high' | 'low' | 'far';
 export interface NativePart { geometry: THREE.BufferGeometry; material: THREE.MeshLambertMaterial; matrix: THREE.Matrix4 }
-export interface NativeTransport { url: string; rawUrl: string; sourceBytes: number; compressedBytes: number }
+export interface BakedTransport { url: string; bytes: number }
+export interface NativeTransport { url: string; rawUrl: string; sourceBytes: number; compressedBytes: number; baked?: BakedTransport }
 export interface ModelTiming { [metric: string]: string | number | undefined }
 export interface StartupDiagnostics { enabled: boolean; stages: Record<string, number>; models: ModelTiming[]; workerCount?: number }
 export interface NativeProgram { format: string; [extension: string]: unknown }

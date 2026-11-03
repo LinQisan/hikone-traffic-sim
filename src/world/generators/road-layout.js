@@ -198,10 +198,10 @@ export function roadLayout(layout) {
   // The photographed inner moat street; see tools/moat_street.py.
   items.push({ a: 'ART_InnerMoatStreet', p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebInnerMoat' });
   for (const item of innerMoatStreet.instances) items.push({ g: 'WebInnerMoat', ...item });
-  // Thin, cut-back cherries on the moat side of the inner road (0862).
+  // IMG_1071/1072: cherries stand in the narrow moat margin, outside the walking lane.
   for (let x = -366, i = 0; x < -118; x += 23, i++) {
-    const z = pathZ(INNER_MOAT_ROAD, x) + 6.8;
-    items.push({ a: 'ART_PromenadeCherry', p: [x, 0.15, z], r: i * 67 % 360, s: [0.8, 0.85, 0.8], g: 'WebGrove' });
+    const z = pathZ(INNER_MOAT_ROAD, x) + 4.15;
+    items.push({ a: 'ART_PromenadeCherry', p: [x, 0.01, z], r: i * 67 % 360, s: [0.8, 0.85, 0.8], g: 'WebGrove' });
   }
   // The northern longhouse is now part of the reviewed approach, at its actual footprint.
   items.push({ a: 'ART_CastleApproach', p: [0, 0, 0], r: 0, s: [1, 1, 1], g: 'WebApproach' });
@@ -236,7 +236,7 @@ export function roadLayout(layout) {
       r: -Math.atan(30 * 6 * t * (1 - t) / 130) * 180 / Math.PI,
       s: [1, 1, 1], g: 'WebFrontage' });
   }
-  for (const a of ['ART_KyobashiRoads', 'ART_KyobashiLand', 'ART_KyobashiBanks', 'ART_KyobashiWater', 'ART_KyobashiBridge'])
+  for (const a of ['ART_KyobashiRoads', 'ART_RoadMarkings', 'ART_KyobashiLand', 'ART_KyobashiBanks', 'ART_KyobashiWater', 'ART_KyobashiBridge'])
     items.push(worldAsset(a));
   // Rotate crossarm offsets with their pole as well as translating the road bend.
   const bendWire = at => {

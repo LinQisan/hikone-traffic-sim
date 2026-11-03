@@ -1,5 +1,5 @@
 {
-  "reviewed": "2026-10-30",
+  "reviewed": "2026-10-31",
   "source": {
     "photo": "IMG_0848.HEIC",
     "photoSha256": "feaa552147f04ba176d796741bd669e5bf7528a49154e5a570e1265e6a0f8a1a",
@@ -701,7 +701,7 @@
     }
   ],
   "profile": {
-    "coastVertices": 15,
+    "coastVertices": 14,
     "toeHeight": -1.35,
     "crestHeight": 4.15,
     "heightBasis": "OSM total wall height 5.5 m, relative to the retained water/toe datum; GSI supports a raised crest. Not a surveyed vertical registration.",
@@ -714,6 +714,126 @@
     "seamBackEdge": 32,
     "transition": 40,
     "shoreBasis": "Retained registered SCHOOL_BANK water edge; source wall outlines confirm extent, but are not substituted for every existing shoreline coordinate."
+  },
+  "corner": {
+    "basis": "IMG_0994 and Google Street View 8WoHMsMgJcvNfwFXje9tbw, November 2022, headings 150 and 220: earth foot beneath a low exposed wall, narrow stone stair beside the tall return, large spreading evergreen. Existing OSM way/1449647547 and returns retain their plan registration. All new dimensions are photo-relative estimates.",
+    "wall": [
+      [
+        -541.39717,
+        232.46609
+      ],
+      [
+        -584.19823,
+        235.19027
+      ]
+    ],
+    "crest": 4.15,
+    "soilEndX": -575.5,
+    "soilProfile": [
+      [
+        0,
+        2.85
+      ],
+      [
+        4.2,
+        1.55
+      ],
+      [
+        10,
+        0.15
+      ]
+    ],
+    "crestPlots": [
+      [
+        [
+          -541.39717,
+          232.46609
+        ],
+        [
+          -584.19823,
+          235.19027
+        ],
+        [
+          -585.25692,
+          233.55735
+        ],
+        [
+          -544.03803,
+          230.72401
+        ]
+      ],
+      [
+        [
+          -584.1,
+          235.3
+        ],
+        [
+          -577.5,
+          235.0
+        ],
+        [
+          -577.5,
+          244.9
+        ],
+        [
+          -583.9,
+          245.1
+        ]
+      ]
+    ],
+    "stair": {
+      "line": [
+        [
+          -576.2,
+          244.8
+        ],
+        [
+          -576.8,
+          234.7
+        ]
+      ],
+      "width": 1.2,
+      "steps": 20
+    },
+    "tree": {
+      "point": [
+        -566.8,
+        232.5
+      ],
+      "height": 14,
+      "spread": 7.8,
+      "basis": "Broad evergreen form in 0994; species, height, crown radius and exact trunk position are estimates, not a botanical survey."
+    },
+    "checked": "2026-10-31",
+    "photo": "IMG_0994",
+    "license": "Owner photograph inspected locally; Google imagery viewed only. No image pixels exported.",
+    "pole": {
+      "point": [
+        -552.7,
+        244.2
+      ],
+      "height": 9.5,
+      "basis": "0994 and the same panorama at heading 150 show a dark pole, protective sleeve and low red fire-hydrant plate. Position and height are photo-relative estimates; cable spans connect existing modeled supports."
+    },
+    "crestPole": {
+      "point": [
+        -582.8,
+        238.5
+      ],
+      "base": 4.1,
+      "height": 13.0,
+      "basis": "0995 and the user's corner view: a concrete utility pole stands on the rampart top behind the stone face. Position and height are photo-relative estimates."
+    },
+    "stele": {
+      "point": [
+        -581.0,
+        241.5
+      ],
+      "base": 4.1,
+      "height": 1.5,
+      "width": 0.7,
+      "basis": "0995: an upright stone on the rampart crest, left of the pole. Inscription not readable; size estimated."
+    }
   },
   "street": {
     "positionBasis": "Photo-relative estimates projected to the existing road-side shoulder; GPS is not a calibrated pose.",

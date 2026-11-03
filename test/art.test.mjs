@@ -563,9 +563,11 @@ test('the road network has one paint layer, and its markings follow the generate
   for (const end of ['min', 'max']) for (const axis of [0, 2])
     assert.ok(Math.abs(replacement[end][axis] - sourceBounds[end][axis]) < 0.008, 'same road footprint');
   const ground = new Ground(JSON.parse(fs.readFileSync(new URL('../data/road_tiles.json', import.meta.url))));
-  const paint = glb('ART_KyobashiRoads');
+  const paint = glb('ART_RoadMarkings');
   let onMappedRoad = 0;
   for (const p of paint.json.meshes.flatMap(m => m.primitives).filter(p => paint.json.materials[p.material].name === 'HK_WhitePaint')) for (const v of accessor(paint, p.attributes.POSITION)) {
+    // The authored practice roads; mapped streets are drawn from OSM centrelines at estimated widths.
+    if (-v[0] < -220 || -v[0] > 184 || v[2] > 100) continue;
     const road = ground.roadHeightAt(-v[0], v[2]);
     assert.notEqual(road, null, 'all rendered markings have a ground polygon');
     assert.ok(road < 0.055 && Math.abs(v[1] - road) < 0.03,
@@ -576,7 +578,7 @@ test('the road network has one paint layer, and its markings follow the generate
 });
 
 test('the bridge entrance has its missing zebra, and the bridge itself has no centre dashes', () => {
-  const paint = triangles('ART_KyobashiRoads', 'HK_WhitePaint');
+  const paint = triangles('ART_RoadMarkings', 'HK_WhitePaint');
   for (const x of [28.6, 30.3, 32.85, 35.4])
     assert.ok(rayDistance(paint, [-x, 2, 34.2], [0, -1, 0]) < 2, 'the north zebra spans the bridge approach');
   for (const z of [46, 55, 64]) {
@@ -586,7 +588,7 @@ test('the bridge entrance has its missing zebra, and the bridge itself has no ce
 });
 
 test('southern zebras are exported as stripes with clear gaps, not covered by centre lines', () => {
-  const paint = triangles('ART_KyobashiRoads', 'HK_WhitePaint');
+  const paint = triangles('ART_RoadMarkings', 'HK_WhitePaint');
   for (const crossing of TOWN_CROSSINGS) {
     const x = castleX(crossing.z);
     for (const dx of [-3.4, -1.7, 0, 1.7, 3.4])

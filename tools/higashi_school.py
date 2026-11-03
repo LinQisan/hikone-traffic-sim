@@ -453,15 +453,7 @@ def frontage(b):
 
 
 def markings(b):
-    from road_network import strip, difference, sample, north_sample, approach_data, face as ground_face
     from university_frontage import label
-    road = data()['roads']['schoolSide']
-    crossings = strip(north_sample(), -3.05, 3.05) + strip(sample(approach_data()['innerRoad']), -3.55, 3.55)
-    for side in (-1, 1):
-        for lo, hi, material in ((2.55, 3, 'ART_PathGreen'), (2.37, 2.5, 'HK_WhitePaint')):
-            for p in strip(road, side * lo, side * hi):
-                for q in difference([p], crossings):
-                    ground_face(b, q, .024, material, False)
     # The west-to-east branch has the photographed stop marking before the T.
     # It is static road paint; this edit does not alter authored event driver rules.
     forward = (.98835, -.1522)

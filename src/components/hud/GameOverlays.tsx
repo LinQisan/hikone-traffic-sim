@@ -10,7 +10,7 @@ export function ReplayControls({store, commands, elementRef}: {store: SimulatorS
   return <section ref={elementRef} id="replayui" className="overlay bar" role="region" aria-labelledby="replayname" hidden={!replay.visible || inspection}>
     <b id="replayname">{replay.title}</b><span id="rtime" className="time">{replay.time}</span>
     <span className="views" role="group" aria-label="視点 / View (V)">
-      <button id="viewover" aria-keyshortcuts="V" className={replay.view === 'overview' ? 'on' : ''} aria-pressed={replay.view === 'overview'} onClick={() => commands?.setReplayView('overview')}>俯瞰 / Overview</button>
+      <button id="viewover" aria-keyshortcuts="V" className={replay.view === 'overview' ? 'on' : ''} aria-pressed={replay.view === 'overview'} onClick={() => commands?.setReplayView('overview')}>分析 / Analysis</button>
       <button id="viewparticipant" aria-keyshortcuts="V" className={replay.view === 'participant' ? 'on' : ''} aria-pressed={replay.view === 'participant'} onClick={() => commands?.setReplayView('participant')}>体験者 / Participant</button>
       <button id="viewdriver" aria-keyshortcuts="V" hidden={!replay.canViewDriver} className={replay.view === 'driver' ? 'on' : ''} aria-pressed={replay.view === 'driver'} onClick={() => commands?.setReplayView('driver')}>運転者 / Driver</button>
     </span>

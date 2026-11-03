@@ -2,6 +2,7 @@
 // Pixel observations describe outlines only; no map imagery is shipped with the scene.
 // The shared registration preserves the existing bridge and hilltop coordinates.
 import { geographicPoint, CASTLE_SITE, CASTLE_BUILDINGS, CASTLE_TERRACES, CASTLE_NORTH_BANK } from './castle-layout.js';
+import { OTEMON_WALK,INNER_RESIDENTIAL_LANES,WALKED_STREET_PROFILE } from './walked-street-layout.ts';
 import { castlePaths } from './castle-paths.js';
 import { EAST_GEOGRAPHY } from './east-layout.ts';
 import higashi from '../../../world/higashi-frontage.json' with { type: 'json' };
@@ -9,6 +10,7 @@ import island from '../../../world/higashi-island.json' with { type: 'json' };
 import street from '../../../world/east-street.json' with { type: 'json' };
 import south from '../../../world/south-promenade.json' with { type: 'json' };
 import moat from '../../../world/castle-moat.json' with { type: 'json' };
+import field from '../../../world/field-observations.json' with { type: 'json' };
 export const HIGASHI_FRONTAGE = higashi;
 export const HIGASHI_ISLAND = island;
 export const HIGASHI_STREET = street;
@@ -44,9 +46,7 @@ const schoolBranch = higashi.roads.branch.flatMap((c, i, points) => {
 // the cubic road author anticipating the long west branch and bowing off the street.
 NORTH_APPROACH.splice(17, NORTH_APPROACH.length - 17, ...schoolBranch);
 // A pedestrian bridge and the visible access to the Otemon ticket office, not a vehicle lane.
-export const OTEMON_PATH = outline([
-  [608, 512], [650, 496], [693, 477],
-]);
+export const OTEMON_PATH = OTEMON_WALK;
 const outerPixels = [
   [316, 207], [405, 286], [489, 358], [570, 428], [631, 491], [702, 551],
   [724, 652], [774, 681], [818, 693], [875, 696], [938, 690],
@@ -68,17 +68,12 @@ export const INNER_MOAT_ROAD = outline(outerPixels.map(([x, y], i, ps) => {
   const dx = b[0] - a[0], dy = b[1] - a[1], length = Math.hypot(dx, dy);
   return [x - dy / length * 15, y + dx / length * 15];
 }));
-// At the school/tennis peninsula the street stands well back from the inner moat.
-// A fixed bank offset put the old western end through the timber-house plots.
-const westernStreet = [[35.2772,136.2487,944,752],[35.2772,136.2487,1035,830],
-  [35.2772,136.2487,1140,891]].map(([lat,lon,x,y])=>{
-  const m=156543.03392*Math.cos(lat*Math.PI/180)/2**18;
-  return geographicPoint(lat+(424-y)*m/111320,lon+(x-768)*m/(111320*Math.cos(lat*Math.PI/180)));
-});
-INNER_MOAT_ROAD.splice(0,westernStreet.length,...westernStreet);
 const frontageStart = INNER_MOAT_ROAD.findIndex(([x]) => x > -90);
 const frontageEnd = INNER_MOAT_ROAD.findIndex(([x, z]) => x > 20 && z > 220);
 INNER_MOAT_ROAD.splice(frontageStart, frontageEnd - frontageStart, ...higashi.roads.inner);
+// IMG_1071/1072 and the November 2022 street view agree with the registered OSM
+// school road. The old independent pixel trace wandered up to 20 m into the car park.
+INNER_MOAT_ROAD.splice(0, frontageStart, ...field.schoolRoad.points.slice(1, 9).toReversed());
 // Replace only the reviewed northern tail, retaining its OSM node geometry at the join.
 if (EAST_GEOGRAPHY.reviewedRoutes) {
   const first = INNER_MOAT_ROAD.findIndex(([,z])=>z>=348);
@@ -129,9 +124,10 @@ export const APPROACH_PATCHES = [
 ];
 
 export const APPROACH_DATA = { north: NORTH_APPROACH, retainedNorth: higashi.roads.retainedSouth, schoolRoad: higashi.roads.schoolSide, innerRoad: INNER_MOAT_ROAD, path: OTEMON_PATH,
-  outerBank: INNER_MOAT_OUTER, innerBank: INNER_MOAT_INNER, buildings: APPROACH_BUILDINGS,
+  outerBank: INNER_MOAT_OUTER, innerBank: INNER_MOAT_INNER, reliefInnerBank: moat.reliefInnerBank, buildings: APPROACH_BUILDINGS,
   patches: APPROACH_PATCHES, castle: CASTLE_SITE, compound: CASTLE_BUILDINGS,
   terraces: CASTLE_TERRACES, northBank: CASTLE_NORTH_BANK,
+  localStreets: INNER_RESIDENTIAL_LANES, bridgeProfile: WALKED_STREET_PROFILE,
   paths: castlePaths(OTEMON_PATH.at(-1), INNER_MOAT_ROAD, INNER_MOAT_INNER, INNER_MOAT_OUTER) };
 
 export function distanceToPath(x, z, points) {

@@ -99,24 +99,6 @@ def roof(b, a, c, width, eave, rise, hip=False, pigment=TILE):
         bar(b,at(u,eave+rise,0),at(u,eave+rise+.35,0),.09,pigment,'HK_RoofTile',6)
 
 
-def stonework(b, a, c, lo, hi, center):
-    """Shallow irregular stone cells, with no displacement of the registered footprint."""
-    length, at = frame(a,c,center)
-    if length<.3:
-        return
-    count=max(1,round(length/(1.6 if b.distant else 1.05)))
-    rows=max(1,round((hi-lo)/.65))
-    for row in range(rows):
-        y0,y1=lo+row*(hi-lo)/rows+.025,lo+(row+1)*(hi-lo)/rows-.025
-        for j in range(count+1):
-            u,v=max(0,(j-.42*(row%2))*length/count),min(length,(j+1-.42*(row%2))*length/count)
-            if v-u<.09:
-                continue
-            tone=.045*math.sin(j*7.1+row*2.9+a[0])
-            face(b,[at(u+.02,y0+.05,.018),at(v-.05,y0,.018),at(v-.015,y1-.08,.018),
-                    at(v-.1,y1,.018),at(u+.04,y1-.025,.018)],'HK_Stone',at(length/2,(lo+hi)/2,-1),
-                 tuple(k+tone for k in STONE))
-
 
 def window(b, at, u, y, width=.86, height=.9, shutters=False):
     plank(b,at,u-width/2-.055,y-.055,u+width/2+.055,y+height+.055,SHADE,.025,'ART_Plaster')
@@ -139,11 +121,10 @@ def turret(b,item,q):
     center=(sum(p[0] for p in ring)/len(ring),q['height']/2,sum(p[1] for p in ring)/len(ring))
     plinth=3.2 if q['kind']=='museum' else 1.8
     # Keep the frozen concave OSM footprint, including its entry recesses.
-    shell(b,ring,-1.35,plinth,'HK_Stone',(.41,.42,.42))
+    shell(b,ring,-1.35,plinth,'ART_CastleStone',(1,1,1))
     shell(b,ring,plinth,q['height'],'ART_Plaster',PLASTER)
     for a,c,length,at in edges(ring):
         interior=at(length/2,0,-.1)
-        stonework(b,a,c,-1.32,plinth,(interior[0],interior[2]))
         if length<2:
             continue
         n=max(1,round(length/6.2))

@@ -96,10 +96,14 @@ def plan():
     circle=lambda r:[(cx+r*math.cos(i*math.tau/24),cz+r*math.sin(i*math.tau/24)) for i in range(24)]
     island,court=circle(5),circle(12)
     roads = union([p for path, half in ((d['road'],4),(d['lane'],2.2),(d['frontLane'],1.8),(d['link'],3.0),
-                    (d['schoolGateEntry'],3.2),*[(line,2.5) for line in d['schoolLanes']]) for p in strip(path, -half, half)]
+                    (d['schoolGateEntry'],3.2),(d['gateDrive'],d['gateDriveHalfWidth']),
+                    *[(line,d['schoolLaneHalfWidth']) for line in d['schoolLanes']],*[(line,1.8) for line in d['localLanes']]) for p in strip(path, -half, half)]
                     +triangulate(ccw(d['schoolCourt']))+triangulate(ccw(school_road()['apron']['footprint'])))
+    from school_road import junction_ring
+    planting_cut = triangulate(ccw(junction_ring()))
+    roads = difference(roads,planting_cut)
     paths = union([p for path in [d['entrance'], *d['paths']] for p in strip(path, -2.4, 2.4)]
-                  + strip(d['schoolLotEntry'],-1.7,1.7))
+                  )
     shoulders = union([p for path, half in ((d['road'],6.5),(d['lane'],2.6),(d['frontLane'],2.1),
                        (d['link'][:6],5.0),(d['link'][5:],3.3)) for p in strip(path, -half, half)]
                       # The west footway reaches the campus wall, with no verge (0976, 0977).
@@ -107,7 +111,7 @@ def plan():
     paths = union(paths + difference(shoulders, roads) + triangulate(ccw(court)))
     apron=[t for t in triangulate(ccw(d['apron']))]
     paths = union(paths + apron + [t for q in d['paving'] for t in triangulate(ccw(q))])
-    paths = difference(paths, roads + [island])
+    paths = difference(paths, roads + [island] + planting_cut)
     print('UNIVERSITY_PLAN streets', len(roads), len(paths), flush=True)
     # Both banks are geographic outlines. A fixed-width road ribbon previously
     # flooded the tennis peninsula and continued around the wrong town junction.
@@ -117,24 +121,30 @@ def plan():
     print('UNIVERSITY_PLAN water', len(water), flush=True)
     lawns = [t for poly in (d['land'],d['northLand'],d['schoolLand'],d['gateLanding']) for t in triangulate(ccw(poly))]
     fields = [t for f in d['fields'] for t in triangulate(ccw(f['footprint']))]
+    tennis = union([t for ring in d['tennisCourts'] for t in triangulate(ccw(ring))])
+    tennis_extra = difference(tennis, fields)
+    fields = union(fields + tennis)
     lot = cut(triangulate(ccw(d['schoolLot'])),roads+paths)
     town = [t for t in triangulate(ccw(d['townLand']))]
     original_lawns = difference(union(lawns),town)
-    native_street=strip(d['outerMoatStreet'],-5.5,5.5)
+    from road_network import inner_road_outer
+    native_street=strip(d['outerMoatStreet'],lambda x,z:-inner_road_outer(x,z),inner_road_outer)
     native_water=triangulate(inner_moat())
     pool=triangulate(ccw(d['schoolPool']['water']))
     pool_deck=cut(triangulate(ccw(d['schoolPool']['deck'])),pool)
-    lawns = difference(original_lawns, roads + paths + water + fields + lot + native_street + native_water +pool+pool_deck)
+    lawns = difference(original_lawns, roads + paths + water + fields + lot + native_street + native_water +pool+pool_deck + planting_cut)
     town = difference(town,roads + paths + water + fields)
     lawns = union(lawns + triangulate(ccw(island)))
     print('UNIVERSITY_PLAN lawns', len(lawns), flush=True)
-    # This low grass sheet can remain beneath raised plots and 1 cm roads. Only depressed
-    # water needs a hole; cutting every path into hidden ground needlessly multiplies faces.
-    base = difference([EXTENT], water + native_water)
+    # A hidden grass sheet beneath a 1 cm road can win depth at distant detail.
+    # Keep a single surface owner at paved corridors in every rendered level.
+    base = difference([EXTENT], water + native_water + roads + paths + native_street)
     print('UNIVERSITY_PLAN base', len(base), flush=True)
     # Exclude buildings from paths only where their authored outlines actually intersect.
     buildings = [t for item in d['buildings'] + d['schoolBuildings'] + d['neighbors'] for t in triangulate(ccw(item['footprint']))]
     paths = difference(paths, buildings)
+    # The old school apron was painted through the now-registered roadside shed.
+    roads = difference(roads, buildings)
     from school_moat import terrain, ground_polygons
     rampart_cut,_=terrain()
     rampart=ground_polygons(roads+paths+buildings)
@@ -142,10 +152,13 @@ def plan():
     # Keeping a hidden zero-height sheet here would cut a green lip through the stone.
     lawns=difference(lawns,rampart_cut);base=difference(base,rampart_cut)
     fields=difference(fields,rampart_cut)
+    # 0977: the court between the hall, office and street wall is gravel, not lawn.
+    gravel_cut=triangulate(ccw(d['gateDetail']['gravel']))
+    gravel=difference(lawns,difference(lawns,gravel_cut))
+    lawns=difference(lawns,gravel_cut)
     curbs=union([q for side in (-1,1) for q in strip(d['road'],side*4,side*4.2)])
     curbs=cut(curbs,strip(d['entrance'],-3,3)+strip(d['lane'],-2.2,2.2)+strip(d['frontLane'],-2.1,2.1)+strip(d['link'],-5,5))
-    lot_paths=cut(paths,cut(paths,strip(d['schoolLotEntry'],-1.7,1.7)))
-    return dict(roads=roads, paths=paths, water=water, lawns=lawns, base=base, fields=fields,lot=lot,lotPaths=lot_paths,
+    return dict(roads=roads, paths=paths, water=water, lawns=lawns, gravel=gravel, base=base, fields=fields,tennisExtra=tennis_extra,lot=lot,
                 pool=pool,poolDeck=pool_deck,curbs=curbs,town=town,rampart=rampart,rampartCut=rampart_cut)
 
 
@@ -156,14 +169,19 @@ def land_cutters():
 
 def ground_groups():
     from road_network import triangles
-    from school_moat import height as rampart_height
     p = plan()
+    # These clipped 3D faces already own their heights. Re-sampling a shared edge
+    # selects the higher adjacent tread and turns stairs into false steep ramps.
+    rampart=[ [round(v,7) for point in (q[0],a,c) for v in point]
+              for q in p['rampart'] for a,c in zip(q[1:],q[2:]) ]
+    from school_road import junction_ground
+    planting = [[round(v,7) for point in triangle for v in point] for triangle in junction_ground()]
     # Walk surfaces use the same Float32 triangles as the exported model.
     return {'Shiga University streets': [t for q in p['roads'] for t in triangles(q, 0.01)],
             'Shiga University paths': [t for q in p['paths'] for t in triangles(q, 0.01)],
             'Shiga University kerbs': [t for q in p['curbs'] for t in triangles(q, 0.16)],
-            'Shiga University grounds': [t for q in p['lawns'] + p['fields'] + p['town'] + p['lot'] + p['poolDeck'] for t in triangles(q, 0.15)],
-            'Shiga University rampart grounds': [t for q in p['rampart'] for t in triangles([(x,z) for x,y,z in q],rampart_height)]}
+            'Shiga University grounds': [t for q in p['lawns'] + p['gravel'] + p['fields'] + p['town'] + p['lot'] + p['poolDeck'] for t in triangles(q, 0.15)] + planting,
+            'Shiga University rampart grounds': rampart}
 
 
 def export_plan():
@@ -309,15 +327,17 @@ def trees(b, points, seed, spacing=17, spread=3.2, setback=0, avoid_streets=Fals
             if avoid_streets:
                 from castle_approach import point_segment_distance
                 d=data()
-                streets=[(d['link'],3.8),*[(line,3.3) for line in d['schoolLanes']]]
+                streets=[(d['link'],3.8),*[(line,d['schoolLaneHalfWidth']+.8) for line in d['schoolLanes']]]
                 if any(point_segment_distance(x,z,p,q)<half for line,half in streets for p,q in zip(line,line[1:])):
                     continue
             # Reuse the painted bough/spray hierarchy; the extension must not bring
             # back the old three-disc umbrella crowns beside the corrected gate.
+            base=placement(x,z) if placement else (x,.15,z)
+            if base is None:continue
             distant=b.distant
             try:
                 if silhouette:b.distant=True
-                tree(b,'cherry',base=placement(x,z) if placement else (x,.15,z),height=7.4,spread=spread,
+                tree(b,'cherry',base=base,height=7.4,spread=spread,
                      seed=seed+n*37+i*13,fine=False)
             finally:
                 b.distant=distant
@@ -483,30 +503,55 @@ def street_boundary(b,run):
     """The two frontage types at the moat-side street, from the owner's 2026-10-29 photos."""
     from university_photos import recolor
     first=len(b.faces)
-    for a,c in zip(run['points'],run['points'][1:]):
-        length=math.dist(a,c)
-        if length<.05:continue
-        at=lambda t:(a[0]+(c[0]-a[0])*t,a[1]+(c[1]-a[1])*t)
+    segments=[(a,c,math.dist(a,c)) for a,c in zip(run['points'],run['points'][1:]) if math.dist(a,c)>.05]
+    for a,c,length in segments:
         if run['kind']=='balustrade':
-            # Granite posts with a heavy top rail and a lower rail over a plinth.
             prism(b,a,c,.15,.42,.34,'ART_StoneLight')
             prism(b,a,c,1.02,1.16,.24,'ART_StoneLight')
             prism(b,a,c,.68,.76,.14,'ART_StoneLight')
-            count=max(1,math.ceil(length/1.8))
-            for i in range(count+1):
-                x,z=at(i/count)
-                b.box((x,.7,z),(.26,1.1,.26),'ART_StoneLight',False)
-                b.box((x,1.27,z),(.3,.08,.3),'HK_Stone',False)
         else:
-            # Weathered concrete wall with a dark timber palisade above it.
             prism(b,a,c,.15,1.3,.34,'HK_StoneDark')
             prism(b,a,c,1.3,1.38,.38,'HK_Stone')
-            for y in (1.5,1.92):prism(b,a,c,y,y+.06,.06,'ART_Timber')
+            for y in (1.5,1.92):prism(b,a,c,y,y+.06,.06,'HK_MetalLight')
+    # Spacing follows the complete frontage, independent of how finely the arc is sampled.
+    length=sum(span for _,_,span in segments)
+    count=max(1,math.ceil(length/(1.8 if run['kind']=='balustrade' else .32)))
+    for i in range(count+1):
+        remaining=length*i/count
+        for a,c,span in segments:
+            if remaining<=span+.00001:
+                x,z=a[0]+(c[0]-a[0])*remaining/span,a[1]+(c[1]-a[1])*remaining/span
+                break
+            remaining-=span
+        if run['kind']=='balustrade':
+            b.box((x,.7,z),(.26,1.1,.26),'ART_StoneLight',False)
+            b.box((x,1.27,z),(.3,.08,.3),'HK_Stone',False)
+        else:b.box((x,1.7,z),(.07,.62,.07),'HK_MetalLight',False)
+    # Smaller terminal posts stand at the street ends of the returns, ahead of the tall pillars.
+    x,z=run['endPost']
+    b.box((x,.9,z),(.38,1.5,.38),'ART_StoneLight',False)
+    b.box((x,1.7,z),(.46,.1,.46),'HK_Stone',False)
+    recolor(b,first)
+    if run['kind']=='palisadeWall':
+        for k in range(first,len(b.faces)):
+            material=b.materials[b.slots[k]]
+            if material=='HK_StoneDark':b.pigments[k]=(.39,.38,.34)
+            elif material=='HK_MetalLight':b.pigments[k]=(.68,.67,.59)
+        # Short warm/cool patches suggest wet stone and lichens without hiding joints.
+        from university_frontage import rect
+        for a,c in zip(run['points'],run['points'][1:]):
+            length=math.dist(a,c);ux,uz=(c[0]-a[0])/length,(c[1]-a[1])/length
+            outward=(uz,-ux)
+            if outward[0]<0:outward=(-outward[0],-outward[1])
+            face=lambda u,y,o:(a[0]+ux*u+outward[0]*o,y,a[1]+uz*u+outward[1]*o)
+            for i in range(max(1,int(length*2))):
+                u=(i+.4)*length/max(1,int(length*2))
+                rect(b,face,u,.19,.08,.5+(i%4)*.13,(.28,.30,.28),.173)
             count=max(1,math.ceil(length/.32))
             for i in range(count+1):
-                x,z=at(i/count)
-                b.box((x,1.7,z),(.07,.62,.07),'ART_Timber',False)
-    recolor(b,first)
+                if i%3==0:continue
+                u=length*i/count
+                rect(b,face,u-.025,1.45+(i%3)*.1,.045,.28,(.39,.31,.25),.043)
 
 
 def gate_frontage(b,d):
@@ -519,19 +564,8 @@ def gate_frontage(b,d):
     a,c=g['hedge']
     prism(b,a,c,.15,1.9,1.1,'HK_LeafDark')
     # Individual folded bars are authored by gate_boards; no solid sheet at the opening.
-    # Old red cylinder post box on the footway outside the south gate post.
-    x,z=g['postbox']
-    cylinder(b,(x,.01,z),(x,.35,z),.17,'HK_StoneDark',segments=10)
-    red_start=len(b.faces)
-    # The historic post box is painted metal, not an emissive traffic-signal lens.
-    cylinder(b,(x,.35,z),(x,1.42,z),.22,'HK_SignRed',segments=16)
-    cylinder(b,(x,1.42,z),(x,1.56,z),.25,'HK_SignRed',segments=16,end_radius=.12)
-    for y in (.39,.48,1.37):
-        cylinder(b,(x,y,z),(x,y+.035,z),.235,'HK_SignRed',segments=16)
-    b.box((x+.23,1.12,z),(.02,.05,.24),'HK_StoneDark',False)
-    b.box((x+.224,.63,z),(.018,.25,.19),'HK_SignRed',False)
-    for k in range(red_start,len(b.faces)):
-        if b.materials[b.slots[k]]=='HK_SignRed':b.pigments[k]=(.72,.22,.12)
+    from campus_postbox import postbox
+    postbox(b,g['postbox'],g['postboxNormal'])
     gate_trees(b,d)
     gate_boards(b,d)
     from school_moat import street_furniture
@@ -569,12 +603,6 @@ def gate_frontage(b,d):
     x,z=beside(g['mirror'][1],-3.4)
     cylinder(b,(x,.01,z),(x,2.9,z),.04,'HK_MetalLight',segments=6)
     cylinder(b,(x-.2,2.55,z),(x-.25,2.55,z),.27,'HK_MetalLight',segments=16)
-    # Green cycle band between the western edge line and the kerb of the moat-side street.
-    # It follows the left edge through the bend to the junction (0980, 0985, 0990).
-    line=d['link'][:8]
-    for q in strip(line,2.28,2.4):face(b,q,.022,'HK_WhitePaint',False)
-    for q in strip(line,-2.4,-2.28):face(b,q,.022,'HK_WhitePaint',False)
-    for q in strip(line,2.42,2.92):face(b,q,.021,'ART_PathGreen',False)
 
 
 def bridge_edges(b,line):
@@ -671,19 +699,19 @@ def school_street_detail(b,d):
     for q in plan()['poolDeck']:face(b,q,.15,'ART_Concrete',False)
     for q in plan()['pool']:b.face([(x,.02,z) for x,z in reversed(q)],'HK_Water',False,pigment=(.36,.42,.25))
     boundary_mesh(b,[dict(kind='fence',points=d['schoolPool']['deck']+[d['schoolPool']['deck'][0]])])
-    # Flat patches partition the gravel instead of stacking coplanar grass decals.
-    lot=d['schoolLot'];a,c,_,e=lot
-    patches=[]
-    for i in range(65):
-        u,v=rng.uniform(0,1),rng.uniform(0,1)
-        x,z=a[0]+(c[0]-a[0])*u+(e[0]-a[0])*v,a[1]+(c[1]-a[1])*u+(e[1]-a[1])*v
-        rx,rz=rng.uniform(1.5,4.8),rng.uniform(.5,1.5)
-        patches.append(ccw([(x+math.cos(j*math.tau/7)*rx*rng.uniform(.75,1.2),
-                             z+math.sin(j*math.tau/7)*rz*rng.uniform(.75,1.2)) for j in range(7)]))
-    grass=cut(plan()['lot'],cut(plan()['lot'],patches))
-    gravel=cut(plan()['lot'],patches)
+    # IMG_1074-1080: grass with worn vehicle tracks, not a paved parking grid.
+    from school_road import data as school_road
+    wear=school_road()['lotWear']
+    tracks=[p for line in wear['tracks'] for p in strip(line,-wear['width']/2,wear['width']/2)]
+    tracks += strip(d['schoolLotEntry'],-1.7,1.7)
+    gravel=cut(plan()['lot'],cut(plan()['lot'],tracks))
+    grass=cut(plan()['lot'],tracks)
     for material,polys in (('HK_Grass',grass),('ART_Gravel',gravel)):
-        for q in polys:face(b,q,.15,material,False)
+        for q in polys:
+            first=len(b.faces)
+            face(b,q,.15,material,False)
+            for k in range(first,len(b.faces)):
+                b.pigments[k]=(.55,.55,.36) if material=='HK_Grass' else (.65,.62,.53)
     # Irregular masonry courses stay below knee height; the road remains flush.
     for line in detail['stone']:
         for a,c in zip(line,line[1:]):
@@ -748,9 +776,33 @@ def school_street_detail(b,d):
             pts=[(a[0]+(c[0]-a[0])*t+nx*offset,y-.5*4*t*(1-t),a[1]+(c[1]-a[1])*t+nz*offset) for t in [i/10 for i in range(11)]]
             for p,q in zip(pts,pts[1:]):cylinder(b,p,q,.018,'HK_Metal',segments=3)
     # Narrow concrete drains flank the unmarked school lane; no invented centre stripe.
-    for line in d['schoolLanes']:
+    half=d['schoolLaneHalfWidth']
+    for i,line in enumerate(d['schoolLanes']):
+        crossings = [q for j,other in enumerate(d['schoolLanes']) if j != i for q in strip(other,-half-.2,half+.2)]
+        crossings += strip(d['link'],-3.2,3.2)
         for side in (-1,1):
-            for q in strip(line,side*2.5,side*2.7):face(b,q,.012,'HK_Stone',False)
+            for q in cut(strip(line,side*half,side*(half+.2)),crossings):face(b,q,.012,'HK_Stone',False)
+
+
+def tennis_courts(b, courts):
+    """The five mapped playing rectangles, separate from the retained clay runoff plot."""
+    from road_network import face, strip
+    from abstract_props import cylinder
+    for ring in courts:
+        a,c,d,e=ring
+        def at(u,v):return (a[0]+(c[0]-a[0])*u+(e[0]-a[0])*v,a[1]+(c[1]-a[1])*u+(e[1]-a[1])*v)
+        # The first edge follows the long axis. Singles alleys and service boxes
+        # use standard proportions; the public outline supplies position and size.
+        lines=[ring+[ring[0]]]
+        lines += [[at(0,v),at(1,v)] for v in (.125,.875)]
+        lines += [[at(u,.125),at(u,.875)] for u in (.23,.77)]
+        lines += [[at(.23,.5),at(.77,.5)]]
+        for line in lines:
+            for q in strip(line,-.035,.035):face(b,q,.156,'HK_WhitePaint',False)
+        left,right=at(.5,-.04),at(.5,1.04)
+        for x,z in (left,right):cylinder(b,(x,.15,z),(x,1.22,z),.045,'HK_Metal',segments=5)
+        # A sparse dark mesh reads at walking distance without a translucent texture.
+        for y in (.35,.65,.95,1.13):cylinder(b,(left[0],y,left[1]),(right[0],y,right[1]),.012,'HK_Metal',segments=3)
 
 
 def build(name, mesh_class, lod=False):
@@ -763,16 +815,12 @@ def build(name, mesh_class, lod=False):
     d,p=data(),plan()
     if name=='ART_ShigaCampus':
         buildings(b,d['buildings'])
-        gx,gz=d['gate']
-        ax,az=d['axis'][1]
-        length=math.hypot(ax-gx,az-gz)
-        inward=((ax-gx)/length,(az-gz)/length)
-        tangent=(-inward[1],inward[0])
+        entry=d['gateDetail']['entry']
+        gx,gz=entry['centre'];tangent=entry['tangent'];normal=entry['normal']
         for side in (-1,1):
-            x,z=gx+tangent[0]*side*4.3,gz+tangent[1]*side*4.3
-            # Stone faces follow the frontage, keeping the plaque outside the column.
+            x,z=gx+tangent[0]*side*entry['halfSpacing'],gz+tangent[1]*side*entry['halfSpacing']
             from university_frontage import pillar
-            pillar(b,x,z,tangent,(-inward[0],-inward[1]),side==-1)
+            pillar(b,x,z,tangent,normal,side==-1)
         # Low, windowed gatekeeper's room on the southwest side, as in Nov 2022 Street View.
         from castle_approach import building
         gatehouse(b,d['gatehouse']['footprint'])
@@ -784,13 +832,14 @@ def build(name, mesh_class, lod=False):
         trees(b,d['axis'][1:],621,23,3.0,setback=6)
     else:
         lane=lambda q:any(all(x0<=x<=x1 and z0<=z<=z1 for x,z in q) for x0,z0,x1,z1 in school_road_box())
-        for key,y,material in (('base',0,'HK_Grass'),('lawns',.15,'HK_Grass'),('town',.15,'HK_Sidewalk'),
+        for key,y,material in (('base',0,'HK_Grass'),('lawns',.15,'HK_Grass'),('gravel',.15,'ART_Gravel'),('town',.15,'HK_Sidewalk'),
                                ('roads',.01,'HK_Asphalt'),('paths',.01,'HK_Sidewalk'),('water',-1.35,'HK_Water')):
-            for q in (cut(p[key],p['lotPaths']) if key=='paths' else p[key]):
+            for q in p[key]:
                 face(b,q,y,'HK_Asphalt' if key=='paths' and lane(q) else material,False)
-        for q in p['lotPaths']:face(b,q,.01,'HK_Stone',False)
         for field in d['fields']:
             for q in cut(triangulate(ccw(field['footprint'])),p['rampartCut']):face(b,q,.15,field['material'],False)
+        for q in p['tennisExtra']:face(b,q,.15,'ART_Sand',False)
+        tennis_courts(b,d['tennisCourts'])
         buildings(b,d['schoolBuildings'])
         school_street_detail(b,d)
         # Close the FINAL water partition, including road/entrance cuts. Closing only
@@ -808,12 +857,6 @@ def build(name, mesh_class, lod=False):
             for a,c in zip(q,q[1:]+q[:1]):
                 outward_face(b,[(a[0],.01,a[1]),(c[0],.01,c[1]),(c[0],.16,c[1]),(a[0],.16,a[1])],'HK_Curb',
                              (sum(v[0] for v in q)/len(q),.08,sum(v[1] for v in q)/len(q)))
-        # Route markings are segmented and anchored to the road, not a long floating plane.
-        for a,c in zip(d['road'],d['road'][1:]):
-            length=math.dist(a,c)
-            for start in range(3,int(length)-3,10):
-                points=[(a[0]+(c[0]-a[0])*t/length,a[1]+(c[1]-a[1])*t/length) for t in (start,min(start+5,length))]
-                for q in strip(points,-.075,.075):face(b,q,.022,'HK_WhitePaint',False)
         # The moat cherries were turning red and copper on 31 October (0979, 0980).
         b.autumn=.5
         trees(b,d['schoolBank'],912,22,4.0,avoid_streets=True,silhouette=True,placement=tree_position)

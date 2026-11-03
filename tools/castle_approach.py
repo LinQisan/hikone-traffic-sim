@@ -33,14 +33,17 @@ def hill_surface():
     site = data()['castle']
     cx, cz, crest = site['x'], site['z'], site['height']
     bank = data()['innerBank'] + data()['northBank']
+    # Water coordinates describe the ground boundary, not inland elevation. Preserve
+    # the established relief profile when a more detailed shore replaces a coarse trace.
+    relief_bank = data()['reliefInnerBank'] + data()['northBank']
     angles = sorted(set([i * math.tau / 36 for i in range(36)] +
-                        [math.atan2((z - cz) / 170, (x - cx) / 140) % math.tau for x, z in bank]))
+                        [math.atan2((z - cz) / 170, (x - cx) / 140) % math.tau for x, z in relief_bank]))
     cross = lambda ax, az, bx, bz: ax * bz - az * bx
     feet = []
     for angle in angles:
         dx, dz = 140 * math.cos(angle), 170 * math.sin(angle)
         intersections = []
-        for a, c in zip(bank, bank[1:] + bank[:1]):
+        for a, c in zip(relief_bank, relief_bank[1:] + relief_bank[:1]):
             sx, sz = c[0] - a[0], c[1] - a[1]
             determinant = cross(dx, dz, sx, sz)
             if abs(determinant) < 1e-9:
@@ -95,14 +98,14 @@ def hill_surface():
     def height(x, z):
         # Continuous wooded slopes, with a broader west ridge and local stone courts.
         smooth = lambda t: (max(0, min(1, t)) ** 2) * (3 - 2 * max(0, min(1, t)))
-        shore_distance=min(point_segment_distance(x,z,a,c) for a,c in zip(bank,bank[1:]+bank[:1]))
+        shore_distance=min(point_segment_distance(x,z,a,c) for a,c in zip(relief_bank,relief_bank[1:]+relief_bank[:1]))
         if shore_distance < .001:return .15
         dx, dz = x - cx, z - cz
         # Keep the established core relief and bridge clearances. The concave
         # northwest spur needs a continuous shore-distance profile: a summit ray
         # there can switch between two shore hits and create an inland shelf.
         intersections=[]
-        for a,c in zip(bank,bank[1:]+bank[:1]):
+        for a,c in zip(relief_bank,relief_bank[1:]+relief_bank[:1]):
             sx,sz=c[0]-a[0],c[1]-a[1];det=cross(dx,dz,sx,sz)
             if abs(det)<1e-9:continue
             ax,az=a[0]-cx,a[1]-cz

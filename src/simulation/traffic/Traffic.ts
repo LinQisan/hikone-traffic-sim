@@ -132,6 +132,55 @@ export const BODY_SIZE: Record<string, number[]> = {
 export const KEI_TRAFFIC_SHARE = { 'kei-tall': 0.25, 'kei-hatch': 0.15 };
 export const PLAYER_RADIUS = 0.3;
 
+type LaneConflict = {ours: number; theirs: number; stop: number; otherStop: number; turning: boolean; otherTurning: boolean};
+type CarBody = Pick<TrafficCar, 'x' | 'z' | 'yaw'>;
+
+/** Separating axes of the actual oriented bodies, with a 5 mm contact gap. */
+function touching(a: CarBody, size: number[], b: TrafficCar) {
+  const ar=a.yaw*Math.PI/180, br=b.yaw*Math.PI/180;
+  const ax=Math.cos(ar),az=-Math.sin(ar),bx=Math.cos(br),bz=-Math.sin(br);
+  const dx=b.x-a.x,dz=b.z-a.z,c=Math.abs(ax*bx+az*bz),s=Math.abs(ax*bz-az*bx);
+  const aw=size[0]/2,al=size[2]/2,bw=b.size[0]/2,bl=b.size[2]/2,margin=.005;
+  return Math.abs(dx*ax+dz*az)<aw+bw*c+bl*s+margin
+    &&Math.abs(-dx*az+dz*ax)<al+bw*s+bl*c+margin
+    &&Math.abs(dx*bx+dz*bz)<bw+aw*c+al*s+margin
+    &&Math.abs(-dx*bz+dz*bx)<bl+aw*s+al*c+margin;
+}
+
+function turningAt(path: PathPoint[], distance: number) {
+  const before=pathAt(path,distance-10),after=pathAt(path,distance+10);
+  return Math.abs(((after.yaw-before.yaw+540)%360)-180)>15;
+}
+
+/** Keep the complete turning body outside the other lane, including its front corner. */
+function yieldAt(path: PathPoint[], distance: number, other: PathPoint[], crossing: number) {
+  const point=pathAt(other,crossing),a=point.yaw*Math.PI/180,nx=Math.cos(a),nz=-Math.sin(a);
+  for(let back=0;back<=20;back+=.25){
+    const pose=carPose(path,distance-back,WHEELBASE.sedan),turn=pose.yaw*Math.PI/180-a;
+    const extent=BODY_SIZE.sedan[0]/2*(1+Math.abs(Math.cos(turn)))
+      +BODY_SIZE.sedan[2]/2*Math.abs(Math.sin(turn))+1;
+    if(Math.abs((pose.x-point.x)*nx+(pose.z-point.z)*nz)>extent)return distance-back;
+  }
+  return distance-20;
+}
+
+/** Shared crossing positions on rounded lanes, independent of their current headings. */
+function laneConflicts(a: PathPoint[], b: PathPoint[]): LaneConflict[] {
+  const result: LaneConflict[]=[];
+  for(let i=1;i<a.length;i++)for(let j=1;j<b.length;j++){
+    const p=a[i-1],q=a[i],r=b[j-1],s=b[j];
+    const ux=q.x-p.x,uz=q.z-p.z,vx=s.x-r.x,vz=s.z-r.z,cross=ux*vz-uz*vx;
+    if(Math.abs(cross)<1e-8)continue;
+    const dx=r.x-p.x,dz=r.z-p.z,t=(dx*vz-dz*vx)/cross,u=(dx*uz-dz*ux)/cross;
+    if(t<0||t>1||u<0||u>1)continue;
+    const ours=p.s+t*(q.s-p.s),theirs=r.s+u*(s.s-r.s);
+    if(result.some(c=>Math.abs(c.ours-ours)<1&&Math.abs(c.theirs-theirs)<1))continue;
+    result.push({ours,theirs,stop:yieldAt(a,ours,b,theirs),otherStop:yieldAt(b,theirs,a,ours),
+      turning:turningAt(a,ours),otherTurning:turningAt(b,theirs)});
+  }
+  return result;
+}
+
 /** Seeded random (mulberry32): the same seed gives the same traffic. */
 export function makeRandom(seed: number): RandomSource {
   let a = seed >>> 0;
@@ -154,6 +203,8 @@ export class Traffic {
   declare cars: TrafficCar[];
   declare plans: DeparturePlan[];
   declare paths: WeakMap<Point[], PreparedRoute>;
+  declare preparedLanes: {path: PathPoint[]; conflicts: WeakMap<PathPoint[], LaneConflict[]>}[];
+  declare conflicts: WeakMap<PathPoint[], WeakMap<PathPoint[], LaneConflict[]>>;
   declare triggerTime: number | null;
   declare participant: Participant | null;
   constructor(scenario: TrafficScenario, { seed = 1, builtInMix = false, canSee = null, maxCars = Infinity }: {seed?: number; builtInMix?: boolean; canSee?: ((car: TrafficCar, point: Participant) => boolean) | null; maxCars?: number} = {}) {
@@ -165,6 +216,8 @@ export class Traffic {
     this.canSee = canSee;
     this.maxCars = maxCars;               // repeating departures wait while this many cars are on the road
     this.paths = new WeakMap();           // route array → { path, signalStops }, shared by admissions
+    this.preparedLanes=[];
+    this.conflicts=new WeakMap();
     this.visibility = Math.max(5, Math.min(150, scenario.environment?.visibilityMeters ?? 80));
     this.grip = Math.max(0.2, Math.min(1, scenario.environment?.roadGrip ?? 1));
     this.cars = [];
@@ -190,6 +243,15 @@ export class Traffic {
     if (!p) {
       const path = smoothRoute(route);
       p = { path, signalStops: junctionStops(path) };
+      const conflicts=new WeakMap<PathPoint[], LaneConflict[]>();
+      this.conflicts.set(path,conflicts);
+      for(const other of this.preparedLanes){
+        const shared=laneConflicts(path,other.path);
+        conflicts.set(other.path,shared);
+        other.conflicts.set(path,shared.map(c=>({ours:c.theirs,theirs:c.ours,stop:c.otherStop,otherStop:c.stop,
+          turning:c.otherTurning,otherTurning:c.turning})));
+      }
+      this.preparedLanes.push({path,conflicts});
       this.paths.set(route, p);
     }
     return p;
@@ -296,6 +358,7 @@ export class Traffic {
       currentSpeed: Math.min(speed, (entryKmh ?? 0) / 3.6), alive: true, distance,
       violation: null,
       signalStops: prepared.signalStops, nextSignal: 0, signalCommitted: false, yellowChecked: false,
+      junctionYield: null,
       crossing: prepared.crossing && prepared.crossing.score <= 1.5 ? prepared.crossing : null, probe: {} as PathPose,
     };
     this.cars.push(car);
@@ -321,6 +384,25 @@ export class Traffic {
       if (lo <= hi) return false;
     }
     return true;
+  }
+
+  /** Project a leader onto the upcoming lane, including bends between the two cars. */
+  followingGap(car: TrafficCar, other: TrafficCar, horizon: number) {
+    let best=Infinity,distance=0,yaw=0;
+    let lo=1,hi=car.path.length-1;
+    while(lo<hi){const mid=(lo+hi)>>1;if(car.path[mid].s<car.distance)lo=mid+1;else hi=mid;}
+    for(let i=lo;i<car.path.length;i++){
+      const a=car.path[i-1],b=car.path[i];
+      if(a.s>car.distance+horizon)break;
+      const dx=b.x-a.x,dz=b.z-a.z,length2=dx*dx+dz*dz;
+      const t=Math.max(0,Math.min(1,((other.x-a.x)*dx+(other.z-a.z)*dz)/length2));
+      const off=(other.x-a.x-dx*t)**2+(other.z-a.z-dz*t)**2;
+      if(off<best){best=off;distance=a.s+t*(b.s-a.s)-car.distance;yaw=Math.atan2(dx,dz);}
+    }
+    if(distance<=0)return Infinity;
+    const turn=other.yaw*Math.PI/180-yaw,c=Math.cos(turn),sn=Math.abs(Math.sin(turn));
+    if(c<.5||best>((car.size[0]+other.size[0]*c+other.size[2]*sn)/2+.2)**2)return Infinity;
+    return distance-(car.size[2]+other.size[2]*c+other.size[0]*sn)/2;
   }
 
   decide(car: TrafficCar, dt: number) {
@@ -373,29 +455,46 @@ export class Traffic {
         if (limit < target) { target = limit; reason = 'signal'; }
       }
     }
-    const a = car.yaw * Math.PI / 180, fx = Math.sin(a), fz = Math.cos(a);
+    const yielding=car.junctionYield;
+    if(yielding){
+      const waitingUpstream=yielding.car.currentSpeed<.05
+        &&yielding.clear-yielding.car.distance>yielding.car.size[2]+car.size[0]+2;
+      if(!yielding.car.alive||yielding.car.distance>yielding.clear||waitingUpstream)car.junctionYield=null;
+      else {
+        const limit=safeSpeed(yielding.stop-car.distance,braking*.65);
+        if(limit<target){target=limit;reason='junction';}
+      }
+    }
     for (const other of this.cars) {
       if (other === car || !other.alive) continue;
-      const dx = other.x - car.x, dz = other.z - car.z, along = dx * fx + dz * fz;
-      if (along <= 0 || along > this.visibility) continue;
-      const turn = Math.abs(((other.yaw - car.yaw + 540) % 360) - 180);
-      if (turn < 40 && Math.abs(dx * fz - dz * fx) < (car.size[0] + other.size[0]) / 2 + 0.2) {
-        const gap = along - (car.size[2] + other.size[2]) / 2;
-        const limit = safeSpeed(gap - 2.2, braking * 0.65, d.timeHeadwaySeconds, other.currentSpeed);
-        if (limit < target) { target = limit; reason = 'traffic'; }
-      } else if (turn > 40 && turn < 140 && other.currentSpeed > 0.3) {
-        // Gap acceptance at intersecting lanes: earlier arrivals go first; id breaks equal arrivals.
-        const b = other.yaw * Math.PI / 180, ox = Math.sin(b), oz = Math.cos(b);
-        const cross = fx * oz - fz * ox;
-        if (Math.abs(cross) < 0.1) continue;
-        const ours = (dx * oz - dz * ox) / cross, theirs = (dx * fz - dz * fx) / cross;
-        const ourTime = ours / Math.max(car.currentSpeed, 1), theirTime = theirs / other.currentSpeed;
-        if (ours < 0 || theirs < -other.size[2] || ourTime > 5 || theirTime > 5
-          || Math.abs(ourTime - theirTime) > 1.8 || !this.sees(car, other)) continue;
-        if (theirTime > ourTime + 0.4 || Math.abs(theirTime - ourTime) <= 0.4 && other.id > car.id) continue;
-        const limit = safeSpeed(ours - front - other.size[0] / 2 - 1, braking * 0.65);
-        if (d.behavior === 'failure-to-yield') { if (limit < target) car.violation = 'failure-to-yield'; continue; }
-        if (limit < target) { target = limit; reason = 'junction'; }
+      if(Math.hypot(other.x-car.x,other.z-car.z)>this.visibility)continue;
+      const gap=this.followingGap(car,other,Math.max(horizon,12));
+      if(Number.isFinite(gap)){
+        const limit=safeSpeed(gap-2.2,braking*.65,d.timeHeadwaySeconds,other.currentSpeed);
+        if(limit<target){target=limit;reason='traffic';}
+        continue;
+      }
+      const crossings=this.conflicts.get(car.path)?.get(other.path);
+      if(!crossings)continue;
+      for(const crossing of crossings){
+        const ours=crossing.ours-car.distance,theirs=crossing.theirs-other.distance;
+        const occupied=Math.abs(theirs)<(other.size[2]+car.size[0])/2+.5;
+        if(ours<-(car.size[2]+other.size[0])/2-.5||theirs<-(other.size[2]+car.size[0])/2-.5)continue;
+        const ourTime=Math.max(0,ours)/Math.max(car.currentSpeed,1),theirTime=Math.max(0,theirs)/Math.max(other.currentSpeed,1);
+        if(!occupied&&(ourTime>5||theirTime>5||Math.abs(ourTime-theirTime)>2.2))continue;
+        if(!occupied&&!this.sees(car,other))continue;
+        if(!occupied){
+          if(!crossing.turning&&crossing.otherTurning)continue;
+          if(crossing.turning===crossing.otherTurning
+            &&(theirTime>ourTime+.4||Math.abs(theirTime-ourTime)<=.4&&other.id>car.id))continue;
+        }
+        const limit=safeSpeed(crossing.stop-car.distance,braking*.65);
+        if(d.behavior==='failure-to-yield'){if(limit<target)car.violation='failure-to-yield';continue;}
+        if(limit<target){
+          target=limit;reason='junction';
+          if(car.junctionYield?.car!==other)car.junctionYield={car:other,stop:crossing.stop,
+            clear:crossing.theirs+(other.size[2]+car.size[0])/2+.5};
+        }
       }
     }
     // Predict a conflict with the actual participant velocity along the upcoming curved lane.
@@ -440,19 +539,50 @@ export class Traffic {
     d.acceleration = Math.max(-braking, Math.min(d.accelerationMps2, change));
   }
 
-  /** Integrate bounded acceleration. No position clamp can conceal insufficient stopping distance. */
-  move(car: TrafficCar, dt: number) {
-    const before = car.currentSpeed, acceleration = this.frozen ? 0 : car.driver.acceleration;
-    const duration = acceleration < 0 ? Math.min(dt, before / -acceleration) : dt;
-    car.currentSpeed = Math.max(0, before + acceleration * duration);
-    car.distance += before * duration + acceleration * duration * duration / 2;
-    if (car.distance > car.path.at(-1)!.s) { car.alive = false; return; }
-    if (car.distance > 0.01) carPose(car.path, car.distance, car.wheelbase, car);
-    if (car.swerve) {
-      car.lateral = Math.min(1.8, car.lateral! + 3 * dt);
-      const a = car.yaw * Math.PI / 180;
-      car.x += Math.cos(a) * car.lateral * car.swerve; car.z -= Math.sin(a) * car.lateral * car.swerve;
+  motionPose(car: TrafficCar, travel: number, lateral: number, fraction: number) {
+    carPose(car.path,car.distance+travel*fraction,car.wheelbase,car.probe);
+    if(car.swerve){
+      const a=car.probe.yaw*Math.PI/180,offset=car.lateral!+(lateral-car.lateral!)*fraction;
+      car.probe.x+=Math.cos(a)*offset*car.swerve;car.probe.z-=Math.sin(a)*offset*car.swerve;
     }
+    return car.probe;
+  }
+
+  /** Bounded braking followed by body contact, never interpenetration or participant snapping. */
+  move(car: TrafficCar, dt: number) {
+    const before=car.currentSpeed,acceleration=this.frozen?0:car.driver.acceleration;
+    const duration=acceleration<0?Math.min(dt,before/-acceleration):dt;
+    const travel=before*duration+acceleration*duration*duration/2;
+    const lateral=car.swerve?Math.min(1.8,car.lateral!+3*dt):0;
+    if(travel<1e-12&&Math.abs(lateral-(car.lateral??0))<1e-12){
+      car.currentSpeed=Math.max(0,before+acceleration*duration);
+      if(car.distance>.01){const p=this.motionPose(car,0,lateral,0);car.x=p.x;car.z=p.z;car.yaw=p.yaw;car.steer=p.steer??0;}
+      return;
+    }
+    let fraction=1;
+    for(const other of this.cars){
+      if(other===car||!other.alive||Math.hypot(car.x-other.x,car.z-other.z)>
+        (car.size[2]+other.size[2])/2+travel+2)continue;
+      const steps=Math.max(1,Math.ceil((travel+Math.abs(lateral-(car.lateral??0)))/.1));
+      let free=0;
+      for(let i=1;i<=steps;i++){
+        const t=fraction*i/steps;
+        if(!touching(this.motionPose(car,travel,lateral,t),car.size,other)){free=t;continue;}
+        let lo=free,hi=t;
+        for(let j=0;j<12;j++){
+          const mid=(lo+hi)/2;
+          if(touching(this.motionPose(car,travel,lateral,mid),car.size,other))hi=mid;else lo=mid;
+        }
+        fraction=lo;break;
+      }
+    }
+    car.currentSpeed=fraction<1?0:Math.max(0,before+acceleration*duration);
+    const next=this.motionPose(car,travel,lateral,fraction);
+    car.distance+=travel*fraction;
+    if(fraction<1){car.driver.reason='traffic';car.driver.state='waiting';}
+    if(car.distance>car.path.at(-1)!.s){car.alive=false;return;}
+    if(car.distance>.01){car.x=next.x;car.z=next.z;car.yaw=next.yaw;car.steer=next.steer??0;}
+    if(car.swerve)car.lateral=car.lateral!+(lateral-car.lateral!)*fraction;
   }
 
   /** Freeze all traffic (contact). A noStop car swerves away from the participant and drives on. */

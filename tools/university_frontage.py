@@ -87,40 +87,6 @@ def pillar(b,x,z,tangent,normal,named):
         for y in (.75,2.39):rect(b,at,u-.012,y-.012,.024,.024,GOLD,.473)
 
 
-def hall_picture(b,at,x,y,w,h,distant,detail=0):
-    """An original painted elevation of the already modeled auditorium."""
-    def poly(points,color,layer):
-        if detail:
-            from field_photos import clipped
-            cx,cy,cw,ch=(.38,.6,.24,.4) if detail==1 else (.68,.20,.29,.63)
-            points=[((u-cx)/cw,(v-cy)/ch) for u,v in points]
-            for axis in (0,1):
-                points=clipped(points,lambda p:p[axis],True)
-                points=clipped(points,lambda p:1-p[axis],True)
-            if len(points)<3:return
-        graphic(b,at,[(x+u*w,y+v*h) for u,v in points],color,layer)
-    poly([(0,0),(1,0),(1,1),(0,1)],(.54,.71,.79),.387)
-    poly([(0,.75),(.28,.89),(.6,.76),(1,.86),(1,1),(0,1)],(.94,.82,.59),.388)
-    poly([(0,0),(1,0),(1,.24),(.5,.19),(0,.30)],(.67,.67,.42),.388)
-    poly([(.14,.22),(.78,.22),(.78,.58),(.14,.58)],(.89,.86,.67),.389)
-    poly([(.72,.22),(.93,.29),(.93,.67),(.78,.58)],(.69,.79,.70),.389)
-    poly([(.08,.57),(.74,.60),(.85,.81),(.23,.76)],(.27,.44,.42),.390)
-    poly([(.74,.60),(.95,.66),(.85,.81)],(.38,.53,.48),.390)
-    for i in range(7):
-        u=.19+i*.075
-        poly([(u,.28),(u+.027,.28),(u+.027,.51),(u,.51)],(.25,.38,.37),.391)
-    poly([(.82,.30),(.87,.32),(.87,.52),(.82,.50)],(.18,.33,.34),.391)
-    poly([(.47,.72),(.52,.72),(.52,.86),(.47,.86)],(.42,.62,.55),.392)
-    poly([(.45,.85),(.54,.85),(.50,.94)],(.31,.48,.44),.393)
-    # Short, deliberately placed warm/cool marks preserve a painted illustration
-    # without letting a large shader dab replace the recognizable roof/window edges.
-    if not distant:
-        for i in range(22):
-            u=(i*.173)%1;v=.80+(i%3)*.055
-            poly([(u,v),(min(1,u+.08),v+.025),(min(1,u+.065),v+.055),(u,v+.032)],
-                 (.85,.78,.58) if i%2 else (.62,.75,.79),.394)
-
-
 def campus_map(b,at,d,x,y,w,h):
     """Schematic built from the actual local footprint author, without a false north arrow."""
     rect(b,at,x,y,w,h,(.87,.88,.73),.386)
@@ -136,34 +102,78 @@ def campus_map(b,at,d,x,y,w,h):
     label(b,at,'正門',x+w*.66,y+.025,w*.27,h*.12,BLUE,.391)
 
 
+def paper_lines(b,at,x,y,w,h,rows):
+    """Column rhythm only. Unreadable source copy is never invented as text."""
+    for i in range(rows):
+        rect(b,at,x,y+h*i/rows,w*(.94 if i%4 else .72),.006,(.43,.48,.45),.390)
+
+
 def board_content(b,at,d,width,height,kind):
-    # Graphic coordinates are the reader's left-to-right direction in metres.
+    # 0972–0975: verified headings with original diagrams in place of photo pixels.
     x,y=-width*.47,-height*.45;w,h=width*.94,height*.90
-    rect(b,at,x,y,w,h,GREEN if kind=='bulletin' else PAPER,.375)
-    if kind=='bulletin':
-        rect(b,at,-width/2,height/2+.02,width,.22,PAPER,.385)
-        label(b,at,'滋賀大学',-.68,height/2+.055,1.36,.15)
-        rect(b,at,-.23,-.43,.76,.84,(.91,.86,.66),.386)
-        label(b,at,'構内案内',-.17,.24,.63,.11)
-        campus_map(b,at,d,-.17,-.36,.63,.50)
-        rect(b,at,.68,-.43,.84,.98,BLUE,.386)
-        label(b,at,'キャンパス内',.73,.37,.74,.10,PAPER)
-        # The reference's blue no-smoking notice: a recognizable ring/cigarette/slash.
-        ring=[(1.10+.21*math.cos(i*math.tau/28),.08+.21*math.sin(i*math.tau/28)) for i in range(29)]
-        line(b,at,ring,.035,PAPER,.389)
-        line(b,at,[(.95,.055),(1.23,.055)],.035,PAPER,.389)
-        line(b,at,[(1.19,.095),(1.18,.14),(1.21,.18)],.016,PAPER,.389)
-        line(b,at,[(.95,.23),(1.25,-.07)],.035,PAPER,.390)
-        label(b,at,'全面禁煙',.73,-.31,.74,.15,PAPER)
-        # An illustrated hall leaflet fills the third sheet with identifiable content.
-        rect(b,at,-1.36,-.37,.83,.70,(.78,.83,.64),.386)
-        label(b,at,'講堂',-1.20,.18,.52,.11)
-        hall_picture(b,at,-1.30,-.28,.71,.39,b.distant)
-    elif kind=='hall':
-        label(b,at,'滋賀大学講堂',-w*.43,h*.34,w*.86,.13)
-        hall_picture(b,at,-w*.46,-.12,w*.92,h*.43,b.distant)
-        hall_picture(b,at,-w*.46,-h*.44,w*.43,h*.24,b.distant,1)
-        hall_picture(b,at,w*.03,-h*.44,w*.43,h*.24,b.distant,2)
+    glazed=kind in ('bulletin','newspaper')
+    rect(b,at,x,y,w,h,(.37,.58,.55) if glazed else (.94,.95,.91),.375)
+    if glazed:
+        rect(b,at,x,height*.34,w,height*.13,(.85,.89,.87),.385)
+        label(b,at,'滋 賀 大 学',-width*.28,height*.365,width*.56,height*.075,DARK,.391)
+        # Sliding glazing, a bottom runner, and restrained traces of faded paper.
+        line(b,at,[(0,y),(0,height*.34)],.009,(.63,.72,.68),.392)
+        line(b,at,[(x,y+.03),(x+w,y+.03)],.014,(.65,.72,.68),.392)
+        if kind=='bulletin':
+            rect(b,at,x+.05,height*.16,.58,.11,(.82,.85,.77),.386)
+            label(b,at,'入札公告関係',x+.08,height*.18,.52,.065,DARK,.391)
+            rect(b,at,.12,-.38,.34,.72,(.89,.90,.81),.386)
+            label(b,at,'一般来学者の入構について',.14,.27,.30,.035,DARK,.391)
+            paper_lines(b,at,.15,-.34,.27,.55,25)
+            rect(b,at,.51,-.38,.40,.78,(.17,.50,.70),.386)
+            label(b,at,'2019.5.31',.535,.31,.32,.065,(.94,.95,.88),.391)
+            line(b,at,[(.87,.34),(.90,.34)],.008,(.94,.95,.88),.391)
+            label(b,at,'キャンパス内',.53,.20,.36,.06,(.94,.95,.88),.391)
+            ring=[(.71+.13*math.cos(i*math.tau/32),-.02+.13*math.sin(i*math.tau/32)) for i in range(33)]
+            line(b,at,ring,.025,(.94,.95,.88),.391)
+            line(b,at,[(.61,-.01),(.81,-.01)],.025,(.94,.95,.88),.391)
+            line(b,at,[(.62,.08),(.80,-.11)],.03,(.94,.95,.88),.393)
+            label(b,at,'全面禁煙',.53,-.29,.36,.08,(.94,.95,.88),.391)
+        else:
+            rect(b,at,.23,-.22,.45,.62,(.86,.89,.81),.386)
+            label(b,at,'滋賀大学陵水新聞',.25,.34,.40,.04,DARK,.391)
+            label(b,at,'滋賀大学七夕祭り',.25,.21,.4,.04,DARK,.391)
+            for col in range(3):paper_lines(b,at,.25+col*.135,-.18,.12,.34,17)
+            for xx,yy in ((.26,.26),(.40,.06),(.26,-.10)):
+                rect(b,at,xx,yy,.11,.07,(.36,.57,.62),.391)
+            # Three pale silhouette remnants at the bottom. Identities are not inferred.
+            for u in (-.2,.22,.66):
+                graphic(b,at,[(u-.07,-.39),(u+.07,-.39),(u+.08,-.25),(u+.04,-.18),
+                              (u-.04,-.18),(u-.09,-.27)],(.79,.87,.79),.389)
+    elif kind=='construction':
+        label(b,at,'計画建築物の概要',x+.06,y+h-.14,w-.12,.085,DARK,.391)
+        label(b,at,'彦根市中高層建築物指導要項',x+.06,y+h-.27,w-.12,.05,DARK,.391)
+        rows=[('敷地面積','57,786.29 m2'),('建築面積','889.68 m2'),('延べ面積','2,196.45 m2'),
+              ('用途','大学用建築物'),('構造','鉄筋コンクリート造'),('規模','地上3階 高さ11.75m'),
+              ('工事予定','2025/6 - 2026/7')]
+        row=(h-.4)/len(rows)
+        for i,(key,value) in enumerate(rows):
+            yy=y+h-.36-i*row
+            line(b,at,[(x+.025,yy+.04),(x+w-.025,yy+.04)],.007,DARK,.389)
+            label(b,at,key,x+.05,yy-row*.58,w*.27,.045,DARK,.391)
+            label(b,at,value,x+w*.36,yy-row*.58,w*.59,.045,DARK,.391)
+        line(b,at,[(x+w*.33,y+.03),(x+w*.33,y+h-.32)],.007,DARK,.389)
+    elif kind=='project':
+        # An original three-storey massing diagram, not a model of the unseen project.
+        def picture(px,py,pw,ph):
+            rect(b,at,px,py,pw,ph,(.63,.77,.82),.386)
+            for i in range(3):
+                yy=py+ph*(.12+i*.23)
+                graphic(b,at,[(px+pw*.08,yy),(px+pw*.70,yy),(px+pw*.88,yy+ph*.10),
+                              (px+pw*.26,yy+ph*.10)],(.36,.40,.39),.389)
+                rect(b,at,px+pw*.09,yy-ph*.12,pw*.61,ph*.12,(.42,.48,.48),.390)
+                for col in range(6):rect(b,at,px+pw*(.13+col*.09),yy-ph*.10,pw*.06,ph*.075,(.67,.79,.79),.392)
+        picture(x+.03,y+h*.32,w*.65,h*.64)
+        picture(x+.03,y+.03,w*.31,h*.25)
+        picture(x+w*.37,y+.03,w*.31,h*.25)
+        label(b,at,'データサイエンス',x+w*.71,y+h*.72,w*.27,.055,DARK,.391)
+        label(b,at,'みらい創造館',x+w*.71,y+h*.60,w*.27,.055,DARK,.391)
+        label(b,at,'2026年秋完成予定',x+w*.71,y+h*.30,w*.27,.04,DARK,.391)
     else:
         label(b,at,'滋賀大学',-w*.40,h*.33,w*.80,min(.19,h*.14))
         label(b,at,'彦根キャンパス',-w*.40,h*.13,w*.80,min(.12,h*.10))

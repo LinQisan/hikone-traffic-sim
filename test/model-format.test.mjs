@@ -26,6 +26,7 @@ test('all packaged recipes decode byte-for-byte to their authoritative source', 
   const root = new URL('../models/', import.meta.url);
   const runtime = JSON.parse(await fs.readFile(new URL('runtime.json', root)));
   for (const [key, entry] of Object.entries(runtime.files)) {
+    if (!entry.url) continue;                     // a far level exists only as a baked file
     const packed = await fs.readFile(new URL('../' + entry.url, root));
     const source = await fs.readFile(new URL('../' + entry.rawUrl.split('?')[0], root));
     assert.ok(gunzipSync(packed).equals(source), key + ': compression must not change modeling instructions');
@@ -47,4 +48,31 @@ test('packaging changes the content URL when a recipe changes and keeps other de
     assert.notEqual(after.files['Demo/high'].url, before.files['Demo/high'].url);
     assert.equal(after.files['Demo/low'].url, before.files['Demo/low'].url);
   } finally { await fs.rm(root, { recursive: true, force: true }); }
+});
+
+test('a baked model decodes to its program\'s triangles within the transport precision', async () => {
+  const { buildNativeModel } = await import('../src/three/geometry/model-builder.js');
+  const { addSkirts } = await import('../src/three/geometry/model-closure.js');
+  const { readBakedModel, POSITION_UNIT } = await import('../src/three/assets/baked-model.js');
+  await packModels();
+  const root = new URL('../models/', import.meta.url), runtime = JSON.parse(await fs.readFile(new URL('runtime.json', root)));
+  for (const name of ['ART_ClippedHedge', 'ART_MoatBankPatch']) {
+    const source = buildNativeModel(JSON.parse(await fs.readFile(new URL(name + '.json', root))));
+    addSkirts(source);
+    const { parts } = await readBakedModel(new Response(await fs.readFile(new URL('../' + runtime.files[name + '/high'].baked.url, root))));
+    assert.equal(parts.length, source.length, name);
+    for (const part of parts) {
+      const original = source.find(p => p.material.name === part.material.name).geometry;
+      assert.equal(part.index.length, original.index.count, name + ': every triangle survives');
+      const corners = (p, index) => Array.from(index, i => [p[i * 3], p[i * 3 + 1], p[i * 3 + 2]].map(v => Math.round(v * POSITION_UNIT)).join()).sort();
+      assert.deepEqual(corners(part.attributes.position.array, part.index), corners(original.attributes.position.array, original.index.array));
+    }
+  }
+});
+
+test('every far level holds geometry', async () => {
+  const { files } = JSON.parse(await fs.readFile(new URL('../models/runtime.json', import.meta.url)));
+  const far = Object.entries(files).filter(([key]) => key.endsWith('/far'));
+  assert.ok(far.length > 5);
+  for (const [key, { baked }] of far) assert.ok(baked.bytes > 200, key);
 });

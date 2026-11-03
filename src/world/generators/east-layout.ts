@@ -33,7 +33,8 @@ EAST_CAMERA_SOLIDS.unshift(...island.buildings.filter(b => b.footprint.some(([x,
   .map(b => ({footprint: b.footprint as [number, number][], height: b.height, rise: b.rise})));
 EAST_CAMERA_SOLIDS.push({footprint:[[gateX-gateHalf,gateZ-gateDepth],[gateX+gateHalf,gateZ-gateDepth],
   [gateX+gateHalf,gateZ+gateDepth],[gateX-gateHalf,gateZ+gateDepth]],height:nishi.gate.height+.06,rise:0},
-  ...nishi.walls.map(w=>({footprint:w.outline as [number,number][],height:w.height,rise:0})));
+  ...nishi.walls.map(w=>({footprint:w.outline as [number,number][],height:w.height,rise:0,
+    base:.01,batter:nishi.wallBatter})));
 const RING = frame.east.coverage as [number, number][];
 /** Inside the OSM-derived geographic coverage (everything outside the retained authored core). */
 export function inEastExtension(x: number, z: number): boolean {

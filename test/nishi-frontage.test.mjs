@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {execFileSync} from 'node:child_process';
 import * as THREE from 'three';
 import {Ground} from '../src/simulation/collision/Ground.ts';
 import {Obstacles} from '../src/simulation/collision/Obstacles.ts';
@@ -12,6 +13,47 @@ import {indexMeshRays} from '../src/three/camera/mesh-ray-index.js';
 
 const read = file => JSON.parse(fs.readFileSync(new URL('../'+file,import.meta.url)));
 const ground = new Ground(read('data/road_tiles.json')), body = new Obstacles(read('data/collision.json'));
+
+test('textured battered wall corners and undersides form closed shells in both levels',()=>{
+  execFileSync('python3',['-c',`
+import sys
+from collections import Counter
+sys.path.insert(0,'tools')
+from nishi_school import wall,data
+class Mesh:
+    def __init__(self,distant): self.distant=distant;self.faces=[]
+    def face(self,points,material,**kwargs):
+        assert material=='ART_CastleStone'
+        self.faces.append(points)
+for item in data()['walls']:
+    near,far=Mesh(False),Mesh(True)
+    for b in (near,far):
+        wall(b,item)
+        edges=Counter(tuple(sorted((tuple(a),tuple(c)))) for f in b.faces for a,c in zip(f,f[1:]+f[:1]))
+        assert edges and all(n==2 for n in edges.values()), (item['osm'],'open wall edge')
+    assert near.faces==far.faces, (item['osm'],'LOD changed the closed shell')
+`],{cwd:new URL('..',import.meta.url),encoding:'utf8'});
+});
+
+test('every bare cherry branch grows from an existing branch instead of floating',()=>{
+  const result=execFileSync('python3',['-c',`
+import sys, math
+sys.path.insert(0, 'tools')
+import school_road
+segments=[]
+school_road.bar=lambda b,a,c,*args,**kwargs: segments.append((a,c))
+class Mesh: distant=False
+school_road.bare_cherry(Mesh(),0,0,0,4)
+def distance(p,a,c):
+    d=[c[i]-a[i] for i in range(3)]
+    t=max(0,min(1,sum((p[i]-a[i])*d[i] for i in range(3))/sum(v*v for v in d)))
+    return math.dist(p,[a[i]+d[i]*t for i in range(3)])
+for j,(a,c) in enumerate(segments[1:],1):
+    assert min(distance(a,p,q) for p,q in segments[:j])<.1, ('detached branch',j,a)
+print(len(segments))
+`],{cwd:new URL('..',import.meta.url),encoding:'utf8'});
+  assert.ok(Number(result.trim())>20,'the check emitted a tree with fine branches');
+});
 
 test('the closed Nishi gate leaves the photographed public turn and crossing clear',()=>{
   const line=CASTLE_CAMPUS_LINK.slice(2,9);

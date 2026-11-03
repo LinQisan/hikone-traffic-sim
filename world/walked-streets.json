@@ -1,0 +1,266 @@
+{
+  "reviewed": "2026-11-01",
+  "source": {
+    "url": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2450,35.2738,136.2528,35.2780",
+    "sha256": "28e9dec2c9ee7bf2e500660fbd162d5235e5e58f883215b22f36bc34e1f9c06b",
+    "license": "ODbL-1.0; OpenStreetMap contributors",
+    "note": "Read as XML from the official API. Photo originals were inspected locally and are not textures or shipped assets."
+  },
+  "roads": {
+    "campusStreet": {
+      "way": 122757608,
+      "version": 5,
+      "timestamp": "2026-03-11T10:16:47Z",
+      "nodes": [
+        1370875450,
+        3833807069,
+        1370875424,
+        12744391710,
+        734899299
+      ],
+      "coordinatesWgs84": [
+        [
+          136.247734,
+          35.2766186
+        ],
+        [
+          136.2475117,
+          35.2763504
+        ],
+        [
+          136.2473015,
+          35.276073
+        ],
+        [
+          136.2471111,
+          35.27584
+        ],
+        [
+          136.2470562,
+          35.2757728
+        ]
+      ]
+    },
+    "campusDriveway": {
+      "way": 380034677,
+      "version": 3,
+      "timestamp": "2025-04-14T10:06:00Z",
+      "nodes": [
+        3833807084,
+        12753992048,
+        3833807073,
+        3833807071,
+        12753992057,
+        3833807069
+      ],
+      "coordinatesWgs84": [
+        [
+          136.2460721,
+          35.2771101
+        ],
+        [
+          136.246545,
+          35.2768055
+        ],
+        [
+          136.2465985,
+          35.2767828
+        ],
+        [
+          136.2470104,
+          35.2766566
+        ],
+        [
+          136.2473863,
+          35.276427
+        ],
+        [
+          136.2475117,
+          35.2763504
+        ]
+      ]
+    },
+    "campusLoop": {
+      "way": 1377415375,
+      "version": 2,
+      "timestamp": "2025-04-14T10:06:00Z",
+      "nodes": [
+        3833807084,
+        12753992062,
+        12753992061,
+        12753992060,
+        12753992059,
+        12753992058,
+        12753992057
+      ],
+      "coordinatesWgs84": [
+        [
+          136.2460721,
+          35.2771101
+        ],
+        [
+          136.2465514,
+          35.2776111
+        ],
+        [
+          136.2466231,
+          35.2776122
+        ],
+        [
+          136.2468994,
+          35.2774487
+        ],
+        [
+          136.24686,
+          35.2771514
+        ],
+        [
+          136.2474603,
+          35.2767629
+        ],
+        [
+          136.2473863,
+          35.276427
+        ]
+      ]
+    },
+    "schoolLoop": {
+      "way": 59265929,
+      "version": 6,
+      "timestamp": "2026-02-05T02:07:29Z",
+      "nodes": [
+        734899422,
+        734899326,
+        734899432,
+        734899383,
+        734899406,
+        13411763877,
+        734899381
+      ],
+      "coordinatesWgs84": [
+        [
+          136.2495744,
+          35.2758145
+        ],
+        [
+          136.2498036,
+          35.2760611
+        ],
+        [
+          136.2493458,
+          35.2764089
+        ],
+        [
+          136.24877,
+          35.2768229
+        ],
+        [
+          136.248679,
+          35.2767392
+        ],
+        [
+          136.2484353,
+          35.2766778
+        ],
+        [
+          136.2483852,
+          35.2766586
+        ]
+      ]
+    },
+    "schoolShortcut": {
+      "way": 1376675005,
+      "version": 3,
+      "timestamp": "2026-02-05T02:07:29Z",
+      "nodes": [
+        734899406,
+        734899424
+      ],
+      "coordinatesWgs84": [
+        [
+          136.248679,
+          35.2767392
+        ],
+        [
+          136.2485231,
+          35.2765661
+        ]
+      ]
+    },
+    "otemonBridge": {
+      "way": 122757598,
+      "version": 8,
+      "timestamp": "2026-02-05T23:32:44Z",
+      "nodes": [
+        13300929310,
+        1370875392
+      ],
+      "coordinatesWgs84": [
+        [
+          136.2516206,
+          35.2745715
+        ],
+        [
+          136.2519736,
+          35.2747328
+        ]
+      ]
+    },
+    "otemonApproach": {
+      "way": 1376711308,
+      "version": 3,
+      "timestamp": "2025-12-27T12:40:32Z",
+      "nodes": [
+        12747595190,
+        13300929310
+      ],
+      "coordinatesWgs84": [
+        [
+          136.2514745,
+          35.2745035
+        ],
+        [
+          136.2516206,
+          35.2745715
+        ]
+      ]
+    }
+  },
+  "estimates": {
+    "campusTurnRadius": 4,
+    "campusDriveHalfWidth": 2.2,
+    "tennisRoadSetback": 4.15,
+    "tennisFenceEnds": [
+      -521,
+      -427
+    ],
+    "tennisGateX": [
+      -470,
+      -466
+    ],
+    "bridgeHalfWidth": 1.8,
+    "bridgeRailHeight": 1.05,
+    "campusPassingPoint": [
+      -620.1,
+      207.9
+    ],
+    "junctionUtilityPole": [
+      -541,
+      257.8
+    ],
+    "schoolLaneHalfWidth": 1.8,
+    "backLaneTurnRadius": 3
+  },
+  "evidence": [
+    "IMG_0852-0854, IMG_0971-0977 and IMG_1084-1085: curved gate enclosure and internal drive",
+    "IMG_0997-1004, IMG_1075-1081 and video IMG_1080: three public arms around an independent planted island",
+    "IMG_1005-1022, IMG_1074 and video IMG_1073: tennis fence behind the carriageway edge, gate opening",
+    "IMG_1070 and video IMG_1069: timber bridge and narrow approach",
+    "IMG_1024-1026: unbroken asphalt through the local street junction"
+  ],
+  "limits": [
+    "Source centre lines and photographed relationships are verified. Widths, curve radius, fence setbacks, bed profile and rail dimensions remain estimates.",
+    "Photo GPS is a camera fix and does not place an object. No altitude is used for terrain heights.",
+    "The temporary site office narrows the internal drive. Its passing point is a photo-relative estimate within about 2 m of the mapped centreline, keeping clear of both the hall and office."
+  ]
+}

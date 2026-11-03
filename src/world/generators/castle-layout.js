@@ -1,13 +1,13 @@
-// Google satellite placement, registered approximately to the browser's rotated Kyobashi plan.
-// The hilltop stays beyond the practice map; castle-approach.js registers its surrounding roads.
+// Registered in the existing metre frame; see world/geographic-registration.json.
 import {geographicPoint} from '../geography/coordinates.ts';
+import {registeredPose} from './geographic-registration.js';
 export {geographicPoint};
-const [x, z] = geographicPoint(35.276452, 136.251846);
+const {x,z,yaw} = registeredPose('keep');
 
 export const CASTLE_SITE = {
   x, z,
   height: 49.5, // Approximate hilltop rise above the moat road; no change to practice-road heights.
-  yaw: 193, // The main roof ridge runs northwest/southeast; the broad courtyard face is southwest.
+  yaw,
 };
 
 // Surviving buildings, rather than copies of the keep. Google satellite footprints and the
@@ -17,10 +17,14 @@ function site(id, name, lat, lon, floor, yaw, size) {
   const [x, z] = geographicPoint(lat, lon);
   return { id, name, x, z, floor, yaw, size };
 }
+function registeredSite(id, name, floor, size) {
+  return {id,name,...registeredPose(id),floor,size};
+}
 export const CASTLE_BUILDINGS = [
-  site('nishinomaru', 'Nishinomaru three-storey turret and connecting wings', 35.277944, 136.250627, 42, -77, [12, 10]),
-  site('taikomon', 'Taikomon gate and connecting turret', 35.276025, 136.252114, 41, 13, [13, 6]),
-  site('tenbin', 'Tenbin turret and corridor bridge', 35.275540, 136.252510, 27, -32, [38, 8]),
+  registeredSite('nishinomaru', 'Nishinomaru three-storey turret and connecting wings', 42, [12, 10]),
+  registeredSite('taikomon', 'Taikomon gate and connecting turret', 41, [13, 6]),
+  registeredSite('tenbin', 'Tenbin turret and corridor bridge', 27, [38, 8]),
+  // The simplified museum halls do not fit the mapped outline well enough for a rigid registration.
   site('omotegoten', 'Reconstructed Omote Goten / Hikone Castle Museum', 35.275667, 136.253500, 0.15, -77, [56, 104]),
   site('sawaguchi', 'Sawaguchi Tamon turret / Kaikoku Memorial Hall', 35.275152, 136.255082, 0.15, 13, [48, 8]),
 ];

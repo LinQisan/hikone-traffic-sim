@@ -16,7 +16,7 @@ from collections import defaultdict
 from functools import lru_cache
 if __name__ == '__main__':
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from castle_approach import data as approach_data, hill_height, hill_surface
+from castle_approach import data as approach_data, hill_height, hill_surface, point_segment_distance
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 with open(os.path.join(ROOT, 'world', 'town-streets.json')) as f:
@@ -126,40 +126,28 @@ def north_bank_height(x, z):
     return 0.15 + BANK_RISE * max(0, min(1, (foot - (z - north_shore(x))) / run))
 
 
-def masonry(b, a, c, low, high, seed, inset=(0.0, 0.0)):
-    """Irregular coursed stones (nozura-zumi) on a wall from a to c, as coplanar painted cells.
-    `low`/`high` give the bottom/top height at a parameter t along the wall; `inset` offsets the
-    face along its normal (x, z) so cells sit just proud of a base face."""
-    rng = random.Random(seed)
-    length = math.dist(a, c)
-    if length < 0.3:
-        return
-    lo, hi = min(low(0), low(1)), max(high(0), high(1))
-    y = lo
-    while y < hi - 0.05:
-        row = min(hi - y, rng.uniform(0.65, 1.05))
-        t = rng.uniform(-0.6, 0) / length
-        while t < 1:
-            t2 = min(1, t + rng.uniform(0.7, 1.9) / length)
-            t0 = max(0, t)
-            if t2 - t0 > 0.05 / length:
-                pts = []
-                for tt in (t0, t2):
-                    px, pz = a[0] + (c[0] - a[0]) * tt + inset[0], a[1] + (c[1] - a[1]) * tt + inset[1]
-                    pts.append((px, pz, max(low(tt), y + 0.03), min(high(tt), y + row - 0.03)))
-                if all(top - bottom > 0.08 for _, _, bottom, top in pts):
-                    (x0, z0, b0, t0y), (x1, z1, b1, t1y) = pts
-                    tone = rng.random()
-                    material = 'ART_StoneLight' if tone < 0.4 else 'HK_Stone' if tone < 0.85 else 'HK_StoneDark'
-                    b.face([(x0, b0, z0), (x0, t0y, z0), (x1, t1y, z1), (x1, b1, z1)], material, False)
-            t = t2
-        y += row
+
+def otemon_height(x, z):
+    d = approach_data()
+    line, half = d['path'], d['bridgeProfile']['bridgeHalfWidth']
+    if not -190 < x < -140 or not 188 < z < 244:
+        return None
+    if min(point_segment_distance(x, z, a, c) for a, c in zip(line, line[1:])) > half + .001:
+        return None
+    a, c = line[:2]
+    dx, dz = c[0] - a[0], c[1] - a[1]
+    t = max(0, min(1, ((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz)))
+    return .01 + .15*t
 
 
 def walk_height(x, z):
     # The photographed footways are level with the road behind a separate raised kerb.
     # Preserve the castle approach's authored terrain and blend the north bridge landing.
-    if z <= 74:
+    bridge = otemon_height(x, z)
+    if bridge is not None:
+        return bridge
+    if z <= 74 or (x < -65 and min(point_segment_distance(x, z, a, c)
+            for a, c in zip(approach_data()['innerRoad'], approach_data()['innerRoad'][1:])) < 5.6):
         return 0.01
     if 25 <= x <= 39 and z < 75.4:
         return 0.01 + 0.15 * (z - 74) / 1.4
@@ -431,7 +419,7 @@ def height_pieces(poly):
 def triangulate(poly):
     """Keep noded boundary vertices without exporting collinear zero-area triangles."""
     points = [tuple(struct.unpack('f', struct.pack('f', v))[0] for v in p) for p in poly]
-    remaining = list(range(len(poly)))
+    remaining = [i for i in range(len(poly)) if points[i] != points[i-1]]
     result = []
     cross = lambda a, b, c: (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
     while len(remaining) > 3:
@@ -448,6 +436,25 @@ def triangulate(poly):
                 continue
             ears.append((size, j, ids))
         if not ears:
+            # Only repair a stalled ribbon: removing shallow nodes from a valid
+            # boundary would change its ownership relative to an adjacent cap.
+            tolerance = max((2 ** (math.frexp(abs(v))[1] - 24)
+                             for i in remaining for v in points[i] if v), default=0) * 2
+            repaired = False
+            for j, i in enumerate(remaining):
+                a, p, c = points[remaining[j-1]], points[i], points[remaining[(j+1)%len(remaining)]]
+                dx, dz = c[0]-a[0], c[1]-a[1]
+                length = math.hypot(dx,dz)
+                turn = cross(a,p,c)
+                if not length or turn >= 0:
+                    continue
+                progress = ((p[0]-a[0])*dx+(p[1]-a[1])*dz)/(length*length)
+                if 0 < progress < 1 and -turn <= tolerance*length:
+                    remaining.pop(j)
+                    repaired = True
+                    break
+            if repaired:
+                continue
             raise ValueError('Cannot triangulate road surface: ' + str(poly))
         _, j, ids = max(ears)
         result.append([poly[i] for i in ids])
@@ -457,6 +464,12 @@ def triangulate(poly):
     return result
 
 
+def inner_road_outer(x, z):
+    """1071/1072: a narrow flush margin before the actual moat edge, not a 2 m lawn."""
+    t = max(0, min(1, (x + 65) / 20))
+    return 4.6 + .9 * t * t * (3 - 2 * t)
+
+
 def plan():
     global _land_cuts
     roads, walks = [], []
@@ -464,7 +477,7 @@ def plan():
     town_path = lambda x, z: 10 - TOWN_INSET * town_taper(x)
     paths = [(MAIN, 4, (town_path, moat_path)), (SOUTH, 4, 10), (BRIDGE, 4, 7), (north_sample(), north_half, north_outer),
              (HONMACHI, 3, 4.5), (PARKING, 3, 4.0),
-             (sample(approach_data()['innerRoad']), 3.5, 5.5),
+             (sample(approach_data()['innerRoad']), 3.5, inner_road_outer),
              (sample(approach_data()['schoolRoad']), 3, 4)]
     paths += [(street['points'], street['halfWidth'], None) for street in TOWN_STREETS]
     negative = lambda width: (lambda x, z: -width(x, z)) if callable(width) else -width
@@ -473,7 +486,8 @@ def plan():
         if outer is not None:
             town, moat = outer if isinstance(outer, tuple) else (outer, outer)
             walks += strip(pts, negative(town), negative(half)) + strip(pts, half, moat)
-    pedestrian = strip(approach_data()['path'], -2.4, 2.4)
+    half = approach_data()['bridgeProfile']['bridgeHalfWidth']
+    pedestrian = strip(approach_data()['path'], -half, half)
     walks += pedestrian
     # Overlapping end caps close the join between the straight bridge and curved road.
     for radius, target in ((4, roads), (6.5, walks)):
@@ -541,6 +555,10 @@ def surfaces():
     from higashi_school import kerb_openings
     school_openings = kerb_openings()
     openings += school_openings
+    # Public access mouths interrupt the kerb instead of meeting a raised bar.
+    openings += [q for line in approach_data()['localStreets'] for q in strip(line,-2.2,2.2)]
+    half = approach_data()['bridgeProfile']['bridgeHalfWidth']
+    openings += strip(approach_data()['path'], -half-.2, half+.2)
     bands = [(p, bounds(p)) for p in difference(curb_bands(roads), openings)]
     pavement, curbs = [], []
     for p in walks:
@@ -562,6 +580,16 @@ def surfaces():
             q = intersection(p, opening)
             if q:
                 entries.append(('walk', q, .01, 'HK_Sidewalk'))
+    # The bridge wearing surface is timber. Its height stays in this shared partition.
+    timber = strip(approach_data()['path'][1:], -half, half)
+    partition = []
+    for kind, p, height, material in entries:
+        if kind != 'walk':
+            partition.append((kind,p,height,material))
+            continue
+        partition += [(kind,q,height,material) for q in difference([p],timber)]
+        partition += [(kind,q, .16,'HK_WoodMid') for t in timber if (q := intersection(p,t))]
+    entries = partition
     entries += [('curb', p, curb_height, 'HK_Curb') for p in curbs]
     entries += [('town', p, 0.15, 'HK_Sidewalk') for p in town_land()]
     entries += [('bank', p, north_bank_height, 'HK_Grass') for p in north_land()]
@@ -650,17 +678,6 @@ def face(b, poly, y, material, strokes=True):
                strokes=strokes, pigment=pigment)
 
 
-def paint(b, a, c, width=0.15):
-    face(b, strip([a, c], -width / 2, width / 2)[0], 0.022, 'HK_WhitePaint')
-
-
-@lru_cache(maxsize=1)
-def approach_paint_crossings():
-    # Margin paint ends at the two real junctions around the parking triangle.
-    return (strip(sample(approach_data()['schoolRoad']), -3.05, 3.05)
-            + strip(sample(approach_data()['innerRoad']), -3.55, 3.55))
-
-
 def roads_mesh(b):
     for kind, p, height, material in surfaces():
         if kind in ('road', 'walk', 'curb'):
@@ -672,84 +689,6 @@ def roads_mesh(b):
             points = approach_side(points, False)
             if points:
                 b.face(points, material, strokes=False)
-    # Four crossings are visible in the close overhead image, including the bridge entrance.
-    # The Route 25 crossings lie just beyond the kerb returns, 24.6 m apart (overhead: ~24.3 m).
-    for z in [22.5 + i * 0.85 for i in range(9)]:
-        for x in WALK_CROSSINGS:
-            face(b, [(x - 1.3, z), (x + 1.3, z), (x + 1.3, z + 0.43), (x - 1.3, z + 0.43)], 0.022, 'HK_WhitePaint')
-    for x in [28.4 + i * 0.85 for i in range(9)]:
-        face(b, [(x, 16.4), (x + 0.43, 16.4), (x + 0.43, 19.0), (x, 19.0)], 0.022, 'HK_WhitePaint')
-        face(b, [(x, 33.1), (x + 0.43, 33.1), (x + 0.43, 35.7), (x, 35.7)], 0.022, 'HK_WhitePaint')
-    # Unsignalised zebras on Castle Road's two southern blocks (GSI aerial + OSM).
-    # Keep their openings, paint and tactile approaches on the same shared local plan.
-    for crossing in TOWN_CROSSINGS:
-        z, half = crossing['z'], crossing['depth'] / 2
-        for i in range(9):
-            x = castle_x(z) - 3.6 + i * 0.85
-            face(b, [(x, z - half), (x + 0.43, z - half),
-                     (x + 0.43, z + half), (x, z + half)], 0.022, 'HK_WhitePaint')
-    # Approach centre and edge lines follow the bend instead of tile repeats.
-    for a, c in zip(MAIN, MAIN[1:]):
-        x = (a[0] + c[0]) / 2
-        if WALK_CROSSINGS[0] - 1.3 < x < WALK_CROSSINGS[1] + 1.3 or x >= 199:
-            continue
-        for offset in (-3.55, 3.55):
-            alley_x = TOWN_STREETS[0]['points'][0][0]
-            if offset < 0 and (-101 < x < -93 or -32 < x < -24 or abs(x - alley_x) < 3.5):
-                continue
-            paint(b, (a[0], a[1] + offset), (c[0], c[1] + offset))
-        if (x < -130 and int((x + 160) / 5) % 2 == 0 or -20 <= x <= STOP_BARS[0]
-                or STOP_BARS[1] <= x < 54
-                or x > 84 and int((x - 84) / 6) % 2 == 0):
-            paint(b, a, c)
-    # The western parking frontage also has a tapered central hatch, visible in Street View.
-    west_hatch = [(-130, 26), (-116, 25.4), (-48, 25.4), (-20, 26.15), (-48, 26.6), (-116, 26.6)]
-    for a, c in zip(west_hatch, west_hatch[1:] + west_hatch[:1]):
-        paint(b, a, c)
-    for x in range(-126, -23, 3):
-        # Clip each diagonal against the convex median; no paint enters either traffic lane.
-        q = strip([(x - 1, 25), (x + 1, 27)], -0.10, 0.10)[0]
-        for a, c in zip(ccw(west_hatch), ccw(west_hatch)[1:] + ccw(west_hatch)[:1]):
-            q = clip(q, a, c, True) if q else []
-        if q:
-            face(b, q, 0.022, 'HK_WhitePaint')
-    # Reuse the hand-authored tapered hatch and arrows, without obsolete edge lines.
-    from moat_art import road_paint
-    road_paint(b, details_only=True)
-    # Castle Road has continuous centre/edge lines, not a repeating tile's dashed centre.
-    # Leave the Honmachi cross street open; traffic routes use the same carriageway as before.
-    for z in range(-154, 12, 2):
-        if -72 <= z < -58 or -150 <= z < -132:
-            continue
-        for dx in (-3.55, 0, 3.55):
-            paint(b, (castle_x(z) + dx, z), (castle_x(z + 2) + dx, z + 2))
-    # The bridge/north bend have edge lines and green margins, with no centre dashes.
-    # End paint before the mapped road's open end: Float32 export must not put its last
-    # vertex over the adjacent terrain when the two use different coordinate rounding.
-    for pts in (BRIDGE, north_sample()[:-1]):
-        for side in (-1, 1):
-            at = lambda offset: (lambda x, z: side * (north_half(x, z) + offset)) if pts is not BRIDGE else side * (4 + offset)
-            for q in strip(pts, at(-0.45 if pts is BRIDGE else -0.65), at(-0.30 if pts is BRIDGE else -0.50)):
-                q = approach_part(q, False)
-                if q:
-                    for p in ([q] if pts is BRIDGE else difference([q], approach_paint_crossings())):
-                        face(b, p, 0.022, 'HK_WhitePaint')
-            for q in strip(pts, at(-0.26 if pts is BRIDGE else -0.46), at(0)):
-                q = approach_part(q, False)
-                if q:
-                    for p in ([q] if pts is BRIDGE else difference([q], approach_paint_crossings())):
-                        face(b, p, 0.023, 'ART_PathGreen')
-    for side in (-1, 1):
-        for q in strip(BRIDGE, side * 4.0, side * 5.05):
-            face(b, q, lambda x, z: walk_height(x, z) + 0.002, 'ART_PathGreen')
-    # Parking bays are visibly parking, rather than a disconnected two-lane road.
-    for z in (-29, -13, 3):
-        for x in range(-103, -34, 3):
-            if z == 3 and -71 < x < -58:
-                continue  # service pavilion apron, not a parking space
-            paint(b, (x, z), (x, z + 5), 0.10)
-        paint(b, (-103, z + 5), (-34, z + 5), 0.10)
-
 
 def town_land():
     polygons()
@@ -814,8 +753,7 @@ def inner_moat():
 
 
 def banks_mesh(b):
-    # Coarse stone faces give the sloped wall its scale without thousands of separate rocks.
-    # Courses and stone widths vary, as in the castle's nozura-zumi walls (18 October 2026 photos).
+    # The shared texture paints Kyobashi stone courses on the authoritative bank faces.
     from streetscape import outward_face
     top = 0.15 + BANK_RISE
     shore = lambda u: north_shore(u)
@@ -824,52 +762,25 @@ def banks_mesh(b):
         if not 24 <= x < 40:
             a, c = (x, moat_edge(x)), (x + 2, moat_edge(x + 2))
             b.face([(a[0], -1.35, a[1]), (c[0], -1.35, c[1]),
-                    (c[0], 0.15, c[1]), (a[0], 0.15, a[1])], 'HK_StoneDark', False)
+                    (c[0], 0.15, c[1]), (a[0], 0.15, a[1])], 'ART_CastleStone', False)
         for u, u2 in ((x, min(x + 2, lo_open)), (max(x, hi_open), x + 2)):
             if u2 - u > 1e-6:
                 b.face([(u, -1.35, shore(u)), (u, top, shore(u) + 4),
-                        (u2, top, shore(u2) + 4), (u2, -1.35, shore(u2))], 'HK_StoneDark', False)
+                        (u2, top, shore(u2) + 4), (u2, -1.35, shore(u2))], 'ART_CastleStone', False)
     # The battered wall turns its corner into the masugata walls at the approach shoulders
     # (OSM retaining walls; photographs 0872/0875). Close each triangular end as a faced
     # corner, instead of leaving a hollow wedge that shows the bank's interior.
     for u, side in ((lo_open, 1), (hi_open, -1)):
         z0 = shore(u)
-        outward_face(b, [(u, -1.35, z0), (u, top, z0 + 4), (u, -1.35, z0 + 4)], 'HK_Stone',
+        outward_face(b, [(u, -1.35, z0), (u, top, z0 + 4), (u, -1.35, z0 + 4)], 'ART_CastleStone',
                      (u - side, 0, z0 + 3))
-        masonry(b, (u, z0), (u, z0 + 4), lambda t: -1.35, lambda t: -1.35 + (top + 1.35) * t,
-                8800 + side, (side * 0.015, 0))
-    rng = random.Random(712)
-    stone_point = lambda u, y: (u, y, shore(u) + 4 * (y + 1.35) / (top + 1.35) - 0.018)
-    y = -1.35
-    while y < top - 0.1:
-        row = min(top - y, rng.uniform(0.7, 1.1))
-        for lo, hi in ((-220, lo_open), (hi_open, 102), (102, 104), (104, 190), (190, 192), (192, 200)):
-            u = lo - rng.uniform(0, 1.2)
-            while u < hi:
-                u2 = min(hi, u + rng.uniform(1.0, 2.4))
-                l, r = max(lo, u) + 0.04, u2 - 0.04
-                if r - l > 0.3:
-                    lean = rng.uniform(-0.12, 0.12)
-                    tone = rng.random()
-                    material = 'ART_StoneLight' if tone < 0.35 else 'HK_Stone' if tone < 0.88 else 'HK_StoneDark'
-                    b.face([stone_point(l, y + 0.04), stone_point(l + lean, y + row - 0.035),
-                            stone_point(r + lean, y + row - 0.035), stone_point(r, y + 0.04)], material, False)
-                u = u2
-        y += row
     # Retaining faces use the same pavement/terrain boundary as their adjoining tops; the tall
     # masugata walls beside the north approach carry the same irregular courses.
     for i, (destination, points, material) in enumerate(surface_steps()):
         if destination == 'banks':
             points = approach_side(points, False)
             if points:
-                b.face(points, material, strokes=False)
-            if len(points) == 4 and max(p[1] for p in points) - min(p[1] for p in points) > 1.2:
-                (ax, la, az), (_, ha, _), (bx, hb, bz), (_, lb, _) = points
-                length = math.hypot(bx - ax, bz - az)
-                if length > 0.3:
-                    n = ((bz - az) / length * 0.015, -(bx - ax) / length * 0.015)
-                    masonry(b, (ax, az), (bx, bz), lambda t: la + (lb - la) * t,
-                            lambda t: ha + (hb - ha) * t, 9000 + i, n)
+                b.face(points, 'ART_CastleStone', strokes=False)
 
 
 def inner_banks_mesh(b):
@@ -886,7 +797,7 @@ def inner_banks_mesh(b):
             side = 1 if bank == 'outerBank' else -1
             solid = (middle[0] + side * dz / length, -0.6, middle[1] - side * dx / length)
             outward_face(b, [(a[0], -1.35, a[1]), (c[0], -1.35, c[1]),
-                             (c[0], 0.15, c[1]), (a[0], 0.15, a[1])], 'HK_StoneDark', solid)
+                             (c[0], 0.15, c[1]), (a[0], 0.15, a[1])], 'ART_CastleStone', solid)
 
 
 def bridge_mesh(b):
@@ -895,20 +806,28 @@ def bridge_mesh(b):
 
 
 def otemon_bridge_mesh(b):
-    # Otemon bridge is pedestrian width. Its existing walk surface is part of the shared plan.
+    """OSM wooden bridge, with a narrow paved approach and open timber rails."""
     from streetscape import outward_face
-    for p in strip(approach_data()['path'][:3], -2.4, 2.4):
-        for a, c in zip(p, p[1:] + p[:1]):
-            outward_face(b, [(a[0], -0.12, a[1]), (c[0], -0.12, c[1]),
-                             (c[0], 0.15, c[1]), (a[0], 0.15, a[1])], 'HK_Stone',
-                         (sum(v[0] for v in p) / 4, 0, sum(v[1] for v in p) / 4))
-    for side in (-1, 1):
-        for p in strip(approach_data()['path'][:3], side * 2.4, side * 2.62):
-            face(b, p, 0.81, 'HK_Stone', False)
-            centre = (sum(v[0] for v in p) / 4, 0.45, sum(v[1] for v in p) / 4)
-            for a, c in zip(p, p[1:] + p[:1]):
-                outward_face(b, [(a[0], 0.15, a[1]), (c[0], 0.15, c[1]),
-                                 (c[0], 0.81, c[1]), (a[0], 0.81, a[1])], 'HK_Stone', centre)
+    from abstract_props import cylinder
+    d = approach_data()
+    line = d['path'][1:]
+    half, rail = d['bridgeProfile']['bridgeHalfWidth'], d['bridgeProfile']['bridgeRailHeight']
+    for p in strip(line,-half,half):
+        centre = (sum(x for x,z in p)/len(p),.12,sum(z for x,z in p)/len(p))
+        # The top belongs to surfaces(), so Ground and visible timber have one owner.
+        outward_face(b,[(x,.06,z) for x,z in p],'HK_WoodDark',centre)
+        for a,c in zip(p,p[1:]+p[:1]):
+            outward_face(b,[(a[0],.06,a[1]),(c[0],.06,c[1]),
+                            (c[0],.16,c[1]),(a[0],.16,a[1])],'HK_WoodDark',centre)
+    a,c = line
+    length = math.dist(a,c)
+    nx,nz = -(c[1]-a[1])/length,(c[0]-a[0])/length
+    for side in (-1,1):
+        def at(t,y):return (a[0]+(c[0]-a[0])*t+nx*side*(half+.03),y,a[1]+(c[1]-a[1])*t+nz*side*(half+.03))
+        count = math.ceil(length/2.5)
+        for i in range(count+1):cylinder(b,at(i/count,.06),at(i/count,.16+rail),.07,'HK_WoodDark',segments=6)
+        for y in (.16+rail*.48,.16+rail):cylinder(b,at(0,y),at(1,y),.055,'HK_WoodMid',segments=6)
+        for t in (.22,.5,.78):cylinder(b,at(t,-1.65),at(t,.06),.14,'HK_WoodDark',segments=6)
 
 
 def approach_part(poly, far):
@@ -945,16 +864,6 @@ def distant_approach_mesh(b):
     face(b, inner_moat(), -1.35, 'HK_Water', False)
     inner_banks_mesh(b)
     otemon_bridge_mesh(b)
-    for side in (-1, 1):
-        pts = north_sample()[:-1]
-        for lo, hi, height, material in ((-0.65, -0.50, 0.022, 'HK_WhitePaint'),
-                                         (-0.46, 0, 0.023, 'ART_PathGreen')):
-            at = lambda offset: lambda x, z: side * (north_half(x, z) + offset)
-            for q in strip(pts, at(lo), at(hi)):
-                q = approach_part(q, True)
-                if q:
-                    for p in difference([q], approach_paint_crossings()):
-                        face(b, p, height, material, False)
 
 
 def triangles(poly, y):
@@ -974,7 +883,7 @@ def surface_kind(name):
 _pending_image = None
 
 
-def export_plan(markings=()):
+def export_plan():
     global _pending_image
     roads = [p for kind, p, height, material in surfaces() if kind == 'road']
     walks = [p for kind, p, height, material in surfaces() if kind in ('walk', 'curb')]
@@ -1006,7 +915,8 @@ def export_plan(markings=()):
         polygon = [(x, moat_edge(x)) for x in xs] + [(x, north_shore(x)) for x in reversed(xs)]
         water_walls.append(dict(name='Moat water ' + label, polygon=[round(v, 5) for p in polygon for v in p]))
     # The bridge deck is free ground; its pedestrian corridor is removed from the water walls.
-    bridge_cuts = strip(approach_data()['path'], -2.4, 2.4)
+    half = approach_data()['bridgeProfile']['bridgeHalfWidth']
+    bridge_cuts = strip(approach_data()['path'], -half, half)
     bridge_cuts += [ccw([(x, z) for x, y, z in quad(segment)]) for segment in segments()
                     if segment['route']['id'] == 'omote-bridge'
                     or (segment['route']['id'] == 'otemon-ascent' and segment['index'] == 0)]
@@ -1026,7 +936,7 @@ def export_plan(markings=()):
         json.dump(dict(world=WORLD, walls=water_walls), f, separators=(',', ':'))
     # Road heights are needed immediately by paving generators. The plan image waits until
     # every requested model is exported, so new frontages have their final GLB bounds.
-    _pending_image = (meta, roads, walks, markings)
+    _pending_image = (meta, roads, walks)
 
 
 def finish_exports(refresh=False):
@@ -1038,7 +948,7 @@ def finish_exports(refresh=False):
 
 def refresh_image():
     """Refresh the complete model-derived editor images and their registration."""
-    export_image(None, None, None, None)
+    export_image(None, None, None)
 
 
 def export_castle_paths():
@@ -1064,7 +974,7 @@ def export_castle_paths():
         json.dump(meta, f, separators=(',', ':'))
 
 
-def export_image(meta, roads, walks, markings):
+def export_image(meta, roads, walks):
     """Render in a clean Blender process, preserving the caller's export/library scene."""
     import bpy
     subprocess.run([bpy.app.binary_path, '-b', '--factory-startup', '--python',
@@ -1075,16 +985,8 @@ def build(name, mesh_class):
     from east_extension import clip_existing_builder
     b = clip_existing_builder(mesh_class(name))
     if name == 'ART_KyobashiRoads':
-        markings = []
-        class PaintedPlan:
-            pigment = b.pigment
-
-            def face(self, points, material, **kwargs):
-                if material in ('HK_WhitePaint', 'ART_PathGreen'):
-                    markings.append(([(x, z) for x, y, z in points], material))
-                b.face(points, material, **kwargs)
-        roads_mesh(PaintedPlan())
-        export_plan(markings)
+        roads_mesh(b)
+        export_plan()
     elif name == 'ART_KyobashiLand':
         land_mesh(b)
     elif name == 'ART_KyobashiBanks':

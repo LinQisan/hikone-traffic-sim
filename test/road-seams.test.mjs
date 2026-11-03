@@ -1,6 +1,7 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import {execFileSync} from 'node:child_process';
 import { Ground } from '../src/simulation/collision/Ground.ts';
 
 const THREE = await import('three');
@@ -10,6 +11,25 @@ const tiles = JSON.parse(await fs.readFile(new URL('../data/road_tiles.json', im
 const ground = new Ground(tiles);
 const material = new THREE.MeshBasicMaterial({ side: THREE.FrontSide });
 
+test('Float32 edge nodes cannot turn a clipped footway into a self-crossing ribbon', () => {
+  execFileSync('python3',['-c',`
+import sys, math
+sys.path.insert(0,'tools')
+from road_network import triangulate
+p=[(-599.5249633789062,213.92935180664062),(-599.5257568359375,213.92022705078125),
+   (-599.6193237304688,212.90037536621094),(-599.6175537109375,212.9004669189453)]
+cross=lambda a,b,c:(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])
+t=triangulate(p)
+assert len(t)==1 and math.isclose(sum(cross(*q)/2 for q in t),.0009063347242772579,abs_tol=1e-12)
+assert {v for q in t for v in q}=={p[0],p[2],p[3]}
+# An ordinary noded edge must keep its shared middle vertex and full area.
+p=[(0,0),(2,0),(4,0),(4,2),(0,2)]
+t=triangulate(p)
+assert math.isclose(sum(cross(*q)/2 for q in t),8)
+assert {v for q in t for v in q}==set(p)
+`],{cwd:new URL('..',import.meta.url)});
+});
+
 async function buildGeometry(detail) {
   const vertical = [], tops = [], caps = [];
   const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3();
@@ -18,7 +38,7 @@ async function buildGeometry(detail) {
     const bytes = await fs.readFile(new URL(`../data/models/impressionist/${asset}${detail}.glb`, import.meta.url));
     const gltf = await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '');
     gltf.scene.traverse(object => {
-      if (!object.isMesh || !['HK_Asphalt', 'HK_Sidewalk', 'HK_Curb', 'HK_Stone'].includes(object.material.name)) return;
+      if (!object.isMesh || !['HK_Asphalt', 'HK_Sidewalk', 'HK_Curb', 'HK_Stone', 'ART_CastleStone'].includes(object.material.name)) return;
       const g = object.geometry, p = g.attributes.position;
       for (let i = 0; i < g.index.count; i += 3) {
         a.fromBufferAttribute(p, g.index.getX(i));

@@ -7,7 +7,7 @@ from functools import lru_cache
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BROWN = (.50, .37, .29)
-SALMON = (.74, .53, .45)
+SALMON = (.62, .48, .40)
 METAL = (.56, .58, .54)
 STONE = (.49, .52, .47)
 INK = (.88, .85, .71)
@@ -20,19 +20,33 @@ def data():
 
 
 def wall(b, item):
-    from higashi_school import solid
-    from east_extension import outward
-    p = item['outline']
+    from higashi_school import face
+    from road_network import ccw, triangulate
+    p = ccw(item['outline'])
     base = item.get('baseHeight', .01)
     top = base + item['height'] if 'baseHeight' in item else item['height']
     center = (sum(x for x, z in p) / len(p), top / 2, sum(z for x, z in p) / len(p))
-    seed = int(item['osm'].split('/')[-1])
-    from school_road import masonry
-    # Above the plot height, so the camera envelope keeps this core; the masonry closes the base.
-    solid(b, p, max(base, .16) if base > 0 else base, top, 'ART_Joint', (.20, .21, .24))
-    for i, (a, c) in enumerate(zip(p, p[1:] + p[:1])):
-        masonry(b, a, c, base, top, (center[0], center[2]), seed % 100000 + i, batter=.12, scale=1.15)
-    return
+    # Bevel the lower corners instead of leaving gaps between independently battered sides.
+    # This stays within their former bounds, including the narrow public turn by the gate.
+    depth = data()['wallBatter'] * (top-base)
+    normals = []
+    for a, c in zip(p, p[1:] + p[:1]):
+        length = math.dist(a, c)
+        normals.append(((c[1]-a[1])/length, (a[0]-c[0])/length))
+    lower = []
+    material, pigment = 'ART_CastleStone', (1, 1, 1)
+    for i, (x, z) in enumerate(p):
+        before, after = normals[i-1], normals[i]
+        first = (x+before[0]*depth, base, z+before[1]*depth)
+        second = (x+after[0]*depth, base, z+after[1]*depth)
+        lower.extend(((first[0],first[2]),(second[0],second[2])))
+        face(b, [first,second,(x,top,z)], material, center, pigment)
+        nx,nz = p[(i+1)%len(p)]
+        face(b, [second,(nx+after[0]*depth,base,nz+after[1]*depth),
+                 (nx,top,nz),(x,top,z)], material, center, pigment)
+    for ring, y in ((lower,base),(p,top)):
+        for triangle in triangulate(ccw(ring)):
+            face(b, [(x,y,z) for x,z in triangle], material, center, pigment)
 
 
 def gate(b):
@@ -55,12 +69,15 @@ def gate(b):
     # Gravel yard behind the closed grille (0989), and the two posted boards at its side.
     from road_network import face as ground
     ground(b,[tuple(p) for p in data()['gateGravel']],.16,'ART_Gravel',False)
-    px,pz=x-w/2-.9,z-.3
+    px,pz=x-w/2-.7,z-2.0
     poster=lambda u,y,o:(px+u,y,pz-o)
     solid(b,[(px-.34,pz-.03),(px+.34,pz-.03),(px+.34,pz+.03),(px-.34,pz+.03)],.5,2.5,'ART_Joint',(.94,.93,.88))
     rect(b,poster,-.32,2.1,.64,.38,(.95,.84,.28),.04)
-    for i,word in enumerate('ダメ。'):label(b,poster,word,-.14,1.76-i*.33,.28,.28,(.82,.14,.12),.045)
-    label(b,poster,'ゼッタイ',.0,.74,.3,.15,(.82,.14,.12),.045)
+    label(b,poster,'たった1回でも犯罪！',-.29,2.21,.58,.065,(.22,.26,.21),.045)
+    for i,word in enumerate('ダメ。ゼッタイ。'):
+        dot=word=='。'
+        label(b,poster,word,.04 if dot else -.1,1.87-i*.17,
+              .045 if dot else .20,.045 if dot else .16,(.82,.14,.12),.045)
     opening = w-2*p-.12
     for y in (.18,q['grilleHeight']):
         cylinder(b,at(-opening/2,y,.03),at(opening/2,y,.03),.035,'ART_Sand',segments=5)
@@ -128,14 +145,7 @@ def fixtures(b):
     points=[(x,.01,z),(x,4.5,z),(x+.12,5.1,z),(x+.45,5.6,z),(x+.95,5.85,z)]
     for a,c in zip(points,points[1:]):cylinder(b,a,c,.045,'HK_MetalLight',segments=6)
     solid(b,[(x+.8,z-.18),(x+1.25,z-.18),(x+1.25,z+.18),(x+.8,z+.18)],5.75,5.9,'HK_MetalLight',METAL)
-    # Blue pedestrian/bicycle crossing sign observed on the western approach.
-    x,z=q['pedestrianSign'];at=lambda u,y,o:(x-u,y,z-o)
-    cylinder(b,(x,.01,z),(x,2.8,z),.045,'ART_StoneLight',segments=5)
-    graphic(b,at,[(-.43,2.0),(.43,2.0),(0,2.78)],(.87,.88,.80),.04)
-    graphic(b,at,[(-.36,2.04),(.36,2.04),(0,2.69)],(.18,.40,.61),.045)
-    line(b,at,[(0,2.56),(-.05,2.34),(-.18,2.18)],.043,INK,.051)
-    line(b,at,[(-.05,2.34),(.13,2.18)],.043,INK,.051)
-    line(b,at,[(-.14,2.4),(.12,2.37)],.035,INK,.051)
+    for sign in q['crossingSigns']:crossing_sign(b,sign)
     x,z=q['restrictionSign'];at=lambda u,y,o:(x+u,y,z-o)
     cylinder(b,(x,.01,z),(x,2.7,z),.04,'ART_StoneLight',segments=5)
     for r,color,o in ((.31,(.76,.22,.18),.04),(.26,(.89,.88,.78),.045)):
@@ -158,20 +168,37 @@ def fixtures(b):
         label(b,at,text,-width/2,y,width,.085,(.24,.29,.25),.055)
 
 
-def cycle_symbols(b):
-    from field_photos import data as observations
-    from university_frontage import line
-    road=observations()['schoolRoad']['points'];a,c=road[-2],road[-3]
-    length=math.dist(a,c);ux,uz=(c[0]-a[0])/length,(c[1]-a[1])/length;nx,nz=-uz,ux
-    x=-574.7;z=a[1]+(c[1]-a[1])*(x-a[0])/(c[0]-a[0])
-    for side in (-1,1):
-        # Two opposing bicycle symbols on the existing blue crossing band.
-        at=lambda u,v,o:(x+ux*(-3.15+u)+nx*(side*2.15+v),.028+o,z+uz*(-3.15+u)+nz*(side*2.15+v))
-        for cy in (-.24,.24):
-            p=[(.14*math.cos(i*math.tau/14),cy+.14*math.sin(i*math.tau/14)) for i in range(15)]
-            line(b,at,p,.025,INK,0)
-        line(b,at,[(0,-.24),(.16,0),(0,.24),(0,-.24),(-.12,0),(.16,0)],.025,INK,0)
-        line(b,at,[(0,.24),(-.10,.28),(-.12,.18)],.025,INK,0)
+def crossing_sign(b,sign):
+    """Five-sided pedestrian-and-bicycle plates, with a physical back and pole."""
+    from abstract_props import cylinder
+    from university_frontage import graphic,line
+    x,z=sign['point'];nx,nz=sign['normal']
+    at=lambda u,y,o:(x-nz*u+nx*o,y,z+nx*u+nz*o)
+    cylinder(b,(x,.01,z),(x,2.75,z),.045,'ART_StoneLight',segments=6)
+    outline=[(-.43,2.0),(.43,2.0),(.43,2.24),(0,2.85),(-.43,2.24)]
+    graphic(b,at,outline,(.88,.90,.86),.045)
+    graphic(b,at,[(u*.9,2.03+(y-2.0)*.9) for u,y in outline],(.15,.37,.65),.051)
+    back=lambda u,y,o:at(-u,y,-o)
+    graphic(b,back,list(reversed(outline)),(.59,.62,.59),.025)
+    for a,c in zip(outline,outline[1:]+outline[:1]):
+        b.face([at(*a,-.025),at(*c,-.025),at(*c,.045),at(*a,.045)],'HK_MetalLight',False)
+    for y in (2.1,2.65):cylinder(b,at(0,y,-.1),at(0,y,-.025),.04,'HK_MetalLight',segments=4)
+    # Hat, head, walking body and the two bicycle wheels remain separate at distance.
+    # Keep the hat and head inside the sloping plate edges, as in 0986.
+    graphic(b,at,[(-.10+.045*math.cos(i*math.tau/16),2.565+.045*math.sin(i*math.tau/16)) for i in range(16)],INK,.058)
+    line(b,at,[(-.17,2.61),(-.02,2.61)],.023,INK,.058)
+    graphic(b,at,[(-.15,2.51),(-.065,2.51),(-.035,2.33),(-.15,2.31)],INK,.058)
+    line(b,at,[(-.12,2.33),(-.25,2.11)],.045,INK,.058)
+    line(b,at,[(-.08,2.33),(.01,2.13)],.043,INK,.058)
+    line(b,at,[(-.08,2.48),(.09,2.41)],.042,INK,.058)
+    line(b,at,[(-.15,2.48),(-.20,2.32)],.035,INK,.058)
+    for u in (-.13,.18):
+        ring=[(u+.095*math.cos(i*math.tau/24),2.17+.095*math.sin(i*math.tau/24)) for i in range(25)]
+        line(b,at,ring,.018,INK,.060)
+    line(b,at,[(-.13,2.17),(-.06,2.33),(.06,2.17),(-.13,2.17),(.13,2.34),(.18,2.17)],.018,INK,.061)
+    line(b,at,[(.13,2.34),(.12,2.41),(.05,2.41)],.018,INK,.061)
+    line(b,at,[(-.11,2.34),(-.02,2.34)],.025,INK,.061)
+    for y in (2.04,2.16,2.28):line(b,at,[(-.35,y),(-.26,y)],.025,INK,.058)
 
 
 def build(b):
@@ -180,4 +207,3 @@ def build(b):
     gate(b)
     vegetation(b)
     fixtures(b)
-    cycle_symbols(b)

@@ -24,7 +24,7 @@ const data = new URL('../data/', import.meta.url);
 const read = name => JSON.parse(fs.readFileSync(new URL(name, data)));
 const layout = webLayout(read('layout.json')), map = read('map.json');   // as the browser shows it
 const ground = new Ground(read('road_tiles.json'));
-const NOT_SOLID = /^(ART_HillWood|HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|Kyobashi(Roads|Land|Water)))/;
+const NOT_SOLID = /^(ART_HillWood|HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|Kyobashi(Roads|Land|Water)|RoadMarkings))/;
 // These photo-corrected buildings have low real thresholds. Project their closed main
 // bodies too: a plinth below the body band must not turn a building's interior into free cells.
 const SOLID_BODY = new Map([['ART_CornerShop', 'ART_ShopPlaster'], ['ART_WhiteStorehouse', 'ART_DisplayInk']]);
@@ -72,7 +72,11 @@ function markTriangle(a, b, c) {
     const n = Math.max(1, Math.ceil(Math.max(Math.hypot(q[0] - p[0], q[2] - p[2]), Math.hypot(r[0] - p[0], r[2] - p[2]), Math.hypot(r[0] - q[0], r[2] - q[2])) / STEP));
     for (let i = 0; i <= n; i++) for (let j = 0; j <= n - i; j++) {
       const u = i / n, v = j / n, w = 1 - u - v;
-      mark(p[0] * w + q[0] * u + r[0] * v, p[2] * w + q[2] * u + r[2] * v);
+      const x = p[0] * w + q[0] * u + r[0] * v, z = p[2] * w + q[2] * u + r[2] * v;
+      const y = p[1] * w + q[1] * u + r[1] * v, floor = ground.heightAt(x, z);
+      // The centroid band is only a broad phase. A long wall beside steps or a
+      // slope must not mark masonry beneath the walker's local feet as an obstacle.
+      if (y >= floor + BAND_LOW - 1e-6 && y <= floor + BAND_HIGH + 1e-6) mark(x, z);
     }
   }
 }

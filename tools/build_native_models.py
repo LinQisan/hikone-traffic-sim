@@ -223,7 +223,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--only', nargs='+')
 options = parser.parse_args(sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else [])
 for name in names:
-    if options.only and name not in options.only:
+    # tools/build_road_markings.mjs writes this layer without Blender.
+    if name == 'ART_RoadMarkings' or options.only and name not in options.only:
         continue
     for low in (False, True):
         b = build(name, low)

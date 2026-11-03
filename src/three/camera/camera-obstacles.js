@@ -8,7 +8,7 @@ const probeMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
 // Plan-view cell of the bounds grid. Replay planning asks for hundreds of thousands of rays,
 // each of which is short compared with a town of thousands of parts.
 const CELL = 16;
-const FLOOR = /^(HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|MoatBankPatch|Kyobashi(Roads|Land|Water)))/;
+const FLOOR = /^(HK_(Road|Ground|Water|Terrain)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|MoatBankPatch|Kyobashi(Roads|Land|Water)|RoadMarkings))/;
 
 export class CameraObstacles {
   constructor(definitions = []) {
@@ -38,9 +38,11 @@ export class CameraObstacles {
   addSolids(parts, solids, transform) {
     const groups = solids.map(s => {
       const box = new THREE.Box3();
-      for (const [x, z] of s.footprint) box.expandByPoint(new THREE.Vector3(-x, 0.15, z));
+      for (const [x, z] of s.footprint) box.expandByPoint(new THREE.Vector3(-x, s.base ?? 0.15, z));
       box.max.y += s.height + s.rise;
-      box.expandByScalar(0.05);
+      // Keep overhanging eaves and battered wall feet. Every triangle vertex must fit the envelope.
+      const margin = 0.05 + (s.eave ?? 0) + (s.batter ?? 0) * s.height;
+      box.expandByScalar(margin * Math.SQRT2);
       const contains = p => {
         if (!box.containsPoint(p)) return false;
         let inside = false;
@@ -49,8 +51,8 @@ export class CameraObstacles {
           const [ax, az] = s.footprint[i], [bx, bz] = s.footprint[(i + 1) % s.footprint.length];
           const dx = bx-ax, dz = bz-az, length = Math.hypot(dx,dz);
           const along = (x-ax)*dx+(z-az)*dz;
-          if (length && along >= -.05*length && along <= length*length+.05*length
-            && Math.abs(dx*(z-az)-dz*(x-ax)) <= .05*length) return true;
+          if (length && along >= -margin*length && along <= length*length+margin*length
+            && Math.abs(dx*(z-az)-dz*(x-ax)) <= margin*length) return true;
           // OSM outlines can be concave. A convex-only half-plane test drops their roofs.
           if ((az>z)!==(bz>z) && x < ax+(z-az)*dx/dz) inside = !inside;
         }
@@ -72,7 +74,7 @@ export class CameraObstacles {
     for (const part of parts) {
       // These are the authored building pigments. Roads, moat banks, water and field
       // surfaces in the same draw are ground, not roof/wall obstacles.
-      if (!/^(ART_(Plaster|Timber|Concrete|Window|Tile|RedRoof|Boulder|Facade|Joint)|HK_(RoofTile|Plaster|Stone|MetalLight))$/.test(part.material.name)) continue;
+      if (!/^(ART_(Plaster|Timber|Concrete|Window|Tile|RedRoof|Boulder|CastleStone|Facade|Joint)|HK_(RoofTile|Plaster|Stone|MetalLight))$/.test(part.material.name)) continue;
       const geometry = part.geometry, position = geometry.attributes.position;
       const count = geometry.index?.count ?? position.count;
       for (let i = 0; i < count; i += 3) {

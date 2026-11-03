@@ -34,6 +34,7 @@ os.makedirs(OUT, exist_ok=True)
 # Pigments in sRGB: complementary strokes are chosen separately, rather than
 # multiplying a photograph/texture by a pastel tint.
 COLORS = {
+    'ART_CastleStone': (1.0, 1.0, 1.0),
     'HK_Plaster': (0.89, 0.86, 0.76), 'HK_PlasterWarm': (0.93, 0.83, 0.66),
     'HK_WoodDark': (0.34, 0.29, 0.33), 'HK_WoodMid': (0.58, 0.42, 0.29),
     'HK_WoodLight': (0.76, 0.59, 0.39), 'HK_RoofTile': (0.41, 0.46, 0.57),
@@ -148,7 +149,7 @@ class BrushMesh:
             pigment = COLORS.get(material) if ground else (self.pigment(material, 0.48) if architecture else None)
         self.polygon(pts, material, pigment,
                      smooth=self.name == 'HK_Terrain_Castle')
-        if self.abstract or not strokes or len(pts) < 3:
+        if self.abstract or not strokes or material == 'ART_CastleStone' or len(pts) < 3:
             return
         # Triangulate a fan for uniform sampling on the actual source surface.
         for i in range(1, len(pts) - 1):

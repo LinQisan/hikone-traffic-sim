@@ -1,0 +1,1301 @@
+{
+  "reviewed": "2026-10-31",
+  "frame": "geographic-frame.json; unchanged metre scale and bearing",
+  "sources": {
+    "osm": {
+      "url": "https://api.openstreetmap.org/api/0.6/map?bbox=136.2450,35.2738,136.2555,35.2792",
+      "license": "ODbL 1.0",
+      "credit": "OpenStreetMap contributors",
+      "sha256": "bcbae4fa065b405b0b3a4aade13bd2772cff7b5730035e2a9eb7e4027e6235e8"
+    },
+    "gsi": {
+      "url": "https://cyberjapandata.gsi.go.jp/xyz/optimal_bvmap-v1/optimal_bvmap-v1.pmtiles",
+      "catalogDate": "2026-07-01",
+      "license": "Public Data License 1.0; GSI terms",
+      "credit": "国土地理院最適化ベクトルタイルを加工",
+      "terms": "https://www.gsi.go.jp/kikakuchousei/kikakuchousei40182.html",
+      "etag": "\"dfa81a9cba11aad28247d63a2d8361ec-2015\"",
+      "tiles": [
+        {
+          "z": 16,
+          "x": 57570,
+          "y": 25896,
+          "sha256": "a9b281d3e468d5ec12df816aabe913b49019e13beb57196296961cf213d80c39"
+        },
+        {
+          "z": 16,
+          "x": 57570,
+          "y": 25897,
+          "sha256": "b94f10795c30f09faf8a1a296ce313705a5e7038e685fc0e504b436373557a6a"
+        },
+        {
+          "z": 16,
+          "x": 57571,
+          "y": 25896,
+          "sha256": "16b932acbc71da28570822dc0f75512bcc1512315b10e44390fd5d608331c61e"
+        },
+        {
+          "z": 16,
+          "x": 57571,
+          "y": 25897,
+          "sha256": "649250bf19003ea7b632dd531a05b6b3efde035d6327aa3c4e22c72fad9dc5e1"
+        },
+        {
+          "z": 16,
+          "x": 57572,
+          "y": 25896,
+          "sha256": "1a5980ff9a8a14537cf3b07010b8a977ce54b5bccf2232492c62f1ac512bdb65"
+        },
+        {
+          "z": 16,
+          "x": 57572,
+          "y": 25897,
+          "sha256": "41a6cba5d421da9807dd6701499d51db7d5193e65befe0d7a8524ac1d56b8639"
+        }
+      ]
+    },
+    "city": {
+      "url": "https://www2.wagmap.jp/hikone-sp/",
+      "role": "Visual cross-check only; no city/PASCO/GeoTechnologies tiles or traced geometry shipped"
+    }
+  },
+  "features": {
+    "nishi-north": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/380217950",
+        "version": "1",
+        "timestamp": "2015-11-14T12:09:59Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2481483,
+              35.2778716
+            ],
+            [
+              136.248858,
+              35.2774744
+            ],
+            [
+              136.2487789,
+              35.2773784
+            ],
+            [
+              136.2480667,
+              35.2777737
+            ],
+            [
+              136.2481483,
+              35.2778716
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -632.63055,
+            351.85258
+          ],
+          [
+            -554.50045,
+            348.53477
+          ],
+          [
+            -554.93386,
+            335.6624
+          ],
+          [
+            -633.14456,
+            338.68044
+          ]
+        ],
+        "method": "OSM outline",
+        "uncertaintyMetres": 2
+      }
+    },
+    "nishi-stair": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/380217944",
+        "version": "1",
+        "timestamp": "2015-11-14T12:09:59Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2482941,
+              35.2780466
+            ],
+            [
+              136.2484095,
+              35.2779818
+            ],
+            [
+              136.2482771,
+              35.2778195
+            ],
+            [
+              136.2481592,
+              35.2778847
+            ],
+            [
+              136.2482941,
+              35.2780466
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -618.99973,
+            374.83559
+          ],
+          [
+            -619.63008,
+            353.13721
+          ],
+          [
+            -632.56323,
+            353.61424
+          ],
+          [
+            -631.7166,
+            375.39526
+          ]
+        ],
+        "method": "OSM outline",
+        "uncertaintyMetres": 2
+      }
+    },
+    "nishi-main": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/380217956",
+        "version": "1",
+        "timestamp": "2015-11-14T12:09:59Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2483058,
+              35.2775143
+            ],
+            [
+              136.2487077,
+              35.277291
+            ],
+            [
+              136.2485796,
+              35.2771402
+            ],
+            [
+              136.2481824,
+              35.2773609
+            ],
+            [
+              136.2483058,
+              35.2775143
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -599.41414,
+            325.70711
+          ],
+          [
+            -555.26571,
+            323.98238
+          ],
+          [
+            -556.24304,
+            303.57674
+          ],
+          [
+            -599.87584,
+            305.28238
+          ]
+        ],
+        "method": "OSM outline",
+        "uncertaintyMetres": 2
+      }
+    },
+    "nishi-wing": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/380217954",
+        "version": "1",
+        "timestamp": "2015-11-14T12:09:59Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2491153,
+              35.2773211
+            ],
+            [
+              136.2490227,
+              35.277207
+            ],
+            [
+              136.2487759,
+              35.2773356
+            ],
+            [
+              136.2488761,
+              35.2774565
+            ],
+            [
+              136.2491153,
+              35.2773211
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -552.04949,
+            347.71664
+          ],
+          [
+            -525.62619,
+            346.45431
+          ],
+          [
+            -526.03237,
+            331.22304
+          ],
+          [
+            -552.64029,
+            331.4774
+          ]
+        ],
+        "method": "OSM outline",
+        "uncertaintyMetres": 2
+      }
+    },
+    "nishi-gym": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/380217958",
+        "version": "2",
+        "timestamp": "2025-04-11T08:00:54Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2479793,
+              35.2776688
+            ],
+            [
+              136.248026,
+              35.277649
+            ],
+            [
+              136.2480644,
+              35.2776951
+            ],
+            [
+              136.2482762,
+              35.2775774
+            ],
+            [
+              136.2479691,
+              35.2771998
+            ],
+            [
+              136.2477083,
+              35.2773402
+            ],
+            [
+              136.2479793,
+              35.2776688
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -605.41042,
+            330.506
+          ],
+          [
+            -606.81472,
+            279.71054
+          ],
+          [
+            -635.19526,
+            280.49515
+          ],
+          [
+            -633.79096,
+            331.29061
+          ]
+        ],
+        "method": "Minimum rectangular roof envelope; source has a small entrance projection",
+        "uncertaintyMetres": 2
+      }
+    },
+    "school-lane-shed": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "geometrySha256": "da72f592369e43f6f95c13a27bc6107a1aa34a0b5db6a4cfb83d0762d6a57def"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.24889219887243,
+              35.27710391827816
+            ],
+            [
+              136.2488928437233,
+              35.27710391827816
+            ],
+            [
+              136.24881774187088,
+              35.277016331398826
+            ],
+            [
+              136.24877080321312,
+              35.27695939987647
+            ],
+            [
+              136.2487305700779,
+              35.27698239145762
+            ],
+            [
+              136.24875873327255,
+              35.277016331398826
+            ],
+            [
+              136.24883249402046,
+              35.27710391827816
+            ],
+            [
+              136.2488328885251,
+              35.27710391827816
+            ],
+            [
+              136.2489478290081,
+              35.27723967775394
+            ],
+            [
+              136.24898806214333,
+              35.27721668624582
+            ],
+            [
+              136.24889219887243,
+              35.27710391827816
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -529.27125,
+            330.5009
+          ],
+          [
+            -530.84084,
+            295.71686
+          ],
+          [
+            -535.35186,
+            295.92042
+          ],
+          [
+            -533.78227,
+            330.70446
+          ]
+        ],
+        "method": "Minimum rectangular roof envelope; facade identity matched to 0858/0860 and lane side",
+        "uncertaintyMetres": 3
+      }
+    },
+    "moat-timber-house": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "geometrySha256": "1fea7986b6ed6c3a1a83c1b3c7454f7f73f70311d2e4bb06f0c633164811cf69"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2489323959967,
+              35.27692874442478
+            ],
+            [
+              136.248931735754,
+              35.27692874442478
+            ],
+            [
+              136.24895319342613,
+              35.2769484515022
+            ],
+            [
+              136.24906182289124,
+              35.276871812840845
+            ],
+            [
+              136.2489853799343,
+              35.27680064830466
+            ],
+            [
+              136.24887809157372,
+              35.27687728703335
+            ],
+            [
+              136.2489323959967,
+              35.27692874442478
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -516.14753,
+            303.55027
+          ],
+          [
+            -503.24413,
+            301.46399
+          ],
+          [
+            -504.92594,
+            291.06224
+          ],
+          [
+            -517.82933,
+            293.14853
+          ]
+        ],
+        "method": "Minimum rectangular roof envelope; facade identity matched to 0858/0860 and lane side",
+        "uncertaintyMetres": 3
+      }
+    },
+    "moat-store": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "geometrySha256": "3ec3b2f10d638d1906c1b59bc13b0376fe1ddc7a5560960581ea1dda7484af0c"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.24920934438705,
+              35.27696158955115
+            ],
+            [
+              136.24920532107353,
+              35.27696487406305
+            ],
+            [
+              136.2492200732231,
+              35.27697801210934
+            ],
+            [
+              136.24922946095467,
+              35.27697034824926
+            ],
+            [
+              136.24927639961243,
+              35.27701414172563
+            ],
+            [
+              136.2492898106575,
+              35.277003193358766
+            ],
+            [
+              136.24929785728455,
+              35.27700976237906
+            ],
+            [
+              136.24936491250992,
+              35.27696158955115
+            ],
+            [
+              136.24924287199974,
+              35.276846631550576
+            ],
+            [
+              136.2491624057293,
+              35.27690465799031
+            ],
+            [
+              136.24918802788662,
+              35.27692874442478
+            ],
+            [
+              136.24918788671494,
+              35.27692874442478
+            ],
+            [
+              136.24920666217804,
+              35.27694626182716
+            ],
+            [
+              136.249198615551,
+              35.27695173601464
+            ],
+            [
+              136.24920934438705,
+              35.27696158955115
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -498.86915,
+            309.54205
+          ],
+          [
+            -496.23506,
+            326.33242
+          ],
+          [
+            -485.17051,
+            324.5966
+          ],
+          [
+            -487.80459,
+            307.80623
+          ]
+        ],
+        "method": "Minimum rectangular roof envelope; facade identity matched to 0858/0860 and lane side",
+        "uncertaintyMetres": 3
+      }
+    },
+    "school-villa": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "geometrySha256": "62d7f71b3cf377ca2726de115cf590d0ef9a531b4e1bf2ac6dc4da1920e4a4fd"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2495419383049,
+              35.27658058526633
+            ],
+            [
+              136.24948292970657,
+              35.27662328411157
+            ],
+            [
+              136.24949097633362,
+              35.27663204284627
+            ],
+            [
+              136.24947622418404,
+              35.276642991263316
+            ],
+            [
+              136.2495218217373,
+              35.276684595234585
+            ],
+            [
+              136.24953120946884,
+              35.27667802618791
+            ],
+            [
+              136.2495432794094,
+              35.27668897459874
+            ],
+            [
+              136.24960899353027,
+              35.27664189642167
+            ],
+            [
+              136.2495419383049,
+              35.27658058526633
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -449.06476,
+            297.06753
+          ],
+          [
+            -447.5089,
+            306.11099
+          ],
+          [
+            -456.45925,
+            307.65083
+          ],
+          [
+            -458.01511,
+            298.60737
+          ]
+        ],
+        "method": "Minimum rectangular roof envelope; facade identity matched to 0858/0860 and lane side",
+        "uncertaintyMetres": 3
+      }
+    },
+    "tennis-1": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/1462190329",
+        "version": "2",
+        "timestamp": "2025-12-28T02:57:13Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2484556,
+              35.2764104
+            ],
+            [
+              136.248382,
+              35.2763329
+            ],
+            [
+              136.2485894,
+              35.2762029
+            ],
+            [
+              136.2486619,
+              35.2762814
+            ],
+            [
+              136.2484556,
+              35.2764104
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -522.7488,
+            228.70824
+          ],
+          [
+            -499.23875,
+            226.46561
+          ],
+          [
+            -500.19582,
+            215.56318
+          ],
+          [
+            -523.84963,
+            217.84724
+          ]
+        ],
+        "method": "OSM playing-court outline, not the surrounding runoff area",
+        "uncertaintyMetres": 2
+      }
+    },
+    "tennis-2": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/1462190332",
+        "version": "2",
+        "timestamp": "2025-12-28T02:57:13Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2482494,
+              35.2762508
+            ],
+            [
+              136.2480882,
+              35.2760815
+            ],
+            [
+              136.2481868,
+              35.2760194
+            ],
+            [
+              136.2483524,
+              35.276187
+            ],
+            [
+              136.2482494,
+              35.2762508
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -531.66357,
+            179.96424
+          ],
+          [
+            -529.22644,
+            203.71048
+          ],
+          [
+            -517.52427,
+            202.64803
+          ],
+          [
+            -520.40081,
+            178.85036
+          ]
+        ],
+        "method": "OSM playing-court outline, not the surrounding runoff area",
+        "uncertaintyMetres": 2
+      }
+    },
+    "tennis-3": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/1462190333",
+        "version": "2",
+        "timestamp": "2025-12-28T02:57:13Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2483868,
+              35.2761678
+            ],
+            [
+              136.2482267,
+              35.2760001
+            ],
+            [
+              136.2483326,
+              35.2759328
+            ],
+            [
+              136.2484955,
+              35.2761014
+            ],
+            [
+              136.2483868,
+              35.2761678
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -516.18706,
+            178.94997
+          ],
+          [
+            -513.74033,
+            202.49219
+          ],
+          [
+            -501.44547,
+            201.4588
+          ],
+          [
+            -504.05491,
+            177.69676
+          ]
+        ],
+        "method": "OSM playing-court outline, not the surrounding runoff area",
+        "uncertaintyMetres": 2
+      }
+    },
+    "tennis-4": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/1462190334",
+        "version": "2",
+        "timestamp": "2025-12-28T02:57:13Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2485287,
+              35.2760305
+            ],
+            [
+              136.2483723,
+              35.2758603
+            ],
+            [
+              136.2484774,
+              35.2757983
+            ],
+            [
+              136.2486331,
+              35.2759686
+            ],
+            [
+              136.2485287,
+              35.2760305
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -496.71828,
+            172.76441
+          ],
+          [
+            -494.70419,
+            196.36444
+          ],
+          [
+            -483.00621,
+            195.54878
+          ],
+          [
+            -484.96044,
+            171.97302
+          ]
+        ],
+        "method": "OSM playing-court outline, not the surrounding runoff area",
+        "uncertaintyMetres": 2
+      }
+    },
+    "tennis-5": {
+      "source": "osm",
+      "reference": {
+        "osm": "way/1462190335",
+        "version": "2",
+        "timestamp": "2025-12-28T02:57:13Z"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2486597,
+              35.275948
+            ],
+            [
+              136.248506,
+              35.2757815
+            ],
+            [
+              136.248605,
+              35.2757177
+            ],
+            [
+              136.2487625,
+              35.2758879
+            ],
+            [
+              136.2486597,
+              35.275948
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "footprint": [
+          [
+            -481.7651,
+            171.76442
+          ],
+          [
+            -479.74085,
+            194.88512
+          ],
+          [
+            -468.27236,
+            194.16234
+          ],
+          [
+            -470.37123,
+            170.50932
+          ]
+        ],
+        "method": "OSM playing-court outline, not the surrounding runoff area",
+        "uncertaintyMetres": 2
+      }
+    },
+    "keep": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "osmCrossCheck": "way/363244224",
+        "geometrySha256": "0c811e85c91657c572a674352b016554df7598b5e0cf8bff55df2fde1d9fd3b7"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.25194787979126,
+              35.27650504110039
+            ],
+            [
+              136.2519934773445,
+              35.27648095453991
+            ],
+            [
+              136.25196665525436,
+              35.27644810921863
+            ],
+            [
+              136.25200152397156,
+              35.2764251174858
+            ],
+            [
+              136.25189423561096,
+              35.27631782264632
+            ],
+            [
+              136.25168904662132,
+              35.27646015250465
+            ],
+            [
+              136.25178426504135,
+              35.27655321419986
+            ],
+            [
+              136.25181376934052,
+              35.2766112408498
+            ],
+            [
+              136.2521530687809,
+              35.27658058526633
+            ],
+            [
+              136.25214502215385,
+              35.27652146375115
+            ],
+            [
+              136.25210210680962,
+              35.27652584312413
+            ],
+            [
+              136.25210344791412,
+              35.276531317340016
+            ],
+            [
+              136.2519733607769,
+              35.276543360613665
+            ],
+            [
+              136.2519720196724,
+              35.276538981241636
+            ],
+            [
+              136.2519036233425,
+              35.27654445545663
+            ],
+            [
+              136.2518821656704,
+              35.27650723078736
+            ],
+            [
+              136.25192508101463,
+              35.27647767000838
+            ],
+            [
+              136.25194787979126,
+              35.27650504110039
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "x": -262.53383,
+        "z": 397.7216,
+        "yaw": 191,
+        "method": "Rigid fit of complete authored roof silhouette; no scale change",
+        "uncertaintyMetres": 3,
+        "silhouetteIoU": {
+          "before": 0.6869,
+          "after": 0.7698
+        }
+      }
+    },
+    "nishinomaru": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "osmCrossCheck": "way/363244236",
+        "geometrySha256": "ddd635163c6d3b9d3cea967d7249f8ea36253b7c6ccd2269bfa68c7f7f6fc986"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.250818669796,
+              35.27798525597945
+            ],
+            [
+              136.25087767839432,
+              35.27792613548966
+            ],
+            [
+              136.25060811638832,
+              35.277816652987184
+            ],
+            [
+              136.25062823295593,
+              35.27778380820758
+            ],
+            [
+              136.25060945749283,
+              35.277776144423754
+            ],
+            [
+              136.25069931149483,
+              35.277668851374074
+            ],
+            [
+              136.25062555074692,
+              35.277628342736726
+            ],
+            [
+              136.25052362680435,
+              35.277752058241305
+            ],
+            [
+              136.25046730041504,
+              35.27783635984855
+            ],
+            [
+              136.250818669796,
+              35.27798525597945
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "x": -444.25161,
+        "z": 463.76066,
+        "yaw": -61,
+        "method": "Rigid fit of complete authored roof silhouette; no scale change",
+        "uncertaintyMetres": 3,
+        "silhouetteIoU": {
+          "before": 0.1097,
+          "after": 0.6254
+        }
+      }
+    },
+    "tenbin": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "osmCrossCheck": "way/363244225",
+        "geometrySha256": "b8e595dfdf2fcd1dbd078fe7ae626618fd965508ee796c6003c27cc1fff34e8b"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.2522791326046,
+              35.275653248381985
+            ],
+            [
+              136.25235959887505,
+              35.275653248381985
+            ],
+            [
+              136.25236093997955,
+              35.27555252165846
+            ],
+            [
+              136.25244140625,
+              35.275553616514834
+            ],
+            [
+              136.25264391303062,
+              35.27555580622751
+            ],
+            [
+              136.25264391303062,
+              35.2756576278019
+            ],
+            [
+              136.25272572040558,
+              35.27565872265684
+            ],
+            [
+              136.2527270615101,
+              35.275493399392836
+            ],
+            [
+              136.25244140625,
+              35.27549120967848
+            ],
+            [
+              136.2522818148136,
+              35.27548901996404
+            ],
+            [
+              136.2522791326046,
+              35.275653248381985
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "x": -159.37596,
+        "z": 340.65659,
+        "yaw": -32,
+        "method": "Rigid fit of complete authored roof silhouette; no scale change",
+        "uncertaintyMetres": 3,
+        "silhouetteIoU": {
+          "before": 0.6524,
+          "after": 0.7042
+        }
+      }
+    },
+    "taikomon": {
+      "source": "gsi",
+      "reference": {
+        "layer": "BldA",
+        "osmCrossCheck": "way/363244226",
+        "geometrySha256": "ce46c3c4f695f4e4ce6bdb20f09a53a89caf3a8272874f29ad91a0c678b66123"
+      },
+      "geometryWgs84": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              136.25218659639359,
+              35.27596309175705
+            ],
+            [
+              136.25205650925636,
+              35.27598170421888
+            ],
+            [
+              136.25209003686905,
+              35.276133888305075
+            ],
+            [
+              136.25217586755753,
+              35.27612184497055
+            ],
+            [
+              136.2521530687809,
+              35.276018929129684
+            ],
+            [
+              136.25219732522964,
+              35.27601236002902
+            ],
+            [
+              136.25218659639359,
+              35.27596309175705
+            ]
+          ]
+        ]
+      },
+      "placement": {
+        "x": -220.22674,
+        "z": 373.10999,
+        "yaw": 67,
+        "method": "Rigid fit of complete authored roof silhouette; no scale change",
+        "uncertaintyMetres": 3,
+        "silhouetteIoU": {
+          "before": 0.3796,
+          "after": 0.6132
+        }
+      }
+    },
+    "school-access": {
+      "source": "gsi",
+      "reference": {
+        "layer": "RdCL",
+        "osmCrossCheck": [
+          "way/1376675005",
+          "way/59265929"
+        ]
+      },
+      "geometryWgs84": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            136.24877214431763,
+            35.276837872839025
+          ],
+          [
+            136.24891296029088,
+            35.277016331398805
+          ],
+          [
+            136.2489826977253,
+            35.27710391827813
+          ]
+        ]
+      },
+      "placement": {
+        "line": [
+          [
+            -526.73118,
+            246.65791
+          ],
+          [
+            -524.9267,
+            270.50764
+          ],
+          [
+            -523.56852,
+            284.30873
+          ],
+          [
+            -523.24273,
+            307.93787
+          ],
+          [
+            -523.03462,
+            319.5651
+          ]
+        ],
+        "method": "GSI north segment spliced to OSM service way at the unchanged photographed fork",
+        "uncertaintyMetres": 2
+      }
+    }
+  },
+  "limits": [
+    "Not survey accuracy. Building heights, roof details and castle floor heights remain artistic estimates.",
+    "Castle fits align simplified complete model silhouettes; remaining footprint differences are not corrected by stretching.",
+    "Small-house facade identities are photo-relative interpretations; their source outlines are independent GSI data.",
+    "The school-access north continuation and other unreviewed shorelines retain the previous scene extent."
+  ]
+}

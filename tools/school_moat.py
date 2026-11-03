@@ -27,9 +27,11 @@ def profile(x):
 @lru_cache(maxsize=1)
 def sections():
     from university import data
-    p=observations()['profile'];line=data()['schoolBank'][:p['coastVertices']]
+    p=observations()['profile'];coast=data()['schoolBank'];line=coast[:p['coastVertices']]
     normals=[]
-    for a,c in zip(line,line[1:]):
+    # The mapped continuation owns the terminal miter too. Truncating the author
+    # must not rotate the preceding twenty metres of otherwise unchanged ground.
+    for a,c in zip(coast,coast[1:]):
         length=math.dist(a,c);normals.append(((c[1]-a[1])/length,-(c[0]-a[0])/length))
     joins=[]
     for i in range(len(line)):
@@ -59,16 +61,35 @@ def terrain():
             vertices=[a[k],c[k],c[k+1],a[k+1]]
             for tri in ((0,1,2),(0,2,3)):
                 ground.append(tuple(vertices[j] for j in tri))
-    return cuts,ground
+    from nishi_rampart import surfaces
+    from university import cut
+    corner=surfaces()
+    corner_cuts=[ccw([(x,z) for x,y,z in t]) for t in corner]
+    retained=[]
+    for t in ground:
+        for p in cut([ccw([(x,z) for x,y,z in t])],corner_cuts):
+            for s in triangulate(ccw(p)):
+                retained.append(tuple((x,plane_height(x,z,t),z) for x,z in s))
+    return cuts+corner_cuts,retained+corner
 
 
-def surface_height(x,z,triangle):
+def barycentric(x,z,triangle):
     (ax,ay,az),(bx,by,bz),(cx,cy,cz)=triangle
     div=(bz-cz)*(ax-cx)+(cx-bx)*(az-cz)
     if abs(div)<1e-10:return None
     u=((bz-cz)*(x-cx)+(cx-bx)*(z-cz))/div;v=((cz-az)*(x-cx)+(ax-cx)*(z-cz))/div
-    if min(u,v,1-u-v)<-1e-4:return None
-    return u*ay+v*by+(1-u-v)*cy
+    return u,v,1-u-v
+
+
+def plane_height(x,z,triangle):
+    weights=barycentric(x,z,triangle)
+    return sum(w*p[1] for w,p in zip(weights,triangle))
+
+
+def surface_height(x,z,triangle):
+    weights=barycentric(x,z,triangle)
+    if weights is None or min(weights)<-1e-4:return None
+    return sum(w*p[1] for w,p in zip(weights,triangle))
 
 
 def height(x,z):
@@ -83,7 +104,9 @@ def ground_polygons(cutters):
     for triangle in terrain()[1]:
         outline=ccw([(v[0],v[2]) for v in triangle])
         for piece in cut([outline],cutters):
-            result.append([(x,surface_height(x,z,triangle),z) for x,z in piece])
+            # Clipping already establishes membership. Float32 noding may move a point
+            # just beyond a very narrow triangle; sample its plane without reclassifying it.
+            result.append([(x,plane_height(x,z,triangle),z) for x,z in piece])
     return result
 
 
@@ -99,6 +122,11 @@ def follows_wall(a,c):
 def tree_position(x,z):
     from university import data
     from castle_approach import point_segment_distance
+    corner=observations()['corner']
+    if -585<x<-540 and 224<z<239:
+        if abs(x-corner['tree']['point'][0])<9:return None
+        a,c=corner['wall'];z=a[1]+(c[1]-a[1])*(x-a[0])/(c[0]-a[0])-1
+        return x,corner['crest'],z
     line=data()['schoolBank'][:observations()['profile']['coastVertices']]
     for a,c in zip(line,line[1:]):
         if point_segment_distance(x,z,a,c)>.02:continue
@@ -110,25 +138,27 @@ def tree_position(x,z):
 
 def rampart(b,ground):
     from streetscape import outward_face
+    from nishi_rampart import stair_contains,crest_contains,details
     for polygon in ground:
         # Height is authored here and exported verbatim to Ground, without renderer offsets.
-        outward_face(b,polygon,'HK_Grass',(polygon[0][0],-2,polygon[0][2]))
+        x,z=[sum(p[i] for p in polygon)/len(polygon) for i in (0,2)]
+        # Steps and stone wall caps belong to their solid authors, not a coplanar lawn.
+        if not stair_contains(x,z) and not crest_contains(x,z):
+            outward_face(b,polygon,'HK_Grass',(polygon[0][0],-2,polygon[0][2]))
     for i,(a,c) in enumerate(zip(sections(),sections()[1:])):
         toe0,top0=a[0],a[1];toe1,top1=c[0],c[1]
         inside=((top0[0]+top1[0])/2,0,(top0[2]+top1[2])/2)
-        outward_face(b,[toe0,toe1,top1,top0],'HK_StoneDark',inside)
+        outward_face(b,[toe0,toe1,top1,top0],'ART_CastleStone',inside)
         dx,dz=toe1[0]-toe0[0],toe1[2]-toe0[2];length=math.hypot(dx,dz)
         if length<.05:continue
-        # The same individual boulders as the school walls, not a tiled surface (0980, 0985).
-        from school_road import masonry,ivy
-        run=math.dist((toe0[0],toe0[2]),(top0[0],top0[2]));high=max(top0[1],top1[1]);low=min(toe0[1],toe1[1])
-        masonry(b,(top0[0],top0[2]),(top1[0],top1[2]),low,high,(inside[0]+(top0[0]-toe0[0])*3,inside[2]+(top0[2]-toe0[2])*3),
-                8900+i,batter=run/max(.5,high-low),scale=1.15)
+        from school_road import ivy
+        high=max(top0[1],top1[1])
         ivy(b,(top0[0],top0[2]),(top1[0],top1[2]),high,(inside[0]+(top0[0]-toe0[0])*3,inside[2]+(top0[2]-toe0[2])*3),8950+i)
     # A closed earthen end is hidden inside the already mapped school-gate stone return.
     end=sections()[-1]
     outward_face(b,[end[0],end[1],end[2],end[3],(end[3][0],.15,end[3][2]),
-                    (end[0][0],.15,end[0][2])],'HK_Stone',end[1])
+                    (end[0][0],.15,end[0][2])],'ART_CastleStone',end[1])
+    details(b)
 
 
 def beside(z,offset):

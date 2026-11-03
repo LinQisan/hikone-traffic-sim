@@ -1,0 +1,31 @@
+{
+  "reference": "../docs/geography.md",
+  "standard": {
+    "source": "区画線の設置様式について (MLIT, 1974-12-26) https://www.mlit.go.jp/road/sign/kijyun/pdf/19741226kukakusenn.pdf",
+    "line": 0.15,
+    "dash": 5,
+    "gap": 5,
+    "note": "Line width and the 5 m dash and gap are the urban standard values. Stop bars, zebra stripes and diamonds follow common practice and are estimates, not checked against the order's annexed drawings."
+  },
+  "kerbMargin": { "primary": 0.55, "default": 0.45 },
+  "signalApproach": 30,
+  "diamondStations": [30, 50],
+  "note": "Street View panoramas viewed as reference only, nothing downloaded. Each profile records one or two sampled points on the corridor, not a survey of its whole length; the width-class defaults apply to every road without a named profile.",
+  "defaults": {
+    "primary": { "centre": "dashed", "edge": true },
+    "secondary": { "centre": "dashed", "edge": true },
+    "tertiary": { "centre": "none", "edge": true },
+    "unclassified": { "centre": "none", "edge": false },
+    "residential": { "centre": "none", "edge": false },
+    "service": { "centre": "none", "edge": false }
+  },
+  "profiles": [
+    { "name": "中濠東西通り", "centre": "dashed", "edge": true, "evidence": "Route 25, centre and edge lines; October 2024 panoramas at (165, 35), (235, 42), (300, 42) and (-894, 119)" },
+    { "name": "大津能登川長浜線", "centre": "dashed", "edge": true, "evidence": "Route 2, centre and edge lines; October 2024 panorama at (-882, 637). A solid section was seen there, so dashes are a simplification" },
+    { "name": "彦根城線", "centre": "dashed", "edge": true, "evidence": "Dashed centre and solid edges; October 2024 panorama at (345, 303)" },
+    { "name": "彦根港彦根停車場線", "centre": "dashed", "edge": true, "evidence": "Route 517, dashed centre and solid edges; October 2024 panorama at (307, 656)" },
+    { "name": "城北通り", "centre": "dashed", "edge": true, "evidence": "One-way carriageway with dashed lane line; June 2023 panorama at (-33, 863)" },
+    { "name": "彦根城線旧道", "centre": "none", "edge": true, "green": { "side": "south", "xMin": 75, "xMax": 255 }, "evidence": "Edge lines, no centre line, green band on the moat side; November 2022 panoramas at (53, 348), (150, 432) and (235, 432). The green's two ends are estimates between samples" },
+    { "name": "朝鮮人街道", "centre": "none", "edge": true, "evidence": "No centre line, crossing diamond; October 2024 panorama at (331, -124)" }
+  ]
+}

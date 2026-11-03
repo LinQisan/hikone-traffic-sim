@@ -158,3 +158,11 @@ test('parked bodies and the collision grid can hide a hazard until it emerges', 
   assert.equal(obstacles.clearSight({ x: 0, z: 100 }, { x: 25, z: 100 }), false);
   assert.equal(obstacles.clearSight({ x: 0, z: 110 }, { x: 25, z: 110 }), true);
 });
+
+test('junction anticipation does not see crossing traffic through a static occluder', () => {
+  const s=scenario({vehicles:[vehicle(),vehicle({route:[{x:20,z:88},{x:20,z:145}]})]});
+  const traffic=new Traffic(s,{canSee:()=>false});
+  traffic.step(.5);
+  assert.equal(traffic.cars.length,2);
+  assert.ok(traffic.cars.every(car=>car.driver.reason!=='junction'),'hidden traffic cannot trigger anticipatory gap acceptance');
+});

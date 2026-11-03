@@ -68,10 +68,10 @@ def road_paint(b, details_only=False):
 
     # Stop bars are behind the crosswalks, leaving the crossing surfaces intact.
     from road_network import STOP_BARS
-    strip((STOP_BARS[1], 22.50), (STOP_BARS[1], 25.85), 0.35)
-    strip((STOP_BARS[0], 26.15), (STOP_BARS[0], 29.50), 0.35)
-    strip((28.50, 14.10), (31.85, 14.10), 0.35)
-    strip((32.15, 37.75), (35.50, 37.75), 0.35)
+    strip((STOP_BARS[1], 22.50), (STOP_BARS[1], 25.85), 0.45)
+    strip((STOP_BARS[0], 26.15), (STOP_BARS[0], 29.50), 0.45)
+    strip((28.50, 14.10), (31.85, 14.10), 0.45)
+    strip((32.15, 37.75), (35.50, 37.75), 0.45)
 
     def arrow(x, z, direction, turn=False):
         dx, dz = direction

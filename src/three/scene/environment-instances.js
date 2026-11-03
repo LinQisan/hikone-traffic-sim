@@ -15,9 +15,14 @@
 // earlier per-colour, per-object multi-draw issued about 3,900 draws per frame and the GPU sat idle.
 import * as THREE from 'three';
 import { placement } from './coords.ts';
+import { batchCells } from './cell-batches.js';
 import { geometryBytes } from './geometry-budget.js';
 
 export const LOD_FAR = 60, LOD_NEAR = 52.8;       // hysteresis: switch out at 60 m, back in at 52.8 m
+export const LOD_DISTANT = 200;                   // the far level: its error stays under 1.5 px from here
+const BACK_IN = LOD_NEAR / LOD_FAR;
+// A placement stops drawing where it would span about 1.5 px at the reference focal length (600 px).
+const CULL_PER_METRE = 600 / 1.5, CULL_MIN = 160;
 const BIG = 100;                                  // assets wider than this are cut into cells
 const MARGIN = 1.5;                               // safety for fast turns and the camera's near plane
 // Lists rebuild only after the view moves 25 cm or turns 1° (quaternion dots use half angles).
@@ -100,55 +105,74 @@ export function mergeParts(parts, palette, transform = null) {
   return geometry;
 }
 
+/** Box and sphere of the listed vertices, without a vector per vertex. */
+function boundsOf(position, vertices) {
+  const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < vertices.length; i++) {
+    const o = vertices[i] * 3;
+    for (let k = 0; k < 3; k++) { const v = position[o + k]; if (v < min[k]) min[k] = v; if (v > max[k]) max[k] = v; }
+  }
+  const box = new THREE.Box3(new THREE.Vector3(...min), new THREE.Vector3(...max));
+  const sphere = new THREE.Sphere(box.getCenter(new THREE.Vector3()));
+  const { x, y, z } = sphere.center;
+  let radiusSquared = 0;
+  for (let i = 0; i < vertices.length; i++) {
+    const o = vertices[i] * 3, dx = position[o] - x, dy = position[o + 1] - y, dz = position[o + 2] - z;
+    radiusSquared = Math.max(radiusSquared, dx * dx + dy * dy + dz * dz);
+  }
+  sphere.radius = Math.sqrt(radiusSquared);
+  return { box, sphere };
+}
+
 /** Splits by triangle centroid, retaining every triangle. A distant proxy can share the low attributes. */
 export function cutIntoCells(geometry, cellSize, shareAttributes = false) {
-  const position = geometry.attributes.position.array, index = geometry.index.array, cells = new Map();
-  for (let i = 0; i < index.length; i += 3) {
-    const a = index[i], b = index[i + 1], c = index[i + 2];
-    const x = Math.floor((position[a * 3] + position[b * 3] + position[c * 3]) / (3 * cellSize));
-    const z = Math.floor((position[a * 3 + 2] + position[b * 3 + 2] + position[c * 3 + 2]) / (3 * cellSize));
-    const key = x + ',' + z;
-    if (!cells.has(key)) cells.set(key, []);
-    cells.get(key).push(a, b, c);
+  const position = geometry.attributes.position.array, index = geometry.index.array, triangles = index.length / 3;
+  // A counting sort over cells: a phone has seconds of this to do while the page is unresponsive.
+  const cellOf = new Uint32Array(triangles), keys = new Map(), counts = [];
+  let lastKey = NaN, lastCell = 0;
+  for (let t = 0; t < triangles; t++) {
+    const a = index[t * 3] * 3, b = index[t * 3 + 1] * 3, c = index[t * 3 + 2] * 3;
+    const x = Math.floor((position[a] + position[b] + position[c]) / (3 * cellSize));
+    const z = Math.floor((position[a + 2] + position[b + 2] + position[c + 2]) / (3 * cellSize));
+    const key = (x + 32768) * 65536 + z + 32768;
+    if (key !== lastKey) {
+      lastKey = key; lastCell = keys.get(key) ?? -1;
+      if (lastCell < 0) { lastCell = counts.length; keys.set(key, lastCell); counts.push(0); }
+    }
+    cellOf[t] = lastCell; counts[lastCell]++;
+  }
+  const sorted = new Uint32Array(index.length), next = [];
+  let offset = 0;
+  for (const count of counts) { next.push(offset); offset += count * 3; }
+  const starts = next.slice();
+  for (let t = 0; t < triangles; t++) {
+    const at = next[cellOf[t]]; next[cellOf[t]] += 3;
+    sorted[at] = index[t * 3]; sorted[at + 1] = index[t * 3 + 1]; sorted[at + 2] = index[t * 3 + 2];
   }
   const result = [], remap = new Int32Array(geometry.attributes.position.count).fill(-1);
-  const point = new THREE.Vector3();
-  for (const [key, ids] of cells) {
-    if (shareAttributes) {
-      const cell = new THREE.BufferGeometry();
-      for (const [name, attribute] of Object.entries(geometry.attributes)) cell.setAttribute(name, attribute);
-      cell.setIndex(new THREE.BufferAttribute(new index.constructor(ids), 1));
-      // BufferGeometry's default bounds include unused vertices in the shared attributes.
-      cell.boundingBox = new THREE.Box3();
-      for (const id of ids) cell.boundingBox.expandByPoint(point.fromBufferAttribute(geometry.attributes.position, id));
-      cell.boundingSphere = new THREE.Sphere();
-      cell.boundingBox.getCenter(cell.boundingSphere.center);
-      let radiusSquared = 0;
-      for (const id of ids) radiusSquared = Math.max(radiusSquared,
-        point.fromBufferAttribute(geometry.attributes.position, id).distanceToSquared(cell.boundingSphere.center));
-      cell.boundingSphere.radius = Math.sqrt(radiusSquared);
-      result.push({ key, geometry: cell });
-      continue;
-    }
+  for (const [key, id] of keys) {
+    const ids = sorted.subarray(starts[id], starts[id] + counts[id] * 3);
+    const name = (Math.floor(key / 65536) - 32768) + ',' + (key % 65536 - 32768);
     const order = [];
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids[i];
-      if (remap[id] < 0) { remap[id] = order.length; order.push(id); }
+    for (let i = 0; i < ids.length; i++) if (remap[ids[i]] < 0) { remap[ids[i]] = order.length; order.push(ids[i]); }
+    const { box, sphere } = boundsOf(position, order), cell = new THREE.BufferGeometry();
+    if (shareAttributes) {
+      for (const [attributeName, attribute] of Object.entries(geometry.attributes)) cell.setAttribute(attributeName, attribute);
+      cell.setIndex(new THREE.BufferAttribute(new index.constructor(ids), 1));
+    } else {
+      // The whole ground can need 32-bit indices while each cell fits in 16 bits.
+      const local = new (order.length > 65535 ? Uint32Array : Uint16Array)(ids.length);
+      for (let i = 0; i < ids.length; i++) local[i] = remap[ids[i]];
+      for (const [attributeName, attribute] of Object.entries(geometry.attributes)) {
+        const size = attribute.itemSize, source = attribute.array, array = new source.constructor(order.length * size);
+        for (let i = 0; i < order.length; i++) for (let c = 0; c < size; c++) array[i * size + c] = source[order[i] * size + c];
+        cell.setAttribute(attributeName, new THREE.BufferAttribute(array, size, attribute.normalized));
+      }
+      cell.setIndex(new THREE.BufferAttribute(local, 1));
     }
-    // The whole ground can need 32-bit indices while each cell fits in 16 bits.
-    const local = new (order.length > 65535 ? Uint32Array : Uint16Array)(ids.length);
-    for (let i = 0; i < ids.length; i++) local[i] = remap[ids[i]];
-    for (const id of order) remap[id] = -1;
-    const cell = new THREE.BufferGeometry();
-    for (const [name, attribute] of Object.entries(geometry.attributes)) {
-      const size = attribute.itemSize, source = attribute.array, array = new source.constructor(order.length * size);
-      for (let i = 0; i < order.length; i++) for (let c = 0; c < size; c++) array[i * size + c] = source[order[i] * size + c];
-      cell.setAttribute(name, new THREE.BufferAttribute(array, size, attribute.normalized));
-    }
-    cell.setIndex(new THREE.BufferAttribute(local, 1));
-    cell.computeBoundingBox();
-    cell.computeBoundingSphere();
-    result.push({ key, geometry: cell });
+    cell.boundingBox = box; cell.boundingSphere = sphere;
+    for (const vertex of order) remap[vertex] = -1;
+    result.push({ key: name, geometry: cell });
   }
   return result;
 }
@@ -160,7 +184,7 @@ export function cutIntoCells(geometry, cellSize, shareAttributes = false) {
  * Batched composites otherwise retain one draw; background selects the longer atmospheric range.
  * castsShadow(asset) → boolean. sideOf(material) → THREE side (scene pigments are single-sided).
  */
-export function environmentInstances(definitions, palette, castsShadow, sideFor = () => THREE.FrontSide) {
+export function environmentInstances(definitions, palette, castsShadow, sideFor = () => THREE.FrontSide, { multiDraw = false } = {}) {
   const root = new THREE.Group();
   root.name = 'HikoneEnvironment';
   const assets = [], cells = [], regions = [];
@@ -185,10 +209,13 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       const step = cellSize ?? Math.max(64, Math.min(128, Math.max(size.x, size.z) / 5));
       placement(...items[0].p, items[0].r, items[0].s, matrix);
       const region = cellSize != null ? { bounds: new THREE.Box3(), low: false, farMesh: null, cells: [] } : null;
-      const levels = [high, low].map((parts, detail) => {
-        const merged = mergeParts(parts, palette, matrix), split = cutIntoCells(merged, step, !!region && detail === 1);
+      const far = definition.far?.filter(p => !p.material.transparent);
+      const levels = [high, low, far].map((parts, detail) => {
+        if (!parts) return new Map();
+        const merged = mergeParts(parts, palette, matrix), whole = region && detail === (far ? 2 : 1);
+        const split = cutIntoCells(merged, step, !multiDraw && !!region && detail > 0);
         if (region) region.bounds.union(merged.boundingBox);
-        if (region && detail === 1) {
+        if (whole) {
           // Far away, draw the whole silhouette once instead of submitting dozens of tiny cells.
           // Nearby cells share these attributes, retaining only their own triangle indices/bounds.
           const mesh = new THREE.Mesh(merged, palette.material(sideFor(high[0].material), true, background ? 0.55 : 1));
@@ -196,15 +223,15 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
           mesh.visible = false; mesh.receiveShadow = true; mesh.matrixAutoUpdate = false;
           mesh.intersectsFrustum = cellInFrustum;
           region.farMesh = mesh; root.add(mesh);
-        } else merged.dispose();
+        } else if (multiDraw || !region || detail === 0) merged.dispose();     // otherwise its cells share these attributes
         return new Map(split.map(c => [c.key, c.geometry]));
       });
       if (region) regions.push(region);
-      for (const key of new Set([...levels[0].keys(), ...levels[1].keys()])) {
+      for (const key of new Set(levels.flatMap(level => [...level.keys()]))) {
         const meshes = levels.map((level, detail) => {
           const geometry = level.get(key);
           if (!geometry) return null;
-          const mesh = new THREE.Mesh(geometry, palette.material(sideFor(high[0].material), detail === 1, background ? 0.55 : 1));
+          const mesh = new THREE.Mesh(geometry, palette.material(sideFor(high[0].material), detail > 0, background ? 0.55 : 1));
           mesh.name = `${asset}/${key}`;
           mesh.castShadow = shadow; mesh.receiveShadow = true;
           mesh.matrixAutoUpdate = false;
@@ -212,7 +239,8 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
           root.add(mesh);
           return mesh;
         });
-        const [highMesh, lowMesh] = meshes;
+        const [highMesh, lowMesh, distantMesh] = meshes;
+        if (distantMesh) { distantMesh.visible = false; distantMesh.castShadow = false; }
         if (shadow && lowMesh) {
           // only the light level casts; it stays in the scene for the shadow pass and draws nothing
           // in the view while the cell is near (its draw range is emptied just before that draw)
@@ -223,7 +251,7 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
         }
         const bounds = new THREE.Box3();
         for (const m of meshes) if (m) bounds.union(m.geometry.boundingBox);
-        const cell = { asset, key, highMesh: meshes[0], lowMesh: meshes[1], bounds, low: false, region };
+        const cell = { asset, key, highMesh, lowMesh, distantMesh, bounds, low: false, distant: false, region };
         cells.push(cell);
         if (region) region.cells.push(cell);
       }
@@ -231,10 +259,11 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     }
     // Repeated or compact asset: one InstancedMesh per detail level, updated on view changes.
     const side = sideFor(high[0].material);
-    const levels = [high, low].map((parts, level) => {
+    const distant = definition.far?.filter(p => !p.material.transparent);
+    const levels = [high, low, ...(distant?.length ? [distant] : [])].map((parts, level) => {
       const geometry = mergeParts(parts, palette);
       const mesh = new THREE.InstancedMesh(geometry, palette.material(side, false, background ? 0.55 : 1), items.length);
-      mesh.name = asset + (level ? '/low' : '/high');
+      mesh.name = asset + ['/high', '/low', '/far'][level];
       mesh.count = 0;
       mesh.visible = false;
       mesh.frustumCulled = false;                  // culled per placement below
@@ -270,7 +299,9 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     // (in the view pass its count is 0 for the draw, so nothing is drawn; three skips the GL call)
     let shadowMesh = null;
     if (shadow) {
-      shadowMesh = new THREE.InstancedMesh(levels[1].geometry, levels[1].material, items.length);
+      // A crown's shadow is a soft mass on the painted ground: its far level casts the same shape.
+      const caster = definition.lodDistant && levels[2] ? levels[2] : levels[1];
+      shadowMesh = new THREE.InstancedMesh(caster.geometry, caster.material, items.length);
       shadowMesh.name = asset + '/shadow';
       shadowMesh.castShadow = true; shadowMesh.receiveShadow = false;
       shadowMesh.frustumCulled = false; shadowMesh.matrixAutoUpdate = false;
@@ -288,16 +319,27 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     const placements = items.map((item, index) => {
       const m = placement(...item.p, item.r, item.s, new THREE.Matrix4());
       const center = sphere.center.clone().applyMatrix4(m);
-      return { item, index, matrix: m, center, radius: sphere.radius * m.getMaxScaleOnAxis(), low: false };
+      return { item, index, matrix: m, center, radius: sphere.radius * m.getMaxScaleOnAxis(), low: false, distant: false };
     });
-    assets.push({ asset, shadow, high: levels[0], low: levels[1], transparent, shadowMesh, placements,
-      lodFar: definition.lodFar ?? LOD_FAR,
-      highIndices: new Uint32Array(items.length).fill(0xffffffff), lowIndices: new Uint32Array(items.length).fill(0xffffffff) });
+    const extent = levels[0].geometry.boundingBox.getSize(size).toArray().sort((a, b) => a - b);
+    const span = Math.max(...items.map(item => Math.max(...[item.s].flat().map(Math.abs)))) * Math.sqrt(extent[1] * extent[2]);
+    assets.push({ asset, shadow, high: levels[0], low: levels[1], far: levels[2] ?? null, transparent, shadowMesh, placements,
+      lodFar: definition.lodFar ?? LOD_FAR, lodDistant: definition.lodDistant ?? LOD_DISTANT,
+      cullDistance: background ? Infinity : Math.max(CULL_MIN, span * CULL_PER_METRE),
+      highIndices: new Uint32Array(items.length).fill(0xffffffff), lowIndices: new Uint32Array(items.length).fill(0xffffffff),
+      farIndices: new Uint32Array(levels[2] ? items.length : 0).fill(0xffffffff) });
   }
 
+  const cellBatches = multiDraw && cells.length ? batchCells(cells, root) : null;
   const frustum = new THREE.Frustum(), second = new THREE.Frustum(), shadowFrustum = new THREE.Frustum();
   const projection = new THREE.Matrix4();
   const eye = new THREE.Vector3(), secondEye = new THREE.Vector3(), sphere = new THREE.Sphere();
+  let viewsSecond = false;
+  const cellInView = (center, radius) => {
+    const distance = Math.max(0, Math.min(center.distanceTo(eye), viewsSecond ? center.distanceTo(secondEye) : Infinity) - radius);
+    sphere.set(center, radius + MARGIN + distance * TURN_MARGIN);
+    return frustum.intersectsSphere(sphere) || (viewsSecond && second.intersectsSphere(sphere));
+  };
   const lastView = new Float64Array(80).fill(NaN), view = new Float64Array(80);
   const rotation = new THREE.Quaternion(), lastRotation = new THREE.Quaternion(), lastEye = new THREE.Vector3(Infinity, 0, 0);
   const frustumOf = (camera, f, position) => {
@@ -305,8 +347,10 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     f.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
     camera.getWorldPosition(position);
   };
+  // 1 on a capable device; lower pulls every switch nearer without touching what is in view.
+  let detail = 1;
   const lodOf = (thing, distance, far = LOD_FAR) => {
-    const low = distance > far * (thing.low ? LOD_NEAR / LOD_FAR : 1);
+    const low = distance > far * detail * (thing.low ? BACK_IN : 1);
     const changed = low !== thing.low;
     thing.low = low;
     return changed;
@@ -322,9 +366,23 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
     casters(on) {
       for (const a of assets) if (a.shadowMesh) a.shadowMesh.visible = on && a.shadowMesh.userData.shadowCount > 0;
       for (const c of cells) if (c.lowMesh?.userData.shadowOnly)
-        c.lowMesh.visible = (!c.region?.farMesh.visible && (c.low || !c.highMesh)) || on;
+        c.lowMesh.visible = (!c.region?.farMesh.visible && !c.distant && (c.low || !c.highMesh)) || on;
     },
     get builds() { return builds; },
+    /** Shows every level, unculled, for `action` (a shader compile), then lets the next view update reselect. */
+    async withAllLevels(action) {
+      const shown = root.children.filter(mesh => !mesh.visible), culled = [];
+      for (const mesh of shown) mesh.visible = true;
+      // The shadow pass culls by its own box, so a caster anywhere else in the scene would wait for first sight too.
+      (root.parent ?? root).traverse(object => {if (object.frustumCulled) {object.frustumCulled = false; culled.push(object);}});
+      await action();
+      for (const mesh of shown) mesh.visible = false;
+      for (const object of culled) object.frustumCulled = true;
+      lastEye.set(Infinity, 0, 0);
+    },
+    get detail() { return detail; },
+    /** Scales every detail range (the next view update applies it). */
+    setDetail(value) { if (value !== detail) { detail = value; lastEye.set(Infinity, 0, 0); } },
     objects: definitions.reduce((n, d) => n + d.items.length, 0),
     get geometryBytes() { return geometryBytes(root); },
     /**
@@ -378,19 +436,26 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
         lastView.set(view); lastEye.copy(eye); lastRotation.copy(rotation);
         builds++;
         for (const a of assets) {
-          let highCount = 0, lowCount = 0, highDirty = false, lowDirty = false;
+          let highCount = 0, lowCount = 0, farCount = 0, highDirty = false, lowDirty = false, farDirty = false;
           for (const p of a.placements) {
             p.distance = Math.max(0, Math.min(p.center.distanceTo(eye), secondCamera ? p.center.distanceTo(secondEye) : Infinity) - p.radius);
             lodOf(p, p.distance, a.lodFar);
+            if (p.distance > a.cullDistance * detail) continue;
             sphere.set(p.center, p.radius + MARGIN + p.distance * TURN_MARGIN);
             if (!frustum.intersectsSphere(sphere) && !(secondCamera && second.intersectsSphere(sphere))) continue;
-            const mesh = p.low ? a.low : a.high, indices = p.low ? a.lowIndices : a.highIndices;
-            const n = p.low ? lowCount++ : highCount++;
+            p.distant = !!a.far && p.distance > a.lodDistant * detail * (p.distant ? BACK_IN : 1);
+            const level = p.distant ? 2 : p.low ? 1 : 0;
+            const mesh = level === 2 ? a.far : level ? a.low : a.high, indices = level === 2 ? a.farIndices : level ? a.lowIndices : a.highIndices;
+            const n = level === 2 ? farCount++ : level ? lowCount++ : highCount++;
             if (indices[n] !== p.index) {
               indices[n] = p.index;
               mesh.instanceMatrix.array.set(p.matrix.elements, 16 * n);
-              if (p.low) lowDirty = true; else highDirty = true;
+              if (level === 2) farDirty = true; else if (level) lowDirty = true; else highDirty = true;
             }
+          }
+          if (a.far) {
+            a.far.count = a.far.userData.drawCount = farCount;
+            if (farDirty) { a.far.instanceMatrix.clearUpdateRanges(); a.far.instanceMatrix.addUpdateRange(0, farCount * 16); a.far.instanceMatrix.needsUpdate = true; }
           }
           a.high.count = a.high.userData.drawCount = highCount;
           a.low.count = a.low.userData.drawCount = lowCount;
@@ -405,6 +470,7 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       for (const a of assets) {
         a.high.visible = a.high.userData.drawCount > 0;
         a.low.visible = a.low.userData.drawCount > 0;
+        if (a.far) a.far.visible = a.far.userData.drawCount > 0;
         for (let level = 0; level < 2; level++) for (const mesh of a.transparent[level]) {
           const frame = level ? a.low : a.high;
           mesh.count = frame.count;
@@ -423,15 +489,19 @@ export function environmentInstances(definitions, palette, castsShadow, sideFor 
       for (const c of cells) {
         const d = Math.min(c.bounds.distanceToPoint(eye), secondCamera ? c.bounds.distanceToPoint(secondEye) : Infinity);
         const switched = lodOf(c, d);
+        c.distant = !!c.distantMesh && d > LOD_DISTANT * detail * (c.distant ? BACK_IN : 1);
         // three culls cells by their bounds; a level without triangles in a cell draws nothing
         if (c.highMesh) c.highMesh.visible = !c.low && !c.region?.farMesh.visible;
         if (c.lowMesh) {
-          c.lowMesh.userData.near = (!c.low && !!c.highMesh) || !!c.region?.farMesh.visible;
-          c.lowMesh.visible = (c.low || !c.highMesh) && !c.region?.farMesh.visible; // casters() shows light levels for shadow frames
+          c.lowMesh.userData.near = (!c.low && !!c.highMesh) || c.distant || !!c.region?.farMesh.visible;
+          c.lowMesh.visible = (c.low || !c.highMesh) && !c.distant && !c.region?.farMesh.visible; // casters() shows light levels for shadow frames
         }
+        if (c.distantMesh) c.distantMesh.visible = c.distant && !c.region?.farMesh.visible;
         // a casting cell with only one level: its casters appear or vanish with the switch
         if (switched && !c.lowMesh?.userData.shadowOnly && (c.highMesh?.castShadow || c.lowMesh?.castShadow)) changed = true;
       }
+      viewsSecond = !!secondCamera;
+      cellBatches?.sync(cellInView);
       return changed;
     },
   };

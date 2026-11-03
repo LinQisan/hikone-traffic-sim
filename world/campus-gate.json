@@ -1,0 +1,30 @@
+{
+  "reviewed": "2026-11-02",
+  "sources": {
+    "photos": "Owner originals IMG_0852-0853 (2026-10-29), IMG_0967-0968 and IMG_0971 (2026-10-31), IMG_1084-1085 (2026-11-01), inspected locally at original resolution. Private references; no pixels are shipped or used as textures.",
+    "streetView": [
+      {"pano": "coHTEsedAMURADClgrac_A", "date": "2022-11", "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=coHTEsedAMURADClgrac_A&heading=313"},
+      {"pano": "oSBsIlmcNwwIajIeCcCoSA", "date": "2022-11", "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=oSBsIlmcNwwIajIeCcCoSA&heading=280"}
+    ],
+    "streetViewUse": "Viewed in Google Maps on 2026-11-02 under Google's terms. No imagery downloaded into the project.",
+    "sourceGateEstimate": [-596.6, 178.0]
+  },
+  "verified": [
+    "Tall gate pillars are recessed from the long street frontage. Concave quarter-circle returns open toward the forecourt and join the two frontage types to the pillars. The owner corrected the earlier convex interpretation on 2026-11-02.",
+    "A smaller stone end post marks each transition to the straight frontage. The south return shelters the orange round postbox.",
+    "The postbox has a shallow domed cap, raised collars, a hooded slot over a round postal badge, a lower collection door and side paper labels."
+  ],
+  "estimates": {
+    "pillarInset": 3.0,
+    "pillarHalfSpacing": 4.3,
+    "wallAttachOffset": 0.48,
+    "returnRadius": 3.0,
+    "arcSegments": 12,
+    "postboxArcDegrees": 75,
+    "postboxFacingDegrees": 15,
+    "postboxWallClearance": 0.47,
+    "northBoardAlong": [10.4, 12.8, 16.0, 19.3],
+    "southMapAlong": -10.4
+  },
+  "limits": "Mapped source junction and photo-relative placements are separate. Inset, radius, pillar spacing, box size and fine details are visual estimates, not a measured survey. Street View predates the temporary office and current notices. Collection times and current rules are not asserted."
+}

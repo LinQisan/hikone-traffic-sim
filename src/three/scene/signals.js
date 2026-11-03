@@ -299,7 +299,10 @@ function buildPosts(rigs) {
     geometry.computeBoundingSphere();
     const mesh = new THREE.Mesh(geometry, mat);
     mesh.name = name;
-    mesh.castShadow = mesh.receiveShadow = true;
+    // Printed faces lie on their backing plates, which cast. Three's shared depth material takes on
+    // a map, so a casting face would compile an extra program whenever draw order lands on it.
+    mesh.castShadow = !mat.map;
+    mesh.receiveShadow = true;
     meshes.push(mesh);
   };
   const lambert = (name, options) => painted(new THREE.MeshLambertMaterial({ name, ...options }));

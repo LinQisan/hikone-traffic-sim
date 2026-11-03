@@ -64,9 +64,8 @@ for(const detail of ['','.lod'])test(`the photographed hall sight line and non-e
   assert.equal(box.object.material.emissive.getHex(),0,'painted metal never emits signal light');
 });
 for(const detail of ['','.lod'])test(`all four gate characters remain visible in front of the stone column ${detail||'high'}`,()=>{
-  const [gx,gz]=UNIVERSITY_GATE,[ax,az]=UNIVERSITY_AXIS[1];
-  const length=Math.hypot(ax-gx,az-gz),ix=(ax-gx)/length,iz=(az-gz)/length;
-  const tx=-iz,tz=ix,nx=-ix,nz=-iz,px=gx-tx*4.3,pz=gz-tz*4.3;
+  const {centre:[gx,gz],tangent:[tx,tz],normal:[nx,nz],halfSpacing}=UNIVERSITY_GATE_DETAIL.entry;
+  const px=gx-tx*halfSpacing,pz=gz-tz*halfSpacing;
   const group=root(detail),ray=new THREE.Raycaster();ray.far=3;
   const columnSurfaces=[];
   group.traverse(mesh=>{if(mesh.isMesh&&mesh.name==='ART_ShigaCampus'&&
@@ -87,5 +86,70 @@ for(const detail of ['','.lod'])test(`all four gate characters remain visible in
     }
     assert.ok(gold>=8,`the character at row ${row} has visible gold strokes, not an empty plaque`);
   }
+});
+test('the curved gate apron admits bodies on both sides of the old narrow driveway',()=>{
+  const {centre,tangent,normal}=UNIVERSITY_GATE_DETAIL.entry;
+  const at=(u,v)=>centre.map((p,i)=>p+tangent[i]*u+normal[i]*v);
+  for(const side of [-1,1]){
+    clearPath([at(side*6.0,4.4),at(side*3.0,1.5),at(side*3.0,-1.8)]);
+    assert.ok(!body.blocked(...at(side*5.66,2.12),.3),'the concave forecourt stays free where the reversed bow used to protrude');
+  }
+});
+for(const detail of ['','.lod'])test(`the recessed pillars and both quarter-circle returns survive ${detail||'high'} export`,()=>{
+  const {centre,tangent,normal}=UNIVERSITY_GATE_DETAIL.entry,group=root(detail);
+  const at=(u,v)=>centre.map((p,i)=>p+tangent[i]*u+normal[i]*v);
+  for(const side of [-1,1]){
+    const pillar=at(side*4.3,4);
+    const ray=new THREE.Raycaster(new THREE.Vector3(-pillar[0],2.4,pillar[1]),new THREE.Vector3(normal[0],0,-normal[1]),0,5);
+    const hit=ray.intersectObject(group,true)[0];
+    assert.ok(hit?.distance>3.4&&hit.distance<3.6,'tall pillar is recessed behind the street frontage');
+    for(const degrees of [25,45,65]){
+      const angle=degrees*Math.PI/180,p=at(side*(4.78+3*Math.sin(angle)),3*(1-Math.cos(angle)));
+      const n=normal.map((v,i)=>v*Math.cos(angle)-side*tangent[i]*Math.sin(angle));
+      ray.set(new THREE.Vector3(-(p[0]+n[0]),.3,p[1]+n[1]),new THREE.Vector3(n[0],0,-n[1]));ray.far=1.4;
+      const wall=ray.intersectObject(group,true)[0];
+      assert.ok(wall&&wall.distance>.7&&wall.distance<1.0,`curved wall at ${side},${degrees}`);
+      assert.ok(['HK_StoneDark','ART_StoneLight'].includes(wall.object.material.name),'the return is real masonry');
+    }
+  }
+});
+for(const detail of ['','.lod'])test(`the close postbox has a visible dark slot, white postal lettering and collection-door recess ${detail||'high'}`,()=>{
+  const {postbox:[x,z],postboxNormal:[nx,nz]}=UNIVERSITY_GATE_DETAIL,group=root(detail);
+  const surfaces=group.children.filter(mesh=>mesh.name==='ART_ShigaCampus');
+  const tx=-nz,tz=nx,ray=new THREE.Raycaster();ray.far=1.1;
+  function hit(u,y){
+    ray.set(new THREE.Vector3(-(x+tx*u+nx),y,z+tz*u+nz),new THREE.Vector3(nx,0,-nz));
+    return ray.intersectObjects(surfaces)[0];
+  }
+  const slot=hit(0,1.22);
+  assert.equal(slot?.object.material.name,'ART_DisplayInk','the dark slot shows below its rain hood');
+  assert.ok(slot.object.geometry.attributes.color.getX(slot.face.a)<.2,'the slot is dark');
+  let white=0;
+  for(let i=0;i<24;i++)for(let j=0;j<20;j++){
+    const h=hit(-.15+(i+.5)*.3/24,.99+(j+.5)*.2/20);
+    if(h?.object.material.name==='ART_DisplayInk'&&h.object.geometry.attributes.color.getX(h.face.a)>.8)white++;
+  }
+  assert.ok(white>70,'postal characters are visible from their reading side');
+  const seam=hit(.115,.5);
+  assert.equal(seam?.object.material.name,'ART_DisplayInk','the collection door is separated from its cast frame');
+  assert.ok(seam.object.geometry.attributes.color.getX(seam.face.a)<.2,'the collection-door recess is dark');
+  // Rear and underside remain closed when walking around or looking up at the box.
+  ray.set(new THREE.Vector3(-(x-nx),.6,z-nz),new THREE.Vector3(-nx,0,nz));
+  assert.equal(ray.intersectObjects(surfaces)[0]?.object.material.name,'HK_SignRed');
+});
+for(const detail of ['','.lod'])test(`the office gallery faces the hall and has a visible soffit ${detail||'high'}`,()=>{
+  const group=root(detail),ray=new THREE.Raycaster();ray.far=3;
+  ray.set(new THREE.Vector3(609.22,4.55,206.8),new THREE.Vector3(0,0,1));
+  let hit=ray.intersectObject(group,true)[0];
+  assert.equal(hit?.object.material.name,'ART_Window','the south gallery reaches real glazed doors');
+  assert.ok(hit.point.z>208.4&&hit.point.z<208.6,'doors belong to the south wall, not the opposite face');
+  ray.set(new THREE.Vector3(610,5.7,207.8),new THREE.Vector3(0,1,0));
+  hit=ray.intersectObject(group,true)[0];
+  assert.equal(hit?.object.material.name,'HK_MetalLight','the canopy has a visible underside');
+  assert.ok(Math.abs(hit.point.y-6.18)<.01,'the underside sits below the roof top');
+  ray.set(new THREE.Vector3(610,2.9,207.8),new THREE.Vector3(0,1,0));
+  hit=ray.intersectObject(group,true)[0];
+  assert.equal(hit?.object.material.name,'HK_MetalLight','the upper landing has a visible underside');
+  assert.ok(Math.abs(hit.point.y-3.12)<.01,'the landing closes the gallery floor');
 });
 test.after(()=>{for(const group of roots.values())group.traverse(o=>{if(o.isMesh){o.geometry.dispose();o.material.dispose();}});});

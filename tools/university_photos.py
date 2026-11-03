@@ -167,50 +167,93 @@ def site_office(b,item):
     for end in (0,1):
         outward_face(b,[f(end,.15,0),f(end,.15,1),f(end,6.15,1),f(end,6.15,0)],'ART_Joint',center)
         at=lambda u,y,o:f(end+(end*2-1)*o/length,y,u/depth)
-        for i in range(5):
-            u=depth*(i+.5)/5
-            for y in (1,3.9):framed_window(b,at,u-.7,u+.7,y,y+1.55,columns=2,rows=1,frame='HK_MetalLight')
+        # 0976/0977: gallery toward the hall (south), blank street ends.
+        # 0984: condensers on the opposite wall, rather than a second gallery.
+        if end==1:
+            for i in range(5):
+                u=depth*(i+.5)/5
+                for y in (.4,3.4):
+                    framed_window(b,at,u-.78,u+.78,y,y+2.25,columns=2,rows=2,frame='HK_MetalLight')
+        else:
+            for u in (depth*.18,depth*.43,depth*.68,depth*.88):
+                a=at(u,3.7,.22)
+                b.box(a,(.78,.62,.38),'HK_MetalLight',False)
+                for j in range(5):
+                    yy=3.48+j*.09
+                    outward_face(b,[at(u-.31,yy,.42),at(u+.31,yy,.42),
+                                    at(u+.31,yy+.025,.42),at(u-.31,yy+.025,.42)],'ART_Window',center)
+                cylinder(b,at(u+.32,3.6,.1),at(u+.32,5.7,.1),.025,'HK_MetalLight',segments=4)
         for y in (3.15,6.15):
             cylinder(b,at(0,y,.025),at(depth,y,.025),.06,'HK_MetalLight',segments=4)
+        for i in range(9):
+            u=depth*i/8
+            cylinder(b,at(u,.2,.025),at(u,6.1,.025),.018,'HK_MetalLight',segments=3)
     outward_face(b,[f(-.035,6.2,-.02),f(1.035,6.2,-.02),f(1.035,6.2,1.02),f(-.035,6.2,1.02)],'HK_MetalLight',center)
-    # Galvanized external stair on the visible southern end, as in 0852.
-    for i in range(15):
-        u=.9-i*.9/15
-        a,c=f(u,.15+i*.2,1.01),f(u,.15+i*.2,1.11)
-        prism(b,(a[0],a[2]),(c[0],c[2]),a[1],a[1]+.1,.38,'HK_MetalLight')
-    for v in (1.01,1.11):
-        cylinder(b,f(.9,1.1,v),f(0,4.0,v),.04,'HK_MetalLight',segments=4)
-    # Galvanized gallery along the upper windows, reached by the stair (0976, 0977).
-    at=lambda u,y,o:f(-o/length,y,u/depth)
-    for lo,hi in ((3.12,3.2),):
-        outward_face(b,[at(0,hi,0),at(depth,hi,0),at(depth,hi,1.05),at(0,hi,1.05)],'HK_MetalLight',at(depth/2,0,.5))
+    at=lambda u,y,o:f(1+o/length,y,u/depth)
+    # Slabs include soffits and ends, so the gallery is solid from below.
+    for lo,hi,outer in ((3.12,3.2,1.05),(6.18,6.24,1.2)):
+        a,c=at(0,lo,outer/2),at(depth,lo,outer/2)
+        prism(b,(a[0],a[2]),(c[0],c[2]),lo,hi,outer,'HK_MetalLight')
+        outward_face(b,[at(0,lo,0),at(depth,lo,0),at(depth,lo,outer),at(0,lo,outer)],
+                     'HK_MetalLight',at(depth/2,hi+.1,outer/2))
     for y in (4.2,3.7):
         cylinder(b,at(0,y,1.05),at(depth,y,1.05),.03,'HK_MetalLight',segments=4)
+        for u in (0,depth):cylinder(b,at(u,y,0),at(u,y,1.05),.03,'HK_MetalLight',segments=4)
     for i in range(6):
         u=depth*i/5
         cylinder(b,at(u,.15,1.05),at(u,6.2,1.05),.04,'HK_MetalLight',segments=4)
-    outward_face(b,[at(0,6.22,-.05),at(depth,6.22,-.05),at(depth,6.22,1.2),at(0,6.22,1.2)],'HK_MetalLight',at(depth/2,0,.5))
+    # Stair occupies the west bay on the hall side, clear of the building core.
+    for i in range(15):
+        u=depth-3.8+i*3.4/15;y=.18+i*.2
+        a,c=at(u,y,.12),at(u,y,1.02)
+        prism(b,(a[0],a[2]),(c[0],c[2]),y,y+.1,.25,'HK_MetalLight')
+    for o in (.12,1.02):
+        cylinder(b,at(depth-3.8,1.15,o),at(depth-.4,4.0,o),.035,'HK_MetalLight',segments=4)
+    # Blue drinks machine at the blank street end (0976/0984).
+    x,y,z=f(.48,.15,-.12)
+    start=len(b.faces)
+    b.box((x,y+.9,z),(.72,1.8,.7),'ART_DisplayInk',False)
+    for k in range(start,len(b.faces)):b.pigments[k]=(.13,.23,.63)
+    from university_frontage import rect,label
+    front=lambda u,y,o:(x+u,y,z-o)
+    rect(b,front,-.28,.7,.41,.8,(.75,.83,.83),.36)
+    for row in range(3):
+        for col in range(4):rect(b,front,-.25+col*.09,.82+row*.22,.05,.12,(.86,.77-row*.12,.57),.37)
+    label(b,front,'Asahi',-.26,1.64,.53,.17,(.94,.94,.89),.375)
     recolor(b,first)
 
 
 def gate_boards(b,d):
-    """Observed entry furniture with graphics refined from the owner's painted reference."""
+    """Observed entry furniture, checked against 0971–0977 and November 2022 Street View."""
     from university import prism
     from abstract_props import cylinder
     from streetscape import outward_face
-    first=len(b.faces);gx,gz=d['gate'];ax,az=d['axis'][1];length=math.hypot(ax-gx,az-gz)
-    nx,nz=(gx-ax)/length,(gz-az)/length;tx,tz=-nz,nx
+    first=len(b.faces);entry=d['gateDetail']['entry'];gx,gz=entry['centre']
+    nx,nz=entry['normal'];tx,tz=-nz,nx
     def at(t,y,o):return (gx+tx*t+nx*o,y,gz+tz*t+nz*o)
     from university_frontage import board_content, climber
-    # Physical frames remain in the established frontage. Content is readable original
-    # vector art and observed labels, never guessed dated notices or copied photo pixels.
-    for t,w,h,y,kind in ((6.3,1.6,1.7,1.55,'map'),(8.6,2,1.45,1.65,'hall'),
-                        (12,3.5,1.4,1.65,'bulletin'),(-6.5,1.05,2,1.35,'map')):
-        for u in (t-w*.42,t+w*.42):
-            cylinder(b,at(u,.01,.32),at(u,y+h*.5+(.30 if kind=='bulletin' else .05),.32),.035,'HK_MetalLight',segments=4)
-        left,right=at(t-w*.5,y-h*.5,.32),at(t+w*.5,y-h*.5,.32)
+    enclosures = {1:next(run['points'] for run in d['boundary'] if run['kind']=='palisadeWall'),
+                  -1:next(run['points'][::-1] for run in d['boundary'] if run['kind']=='balustrade')}
+    for q in d['gateDetail']['boards']:
+        t,w,h,y,kind=[q[k] for k in ('along','width','height','center','kind')]
+        board_at = lambda u,yy,o:at(t+u,yy,o)
+        if abs(t) >= entry['halfSpacing']:
+            side=1 if t>0 else -1;enclosure=enclosures[side]
+            remaining = abs(t)-entry['halfSpacing']
+            for a,c in zip(enclosure,enclosure[1:]):
+                span = math.dist(a,c)
+                if remaining <= span:
+                    dx,dz=(c[0]-a[0])/span,(c[1]-a[1])/span
+                    px,pz=a[0]+dx*remaining,a[1]+dz*remaining
+                    dx,dz=dx*side,dz*side
+                    board_at = lambda u,yy,o:(px+dx*u+dz*o,yy,pz+dz*u-dx*o)
+                    break
+                remaining -= span
+        for u in (-w*.42,w*.42):
+            cylinder(b,board_at(u,.01,.32),board_at(u,y+h*.5+.05,.32),.035,'HK_MetalLight',segments=4)
+        left,right=board_at(-w*.5,y-h*.5,.32),board_at(w*.5,y-h*.5,.32)
         prism(b,(left[0],left[2]),(right[0],right[2]),y-h*.5,y+h*.5,.09,'HK_MetalLight')
-        board_content(b,lambda u,yy,o:at(t+u,y+yy,o),d,w,h,kind)
+        board_content(b,lambda u,yy,o:board_at(u,y+yy,o),d,w,h,kind)
     # The north gate leaf is folded against the enclosure; its centre stays fully open.
     for t in (-4.0,4.0):
         for i in range(6):

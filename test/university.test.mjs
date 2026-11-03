@@ -6,7 +6,6 @@ import { Ground } from '../src/simulation/collision/Ground.ts';
 import { Obstacles } from '../src/simulation/collision/Obstacles.ts';
 import { crossesWall } from '../src/simulation/core/scenario.ts';
 import { inEastExtension } from '../src/world/generators/east-layout.ts';
-import { INNER_MOAT_INNER, INNER_MOAT_OUTER } from '../src/world/generators/castle-approach.js';
 import { WEST_ROUTE, UNIVERSITY_ENTRANCE, UNIVERSITY_AXIS, UNIVERSITY_WEST_LANE,
   UNIVERSITY_BUILDINGS, CASTLE_CAMPUS_LINK, UNIVERSITY_BOUNDARY,
   UNIVERSITY_FRONT_LANE, UNIVERSITY_WEST_ENTRY, UNIVERSITY_WEST_GATE,
@@ -149,8 +148,9 @@ for(const detail of ['', '.lod'])test('the campus filler leaves the existing inn
   };
   const extension=await load('ART_WestMoat'),native=await load('ART_CastleApproach');
   const ray=new THREE.Raycaster();ray.far=3;
-  for(let i=0;i<3;i++){
-    const q=INNER_MOAT_INNER[i].map((v,j)=>(v+INNER_MOAT_OUTER[i][j])/2);
+  // The banks have independent source vertices. Pairing by index samples land after
+  // adding mapped corners, and the first pair lies exactly on the closing seam.
+  for(const q of [[-375,253],[-330,240],[-280,228],[-230,217]]){
     ray.set(new THREE.Vector3(-q[0],1,q[1]),new THREE.Vector3(0,-1,0));
     assert.ok(!ray.intersectObject(extension,true).some(h=>['HK_Grass','HK_Sidewalk'].includes(h.object.material.name)&&h.point.y> -1.3),
       'no dry filler above the joined water at '+q);

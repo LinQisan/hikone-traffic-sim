@@ -1,5 +1,6 @@
 // Cache a seamless brush mask once. Rendering samples it instead of evaluating noise per pixel.
 import * as THREE from 'three';
+import {resetStoneTexture} from './stone-texture.ts';
 
 let texture;
 const PERIOD = 32, SIZE = 512;
@@ -50,4 +51,4 @@ export function brushTexture() {
 }
 
 /** The application releases the shared mask only after every material leaves the renderer. */
-export function resetBrushTexture() {texture?.dispose(); texture = undefined;}
+export function resetBrushTexture() {texture?.dispose(); texture = undefined; resetStoneTexture();}

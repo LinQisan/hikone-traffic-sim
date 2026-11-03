@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 
 const THREE = await import('three');
 const { CameraObstacles } = await import('../src/three/camera/camera-obstacles.js');
-const { ReplayCamera, replaySampleTimes } = await import('../src/three/camera/replay-camera.js');
+const { ReplayCamera, replaySampleTimes } = await import('../src/three/camera/ReplayCamera.ts');
 const { Replay } = await import('../src/three/entities/replay.js');
 const { registerModel } = await import('../src/three/scene/world.js');
 
@@ -85,7 +85,10 @@ test('fractional recording timestamps do not create near-duplicate camera keys',
 });
 function sample(t, x = t * 2, z = 0) {
   const bounds = new THREE.Box3(vector(x - 1, 0.01, z - 1), vector(x + 1, 1.8, z + 1));
-  return { t, bounds, targets: [vector(x, 0.9, z), vector(x, 0.2, z), vector(x, 1.7, z)] };
+  return {t, subjects: [{role:'participant',bounds,targets:[vector(x,.9,z),vector(x,.2,z),vector(x,1.7,z)]}], blockers:[]};
+}
+function sampleBounds(s) {
+  const bounds=new THREE.Box3();for(const subject of s.subjects)bounds.union(subject.bounds);return bounds;
 }
 function addBox(obstacles, x, y, z, w, h, d) {
   const geometry = new THREE.BoxGeometry(w, h, d);
@@ -99,27 +102,32 @@ function assertFramed(camera, bounds) {
     assert.ok(Math.abs(p.x) < 0.83 && Math.abs(p.y) < 0.83 && p.z > -1 && p.z < 1, 'subject stays inside the safe screen margins');
   }
 }
+function startCamera(camera,samples,referenceTime,preferredAngle,obstacles=null,reducedMotion=false){
+  const director=new ReplayCamera(camera,flat);
+  director.configure({reducedMotion});
+  director.start({samples,referenceTime,preferredAngle,obstacles});return director;
+}
+function assertLockedShots(director){
+  const fov=director.camera.fov;
+  for(const shot of director.shots){
+    director.frame(shot.from+.0001);const from=director.camera.position.clone(),focus=director.focus.clone();
+    director.frame((shot.from+shot.until)/2);
+    assert.ok(director.camera.position.equals(from)&&director.focus.equals(focus),'each shot holds its composition');
+    assert.equal(director.camera.fov,fov,'the lens does not zoom');
+  }
+}
 
-test('overview avoids a foreground roof without hiding it, holds one angle and frames portrait subjects', () => {
+test('analysis shots avoid a foreground roof without hiding it and frame portrait subjects', () => {
   const obstacles = new CameraObstacles();
   const roof = addBox(obstacles, 3, 5, 8, 20, 10, 8);
   const camera = new THREE.PerspectiveCamera(50, 9 / 16, 0.3, 500);
-  const director = new ReplayCamera(camera, flat, obstacles);
-  const samples = Array.from({ length: 21 }, (_, i) => sample(i / 5));
-  director.start(samples, 2, 0);
-  assert.equal(director.track.filter(p => p.cut).length, 0, 'no cut is needed to get around the roof');
-  assert.equal(new Set(director.track.map(p => p.angle)).size, 1, 'a whole-clip clear angle stays stable');
-  let before = null;
-  for (let i = 0; i <= 240; i++) {
-    const t = i / 60, s = sample(t);
-    director.frame(t);
-    assertFramed(camera, s.bounds);
-    assert.ok(director.clear(camera.position, s.targets), `clear sight at ${t}`);
-    if (before) assert.ok(camera.position.distanceTo(before) < 0.3, 'smooth translation, no teleport');
-    before = camera.position.clone();
+  const director = startCamera(camera,Array.from({length:21},(_,i)=>sample(i/5)),2,0,obstacles);
+  assertLockedShots(director);
+  for(let i=0;i<=240;i++){
+    const t=i/60,s=sample(t);director.frame(t);assertFramed(camera,sampleBounds(s));
+    assert.ok(director.clear(camera.position,s),`clear sight at ${t}`);
   }
-  assert.equal(roof.attributes.position.count, 24, 'obstacle geometry remains intact');
-  roof.dispose();
+  assert.equal(roof.attributes.position.count,24,'obstacle geometry remains intact');roof.dispose();
 });
 
 test('camera queries preserve openings, see back faces, and do not depend on render visibility', () => {
@@ -137,107 +145,86 @@ test('camera queries preserve openings, see back faces, and do not depend on ren
   geometry.dispose(); mesh.material.dispose();
 });
 
-test('clear endpoint cameras cannot take a shortcut through a building', () => {
-  const obstacles = new CameraObstacles();
-  const roof = addBox(obstacles, 0, 5, 0, 4, 10, 4);
-  const director = new ReplayCamera(new THREE.PerspectiveCamera(), flat, obstacles);
-  const a = { position: vector(-5, 5, 0) }, b = { position: vector(5, 5, 0) };
-  assert.equal(director.edge(a, b, sample(0, -7), sample(1, 7)), false);
-  roof.dispose();
+test('parked truck copies affect planning without changing the rendered vehicle', () => {
+  const city=new CameraObstacles(),root=new THREE.Group();
+  const truck=new THREE.Mesh(new THREE.BoxGeometry(7,6,10),new THREE.MeshBasicMaterial());
+  truck.position.set(2,3,7);root.add(truck);
+  const obstacles=city.withRoot(root),camera=new THREE.PerspectiveCamera(50,16/9,.3,500);
+  const director=startCamera(camera,Array.from({length:11},(_,i)=>sample(i/5)),1,0,obstacles);
+  for(const s of director.samples){director.frame(s.t);assert.ok(director.clear(camera.position,s));}
+  assert.equal(city.parts.length,0);assert.equal(truck.visible,true);truck.geometry.dispose();truck.material.dispose();
 });
 
-test('parked truck copies affect camera planning without changing or retaining the rendered vehicle', () => {
-  const city = new CameraObstacles();
-  const root = new THREE.Group();
-  const truck = new THREE.Mesh(new THREE.BoxGeometry(7, 6, 10), new THREE.MeshBasicMaterial());
-  truck.position.set(2, 3, 7); root.add(truck);
-  const obstacles = city.withRoot(root);
-  const director = new ReplayCamera(new THREE.PerspectiveCamera(50, 16 / 9), flat, obstacles);
-  director.start(Array.from({ length: 11 }, (_, i) => sample(i / 5)), 1, 0);
-  for (const shot of director.samples) {
-    director.frame(shot.t);
-    assert.ok(director.clear(director.camera.position, shot.targets));
+test('planned playback probes nothing, reduced motion holds still and resize/restart are deterministic', () => {
+  const obstacles=new CameraObstacles(),camera=new THREE.PerspectiveCamera(50,16/9,.3,500);
+  const director=startCamera(camera,Array.from({length:16},(_,i)=>sample(i/5)),1.5,0,obstacles,true);
+  const start=camera.position.clone(),shots=director.shots,original=obstacles.clear;
+  obstacles.clear=()=>{throw Error('playback must not raycast');};
+  for(let i=0;i<=180;i++)director.frame(i/60);
+  assert.ok(camera.position.distanceTo(start)<1e-10);
+  director.frame(0);assert.ok(camera.position.equals(start));assert.equal(director.shots,shots);
+  obstacles.clear=original;director.configure({aspect:9/16});director.frame(0);
+  assert.notEqual(director.shots,shots);
+  for(const s of director.samples){director.frame(s.t);assertFramed(camera,sampleBounds(s));}
+});
+
+test('a blind corner uses held visible compositions instead of a camera flight through the scene', () => {
+  const obstacles={cameraClear:()=>true,clear(from,to){
+    if(to.y>3)return true;
+    const desired=Math.PI*Math.max(0,Math.min(1,to.x/8)),actual=Math.atan2(from.x-to.x,from.z-to.z);
+    return Math.abs(Math.atan2(Math.sin(actual-desired),Math.cos(actual-desired)))<.95;
+  }};
+  const camera=new THREE.PerspectiveCamera(50,16/9,.3,500);
+  const director=startCamera(camera,Array.from({length:41},(_,i)=>sample(i/5,i/5)),4,0,obstacles);
+  assertLockedShots(director);
+  for(let i=0;i<=480;i++){const t=i/60;director.frame(t);assert.ok(director.clear(camera.position,sample(t,t)),`visible at ${t}`);}
+});
+
+test('a short blind corner prioritizes visibility over the preferred shot duration', () => {
+  const obstacles={cameraClear:()=>true,clear(from,to){
+    const desired=Math.PI*Math.max(0,Math.min(1,to.x/8)),actual=Math.atan2(from.x-to.x,from.z-to.z);
+    return Math.abs(Math.atan2(Math.sin(actual-desired),Math.cos(actual-desired)))<.95;
+  }};
+  const camera=new THREE.PerspectiveCamera(50,16/9,.3,500);
+  const director=startCamera(camera,replaySampleTimes(0,2.8,1.4).map(t=>sample(t,t*8/2.8)),1.4,0,obstacles);
+  assert.ok(director.shots.every(s=>s.visibility==='clear'),'short visibility cuts replace an obstructed fallback');
+  for(let t=0;t<=2.8;t+=1/120){
+    director.frame(t);assert.ok(director.clear(camera.position,sample(t,t*8/2.8)),`visible around the corner at ${t}`);
   }
-  assert.equal(city.parts.length, 0, 'the shared city does not retain a scenario truck');
-  assert.equal(truck.visible, true, 'planning does not hide the truck');
-  truck.geometry.dispose(); truck.material.dispose();
+  assertLockedShots(director);
 });
 
-test('planned playback allocates no camera probes, restarts exactly and replans a resized viewport', () => {
-  const obstacles = new CameraObstacles();
-  const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 500);
-  const director = new ReplayCamera(camera, flat, obstacles);
-  director.start(Array.from({ length: 16 }, (_, i) => sample(i / 5)), 1.5, 0, true);
-  const start = camera.position.clone(), track = director.track;
-  const original = obstacles.clear;
-  obstacles.clear = () => { throw new Error('playback must not raycast'); };
-  for (let i = 0; i <= 180; i++) director.frame(i / 60);
-  assert.ok(camera.position.distanceTo(start) < 1e-10, 'reduced motion holds a stationary shot');
-  director.frame(0);
-  assert.ok(camera.position.equals(start));
-  assert.equal(director.track, track);
-  obstacles.clear = original;
-  camera.aspect = 9 / 16; camera.updateProjectionMatrix();
-  director.frame(1.5);
-  assert.notEqual(director.track, track);
-  assertFramed(camera, sample(1.5).bounds);
-});
-
-test('a blind corner anticipates an angle change without cuts or oscillating between sides', () => {
-  const obstacles = {
-    cameraClear: () => true,
-    clear(from, to) {
-      if (to.y > 3) return true; // Camera translations are in open air.
-      const desired = Math.PI * Math.max(0, Math.min(1, to.x / 8));
-      const actual = Math.atan2(from.x - to.x, from.z - to.z);
-      return Math.abs(Math.atan2(Math.sin(actual - desired), Math.cos(actual - desired))) < 0.95;
-    },
-  };
-  const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 500);
-  const director = new ReplayCamera(camera, flat, obstacles);
-  director.start(Array.from({ length: 41 }, (_, i) => sample(i / 5, i / 5)), 4, 0);
-  assert.equal(director.track.filter(p => p.cut).length, 0);
-  let last = null;
-  for (let i = 0; i <= 480; i++) {
-    const t = i / 60;
-    director.frame(t);
-    assert.ok(director.clear(camera.position, sample(t, t).targets));
-    if (last) assert.ok(camera.position.distanceTo(last) < 0.45, 'the planned turn stays gradual');
-    last = camera.position.clone();
-  }
-});
-
-test('playback keeps a continuous velocity when the shot widens for the arriving car', () => {
-  // The accident car enters the framed part of the recording at once: the old piecewise-linear
-  // track jumped back in 0.2 s (accelerations of thousands of m/s²). The boom now eases out early.
-  const impact = 3, times = replaySampleTimes(0, 5, impact);
-  const shots = times.map(t => {
-    const px = t < impact ? 0 : Math.min(3, (t - impact) * 4), pz = t < impact ? t * 1.3 - 3.9 : 0, car = 30 - t * 10;
-    const s = sample(t, px, pz);
-    if (Math.abs(car) < 32) { s.bounds.union(new THREE.Box3(vector(car - 2.2, 0, -1), vector(car + 2.2, 1.5, 1))); s.targets.push(vector(car, 0.8, 0)); }
-    return { ...s, blockers: [] };
+test('an arriving then departing car cannot pump the camera distance inside an analytical shot', () => {
+  const impact=3,shots=replaySampleTimes(0,5,impact).map(t=>{
+    const s=sample(t,t<impact?0:Math.min(3,(t-impact)*4),t<impact?t*1.3-3.9:0),car=30-t*10;
+    if(Math.abs(car)<32)s.subjects.push({role:'vehicle',bounds:new THREE.Box3(vector(car-2.2,0,-1),vector(car+2.2,1.5,1)),
+      targets:[vector(car,.8,0),vector(car-1.8,.8,0),vector(car+1.8,.8,0)]});
+    return s;
   });
-  const camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 500);
-  const director = new ReplayCamera(camera, flat, null);
-  director.start(shots, impact, 0.6);
-  assert.equal(director.track.filter(p => p.cut).length, 0);
-  const dt = 1 / 60, positions = [];
-  for (let t = 0; t <= 5; t += dt) { director.frame(t); positions.push(camera.position.clone()); }
-  let peak = 0;
-  for (let i = 2; i < positions.length; i++) {
-    const a = positions[i].clone().sub(positions[i - 1]).sub(positions[i - 1].clone().sub(positions[i - 2])).divideScalar(dt * dt);
-    peak = Math.max(peak, a.length());
-  }
-  assert.ok(peak < 80, `camera acceleration stays gentle (peak ${peak.toFixed(0)} m/s²)`);
-  for (const shot of shots) { director.frame(shot.t); assertFramed(camera, shot.bounds); }
+  const camera=new THREE.PerspectiveCamera(50,16/9,.3,500),director=startCamera(camera,shots,impact,.6);
+  assertLockedShots(director);
+  assert.ok(director.shots.length<=3,'edits form a short sequence, not per-frame cuts');
+  for(const shot of director.shots.slice(1))assert.ok(Math.abs(shot.from-impact)>.7,'the contact itself has no distracting cut');
+  for(const s of shots){director.frame(s.t);assertFramed(camera,sampleBounds(s));}
 });
 
-test('an enclosed custom recording still has a finite stable camera and can reach its end', () => {
-  const director = new ReplayCamera(new THREE.PerspectiveCamera(), flat, { cameraClear: () => true, clear: () => false });
-  director.start(Array.from({ length: 11 }, (_, i) => sample(i / 5)), 1, 0);
-  for (let t = 0; t < 2; t += 1 / 60) director.frame(t);
-  assert.ok(director.camera.position.toArray().every(Number.isFinite));
-  assert.equal(new Set(director.track.map(p => p.angle)).size, 1);
+test('a moving truck between planning samples cannot briefly hide the participant', () => {
+  const truck=t=>({id:9,reference:false,bounds:new THREE.Box3(vector(t*50-6,0,4),vector(t*50-4,6,7))});
+  const samples=[0,.2].map(t=>({...sample(t,0),blockers:[truck(t)]}));
+  const camera=new THREE.PerspectiveCamera(50,16/9,.3,500),director=startCamera(camera,samples,.1,0);
+  assert.ok(director.shots.every(s=>s.visibility==='clear'));
+  for(let t=0;t<=.2;t+=1/240){
+    director.frame(t);
+    assert.ok(director.clear(camera.position,{...sample(t,0),blockers:[truck(t)]}),`truck does not obscure the body at ${t}`);
+  }
+  assertLockedShots(director);
+});
+
+test('enclosed custom recordings retain a finite stable camera and working timeline', () => {
+  const camera=new THREE.PerspectiveCamera(),director=startCamera(camera,Array.from({length:11},(_,i)=>sample(i/5)),1,0,
+    {cameraClear:()=>true,clear:()=>false});
+  for(let t=0;t<2;t+=1/60)director.frame(t);
+  assert.ok(camera.position.toArray().every(Number.isFinite));assertLockedShots(director);
 });
 
 test('portrait overview reserves the actual area covered by wrapped replay controls', () => {
@@ -248,8 +235,8 @@ test('portrait overview reserves the actual area covered by wrapped replay contr
   for (const shot of replay.overview.samples) {
     replay.frame(shot.t);
     for (let i = 0; i < 8; i++) {
-      const p = vector(i & 1 ? shot.bounds.max.x : shot.bounds.min.x, i & 2 ? shot.bounds.max.y : shot.bounds.min.y,
-        i & 4 ? shot.bounds.max.z : shot.bounds.min.z).project(replay.camera);
+      const p = vector(i & 1 ? sampleBounds(shot).max.x : sampleBounds(shot).min.x, i & 2 ? sampleBounds(shot).max.y : sampleBounds(shot).min.y,
+        i & 4 ? sampleBounds(shot).max.z : sampleBounds(shot).min.z).project(replay.camera);
       assert.ok(p.y > -0.32 && p.y < 0.93 && Math.abs(p.x) < 0.83, 'the figure stays above the controls');
     }
   }
@@ -283,11 +270,12 @@ test('walking and cycling replay see the actual town throughout approach, impact
     if (mode === 'west-bicycle') replay.setView('driver');
     replay.start(demo.frames, demo.impact, demo.car.id, 170, bicycle ? 'bicycle' : 'walking');
     replay.setView('overview');
-    assert.equal(replay.overview.track.filter(p => p.cut).length, 0, 'the junction has a continuous visible view');
+    assertLockedShots(replay.overview);
+    assert.ok(replay.overview.shots.length<=3,'the junction uses a short analytical sequence');
     for (const shot of replay.overview.samples) {
       replay.frame(shot.t);
-      assertFramed(replay.camera, shot.bounds);
-      assert.ok(replay.overview.clear(replay.camera.position, shot.targets, shot.blockers), `visible at ${shot.t}, bicycle=${bicycle}`);
+      assertFramed(replay.camera, sampleBounds(shot));
+      assert.ok(replay.overview.clear(replay.camera.position, shot), `visible at ${shot.t}, bicycle=${bicycle}`);
     }
     // Dense playback catches a camera path or moving vehicle that is clear only at its keyframes.
     for (let t = 0; t <= 5.6; t += 1 / 60) {

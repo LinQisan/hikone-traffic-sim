@@ -14,7 +14,6 @@ from higashi_school import box, face, frame, solid
 from east_street import bar, plank, ribs
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STONES = ((.47, .47, .43), (.38, .40, .39), (.56, .55, .47), (.44, .45, .36), (.31, .32, .34), (.62, .60, .50))
 BAMBOO = (.62, .56, .44)
 RUST = (.55, .29, .20)
 SLATE = (.36, .37, .40)
@@ -32,53 +31,14 @@ def data():
         return json.load(f)
 
 
-def masonry(b, a, c, lo, hi, inside, seed, batter=.08, scale=1):
-    """Boulder courses on a dark core: every stone has its own outline, face and bevelled depth."""
-    rng = random.Random(seed)
+def masonry(b, a, c, lo, hi, inside, batter=.08):
+    """One flat battered face; the shared castle texture supplies every stone and joint."""
     length, at = frame(a, c, inside)
     if length < .2:
         return
-    # The face leans in toward its top and meets the original outline there.
-    lean = lambda y: batter * (hi - y)
-    core = [at(0, lo, -.03), at(length, lo, -.03), at(length, hi, lean(hi) - .03), at(0, hi, lean(hi) - .03)]
-    centre = at(length / 2, (lo + hi) / 2, -1)
-    face(b, core, 'ART_Joint', centre, (.17, .18, .20))
-    y = lo
-    while y < hi - .12:
-        course = min(hi - y, rng.uniform(.62, 1.15) * scale * (1.5 if b.distant else 1))
-        u = -rng.uniform(0, .5)
-        while u < length:
-            width = rng.uniform(.8, 1.9) * scale * (1.6 if b.distant else 1)
-            u0, u1 = max(0, u), min(length, u + width)
-            u += width
-            if u1 - u0 < .12:
-                continue
-            y0, y1 = y + .03, y + course - .03
-            tone = rng.choice(STONES)
-            shade = rng.uniform(-.05, .05)
-            pigment = tuple(v + shade for v in tone)
-            cut = min(.16, (u1 - u0) * .22)
-            outline = [(u0 + cut * rng.random(), y0 + .07 * rng.random()), (u1 - cut * rng.random(), y0 + .05 * rng.random()),
-                       (u1 - .01, (y0 + y1) / 2 + .1 * rng.uniform(-1, 1)), (u1 - cut * rng.random(), y1 - .05 * rng.random()),
-                       (u0 + cut * rng.random(), y1 - .08 * rng.random()), (u0 + .01, (y0 + y1) / 2 + .1 * rng.uniform(-1, 1))]
-            proud = rng.uniform(.10, .22) * scale
-            front = [at(p, q, lean(q) + proud) for p, q in outline]
-            face(b, front, 'ART_Boulder', centre, pigment)
-            if b.distant:
-                continue
-            back = [at(p, q, lean(q)) for p, q in outline]
-            dark = tuple(v * .68 for v in pigment)
-            for i in range(6):
-                j = (i + 1) % 6
-                face(b, [back[i], back[j], front[j], front[i]], 'ART_Joint', centre, dark)
-            # Lichen and moss are small colour shapes on the stone, not a brush overlay.
-            if rng.random() < .3:
-                p, q = rng.uniform(u0, u1), rng.uniform(y0, y1)
-                r = rng.uniform(.08, .2)
-                tone = rng.choice(((.72, .71, .58), (.40, .47, .27)))
-                face(b, [at(p + r * math.cos(i * 1.257), q + r * .7 * math.sin(i * 1.257), lean(q) + proud + .012) for i in range(5)],
-                     'ART_Boulder', centre, tone)
-        y += course
+    points = [at(0, lo, batter * (hi-lo)), at(length, lo, batter * (hi-lo)),
+              at(length, hi, 0), at(0, hi, 0)]
+    face(b, points, 'ART_CastleStone', at(length / 2, (lo + hi) / 2, -1), (1, 1, 1))
 
 
 def ivy(b, a, c, top, inside, seed):
@@ -266,12 +226,12 @@ def building(b, item):
 def villa(b):
     """A grey rendered two-storey lodge with a hipped slate roof (0858-0860)."""
     from university_photos import framed_window
+    from university import data as campus_data
     q = data()['villa']
-    x, z = q['center']
-    h = math.radians(q['heading'])
-    ca, sa = math.cos(h), math.sin(h)
-    w, d = q['width'] / 2, q['depth'] / 2
-    ring = [(x + u * ca - v * sa, z + u * sa + v * ca) for u, v in ((-w, -d), (w, -d), (w, d), (-w, d))]
+    ring = campus_data()['schoolVilla']['footprint']
+    x, z = (sum(p[k] for p in ring) / 4 for k in (0, 1))
+    w, d = math.dist(ring[0], ring[1]) / 2, math.dist(ring[1], ring[2]) / 2
+    ca, sa = (ring[1][0] - ring[0][0]) / (2 * w), (ring[1][1] - ring[0][1]) / (2 * w)
     top = .15 + q['height']
     wall = (.46, .45, .42)
     solid(b, ring, .15, top, 'ART_Facade', wall)
@@ -310,34 +270,67 @@ def no_parking(b, x, z, facing):
     label(b, at, '区域内', -.23, 2.04, .46, .11, INK, .05)
 
 
+def junction_ring():
+    q = data()['junctionBed']
+    corners = [tuple(p) for p in q['outline']]
+    ring=[]
+    for i,p in enumerate(corners):
+        a,c=corners[i-1],corners[(i+1)%len(corners)]
+        before=tuple(p[j]+(a[j]-p[j])*.16 for j in range(2))
+        after=tuple(p[j]+(c[j]-p[j])*.16 for j in range(2))
+        for t in (0,.5,1):ring.append(tuple((1-t)**2*before[j]+2*t*(1-t)*p[j]+t*t*after[j] for j in range(2)))
+    return ring
+
+
+def junction_ground():
+    q = data()['junctionBed']
+    ring = junction_ring()
+    centre = (sum(p[0] for p in ring)/len(ring),sum(p[1] for p in ring)/len(ring))
+    return [[(a[0],q['profile']['kerb'],a[1]),(c[0],q['profile']['kerb'],c[1]),
+             (centre[0],q['profile']['mound'],centre[1])] for a,c in zip(ring,ring[1:]+ring[:1])]
+
+
 def junction_bed(b):
-    """0858: the raised bed is held by logs, with diagonal log terracing on its slope."""
+    """0997/1002: rounded stone kerb, earth mound and short timber terraces."""
     from abstract_props import cylinder
     from south_promenade import cherry
     q = data()['junctionBed']
-    ring = [tuple(p) for p in q['outline']]
-    solid(b, ring, .15, .42, 'HK_Soil', (.46, .42, .28))
+    ring = junction_ring()
+    kerb, mound = q['profile']['kerb'], q['profile']['mound']
+    solid(b, ring, .01, kerb, 'ART_Concrete', (.38, .38, .34))
     centre = (sum(p[0] for p in ring) / len(ring), sum(p[1] for p in ring) / len(ring))
-    mound = [(centre[0] + (p[0] - centre[0]) * .72, centre[1] + (p[1] - centre[1]) * .72) for p in ring]
-    solid(b, mound, .42, .62, 'HK_Grass', (.50, .52, .32))
+    for a,c in zip(ring,ring[1:]+ring[:1]):
+        face(b,[(a[0],kerb,a[1]),(c[0],kerb,c[1]),(centre[0],mound,centre[1])],
+             'HK_Soil',(centre[0],0,centre[1]),(.47,.43,.32))
     for a, c in zip(ring, ring[1:] + ring[:1]):
         length = math.dist(a, c)
         n = max(1, round(length / 1.1))
         for i in range(n):
             s, t = i / n, (i + .94) / n
-            p = (a[0] + (c[0] - a[0]) * s, .29, a[1] + (c[1] - a[1]) * s)
-            e = (a[0] + (c[0] - a[0]) * t, .29, a[1] + (c[1] - a[1]) * t)
-            bar(b, p, e, .13, (.33, .29, .24), 'ART_Timber', 6)
+            p = (a[0] + (c[0] - a[0]) * s, kerb + .02, a[1] + (c[1] - a[1]) * s)
+            e = (a[0] + (c[0] - a[0]) * t, kerb + .02, a[1] + (c[1] - a[1]) * t)
+            bar(b, p, e, .07, (.60,.58,.50), 'ART_Boulder', 6)
     if not b.distant:
         for i in range(9):
             t = i / 8
-            x = ring[1][0] + (ring[4][0] - ring[1][0]) * t
-            z = ring[1][1] + (ring[4][1] - ring[1][1]) * t
-            bar(b, (x - 1, .58, z - .8), (x + 1, .62, z + .7), .05, (.45, .41, .33), 'ART_Timber', 4)
+            x = centre[0]-2+t*4
+            z = centre[1]-.9+t*.9
+            bar(b, (x-.5,.42+t*.13,z-.3), (x+.5,.45+t*.13,z+.3), .055, (.55,.50,.39), 'ART_Timber', 5)
     no_parking(b, *q['sign'], (-.7, -.7))
     x, z = q['pole']
     cylinder(b, (x, .15, z), (x + .12, 4.6, z), .045, 'ART_Timber', segments=5)
-    bare_cherry(b, *q['cherry'], .42, 4)
+    x,z=q['cherry']
+    root = kerb
+    for triangle in junction_ground():
+        (ax,ay,az),(bx,by,bz),(cx,cy,cz)=triangle
+        denominator=(bz-cz)*(ax-cx)+(cx-bx)*(az-cz)
+        if abs(denominator)<1e-10:continue
+        u=((bz-cz)*(x-cx)+(cx-bx)*(z-cz))/denominator
+        v=((cz-az)*(x-cx)+(ax-cx)*(z-cz))/denominator
+        if min(u,v,1-u-v)>=-1e-6:
+            root=u*ay+v*by+(1-u-v)*cy
+            break
+    bare_cherry(b, x,z,root,4)
 
 
 def bare_cherry(b, x, z, y, seed):
@@ -358,15 +351,17 @@ def bare_cherry(b, x, z, y, seed):
             continue
         for k in range(5):
             s = a + rng.uniform(-.9, .9)
-            start = tuple(mid[n] + (tip[n] - mid[n]) * rng.uniform(.3, 1) for n in range(3))
+            t = rng.uniform(.3, 1)
+            start = tuple(mid[n] + (tip[n] - mid[n]) * t for n in range(3))
             end = (start[0] + math.cos(s) * rng.uniform(.7, 1.6), start[1] + rng.uniform(-.1, 1.1), start[2] + math.sin(s) * rng.uniform(.7, 1.6))
             bar(b, start, end, .012, (.31, .27, .27), 'ART_TreeBark', 4)
 
 
 def cypress_screen(b):
     q = data()['cypress']
-    line = q['line']
-    rust_fence(b, [tuple(p) for p in line])
+    from university import data as university_data
+    line = university_data()['tennisFrontage']['fenceRuns'][0][:2]
+    # The continuous road-relative fence and its gate opening belong to moat_street.
     for i, (x, z) in enumerate(along(offset(line, -2.3), 2.9)):
         cypress(b, x, z, q['height'] * (1 + .08 * math.sin(i * 1.7)), 8590 + i)
 
@@ -391,22 +386,23 @@ def road_diamonds(b):
 
 
 def nishi_details(b):
-    """Banners, a notice and a roofed historic board beside the Nishi gate (0855-0857)."""
+    """Weathered roofed notice case. The gate author owns the two banners."""
     from abstract_props import cylinder
     from university_frontage import rect
-    at = lambda u, y, o: (-590.3 + u, y, 261.3 - o)
-    cylinder(b, (-590.3, .01, 261.3), (-590.3, 2.2, 261.3), .03, 'ART_StoneLight', segments=5)
-    rect(b, at, -.52, .1, .42, 1.55, (.95, .86, .25), .05)
-    rect(b, at, -.47, .22, .32, 1.32, WHITE, .055)
-    for i in range(5):
-        rect(b, at, -.42, 1.33 - i * .26, .22, .17, SIGN_RED, .06)
-    rect(b, at, .05, .5, .36, 1.65, (.91, .90, .86), .05)
-    rect(b, at, .1, .7, .26, .65, (.70, .25, .22), .056)
     x, z = -595.2, 255.5
     frame_at = lambda u, y, o: (x + u * .3, y, z + u - o * .95)
     cylinder(b, (x, .01, z), (x, 2.35, z), .05, 'ART_Timber', segments=6)
     plank(b, lambda u, y, o: (x + o, y, z + u), -.5, 1.55, .5, 2.25, (.91, .90, .84), .035)
     box(b, lambda u, y, v: (x + v, y, z + u), 0, 0, 1.32, .5, 2.34, 2.42, 'ART_Timber', (.22, .20, .22))
+    # 0992 resolves the short timber notice beside the crossing pole.
+    from university_frontage import label,graphic
+    q=data()['smokingNotice'];x,z=q['point'];nx,nz=q['normal']
+    at=lambda u,y,o:(x-nz*u+nx*o,y,z+nx*u+nz*o)
+    bar(b,(x,.01,z),(x,1.28,z),.035,WEATHERED,'ART_Timber',5)
+    box(b,at,0,0,.50,.055,.90,1.24,'ART_Timber',(.35,.28,.25))
+    graphic(b,at,[(-.29,1.24),(0,1.33),(.29,1.24)],(.35,.28,.25),.035)
+    label(b,at,'路上喫煙',-.20,1.10,.40,.065,WHITE,.039)
+    label(b,at,'禁止地区です',-.21,.99,.42,.065,WHITE,.039)
 
 
 def samurai_wall(b):
@@ -416,7 +412,7 @@ def samurai_wall(b):
     road_side = (-80, 175)
     top = q['base'] + q['height']
     for i, (a, c) in enumerate(zip(line, line[1:])):
-        masonry(b, a, c, .01, q['base'], road_side, 8630 + i, batter=-.02)
+        masonry(b, a, c, .01, q['base'], road_side, batter=-.02)
         back = [(p[0], p[1] - .45) for p in (a, c)]
         solid(b, [a, c, back[1], back[0]], q['base'], top, 'ART_Facade', (.60, .60, .57))
         length, at = frame(a, c, (a[0], a[1] - 3))
@@ -442,7 +438,7 @@ def rampart(b):
     lo, hi = q['range']
     line = [p for p in approach()['innerBank'] if lo <= p[0] <= hi and p[1] < 240]
     for i, (a, c) in enumerate(zip(line, line[1:])):
-        masonry(b, a, c, q['base'], q['height'], (a[0] + 20, a[1] + 40), 8660 + i, batter=.16)
+        masonry(b, a, c, q['base'], q['height'], (a[0] + 20, a[1] + 40), batter=.16)
         ivy(b, a, c, q['height'], (a[0] + 20, a[1] + 40), 8680 + i)
     # The mapped wall of the east moat stands back from the water behind a grass ledge.
     with open(os.path.join(ROOT, 'world', 'castle-moat.json')) as f:
@@ -450,7 +446,7 @@ def rampart(b):
     line = east['line']
     for i, (a, c) in enumerate(zip(line, line[1:])):
         hill = (-120, 420)
-        masonry(b, a, c, east['base'], east['height'], hill, 8700 + i, batter=.22, scale=1.25)
+        masonry(b, a, c, east['base'], east['height'], hill, batter=.22)
         ivy(b, a, c, east['height'], hill, 8740 + i)
 
 
@@ -496,7 +492,6 @@ def furniture(b):
     from nishi_school import data as nishi
     cypress_screen(b)
     nishi_cypress(b)
-    road_diamonds(b)
     junction_bed(b)
     villa(b)
     nishi_details(b)

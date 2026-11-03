@@ -48,12 +48,17 @@ async function constructInWorker(url) {
   return result;
 }
 
+/** The far level exists only where simplifying a model saved enough, and only as a baked file. */
+export const hasFarDetail = name => !!runtime.files[`${name}/far`] && typeof DecompressionStream !== 'undefined' && typeof Worker !== 'undefined'
+  && !(startup.enabled && new URLSearchParams(location.search).get('modelEncoding') === 'plain');
+
 export async function loadNativeModel(name, detail = 'high') {
-  if (!/^[A-Za-z0-9_]+$/.test(name) || !['high', 'low'].includes(detail)) throw new Error('Invalid native model name or detail');
+  if (!/^[A-Za-z0-9_]+$/.test(name) || !['high', 'low', 'far'].includes(detail)) throw new Error('Invalid native model name or detail');
   const entry = runtime.files[`${name}/${detail}`];
   if (!entry) throw new Error(`Unknown native model: ${name}/${detail}`);
   const raw = startup.enabled && new URLSearchParams(location.search).get('modelEncoding') === 'plain';
-  const url = nativeModelURL(entry, !raw && typeof DecompressionStream !== 'undefined');
+  const compressed = !raw && typeof DecompressionStream !== 'undefined';
+  const url = compressed && typeof Worker !== 'undefined' && entry.baked ? entry.baked.url : nativeModelURL(entry, compressed);
   const manager = activeManager, current = generation, signal = activeSignal;
   manager.itemStart(url);
   try {

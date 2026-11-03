@@ -1,6 +1,6 @@
 // Impressionist Hikone meshes at imported and browser-owned placements.
 import * as THREE from 'three';
-import { loadNativeModel } from '../assets/models.js';
+import { hasFarDetail, loadNativeModel } from '../assets/models.js';
 import { placement } from './coords.ts';
 import { LIGHT, painted, paintedSky, PigmentPalette } from '../materials/style.js';
 import { environmentInstances } from './environment-instances.js';
@@ -9,18 +9,19 @@ import { buildOverheadWires } from '../geometry/overhead-wires.js';
 import { CameraObstacles } from '../camera/camera-obstacles.js';
 import { APPROACH_CAMERA_SOLIDS } from '../../world/generators/castle-approach.js';
 import { EAST_BUILDING_REGIONS, EAST_CAMERA_SOLIDS } from '../../world/generators/east-layout.ts';
-import { UNIVERSITY_SOLIDS, WEST_BUILDINGS, WEST_SOLIDS } from '../../world/generators/university-layout.js';
+import { UNIVERSITY_SOLIDS, WEST_BUILDINGS, WEST_SOLIDS, SCHOOL_VILLA } from '../../world/generators/university-layout.js';
 import { ambientMotion } from '../materials/ambient-motion.js';
 import { startupMark } from '../renderer/startup.ts';
 
-const NO_SHADOW = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/;
+const NO_SHADOW = /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(EastHikone(Surface|Water)|PavingDetails|MoatRoad|RoadMarkings|Kyobashi(Roads|Land|Water)))/;
 // Broad composites need local LOD: a camera near one edge must not promote the entire hill/campus.
 const EAST_BUILDING_ASSETS = new Set(['ART_EastHikoneBuildings', ...EAST_BUILDING_REGIONS]);
 export const ENVIRONMENT_CELLS = Object.freeze({
   HK_Terrain_Hikone: 128, ART_HillWood: 128, ART_InnerMoatStreet: 96, ART_ShigaCampus: 96, ART_WestMoat: 128, ART_HikoneCompound: 128,
-  // The geographic district spans the whole world but is light (~50k triangles): one draw each.
-  ART_EastHikoneSurface: 2048, ART_EastHikoneWater: 2048, ART_EastHikoneBuildings: 2048,
-  ART_EastHikoneWest: 2048, ART_EastHikoneSouth: 2048, ART_EastHikoneNorth: 2048,
+  ART_RoadMarkings: 128,
+  ART_EastHikoneBuildings: 128, ART_EastHikoneWest: 192, ART_EastHikoneSouth: 192, ART_EastHikoneNorth: 192, ART_EastHikoneSurface: 192,
+  // Light and flat, so one draw stays cheaper than the cells it would take to cull it.
+  ART_EastHikoneWater: 2048,
 });
 // Dense foliage loses individual leaf detail long before a building loses its joinery.
 const TREE_ASSET = /^(HK_Tree_|ART_(TownTree$|MoatTree_|CastleGrove$|IrohaPine$|PromenadeCherry$))/;
@@ -142,22 +143,25 @@ export async function buildEnvironment(scene, layout, materials, ground = null) 
   const definitions = await Promise.all([...byAsset].map(async ([asset, items]) => {
     // These are merge inputs, not reusable runtime models. Keeping them in the model cache
     // retains both unmerged source geometries alongside the merged city for the lifetime of the page.
-    let [high, low] = await Promise.all([loadParts(asset, 'high', false), loadParts(asset, 'low', false)]);
+    let [high, low, far] = await Promise.all([loadParts(asset, 'high', false), loadParts(asset, 'low', false),
+      hasFarDetail(asset) ? loadParts(asset, 'far', false) : null]);
     const background = items.every(item => item.g === 'WebLandmark') ||
       ['ART_ShigaCampus','ART_WestMoat','ART_CastleApproach'].includes(asset);
     if (ground && !background && UNDER_ROADS.test(asset) && items.length === 1)
-      [high, low] = [pressUnderRoads(high, items[0]), pressUnderRoads(low, items[0])];
-    return { asset, items, high: resolve(high), low: resolve(low), background,
+      [high, low, far] = [high, low, far].map(parts => parts && pressUnderRoads(parts, items[0]));
+    return { asset, items, high: resolve(high), low: resolve(low), far: far && resolve(far), background,
       cellSize: ENVIRONMENT_CELLS[asset],
       lodFar: TREE_ASSET.test(asset) ? 24 : undefined,
+      lodDistant: TREE_ASSET.test(asset) ? 110 : undefined,
       batched: ['ART_CastleApproach', 'ART_ShigaCampus', 'ART_WestMoat'].includes(asset),
       cameraSolids: asset === 'ART_CastleApproach' ? APPROACH_CAMERA_SOLIDS
+        : asset === 'ART_EastHikoneBuildings' ? [...EAST_CAMERA_SOLIDS,SCHOOL_VILLA]
         : EAST_BUILDING_ASSETS.has(asset) ? EAST_CAMERA_SOLIDS
         : asset === 'ART_ShigaCampus' ? UNIVERSITY_SOLIDS : asset === 'ART_WestMoat' ? [...WEST_BUILDINGS,...WEST_SOLIDS] : null };
   }));
   startupMark('environmentModelsReady');
   const palette = new PigmentPalette();
-  const env = environmentInstances(definitions, palette, asset => !NO_SHADOW.test(asset), m => m.side);
+  const env = environmentInstances(definitions, palette, asset => !NO_SHADOW.test(asset), m => m.side, { multiDraw: true });
   startupMark('environmentMerged');
   const wires = buildOverheadWires(layout.overheadWires ?? []);
   if (wires) env.root.add(wires);

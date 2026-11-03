@@ -13,7 +13,9 @@ test('Vite serves all entries and mounts the guarded editor API on the same orig
       assert.equal(response.status, 200, url);
       assert.match(await response.text(), /@vite\/client/, 'the HTML is transformed by Vite');
     }
-    for (const url of ['/server/editor-api.mjs', '/tools/sync.mjs', '/.git/config']) {
+    for (const url of ['/server/editor-api.mjs', '/tools/sync.mjs', '/.git/config',
+      '/field-photos/INDEX.md', '/FIELD-PHOTOS/survey/position.json',
+      '/field%2Dphotos/survey/image.HEIC', '/@fs/private/survey/field-photos/image.HEIC']) {
       assert.equal((await fetch(base + url)).status, 403, 'development must not expose ' + url);
     }
     const status = await (await fetch(base + '/api/status')).json();

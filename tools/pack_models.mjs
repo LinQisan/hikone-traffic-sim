@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
+import { bakeModels } from './bake_models.mjs';
 
 const root = fileURLToPath(new URL('../models/', import.meta.url));
 export async function packModels(directory = root) {
@@ -26,6 +27,10 @@ export async function packModels(directory = root) {
       rawUrl: `models/${filename}?v=${hash}`, sourceBytes: source.length, compressedBytes: stats.size };
     sourceBytes += source.length; compressedBytes += stats.size;
   }
+  await bakeModels(directory, manifest, packed);
+  // Superseded packs otherwise accumulate into dist/, against the Pages site limit.
+  const kept = new Set(['bake-cache.json', ...Object.values(manifest.files).flatMap(({ url, baked }) => [url, baked?.url]).filter(Boolean).map(url => path.basename(url))]);
+  for (const name of await fs.readdir(packed)) if (!kept.has(name)) await fs.rm(path.join(packed, name));
   const output = JSON.stringify(manifest) + '\n', file = path.join(directory, 'runtime.json');
   if (await fs.readFile(file, 'utf8').catch(() => '') !== output) await fs.writeFile(file, output);
   return { models: index.models.length, sourceBytes, compressedBytes };

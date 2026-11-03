@@ -23,6 +23,7 @@ export interface TrafficCar extends Pose {
   body: BodyId; driver: DriverState; size: number[]; born: number; speed: number;
   path: PathPoint[]; wheelbase: number; steer: number; currentSpeed: number; alive: boolean; distance: number;
   violation: string | null; signalStops: SignalStop[]; nextSignal: number; signalCommitted: boolean; yellowChecked: boolean;
+  junctionYield: {car: TrafficCar; stop: number; clear: number} | null;
   crossing: Crossing | null; probe: PathPose; owner?: string | null; paintSeed?: number | null; swerve?: number; lateral?: number; closest?: number; passed?: boolean;
 }
 export type TrafficScenario = Pick<Scenario, 'id' | 'map' | 'playerMode' | 'vehicles'> & {

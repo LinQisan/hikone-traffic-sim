@@ -5,6 +5,9 @@ import { geographicPoint, westernOutline, CASTLE_WEST_BANK } from './castle-layo
 import { INNER_MOAT_OUTER, INNER_MOAT_INNER, INNER_MOAT_ROAD } from './castle-approach.js';
 import { inEastExtension } from './east-layout.ts';
 import FIELD_PHOTOS from '../../../world/field-observations.json' with {type:'json'};
+import GATE_SURVEY from '../../../world/campus-gate.json' with {type:'json'};
+import {CAMPUS_STREET,CAMPUS_LOOP_ENTRY,SCHOOL_LOOP,INNER_RESIDENTIAL_LANES,TENNIS_FRONTAGE,WALKED_STREET_PROFILE,roundedRoute,streetEdgeAtX} from './walked-street-layout.ts';
+import {registeredFootprint, SCHOOL_ACCESS} from './geographic-registration.js';
 
 export const UNIVERSITY_REFERENCES = [
   'https://www.google.com/maps/@?api=1&map_action=map&center=35.27765,136.24650&zoom=18&basemap=satellite',
@@ -79,9 +82,9 @@ export const UNIVERSITY_BUILDINGS = [
   building('site-office', 'Temporary two-storey site office', [[-601,214.5],[-601,208.5],[-617,208.5],[-617,214.5]], 6.0),
 ];
 
-// The main gate stands at the roadside where OSM driveway 380034677 crosses the campus
-// boundary (way 180830880). The owner's photos of 2026-10-29 (IMG_0852–0854) show no
-// forecourt between the moat-side street and the gate; the earlier Maps label pin lay 15 m inside.
+// Mapped driveway 380034677 meets campus boundary way 180830880 here. The physical
+// gate pillars sit behind curved returns (campus-gate.json); this source junction
+// remains separate from the photo-relative entrance placement.
 export const UNIVERSITY_GATE = [-596.6,178.0];
 const w = westernOutline;
 // The southeast turn previously cut through the photographed office plot. Keep the
@@ -133,6 +136,8 @@ export const CASTLE_CAMPUS_LINK = [WEST_ROUTE[6],...w([[608,610],[633,575]]),
 // 0855–0861 locate the actual stone-lined turn; OSM 121393441 supplies its vertices.
 // Retain the public road endpoints and shared school branch vertex ownership.
 const schoolRoad = FIELD_PHOTOS.schoolRoad.points;
+// OSM gate junction and street replace independent pixel samples. Keep public end anchors.
+CASTLE_CAMPUS_LINK.splice(1,3,...CAMPUS_STREET.slice(0,3).toReversed());
 CASTLE_CAMPUS_LINK.splice(4,4,schoolRoad.at(-1),schoolRoad.at(-2),schoolRoad.at(-3),schoolRoad.at(-4));
 for (const i of [8,9]) {
   const x=CASTLE_CAMPUS_LINK[i][0],a=schoolRoad.at(-4),b=schoolRoad.at(-5);
@@ -145,12 +150,28 @@ export const SCHOOL_GATE_ENTRY = [schoolRoad.at(-2),[-587.0,263.2]];
 // It meets the moat-side street at the real lane mouth (OSM way 122757607), south of the campus corner.
 export const UNIVERSITY_FRONT_LANE = [...westStreetView([[749,269],[901,374],[1047,510]]),...south([[473,386],[650,512],[836,643]]),[-616.8,141.2],CASTLE_CAMPUS_LINK[1]];
 export const UNIVERSITY_ENTRANCE = [CASTLE_CAMPUS_LINK[2],UNIVERSITY_GATE,UNIVERSITY_AXIS[1]];
+export const UNIVERSITY_GATE_DRIVE = roundedRoute([UNIVERSITY_GATE,CAMPUS_LOOP_ENTRY[0],WALKED_STREET_PROFILE.campusPassingPoint,...CAMPUS_LOOP_ENTRY.slice(1)],WALKED_STREET_PROFILE.campusTurnRadius);
 // A low pierced concrete wall encloses the street frontage. The gate opening splits
 // it into two runs; the eastern edge changes to a slim timber/metal palisade by the moat.
 const gateLength = Math.hypot(UNIVERSITY_AXIS[1][0]-UNIVERSITY_GATE[0],UNIVERSITY_AXIS[1][1]-UNIVERSITY_GATE[1]);
 const gateTangent = [-(UNIVERSITY_AXIS[1][1]-UNIVERSITY_GATE[1])/gateLength,
   (UNIVERSITY_AXIS[1][0]-UNIVERSITY_GATE[0])/gateLength];
-const gateEdge = side => UNIVERSITY_GATE.map((v,i)=>v+gateTangent[i]*side*4.3);
+const gateNormal = [-(UNIVERSITY_AXIS[1][0]-UNIVERSITY_GATE[0])/gateLength,
+  -(UNIVERSITY_AXIS[1][1]-UNIVERSITY_GATE[1])/gateLength];
+const gateProfile = GATE_SURVEY.estimates;
+// Keep the mapped junction; the physical pillars stand behind the curved street returns.
+export const UNIVERSITY_GATE_ENTRY = {
+  centre:UNIVERSITY_GATE.map((v,i)=>v-gateNormal[i]*gateProfile.pillarInset),
+  tangent:gateTangent, normal:gateNormal, halfSpacing:gateProfile.pillarHalfSpacing,
+};
+const entryAt = (u,v) => UNIVERSITY_GATE_ENTRY.centre.map((p,i)=>p+gateTangent[i]*u+gateNormal[i]*v);
+const gateEdge = side => entryAt(side*gateProfile.pillarHalfSpacing,0);
+// The return is concave toward the forecourt: its midpoint stays behind the chord.
+const gateReturn = side => Array.from({length:gateProfile.arcSegments+1},(_,i)=>{
+  const angle=i*Math.PI/2/gateProfile.arcSegments;
+  return entryAt(side*(gateProfile.pillarHalfSpacing+gateProfile.wallAttachOffset+gateProfile.returnRadius*Math.sin(angle)),gateProfile.returnRadius*(1-Math.cos(angle)));
+});
+export const UNIVERSITY_GATE_RETURNS = {north:gateReturn(-1),south:gateReturn(1)};
 const westTangent = (() => {
   const [a,b]=south([[450,319],[550,390]]),length=Math.hypot(b[0]-a[0],b[1]-a[1]);
   return [(b[0]-a[0])/length,(b[1]-a[1])/length];
@@ -169,9 +190,9 @@ const streetWallChange = (([ax,az],[cx,cz]) => {
 export const UNIVERSITY_BOUNDARY = [
   {kind:'wall',points:[...westStreetView([[784,264],[912,348]]),westEdge(-1)]},
   {kind:'wall',points:[westEdge(1),...south([[570,398],[660,463],[778,548],[889,628],[993,697]]),[-620.3,144.3],[-597.6,143.0]]},
-  {kind:'balustrade',points:[[-597.6,143.0],[-596.8,145.6],gateEdge(1)]},
+  {kind:'balustrade',points:[[-597.6,143.0],[-596.8,145.6],...UNIVERSITY_GATE_RETURNS.south.toReversed()],endPost:UNIVERSITY_GATE_RETURNS.south.at(-1)},
   // The timber palisade stops short of the hall: stone posts and rail carry on north (0971, 0977).
-  {kind:'palisadeWall',points:[gateEdge(-1),streetWallChange]},
+  {kind:'palisadeWall',points:[...UNIVERSITY_GATE_RETURNS.north,streetWallChange],endPost:UNIVERSITY_GATE_RETURNS.north.at(-1)},
   {kind:'wall',points:[streetWallChange,CAMPUS_BANK[0]]},
   {kind:'wall',points:CAMPUS_BANK},
   {kind:'fence',points:[...westStreetView([[784,264],[864,157],[962,23]]),...aerial([[535,229],[695,15],[970,-335]]),...w([[650,174],[690,190]])]},
@@ -194,7 +215,12 @@ export const UNIVERSITY_NEIGHBORS = [
   const [x,z]=item.footprint.reduce(([sx,sz],[px,pz])=>[sx+px/4,sz+pz/4],[0,0]);
   return !inEastExtension(x,z);
 });
-export const UNIVERSITY_PAVING = [
+const gateApron = [...UNIVERSITY_GATE_RETURNS.south.toReversed(),
+  entryAt(gateProfile.pillarHalfSpacing+gateProfile.wallAttachOffset,-3.2),entryAt(-gateProfile.pillarHalfSpacing-gateProfile.wallAttachOffset,-3.2),
+  ...UNIVERSITY_GATE_RETURNS.north,
+  entryAt(-gateProfile.pillarHalfSpacing-gateProfile.wallAttachOffset-gateProfile.returnRadius,6),
+  entryAt(gateProfile.pillarHalfSpacing+gateProfile.wallAttachOffset+gateProfile.returnRadius,6)];
+export const UNIVERSITY_PAVING = [gateApron,
   south([[574,347],[655,404],[1029,666],[996,713],[606,433],[563,400]]),
   aerial([[510,471],[658,272],[785,211],[830,247],[775,335],[674,376],[588,500]]),
   westGateView([[369,184],[488,268],[653,391],[616,440],[327,232]]),
@@ -206,8 +232,27 @@ export const UNIVERSITY_PARKING = [
 // the moat promenade's stone bollards (barrier way 1449647550), benches and map board,
 // the old cylinder post box outside the south gate post and the gate's tall conifers.
 export const UNIVERSITY_GATE_DETAIL = {
-  postbox:[-595.0,172.4],
-  hedge:[[-598.3,146.2],[-597.6,172.4]],
+  // 0972–0975 (31 October): distances north from the gate and visually estimated sizes.
+  boards:[
+    {along:gateProfile.northBoardAlong[0],width:1.55,height:1.7,center:1.55,kind:'construction'},
+    {along:gateProfile.northBoardAlong[1],width:1.75,height:1.35,center:1.6,kind:'project'},
+    {along:gateProfile.northBoardAlong[2],width:2.1,height:1.12,center:1.48,kind:'bulletin'},
+    {along:gateProfile.northBoardAlong[3],width:2.1,height:1.12,center:1.48,kind:'newspaper'},
+    {along:gateProfile.southMapAlong,width:1.05,height:2,center:1.35,kind:'map'},
+  ],
+  gravel:[[-597.0,199.4],[-621.5,197.4],[-622.2,207.4],[-600.2,207.4]],
+  entry:UNIVERSITY_GATE_ENTRY,
+  returns:UNIVERSITY_GATE_RETURNS,
+  postbox:(()=>{
+    const a=gateProfile.postboxArcDegrees*Math.PI/180;
+    return entryAt(gateProfile.pillarHalfSpacing+gateProfile.wallAttachOffset+gateProfile.returnRadius*Math.sin(a)-Math.sin(a)*gateProfile.postboxWallClearance,
+      gateProfile.returnRadius*(1-Math.cos(a))+Math.cos(a)*gateProfile.postboxWallClearance);
+  })(),
+  postboxNormal:(()=>{
+    const a=gateProfile.postboxFacingDegrees*Math.PI/180;
+    return gateNormal.map((v,i)=>v*Math.cos(a)-gateTangent[i]*Math.sin(a));
+  })(),
+  hedge:[[-598.3,146.2],entryAt(9,gateProfile.returnRadius-.8)],
   sliding:[[-597.4,174.2],[-601.4,174.6]],
   // Photo-relative placement estimates: cypress by the southern wall and spreading
   // conifers behind the gatekeeper. Keep the photographed view to the hall unobstructed.
@@ -224,6 +269,7 @@ export const UNIVERSITY_GATE_DETAIL = {
   board:[-585.4,122.8],
   mirror:[-589.0,183.6],
 };
+
 export const UNIVERSITY_STREET_DETAIL = {
   busStop:south([[616,395]])[0],
   poles:[geographicPoint(35.27707,136.24557),...south([[730,565],[1023,714]])],
@@ -252,23 +298,38 @@ export const SCHOOL_INNER_BANK = [INNER_MOAT_OUTER[0],...schoolView([[986,693],[
   [935,233],[947,192],[953,151],[961,107],[971,75],[980,42],[976,17],
   [961,-12],[937,-35],[916,-58],[935,-100],[952,-153],[992,-224]])];
 export const WEST_INNER_WATER = [...SCHOOL_INNER_BANK,...[...CASTLE_WEST_BANK].reverse(),INNER_MOAT_INNER[0]];
-const schoolEastSeam = (()=>{
-  const [a,b]=INNER_MOAT_OUTER.slice(2,4),t=(-220-a[0])/(b[0]-a[0]);
-  return [-220,a[1]+(b[1]-a[1])*t];
-})();
+// Clip the shared shoreline at the ownership seam. Its source vertex count can change
+// when a shoreline review adds real corners, so an array index cannot locate this join.
+const schoolCoast = [];
+for (let i = 0; i < INNER_MOAT_OUTER.length; i++) {
+  const p = INNER_MOAT_OUTER[i];
+  if (p[0] <= -220) schoolCoast.push(p);
+  else {
+    const a = INNER_MOAT_OUTER[i - 1], t = (-220 - a[0]) / (p[0] - a[0]);
+    schoolCoast.push([-220, a[1] + (p[1] - a[1]) * t]);
+    break;
+  }
+}
 export const SCHOOL_LAND = [...SCHOOL_BANK,...w([[820,136],[848,147],[852,157]]),
-  ...[...SCHOOL_INNER_BANK].reverse().slice(1),...INNER_MOAT_OUTER.slice(1,3),schoolEastSeam];
+  ...[...SCHOOL_INNER_BANK].reverse().slice(1),...schoolCoast.slice(1)];
 export const WEST_BUILDINGS = [
-  building('nishi-north', 'Hikone Nishi Junior High north classroom', schoolView([[650,278],[782,370],[764,395],[632,303]]), 9.6,'metal',1.5),
-  building('nishi-stair', 'Hikone Nishi Junior High north return', schoolView([[683,234],[710,253],[679,297],[652,278]]), 9.6),
-  building('nishi-main', 'Hikone Nishi Junior High main classroom', schoolView([[690,355],[767,409],[747,438],[670,384]]), 10.2,'metal',2),
-  building('nishi-wing', 'Hikone Nishi Junior High south wing', schoolView([[791,374],[832,403],[818,423],[777,394]]), 6.6,'metal',1.6),
-  building('nishi-gym', 'Hikone Nishi Junior High gymnasium', schoolView([[629,319],[683,357],[635,425],[581,387]]), 9.0, 'red', 3),
-  building('moat-timber-house', 'Observed two-storey timber house beside the inner moat', schoolView([[841,456],[871,477],[845,514],[815,493]]), 5.4, 'tile', 2.1),
-  building('moat-store', 'Observed low tiled store', schoolView([[869,472],[895,490],[872,523],[846,505]]), 3.2, 'tile', 1.5),
-  building('school-lane-shed', 'Observed gabled shed by the school lane', schoolView([[794,473],[822,493],[807,514],[779,494]]), 3.4, 'metal', 1.3),
+  building('nishi-north', 'Hikone Nishi Junior High north classroom', registeredFootprint('nishi-north'), 9.6,'metal',1.5),
+  building('nishi-stair', 'Hikone Nishi Junior High north return', registeredFootprint('nishi-stair'), 9.6),
+  building('nishi-main', 'Hikone Nishi Junior High main classroom', registeredFootprint('nishi-main'), 10.2,'metal',2),
+  building('nishi-wing', 'Hikone Nishi Junior High south wing', registeredFootprint('nishi-wing'), 6.6,'metal',1.6),
+  building('nishi-gym', 'Hikone Nishi Junior High gymnasium', registeredFootprint('nishi-gym'), 9.0, 'red', 3),
+  building('moat-timber-house', 'Observed two-storey timber house beside the inner moat', registeredFootprint('moat-timber-house'), 5.4, 'tile', 2.1),
+  building('moat-store', 'Observed low tiled store', registeredFootprint('moat-store'), 3.2, 'tile', 1.5),
+  building('school-lane-shed', 'Observed gabled shed by the school lane', registeredFootprint('school-lane-shed'), 3.4, 'metal', 1.3),
 ];
-export const SCHOOL_LANES = [[CASTLE_CAMPUS_LINK[7],...schoolView([[750,539],[780,488],[811,443]])]];
+export const SCHOOL_VILLA = {footprint:registeredFootprint('school-villa'),height:6.2,rise:2.6,eave:.8};
+export const SCHOOL_TENNIS_COURTS = [1,2,3,4,5].map(i=>registeredFootprint('tennis-'+i));
+// The public junction remains photo/OSM-registered; GSI locates the northern segment.
+export const SCHOOL_LANES = [
+  [CASTLE_CAMPUS_LINK[7],...SCHOOL_ACCESS.slice(1)],
+  SCHOOL_LOOP.slice(-3).toReversed(),
+  roundedRoute([SCHOOL_ACCESS[2],...SCHOOL_LOOP.slice(0,4).toReversed().slice(1)],WALKED_STREET_PROFILE.backLaneTurnRadius),
+];
 export const SCHOOL_LOT = schoolView([[790,531],[887,600],[850,650],[751,580]]);
 export const SCHOOL_LOT_ENTRY = schoolView([[790,611],[804,595],[829,580]]);
 export const SCHOOL_COURT = schoolView([[770,415],[812,444],[776,495],[734,466]]);
@@ -286,6 +347,19 @@ export const SCHOOL_STREET_DETAIL = {
   poles: schoolView([[730,543],[803,512],[857,553],[913,611],[958,713]]),
   board: schoolView([[775,483]])[0],
 };
+// The detailed junction bed owns the old cherry; the former generic duplicate blocked its west arm.
+SCHOOL_STREET_DETAIL.broadleaf = SCHOOL_STREET_DETAIL.broadleaf.slice(1);
+SCHOOL_STREET_DETAIL.poles[0] = WALKED_STREET_PROFILE.junctionUtilityPole;
+// The lot rope owns this boundary. Its speculative extra fence crossed the mapped back lane.
+SCHOOL_STREET_DETAIL.fence = [];
+// The fence plinth owns the tennis edge. The older extra stone runs crossed asphalt.
+SCHOOL_STREET_DETAIL.stone = SCHOOL_STREET_DETAIL.stone.slice(0,1);
+const lotEdge = x => streetEdgeAtX(schoolRoad,x,-4.15);
+SCHOOL_STREET_DETAIL.rope = [
+  [-517,-502].map(lotEdge),
+  [...[-484,-463].map(lotEdge),...[-457,-513].map(x=>streetEdgeAtX(SCHOOL_LOOP.slice(1,4),x,4.15))],
+];
+SCHOOL_STREET_DETAIL.poles.at(-1)[0] = -394.9;
 export const UNIVERSITY_FIELDS = [
   { id:'small-ground', footprint:north([[211,312],[322,391],[265,485],[139,397]]), material:'ART_Sand' },
   { id:'school-ground', footprint:w([[750,306],[807,328],[751,427],[698,391]]), material:'ART_Sand' },
@@ -306,8 +380,8 @@ export const UNIVERSITY_ITEMS = ['ART_ShigaCampus','ART_WestMoat'].map(a =>
 export const UNIVERSITY_DATA = { apron:w([[618,566],[625,549],[611,541],[589,531],[576,534],[540,514],[533,521],[565,544]]), buildings:UNIVERSITY_BUILDINGS, land:UNIVERSITY_LAND,
   gatehouse:UNIVERSITY_GATEHOUSE, neighbors:UNIVERSITY_NEIGHBORS, paving:UNIVERSITY_PAVING, parking:UNIVERSITY_PARKING,
   detail:UNIVERSITY_STREET_DETAIL, frontLane:UNIVERSITY_FRONT_LANE,
-  schoolLanes:SCHOOL_LANES, schoolLot:SCHOOL_LOT, schoolLotEntry:SCHOOL_LOT_ENTRY, schoolDetail:SCHOOL_STREET_DETAIL,
-  outerMoatStreet:INNER_MOAT_ROAD,
+  schoolLanes:SCHOOL_LANES, schoolLaneHalfWidth:WALKED_STREET_PROFILE.schoolLaneHalfWidth, schoolLot:SCHOOL_LOT, schoolLotEntry:SCHOOL_LOT_ENTRY, schoolDetail:SCHOOL_STREET_DETAIL,
+  outerMoatStreet:INNER_MOAT_ROAD, localLanes:INNER_RESIDENTIAL_LANES, tennisFrontage:TENNIS_FRONTAGE, gateDrive:UNIVERSITY_GATE_DRIVE, gateDriveHalfWidth:WALKED_STREET_PROFILE.campusDriveHalfWidth,
   schoolCourt:SCHOOL_COURT, schoolPool:SCHOOL_POOL,
   boundary:UNIVERSITY_BOUNDARY, link:CASTLE_CAMPUS_LINK, forecourt:UNIVERSITY_FORECOURT,
   castleBank:[INNER_MOAT_INNER[0],...CASTLE_WEST_BANK], schoolInnerBank:SCHOOL_INNER_BANK,
@@ -317,3 +391,5 @@ export const UNIVERSITY_DATA = { apron:w([[618,566],[625,549],[611,541],[589,531
   moat:WEST_MOAT, townBank:MIDDLE_MOAT_TOWN_BANK, schoolLand:SCHOOL_LAND, innerWater:WEST_INNER_WATER,
   schoolBuildings:WEST_BUILDINGS, fields:UNIVERSITY_FIELDS, gateDetail:UNIVERSITY_GATE_DETAIL };
 UNIVERSITY_DATA.schoolGateEntry=SCHOOL_GATE_ENTRY;
+UNIVERSITY_DATA.schoolVilla=SCHOOL_VILLA;
+UNIVERSITY_DATA.tennisCourts=SCHOOL_TENNIS_COURTS;

@@ -191,13 +191,18 @@ def clip_existing_face(points):
     return result
 
 
-def skirts(pieces, original_points):
+def skirts(pieces, original_points, material):
     """Vertical closures from a clipped ground face down to the moat datum, where the seam meets
     mapped water. Land/road seams keep the fill's own step faces and stay walkable.
 
     Only near-horizontal faces receive them; cut walls/roofs are already closed volumes.
     Faces point away from the retained piece.
     """
+    # Clipped leaves and roof planes are not ground. Closing them to water datum
+    # made full-height stone curtains beside the Omotemon bridge.
+    if material not in {'HK_Grass', 'HK_Soil', 'HK_Asphalt', 'HK_Sidewalk', 'HK_Curb',
+                        'ART_Sand', 'ART_Gravel', 'ART_ApronAsphalt'}:
+        return []
     a, c, d = original_points[:3]
     u, v = [c[i] - a[i] for i in range(3)], [d[i] - a[i] for i in range(3)]
     n = (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
@@ -252,7 +257,7 @@ def clip_existing_builder(b):
                     continue
             original([Vector((-x,-z,y)) for x,y,z in p], material, pigment, smooth, detail)
         if changed:
-            for quad in skirts(pieces, points):
+            for quad in skirts(pieces, points, material):
                 original([Vector((-x,-z,y)) for x,y,z in reversed(quad)], 'HK_Stone', SKIRT)
     b.polygon = polygon
     return b
@@ -294,7 +299,7 @@ def clip_finished_builder(b, origin):
             b.polygon([Vector((-(x-origin[0]),-(z-origin[2]),y-origin[1])) for x,y,z in p],
                       b.materials[old['slots'][i]],pigment,old['smooth'][i],old['details'][i])
         if not same:
-            for quad in skirts(pieces, points):
+            for quad in skirts(pieces, points, b.materials[old['slots'][i]]):
                 b.polygon([Vector((-(x-origin[0]),-(z-origin[2]),y-origin[1])) for x,y,z in reversed(quad)],
                           'HK_Stone',SKIRT,False,0)
     face_map[len(old['faces'])] = len(b.faces)
@@ -419,6 +424,9 @@ def shore_height(x,z):
     return bank_height(x,z)
 
 
+BANK_CORNER = [[(-37.78,447.8),(-23.06,445.34),(-24.4,488.2)], [(-37.78,447.8),(-24.4,488.2),(-71,487.1)]]
+
+
 def seam_faces():
     """Close retained road/plot steps at ownership cuts using the exported ground profiles."""
     with open(os.path.join(ROOT,'data','road_tiles.json')) as f:
@@ -521,7 +529,6 @@ def build(name, mesh_class, lod=False):
             flat(b, pieces, .01, material)
         for material, pieces in grounds.items():
             flat(b, pieces, .15, material)
-        flat(b, d['paint'], .022, 'HK_WhitePaint')
         # Expose the true mapped shoreline against the existing project's water datum.
         for a,c in water_edges():
             if not crop_edge(a,c):
@@ -529,6 +536,9 @@ def build(name, mesh_class, lod=False):
                         (c[0],shore_height(*c),c[1]),(c[0],-1.35,c[1])], 'HK_Stone', strokes=False)
         for face in seam_faces():
             b.face(face,'HK_Sidewalk',strokes=False)
+        # The mapped moat edge and the owned castle approach leave this bank corner to neither
+        # model. A centimetre under the plots, so the closure never competes with their lawn.
+        flat(b, BANK_CORNER, .14, 'HK_Grass')
     elif name in REGION_MODELS:
         for building in d['buildings']:
             if building_region(building) == name:

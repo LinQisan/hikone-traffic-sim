@@ -12,7 +12,7 @@ import { createReplayCyclist, ridingTrack, sampleRide } from './replay-cyclist.j
 import { classifyCrash, crashMotion, bicycleMotion } from '../../simulation/collision/crash.ts';
 import { BODY_SIZE } from '../../simulation/traffic/Traffic.ts';
 import { buildCockpit } from './cockpit.js';
-import { ReplayCamera, replaySampleTimes } from '../camera/replay-camera.js';
+import { ReplayCamera, replaySampleTimes } from '../camera/ReplayCamera.ts';
 import { GroundContact } from '../scene/ground-contact.js';
 import { ParticipantReplayCamera } from '../camera/ParticipantReplayCamera.ts';
 import { EYE_RATIO } from '../controls/Player.ts';
@@ -41,7 +41,7 @@ export class Replay {
     this.materials = materials;
     this.ground = ground;
     this.camera = new THREE.PerspectiveCamera(50, 16 / 9, 0.3, 900);
-    this.overview = new ReplayCamera(this.camera, ground, cameraObstacles);
+    this.overview = new ReplayCamera(this.camera, ground);
     this.cameraObstacles = cameraObstacles;
     this.focus = this.overview.focus;
     this.reducedMotion = false;
@@ -70,7 +70,7 @@ export class Replay {
     this.time = this.start_;
     this.atEnd = false;
     this.playing = true;
-    this.overview.obstacles = parked && this.cameraObstacles ? this.cameraObstacles.withRoot(parked) : this.cameraObstacles;
+    const cameraObstacles = parked && this.cameraObstacles ? this.cameraObstacles.withRoot(parked) : this.cameraObstacles;
     this.root = new THREE.Group();
     this.scene.add(this.root);
     this.root.add(this.driverCamera);
@@ -166,26 +166,29 @@ export class Replay {
       const centre = person.getCenter(new THREE.Vector3());
       const targets = [centre, new THREE.Vector3(centre.x, person.min.y + 0.15, centre.z),
         new THREE.Vector3(centre.x, person.max.y - 0.1, centre.z)];
+      const subjects = [{role: 'participant', bounds, targets}];
       const blockers = [];
       for (const [id, { mesh, track }] of this.cars) if (sample(track, t)) {
-        blockers.push({ bounds: bodyBounds(mesh), ignoreFrom: id === carId ? 3 : Infinity });
+        blockers.push({id, bounds: bodyBounds(mesh), reference: id === carId});
       }
       const accident = this.cars.get(carId)?.mesh;
       if (accident && sample(car, t)) {
         const carBounds = bodyBounds(accident);
         const carCentre = carBounds.getCenter(new THREE.Vector3());
         if (centre.distanceTo(carCentre) < 32) {
-          bounds.union(carBounds);
+          const vehicleTargets = [];
           // Front and rear targets keep the approaching vehicle readable, not just its roof pin.
           const c = sample(car, t), a = yawToThree(c.yaw);
           const forward = new THREE.Vector3(Math.sin(a), 0, Math.cos(a));
-          targets.push(carCentre, carCentre.clone().addScaledVector(forward, this.driverSize[2] * 0.4),
+          vehicleTargets.push(carCentre, carCentre.clone().addScaledVector(forward, this.driverSize[2] * 0.4),
             carCentre.clone().addScaledVector(forward, -this.driverSize[2] * 0.4));
+          subjects.push({role: 'vehicle', bounds: carBounds, targets: vehicleTargets});
         }
       }
-      samples.push({ t, bounds, targets, blockers });
+      samples.push({t, subjects, blockers});
     }
-    this.overview.start(samples, referenceTime, angle, this.reducedMotion);
+    this.overview.configure({reducedMotion: this.reducedMotion});
+    this.overview.start({samples, referenceTime, preferredAngle: angle, obstacles: cameraObstacles});
     this.frame(this.start_);
   }
 
@@ -239,20 +242,15 @@ export class Replay {
     this.reducedMotion = value;
     this.participantCamera.reducedMotion = value;
     if (this.playing) {
-      this.overview.reducedMotion = value;
-      this.overview.plan();
+      this.overview.configure({reducedMotion: value});
       this.frame(this.time);
     }
   }
 
   /** Reserve the screen covered by the replay controls, including wrapped phone layouts. */
   setViewport(aspect, bottomInset = 0) {
-    const inset = Math.max(0, Math.min(0.65, Math.ceil(bottomInset * 50) / 50));
-    if (this.camera.aspect === aspect && this.overview.bottomInset === inset) return;
-    this.overview.bottomInset = inset;
-    // Shift the lens, keeping the subject in the centre of the unobscured part of the canvas.
-    this.camera.setViewOffset(aspect, 1, 0, inset / 2, aspect, 1);
-    if (this.playing) { this.overview.plan(); this.frame(this.time); }
+    this.overview.configure({aspect, bottomInset});
+    if (this.playing) this.frame(this.time);
   }
 
   /**
@@ -354,9 +352,7 @@ export class Replay {
 
   stop() {
     this.playing = false;
-    this.overview.track = [];
-    this.overview.samples = null;
-    this.overview.obstacles = this.cameraObstacles;
+    this.overview.stop();
     if (this.cockpit) {
       this.cockpit.root.removeFromParent();
       this.cockpit.dispose();

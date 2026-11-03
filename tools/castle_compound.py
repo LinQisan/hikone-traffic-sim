@@ -101,7 +101,7 @@ def retaining_walls(b, terrace):
                     x, z = a[0] + (c[0] - a[0]) * u, a[1] + (c[1] - a[1]) * u
                     x, z = cx + (x - cx) * (1 + (1 - v) * 0.12), cz + (z - cz) * (1 + (1 - v) * 0.12)
                     pts.append((x - site['x'], top - 5 * (1 - v), z - site['z']))
-                outward_face(b, pts, 'ART_StoneLight' if (row + col) % 3 else 'HK_Stone',
+                outward_face(b, pts, 'ART_CastleStone',
                              (cx - site['x'], top - 2.5, cz - site['z']))
 
 

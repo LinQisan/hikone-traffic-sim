@@ -245,7 +245,7 @@ def building(b, item):
 def low_wall(b, line, top, seed, inside):
     """Mortared rubble: a dark core with low-relief stones, as 1042 and 1036."""
     for i, (a, c) in enumerate(zip(line, line[1:])):
-        masonry(b, tuple(a), tuple(c), .15, top, inside(a), seed + i, batter=.03, scale=.42)
+        masonry(b, tuple(a), tuple(c), .15, top, inside(a), batter=.03)
 
 
 def wall_side(line, sign):
@@ -292,10 +292,11 @@ def concrete_block_wall(b, line, top, seed):
 
 
 def hedge(b, line, seed):
-    """1042: multi-stemmed shrubs cut into a loose row, not a solid box."""
+    """1071/1072: clipped shrubs over the low stone wall, below the street lamps."""
     from vegetation import _tuft
     from abstract_props import cylinder
     rng, stems = random.Random(seed), random.Random(seed + 1)
+    profile = data()['hedgeProfile']
     for a, c in zip(line, line[1:]):
         length = math.dist(a, c)
         count = max(1, int(length / 1.3))
@@ -309,10 +310,10 @@ def hedge(b, line, seed):
             for k in range(7):
                 material = 'HK_LeafDark' if rng.random() < .6 else 'HK_LeafDeep'
                 size = rng.uniform(.42, .68)
-                centre_point = (x + rng.uniform(-.85, .85), rng.uniform(1.25, 2.9), z + rng.uniform(-.55, .55))
+                centre_point = (x + rng.uniform(-.85, .85), profile['base'] + profile['height'] * rng.uniform(.35, .65), z + rng.uniform(-.55, .55))
                 angle = rng.uniform(0, 6)
                 if not b.distant or k % 2 == 0 or i == 0 or i == count - 1:
-                    _tuft(b, centre_point, (size, size * .85, size * .9), angle, material, seed + i * 11 + k, False)
+                    _tuft(b, centre_point, (size, profile['height'] * .40, size * .9), angle, material, seed + i * 11 + k, False)
 
 
 def ditch(b, line):
@@ -331,14 +332,6 @@ def surface(b, ring, y, material, tone):
     from road_network import ccw, triangulate
     for t in triangulate(ccw([tuple(p) for p in ring])):
         face(b, [(x, y, z) for x, z in t], material, (t[0][0], y - 1, t[0][1]), tone)
-
-
-def lane(b, line, width, tone=(.40, .41, .44)):
-    for a, c in zip(line, line[1:]):
-        length = math.dist(a, c)
-        n = -(c[1] - a[1]) / length * width / 2, (c[0] - a[0]) / length * width / 2
-        quad = [(a[0] + n[0], .163, a[1] + n[1]), (c[0] + n[0], .163, c[1] + n[1]), (c[0] - n[0], .163, c[1] - n[1]), (a[0] - n[0], .163, a[1] - n[1])]
-        face(b, quad, 'HK_Asphalt', (a[0], 0, a[1]), tone)
 
 
 def pole(b, x, z, top=10.5):
@@ -507,10 +500,11 @@ def build(name, mesh_class, lod=False):
     b = mesh_class(name)
     b.abstract, b.distant = True, lod
     q = data()
+    from university import data as university_data
+    tennis = university_data()['tennisFrontage']
+    q = dict(q, lot={**q['lot'], **tennis})
     surface(b, q['carPark']['ring'], .162, 'ART_Gravel', (.68, .64, .57))
-    lanes = q['lanes']
-    for key in ('south', 'back', 'north'):
-        lane(b, lanes[key], lanes['width'])
+    # Local lanes are asphalt in university.plan, including Ground and collision.
     for item in q['buildings']:
         building(b, item)
     for line in q['ditch']:
@@ -534,6 +528,7 @@ def build(name, mesh_class, lod=False):
     no_parking(b, *q['noParking'][0], (0, -1))
     no_parking(b, *q['noParking'][1], (0, 1))
     mirror(b, *q['mirror'])
-    rust_fence(b, [tuple(p) for p in q['lot']['fence']])
+    for run in q['lot']['fenceRuns']:
+        rust_fence(b, [tuple(p) for p in run])
     lot_details(b, q['lot'])
     return b

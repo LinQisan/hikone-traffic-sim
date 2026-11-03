@@ -3,6 +3,7 @@
 // There is no screen-space oil-paint pass; desktop and mobile render the same models.
 import * as THREE from 'three';
 import { brushTexture } from './paint-texture.js';
+import { stoneTexture } from './stone-texture.ts';
 import { ambientMotion } from './ambient-motion.js';
 
 export const LIGHT = {
@@ -52,6 +53,7 @@ const PIGMENTS = {
   HK_Bark: [[0.65, 0.48, 0.32], [0.44, 0.44, 0.54]],
   HK_Stone: [[0.89, 0.81, 0.63], [0.55, 0.66, 0.83]],
   HK_StoneDark: [[0.80, 0.72, 0.59], [0.50, 0.60, 0.78]],
+  ART_CastleStone: [[0.89, 0.81, 0.63], [0.55, 0.66, 0.83]],
   HK_Leaf: [[0.78, 0.78, 0.46], [0.35, 0.53, 0.48]],
   HK_LeafDark: [[0.69, 0.73, 0.44], [0.32, 0.49, 0.46]],
   HK_LeafDeep: [[0.42, 0.52, 0.34], [0.20, 0.33, 0.34]],
@@ -82,10 +84,10 @@ const SOFT_DABS = {HK_Asphalt: 0.3, HK_Sidewalk: 0.32, HK_Curb: 0.36, ART_Boulde
 const STREET_METAL = new Set(['HK_MetalLight', 'ART_SignalPole', 'ART_SignalHousing',
   'ART_SignalHood', 'ART_SignalHousingDark', 'ART_SignalHoodDark']);
 
-/** Warm/cool pigments, brush strength and surface family (0 ordinary, 1 leaves, 2 street metal). */
+/** Warm/cool pigments and surface family (0 ordinary, 1 leaves, 2 street metal, 3 stone). */
 export function pigmentOf(name) {
   const pigments = PIGMENTS[name];
-  const surface = LEAVES.has(name) ? 1 : STREET_METAL.has(name) ? 2 : 0;
+  const surface = LEAVES.has(name) ? 1 : STREET_METAL.has(name) ? 2 : name === 'ART_CastleStone' ? 3 : 0;
   const dab = surface === 1 ? 0.43 : surface === 2 ? 0.60
     : SOFT_DABS[name] ?? ((name.startsWith('ART_') && !pigments) || name === 'HK_KeiPaint' ? 0 : pigments ? 0.65 : 0.12);
   return {
@@ -103,6 +105,7 @@ const DAB_FRAGMENT = `
         if (hkSurface < 0.5 || hkSurface > 1.5) {
         vec3 hkAn = abs(normalize(vHkNormal));
         vec2 hkP = hkAn.y > max(hkAn.x, hkAn.z) ? vHkWorld.xz : (hkAn.x > hkAn.z ? vHkWorld.zy : vHkWorld.xy);
+        if (hkSurface > 2.5) diffuseColor.rgb = texture2D(hkStone, hkP / vec2(32.0, 16.0)).rgb;
         float hkRipple = 0.0, hkGlint = 0.0;
         if (hkWater > 0.5) {
           float a = dot(vHkWorld.xz, vec2(0.95, 0.26)) * 2.6 - hkTime * 1.2;
@@ -111,10 +114,10 @@ const DAB_FRAGMENT = `
           hkGlint = pow(max(0.0, sin(a) * cos(b)), 6.0);
           hkP += vec2(0.12, 0.035) * hkTime + vec2(sin(b), sin(a)) * 0.075;
         }
-        if (hkSurface > 1.5) hkP = vec2(vHkWorld.x + vHkWorld.z * 0.61, vHkWorld.y);
+        if (hkSurface > 1.5 && hkSurface < 2.5) hkP = vec2(vHkWorld.x + vHkWorld.z * 0.61, vHkWorld.y);
         vec2 hkQ = mat2(0.86, -0.51, 0.51, 0.86) * hkP;
         float hkScale = hkAn.y > 0.7 ? 2.3 : 3.7;
-        vec2 hkBrushScale = hkSurface > 1.5 ? vec2(22.0, 2.4)
+        vec2 hkBrushScale = hkSurface > 1.5 && hkSurface < 2.5 ? vec2(22.0, 2.4)
           : vec2(hkScale, hkScale * 1.35);
         vec4 hkStroke = texture2D(hkBrush, hkQ * hkBrushScale / 32.0);
         vec2 hkDab = hkStroke.rg;
@@ -137,6 +140,7 @@ const DAB_FRAGMENT = `
 function injectPaint(shader, { vertexDeclarations = '', vertexBody = '', fragmentDeclarations, dabs = true, emissive = '' }) {
   shader.uniforms.hkStrength = paint.strength;
   shader.uniforms.hkBrush = { value: brushTexture() };
+  shader.uniforms.hkStone = { value: stoneTexture() };
   shader.uniforms.hkTime = ambientMotion.time;
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>
@@ -161,6 +165,7 @@ function injectPaint(shader, { vertexDeclarations = '', vertexBody = '', fragmen
     .replace('#include <common>', `#include <common>
       uniform float hkStrength;
       uniform sampler2D hkBrush;
+      uniform sampler2D hkStone;
       uniform float hkTime;
       varying vec3 vHkWorld;
       varying vec3 vHkNormal;
@@ -197,7 +202,7 @@ export function painted(material) {
     injectPaint(shader, { dabs, fragmentDeclarations: 'uniform vec3 hkWarm;\nuniform vec3 hkCool;\nuniform float hkDabStrength;\nuniform float hkSurface;\n'
       + '#define hkWater ' + (material.name === 'HK_Water' ? '1.0' : '0.0') });
   };
-  material.customProgramCacheKey = () => 'hk-cached-pigment-v7-' + dabs + '-' + (material.name === 'HK_Water');
+  material.customProgramCacheKey = () => 'hk-cached-pigment-v8-' + dabs + '-' + (material.name === 'HK_Water');
   return material;
 }
 
@@ -207,7 +212,7 @@ export function painted(material) {
  * material lets an asset draw in one call instead of one call per colour.
  */
 export class PigmentPalette {
-  static ROWS = 64;
+  static ROWS = 128;
   constructor() {
     this.rows = new Map();
     this.data = new Float32Array(3 * PigmentPalette.ROWS * 4);
@@ -282,7 +287,7 @@ export class PigmentPalette {
       if (fogScale !== 1) shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>',
         `#include <fog_vertex>\n#ifdef USE_FOG\nvFogDepth *= ${fogScale.toFixed(3)};\n#endif`);
     };
-    material.customProgramCacheKey = () => 'hk-palette-v5-' + fogScale;
+    material.customProgramCacheKey = () => 'hk-palette-v6-' + fogScale;
     this.materials.set(key, material);
     return material;
   }

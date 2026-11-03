@@ -61,7 +61,7 @@ interface RunBase {
   impact: {time: number; car: TrafficCar; kmh: number; x?: number; z?: number; binding?: Binding | null} | null;
   impactUntil: number; frames: ReplayFrame[]; replaySource: 'impact' | 'success' | 'summary';
 }
-interface PracticeRun extends RunBase {kind: 'practice'; scenario: Scenario}
+interface PracticeRun extends RunBase {kind: 'practice'; scenario: Scenario; successReview: {remaining: number} | null}
 interface ExplorationRun extends RunBase {
   kind: 'explore'; scenario: Pick<Scenario, 'name' | 'playerMode'>;
   log: SessionLog; travelled: number; rulesSeen: {red: number; unchecked: number; wrongWay: boolean};
@@ -207,6 +207,7 @@ const replayObserver = new ResizeObserver(replayViewport);
 replayObserver.observe(replayRoot); scope.own(() => replayObserver.disconnect());
 addEventListener('resize', replayViewport, {signal: scope.signal});
 const touchDevice = isTouchDevice();
+if (touchDevice) env.setDetail(0.75);
 ui.patch('presentation', {touch: touchDevice});
 const touch = new TouchControls(player, renderer.domElement, touchRoot, active => ui.patch('presentation', {touchActive: active}));
 scope.own(() => touch.dispose());
@@ -250,6 +251,14 @@ if (params.get('play') === 'editor') {
     customScenario = await readScenario(text);
   } catch (e) { editorProblem = errorMessage(e); }
 }
+// Programs compile and buffers upload when first drawn: left to the walk, a batch's first
+// appearance is a 400 ms stall on this laptop. Do both once behind the loading screen.
+status('表示の準備をしています… / Preparing shaders…');
+light.sun.shadow.needsUpdate = true;                    // also meets the depth programs, once with every level
+await env.withAllLevels(async () => {await renderer.compileAsync(scene, camera); renderer.render(scene, camera);});
+light.sun.shadow.needsUpdate = true;
+scope.check();
+startupMark('shadersReady');
 renderTitle();
 loading.done();
 startupMark('menuReady');
@@ -264,6 +273,7 @@ if (editorProblem) {
 // ---------------------------------------------------------------- run
 let state: Screen = 'title';
 let activeRun: Run | null = null;
+const SUCCESS_REVIEW_DELAY = 0.25, IMPACT_REVIEW_DELAY = 0.65;
 const requireRun = () => {if (!activeRun) throw new Error('No active simulation'); return activeRun;};
 const requireExploration = () => {const run = requireRun(); if (run.kind !== 'explore') throw new Error('Not exploring'); return run;};
 let resultsKind: 'success' | 'accident' | 'incident' | 'summary' | null = null;                      // 'success' | 'accident' (practice), 'incident' | 'summary' (exploration)
@@ -283,7 +293,7 @@ async function start(again = false) {
       canSee: (car, participant) => obstacles.clearSight(car, participant) }),
     recorder: new Recorder(), recordingHead: {}, participant: {x: 0, z: 0},
     cars: new Map(), carFrame: 0, parked: new THREE.Group(), impact: null,
-    lastX: 0, lastZ: 0, impactUntil: 0, frames: [], replaySource: 'impact',
+    lastX: 0, lastZ: 0, impactUntil: 0, frames: [], replaySource: 'impact', successReview: null,
   };
   obstacles.setTraffic(run.traffic.cars);
   signals.update(0);
@@ -586,11 +596,11 @@ function onImpact(car: TrafficCar) {
   player.enabled = false;
   document.exitPointerLock?.();
   setState('impact');
-  // the view falls with the body; the replay starts once the recording covers 1.6 s after contact
+  // Show the initial fall, then finish the recording tail before entering replay.
   player.knockDown(car.yaw);
   touch.setActive(false);
   ui.patch('hud', {visible: false});
-  run.impactUntil = run.time + SECONDS_AFTER_IMPACT;
+  run.impactUntil = run.time + IMPACT_REVIEW_DELAY;
   flash(true);
   announce('車と接触しました。 / Contact with a car.');
   navigator.vibrate?.(300);
@@ -612,6 +622,8 @@ function beginReplay() {
 
 function beginSuccessReplay() {
   const run = requireRun();
+  if(run.kind==='practice')run.successReview=null;
+  ui.patch('toast',{visible:false});
   player.enabled = false;
   document.exitPointerLock?.();
   touch.setActive(false);
@@ -622,6 +634,26 @@ function beginSuccessReplay() {
   ui.patch('replay', {visible: true, title: 'ゴールまでのリプレイ / Goal replay', next: 'スキップ / Skip',
     hint: 'ゴールまでの動きを振り返ります。スキップをクリックすると結果へ進みます。'});
   playReplay(run.frames, null, nearestReplayCar(run.frames));
+}
+
+function onSuccess(run: PracticeRun) {
+  player.enabled=false;
+  touch.setActive(false);
+  document.exitPointerLock?.();
+  run.recorder.capture(run.time,player.head(run.recordingHead),run.traffic.cars,true);
+  run.recorder.stop();
+  run.successReview={remaining:SUCCESS_REVIEW_DELAY};
+  ui.patch('hud',{visible:false});
+  ui.patch('toast',{visible:true,tone:'good',text:'ゴールしました。リプレイで振り返ります。'});
+  announce('ゴールしました。リプレイで振り返ります。');
+}
+
+/** The complete post-contact clip is retained even though the live wait is shorter. */
+function recordImpactStep(run: Run, dt: number) {
+  run.time+=dt;
+  run.traffic.step(dt,run.kind==='explore'?run.participant:null);
+  player.update(dt);
+  run.recorder.capture(run.time,player.head(run.recordingHead),run.traffic.cars);
 }
 
 /** A kept contact clip of this session, from the session record. */
@@ -642,7 +674,7 @@ function playReplay(frames: ReplayFrame[], t: number | null, carId: number | nul
   ui.patch('replay', {view: replay.view, canViewDriver: !!replay.driverTrack?.length});
   light.invalidate();
   setState('replay');
-  announce(`${t == null ? 'ゴールしました。' : ''}リプレイです。俯瞰・体験者${carId == null ? '' : '・運転者'}の視点で見られます。 / Replay.`);
+  announce(`${t == null ? 'ゴールしました。' : ''}リプレイです。分析・体験者${carId == null ? '' : '・運転者'}の視点で見られます。 / Replay.`);
   ui.focus('next', true);
   ui.patch('hud', {visible: false});
 }
@@ -811,7 +843,10 @@ addEventListener('keydown', event => {
 let fpsTime = 0, fpsFrames = 0;
 function tick(dt: number) {
   const run = activeRun!;
-  if (state === 'playing' && run.kind === 'explore') {
+  if(state==='playing'&&run.kind==='practice'&&run.successReview){
+    run.successReview.remaining-=dt;
+    if(run.successReview.remaining<=1e-9)beginSuccessReplay();
+  } else if (state === 'playing' && run.kind === 'explore') {
     const steps = Math.max(1, Math.ceil(dt / EXPLORE_STEP - 1e-6));
     for (let i = 0; i < steps; i++) {
       const hit = exploreStep(dt / steps);
@@ -838,17 +873,18 @@ function tick(dt: number) {
     run.recorder.capture(run.time, player.head(run.recordingHead), run.traffic.cars);
     const hit = run.traffic.hit(player.x, player.z);
     if (hit) onImpact(hit);
-    else if (S.pointInArea([player.x, player.z], s.goal)) beginSuccessReplay();
+    else if (S.pointInArea([player.x, player.z], s.goal)) onSuccess(run);
   } else if (state === 'impact') {
-    run.time += dt;
-    // practice: only a car that does not stop (noStop) still moves; exploration: drivers see the fall
-    run.traffic.step(dt, run.kind === 'explore' ? run.participant : null);
+    recordImpactStep(run,dt);
     syncCars();
     // a short red flash at contact, then it fades (CSS) so the fall itself stays visible
     if (run.time - run.impact!.time > 0.2) flash(false);
-    player.update(dt);
-    run.recorder.capture(run.time, player.head(run.recordingHead), run.traffic.cars);
-    if (run.time >= run.impactUntil) beginReplay();
+    if (run.time >= run.impactUntil) {
+      const end=run.impact!.time+SECONDS_AFTER_IMPACT;
+      while(run.time<end-1e-9)recordImpactStep(run,Math.min(1/60,end-run.time));
+      run.recorder.capture(run.time,player.head(run.recordingHead),run.traffic.cars,true);
+      beginReplay();
+    }
   } else if (state === 'replay') {
     const label = replay.update(dt);
     if (ui.getSnapshot().replay.time !== label || ui.getSnapshot().replay.next !== (replay.atEnd ? '結果へ進む / Next' : 'スキップ / Skip')) ui.patch('replay', {time: label, next: replay.atEnd ? '結果へ進む / Next' : 'スキップ / Skip',
@@ -872,7 +908,11 @@ renderer.setAnimationLoop(() => {
   const elapsed = timer.getDelta();
   const dt = Math.min(elapsed, 0.1);
   // Resize before drawing: a canvas resized after its frame is drawn shows one blank frame.
-  if (resolution.frame(elapsed, performance.now(), document.hidden)) sizeRenderer();
+  if (resolution.frame(elapsed, performance.now(), document.hidden)) {
+    sizeRenderer();
+    // A GPU that cannot hold the frame at reduced resolution gets the nearer detail ranges too.
+    env.setDetail((touchDevice ? 0.75 : 1) * (resolution.scale < 0.7 ? 0.75 : 1));
+  }
   const updateStart = performance.now();
   tick(dt);
   if (street.active && street.update(dt)) reportStreet();

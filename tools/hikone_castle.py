@@ -154,7 +154,6 @@ def window(b, x, y, width, height, transform, bell=False):
 
 
 def stone_base(b):
-    rng = random.Random(8307)
     def edge(u, t, side):
         inset = 1 - (1 - t) ** 1.45
         w, d = 12.4 - 2.15 * inset, 11.35 - 1.95 * inset
@@ -162,29 +161,12 @@ def stone_base(b):
         if side == 1: return (w, 5.2 * t, (1 - 2 * u) * d)
         if side == 2: return ((1 - 2 * u) * w, 5.2 * t, -d)
         return (-w, 5.2 * t, (2 * u - 1) * d)
-    rows, columns = (4, 6) if b.distant else (6, 9)
+    rows = 6
     for side in range(4):
         for row in range(rows):
-            cuts = [0] + sorted((i + rng.uniform(-0.2, 0.2)) / columns for i in range(1, columns)) + [1]
-            for left, right in zip(cuts, cuts[1:]):
-                # Pigment seams follow the battered wall; no floating individual stone boxes.
-                points = [edge(left, row / rows, side), edge(right, row / rows, side),
-                          edge(right, (row + 1) / rows, side), edge(left, (row + 1) / rows, side)]
-                pigment = 'HK_Stone' if rng.random() < 0.28 else 'ART_StoneLight'
-                if b.distant:
-                    outward_face(b, points, pigment, (0, 2.6, 0))
-                else:
-                    outward_face(b, points, 'HK_StoneDark', (0, 2.6, 0))
-                    width = right - left
-                    outline = [(0.04, 0.18), (0.15, 0.035), (0.84, 0.04), (0.97, 0.21),
-                               (0.96, 0.80), (0.80, 0.97), (0.18, 0.95), (0.035, 0.78)]
-                    normal = [(0, 0, 1), (1, 0, 0), (0, 0, -1), (-1, 0, 0)][side]
-                    rock = []
-                    for u, v in outline:
-                        p = edge(left + width * (u + rng.uniform(-0.018, 0.018)),
-                                 (row + v + rng.uniform(-0.015, 0.015)) / rows, side)
-                        rock.append(tuple(p[k] + normal[k] * 0.025 for k in range(3)))
-                    outward_face(b, rock, pigment, (0, 2.6, 0))
+            points = [edge(0, row / rows, side), edge(1, row / rows, side),
+                      edge(1, (row + 1) / rows, side), edge(0, (row + 1) / rows, side)]
+            outward_face(b, points, 'ART_CastleStone', (0, 2.6, 0))
     box(b, (0, 5.14, 0), (20.5, 0.12, 18.8), 'HK_Stone')
     box(b, (0, 0.03, 0), (24.8, 0.06, 22.7), 'HK_StoneDark')
 

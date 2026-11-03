@@ -268,7 +268,7 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
       cellSize: ENVIRONMENT_CELLS[asset], batched: asset === 'ART_CastleApproach' };
   }));
   const palette = new PigmentPalette();
-  const noShadow = asset => /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(PavingDetails|MoatRoad|Kyobashi(Roads|Land|Water)))/.test(asset);
+  const noShadow = asset => /^(HK_(Road|Ground|Water|Terrain|Sign|Bollard|Guardrail|ChainFence)|ART_(PavingDetails|MoatRoad|RoadMarkings|Kyobashi(Roads|Land|Water)))/.test(asset);
   const environment = environmentInstances(definitions, palette, asset => !noShadow(asset));
   const shared = new Set(environment.root.children.map(m => m.material));
   const opaque = [...shared].filter(m => !m.transparent), glass = [...shared].filter(m => m.transparent);
@@ -402,7 +402,7 @@ test('the instanced city keeps every placement and triangle, draws in few calls 
 
 test('compact pigment rows retain linear colours, brush family, water identity and HDR emissive light', () => {
   const palette = new PigmentPalette();
-  for (const name of ['HK_Asphalt', 'HK_Sakura', 'HK_Water', 'HK_Leaf', 'ART_SignalPole', 'ART_SignalRed', 'ART_LampGlow']) {
+  for (const name of ['HK_Asphalt', 'HK_Sakura', 'HK_Water', 'HK_Leaf', 'ART_SignalPole', 'ART_SignalRed', 'ART_LampGlow', 'ART_CastleStone']) {
     const material = new THREE.MeshLambertMaterial({ name, emissive: 0xffa840, emissiveIntensity: 2 });
     const row = palette.row(material), pigment = pigmentOf(name), base = row * 12;
     const linear = value => new THREE.Color().setRGB(...value, THREE.SRGBColorSpace).toArray();
@@ -413,7 +413,7 @@ test('compact pigment rows retain linear colours, brush family, water identity a
     assert.equal(palette.row(material), row, 'reused source material keeps its row');
   }
   assert.equal(palette.texture.image.width, 3);
-  assert.equal(palette.texture.image.data.byteLength, 3072);
+  assert.equal(palette.texture.image.data.byteLength, 6144);
   palette.texture.dispose();
 });
 
@@ -500,4 +500,48 @@ test('desktop resolution steps down on a slow GPU, recovers with headroom and do
   const fixed = new AdaptiveResolution({ enabled: false });
   for (let i = 0; i < 100; i++) fixed.frame(1 / 10, i * 100);
   assert.equal(fixed.scale, 1);
+});
+
+test('a far level takes over beyond its range with hysteresis, and tiny placements stop drawing', () => {
+  const material = new THREE.MeshLambertMaterial({ name: 'Box' });
+  const box = size => [{ geometry: new THREE.BoxGeometry(size, size, size), material, matrix: new THREE.Matrix4() }];
+  const definition = { asset: 'Tree', items: [{ p: [0, 0, -300], r: 0, s: [1, 1, 1] }], high: box(4), low: box(4), far: box(4), lodDistant: 100 };
+  const small = { asset: 'Bollard', items: [{ p: [0, 0, -300], r: 0, s: [1, 1, 1] }], high: box(0.2), low: box(0.2) };
+  const env = environmentInstances([definition, small], new PigmentPalette(), () => false);
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 900);
+  const [tree, bollard] = env.assets;
+  env.updateLOD(camera);
+  assert.equal(tree.far.count, 1);
+  assert.equal(bollard.low.count + bollard.high.count, 0, 'below a pixel and a half it is not submitted');
+  camera.position.z = -205; env.updateLOD(camera);
+  assert.equal(tree.far.count, 1, 'within the hysteresis band the far level holds');
+  camera.position.z = -215; env.updateLOD(camera);
+  assert.equal(tree.low.count, 1);
+  assert.equal(tree.far.count, 0);
+  camera.position.z = 100; env.updateLOD(camera);
+  env.setDetail(0.5);
+  camera.position.z = -110; env.updateLOD(camera);
+  assert.equal(tree.far.count, 1, 'a lower detail scale pulls the switch nearer');
+  for (const mesh of env.root.children) mesh.geometry.dispose();
+});
+
+test('multi-draw cells keep the selection of separate meshes in one call per material', () => {
+  const plane = new THREE.PlaneGeometry(600, 40, 60, 4).rotateX(-Math.PI / 2).translate(-300, 0.2, -60);
+  const color = new THREE.BufferAttribute(new Float32Array(plane.attributes.position.count * 3).fill(1), 3);
+  plane.setAttribute('color', color);
+  const material = new THREE.MeshLambertMaterial({ name: 'Ground' });
+  const parts = [{ geometry: plane, material, matrix: new THREE.Matrix4() }];
+  const definition = { asset: 'Hill', items: [{ p: [0, 0, 0], r: 0, s: [1, 1, 1] }], high: parts, low: parts, cellSize: 64 };
+  const plain = environmentInstances([definition], new PigmentPalette(), () => true);
+  const batched = environmentInstances([definition], new PigmentPalette(), () => true, () => THREE.FrontSide, { multiDraw: true });
+  const camera = new THREE.PerspectiveCamera(70, 2, 0.1, 900);
+  camera.position.set(0, 2, -40); camera.lookAt(-300, 0, -60); camera.updateMatrixWorld();
+  plain.updateLOD(camera); batched.updateLOD(camera);
+  assert.equal(batched.root.children.filter(m => m.isBatchedMesh).length, 2, 'near and light levels use two materials');
+  assert.ok(batched.root.children.length < plain.root.children.length / 3, 'the cell meshes left the scene graph');
+  assert.deepEqual(batched.cells.map(c => [c.highMesh.visible, c.lowMesh.visible]), plain.cells.map(c => [c.highMesh.visible, c.lowMesh.visible]));
+  assert.equal(batched.cells[0].highMesh.geometry.attributes.position, undefined, 'cells keep no second copy of their vertices');
+  assert.ok(batched.cells[0].bounds.getSize(new THREE.Vector3()).x > 0, 'and still select by their bounds');
+  for (const mesh of plain.root.children) mesh.geometry.dispose();
+  for (const mesh of batched.root.children) mesh.dispose();
 });

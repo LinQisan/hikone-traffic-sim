@@ -376,13 +376,6 @@ def furniture(b):
             continue  # The gate-corner walls are now authored by nishi_school.
         from nishi_school import wall as boulder_wall
         boulder_wall(b,item)
-    # The photo's diagonal zebra and blue cycle crossing share the corrected road axis.
-    line=d['schoolRoad']['points'];a,c=line[-2],line[-3];length=math.dist(a,c);ux,uz=(c[0]-a[0])/length,(c[1]-a[1])/length;nx,nz=-uz,ux
-    x,z=-574.7,a[1]+(c[1]-a[1])*(-574.7-a[0])/(c[0]-a[0])
-    at=lambda u,y,v:(x+ux*u+nx*v,y,z+uz*u+nz*v)
-    for i in range(6):
-        u=-2.2+i*.82;face(b,[at(u,.023,-2.9),at(u+.4,.023,-2.9),at(u+.4,.023,2.9),at(u,.023,2.9)],'HK_WhitePaint',(x,0,z))
-    face(b,[at(-3.5,.022,-2.9),at(-2.8,.022,-2.9),at(-2.8,.022,2.9),at(-3.5,.022,2.9)],'HK_SignBlue',(x,0,z))
     # Small, photo-confirmed fan palms within the church garden, clear of the public street.
     for x,z,h in [(274,259,2.8),(275,267,3.5),(277,273,2.6)]:palm(b,x,z,h)
     # The low roadside shrine in 0895, behind the narrow shoulder (estimated dimensions).
@@ -402,27 +395,8 @@ def furniture(b):
 
 def road_details(b):
     from abstract_props import cylinder
-    from road_network import strip,face as ground_face
+    from road_network import sample,strip,face as ground_face
     from castle_approach import data as approach
-    # Green shoulders along the photo-confirmed inner-moat corridor, inside the existing
-    # seven-metre carriageway. The route's shoulders and datum are unchanged.
-    runs=[];route=[]
-    for a,c in zip(approach()['innerRoad'],approach()['innerRoad'][1:]):
-        dz=c[1]-a[1];lo,hi=0,1
-        if abs(dz)<1e-8:
-            if not 90<=a[1]<=348:continue
-        else:
-            s,t=sorted(((90-a[1])/dz,(348-a[1])/dz));lo,hi=max(lo,s),min(hi,t)
-            if lo>=hi:continue
-        p,q=[[a[j]+(c[j]-a[j])*t for j in (0,1)] for t in (lo,hi)]
-        if route and math.dist(route[-1],p)>.001:runs.append(route);route=[]
-        if not route:route=[p]
-        route.append(q)
-    if route:runs.append(route)
-    for side in (-1,1):
-        for lo,hi,mat in [(2.85,3.3,'ART_PathGreen'),(2.72,2.82,'HK_WhitePaint')]:
-            for route in runs:
-                for p in strip(route,side*lo,side*hi):ground_face(b,p,.023 if mat=='HK_WhitePaint' else .022,mat,False)
     # Segmented numerals observed at the high-school bend; no runtime speed-rule changes.
     target=(-89.3,174.4);best=None
     for a,c in zip(approach()['innerRoad'],approach()['innerRoad'][1:]):

@@ -590,11 +590,8 @@ def hotel(b):
 
 def street_line(b):
     from road_network import face as ground_face, ccw
-    # Edge lines on both sides, the footway's stone edge and the forecourt's parking marks.
+    # The footway's stone edge and the forecourt's parking marks.
     s = data()['street']
-    for o, material, width in ((s['road'][0] + .28, 'HK_WhitePaint', .14), (s['road'][1] - .28, 'HK_WhitePaint', .14)):
-        for p in band(o, o + width):
-            ground_face(b, p, .022, material, False)
     for p in band(s['road'][1] - .02, s['road'][1] + .28):
         ground_face(b, p, .024, 'HK_Curb', False)
     for z in range(304, 354, 6):
